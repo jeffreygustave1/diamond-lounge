@@ -4,23 +4,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Diamond Lounge Dashboard</title>
 
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
 <div class="dashboard">
 
-    <!-- SERVER BAR -->
-
     <div class="servers">
 
-        <div class="server-logo">
-            💎
-        </div>
+        <div class="server-logo">💎</div>
 
         <div class="server-icon">🎮</div>
         <div class="server-icon">🎵</div>
@@ -29,8 +25,6 @@
         <div class="server-icon">➕</div>
 
     </div>
-
-    <!-- CHANNELS -->
 
     <div class="channels">
 
@@ -63,8 +57,6 @@
 
     </div>
 
-    <!-- CHAT -->
-
     <div class="chat-area">
 
         <div class="chat-header">
@@ -96,7 +88,7 @@
             <input
                 type="text"
                 id="messageInput"
-                placeholder="Send a message...">
+                placeholder="Send a message..." />
 
             <button onclick="sendMessage()">
                 Send
@@ -105,8 +97,6 @@
         </div>
 
     </div>
-
-    <!-- ONLINE USERS -->
 
     <div class="members">
 
@@ -125,25 +115,7 @@
 
 </div>
 
-<script>
+<script src="script.js"></script>
 
-function sendMessage() {
-
-    const input =
-        document.getElementById("messageInput");
-
-    const message =
-        input.value.trim();
-
-    if(message === "") return;
-
-    const messages =
-        document.getElementById("messages");
-
-    const newMessage =
-        document.createElement("div");
-
-    newMessage.className = "message";
-
-    newMessage.innerHTML =
-        "<strong>Jeffrey
+</body>
+</html>
