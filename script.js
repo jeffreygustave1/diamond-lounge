@@ -1,90 +1,40 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+window.sendMessage = function() {
 
-import {
-    getFirestore,
-    collection,
-    addDoc,
-    query,
-    orderBy,
-    onSnapshot,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+    const input =
+        document.getElementById("messageInput");
 
-const currentUser =
-    localStorage.getItem("diamondUsername") ||
-    "Member";
+    if (!input) return;
 
-const firebaseConfig =
-    window.firebaseConfig;
+    const text =
+        input.value.trim();
 
-const app =
-    initializeApp(firebaseConfig);
+    if (text === "") return;
 
-const db =
-    getFirestore(app);
+    const messages =
+        document.getElementById("messages");
 
-const messagesRef =
-    collection(
-        db,
-        "messages"
-    );
+    const message =
+        document.createElement("div");
 
-window.onload = function () {
+    message.className =
+        "message";
 
-    const profileName =
-        document.getElementById(
-            "profileName"
-        );
+    message.innerHTML =
+        "<strong>Test User:</strong> " + text;
 
-    if (profileName) {
+    messages.appendChild(message);
 
-        profileName.textContent =
-            "💎 " + currentUser;
-
-    }
-
-    const currentUserElement =
-        document.getElementById(
-            "currentUser"
-        );
-
-    if (currentUserElement) {
-
-        currentUserElement.textContent =
-            "🟢 " + currentUser;
-
-    }
-
+    input.value = "";
 };
 
-let chatLoaded = false;
+window.clearChat = function() {
 
-const messagesContainer =
-    document.getElementById(
-        "messages"
-    );
+    const messages =
+        document.getElementById("messages");
 
-const messagesQuery =
-    query(
-        messagesRef,
-        orderBy(
-            "timestamp"
-        )
-    );
+    if (messages) {
+        messages.innerHTML = "";
+    }
+};
 
-onSnapshot(
-    messagesQuery,
-    function(snapshot){
-
-        if(!messagesContainer){
-            return;
-        }
-
-        messagesContainer.innerHTML = "";
-
-        snapshot.forEach(function(doc){
-
-            const data =
-                doc.data();
-
-        
+console.log("Diamond Lounge Ready");
