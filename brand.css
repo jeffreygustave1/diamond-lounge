@@ -17,6 +17,8 @@ body.auth-page {
     font-family: "DM Sans", Segoe UI, sans-serif;
 }
 
+
+/* Landing page navigation diamond - 7x */
 .brand-gem-image {
     display: block;
     width: 30px;
@@ -24,7 +26,11 @@ body.auth-page {
     object-fit: contain;
     flex: none;
     filter: drop-shadow(0 0 10px rgba(199,169,107,.38));
+
+    transform: scale(7);
+    transform-origin: center center;
 }
+
 
 /* LOGIN PAGE DIAMOND - ENLARGED 6X */
 .auth-brand-gem {
