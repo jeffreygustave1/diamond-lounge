@@ -24,21 +24,27 @@
 Sign into Diamond Lounge
 </p>
 
-<form class="login-form">
+<form id="loginForm" class="login-form">
 
 <input
-type="email"
-placeholder="Email Address"
+type="text"
+id="loginUsername"
+placeholder="Username"
 required>
 
 <input
 type="password"
+id="loginPassword"
 placeholder="Password"
 required>
 
-<a href="dashboard.html" class="login-button">
+<button
+type="submit"
+class="login-button">
+
 Login
-</a>
+
+</button>
 
 </form>
 
@@ -46,13 +52,62 @@ Login
 
 Don't have an account?
 
-<a href="#">
+<a href="create-account.html">
 Create One
 </a>
 
 </p>
 
 </div>
+
+<script>
+
+document
+.getElementById("loginForm")
+.addEventListener("submit", function(event){
+
+event.preventDefault();
+
+const username =
+localStorage.getItem(
+"diamondUsername"
+);
+
+const password =
+localStorage.getItem(
+"diamondPassword"
+);
+
+const enteredUsername =
+document.getElementById(
+"loginUsername"
+).value;
+
+const enteredPassword =
+document.getElementById(
+"loginPassword"
+).value;
+
+if(
+enteredUsername === username &&
+enteredPassword === password
+){
+
+window.location.href =
+"dashboard.html";
+
+}
+else{
+
+alert(
+"Wrong username or password"
+);
+
+}
+
+});
+
+</script>
 
 </body>
 
