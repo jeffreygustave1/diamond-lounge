@@ -1,51 +1,21 @@
-/* Animated Diamond Lounge identity and compact server rail. */
-.workspace-title{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    margin:7px 0 11px;
-}
-.workspace-title h1{
-    margin:0;
-}
-.workspace-title .workspace-gem{
-    display:block;
-    width:30px;
-    height:30px;
-    object-fit:contain;
-    flex:none;
-    filter:drop-shadow(0 0 9px rgba(199,169,107,.35));
-}
-.servers .dm-home{
-    display:grid;
-    place-items:center;
-    padding:0;
-    overflow:hidden;
-    cursor:pointer;
-}
-.servers .dm-home img{
-    width:31px;
-    height:31px;
-    object-fit:contain;
-    display:block;
-}
-.servers .dm-home:hover img{
-    transform:scale(1.08);
-}
-.servers .server-icon:not(.dm-home){
-    flex:none;
-    display:grid;
-    place-items:center;
-    padding:0;
-    cursor:pointer;
-}
+/* Keep the selected channel expandable and make every brand diamond legible. */
+.workspace-title{display:flex;align-items:center;gap:10px;margin:9px 0 12px;min-width:0;}
+.workspace-title h1{margin:0;white-space:nowrap;}
+.workspace-title .workspace-gem{display:block;width:40px;height:40px;flex:none;object-fit:contain;filter:drop-shadow(0 0 9px rgba(199,169,107,.35));}
+.servers .dm-home{display:grid;place-items:center;padding:0;overflow:hidden;text-decoration:none;}
+.servers .dm-home img{display:block;width:38px;height:38px;object-fit:contain;}
+.servers .dm-home:hover img{transform:scale(1.06);}
+.servers .server-icon:not(.dm-home){flex:none;display:grid;place-items:center;padding:0;cursor:pointer;}
 .servers .add-server{color:#8eae84;}
-.profile-avatar img{
-    width:25px;
-    height:25px;
-    object-fit:contain;
-}
+.profile-avatar img{display:block;width:30px;height:30px;object-fit:contain;}
+.voice-channel{flex-wrap:wrap;}
+.voice-channel>span{flex:1;}
+.voice-channel .voice-panel{width:100%;flex-basis:100%;}
+.voice-panel[hidden]{display:none!important;}
+.voice-channel .voice-buttons button{position:relative;z-index:1;}
+.voice-participant{display:flex;align-items:center;gap:6px;}
 @media(max-width:600px){
-    .workspace-title .workspace-gem{width:26px;height:26px;}
-    .workspace-title h1{font-size:18px;}
+    .workspace-title .workspace-gem{width:34px;height:34px;}
+    .workspace-title h1{font-size:17px;}
+    .servers .dm-home img{width:32px;height:32px;}
 }

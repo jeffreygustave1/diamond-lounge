@@ -8,12 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="brand.css">
+    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="brand.css?v=3">
 </head>
 <body class="auth-page">
     <main class="login-container">
-        <a class="auth-brand" href="index.html"><span>💎</span> DIAMOND LOUNGE</a>
+        <a class="auth-brand" href="index.html"><img src="diamond.gif" alt="" class="auth-brand-gem"> DIAMOND LOUNGE</a>
         <h1>Welcome back</h1>
         <p class="login-subtitle">Your lounge is waiting.</p>
         <form id="loginForm" class="login-form">
@@ -30,39 +30,18 @@
     <script type="module">
         import { auth } from "./firebase.js";
         import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-
         const form = document.getElementById("loginForm");
         const button = document.getElementById("loginButton");
         const errorMessage = document.getElementById("errorMessage");
-        const errors = {
-            "auth/invalid-credential": "Incorrect email or password.",
-            "auth/user-not-found": "No account was found with this email.",
-            "auth/wrong-password": "Incorrect email or password.",
-            "auth/invalid-email": "Please enter a valid email address.",
-            "auth/user-disabled": "This account has been disabled. Contact support.",
-            "auth/too-many-requests": "Too many attempts. Please try again later.",
-            "auth/network-request-failed": "Network error. Check your connection and try again.",
-            "auth/operation-not-allowed": "Email/password sign-in is not enabled for this project.",
-            "auth/unauthorized-domain": "This website domain is not authorized in Firebase Authentication."
-        };
-
+        const errors = {"auth/invalid-credential":"Incorrect email or password.","auth/user-not-found":"No account was found with this email.","auth/wrong-password":"Incorrect email or password.","auth/invalid-email":"Please enter a valid email address.","auth/user-disabled":"This account has been disabled. Contact support.","auth/too-many-requests":"Too many attempts. Please try again later.","auth/network-request-failed":"Network error. Check your connection and try again.","auth/operation-not-allowed":"Email/password sign-in is not enabled for this project.","auth/unauthorized-domain":"This website domain is not authorized in Firebase Authentication."};
         form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            errorMessage.textContent = "";
-            button.disabled = true;
-            button.textContent = "Signing in…";
+            event.preventDefault(); errorMessage.textContent = ""; button.disabled = true; button.textContent = "Signing in…";
             try {
-                await signInWithEmailAndPassword(
-                    auth,
-                    document.getElementById("loginEmail").value.trim(),
-                    document.getElementById("loginPassword").value
-                );
+                await signInWithEmailAndPassword(auth, document.getElementById("loginEmail").value.trim(), document.getElementById("loginPassword").value);
                 window.location.assign("dashboard.html");
             } catch (error) {
-                console.error("Login error:", error);
-                errorMessage.textContent = errors[error.code] || "Sign in failed. Check your details and try again.";
-                button.disabled = false;
-                button.textContent = "Sign in";
+                console.error("Login error:", error); errorMessage.textContent = errors[error.code] || "Sign in failed. Check your details and try again.";
+                button.disabled = false; button.textContent = "Sign in";
             }
         });
     </script>

@@ -8,16 +8,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="luxury.css">
-    <link rel="stylesheet" href="branding-polish.css">
+    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="luxury.css?v=3">
+    <link rel="stylesheet" href="branding-polish.css?v=3">
 </head>
 <body>
     <div class="dashboard">
         <aside class="servers" aria-label="Servers and direct messages">
-            <button class="server-icon dm-home selected" id="dmHomeButton" type="button" title="Diamond Lounge direct messages" aria-label="Diamond Lounge direct messages">
-                <img src="diamond.gif" alt="">
-            </button>
+            <a class="server-icon dm-home selected" href="index.html" title="Diamond Lounge home" aria-label="Diamond Lounge home">
+                <img src="diamond.gif" alt="Diamond Lounge animated diamond">
+            </a>
             <div class="server-divider"></div>
             <button class="server-icon" type="button" title="Gaming community" aria-label="Gaming community">🎮</button>
             <button class="server-icon" type="button" title="Music community" aria-label="Music community">♫</button>
@@ -51,7 +51,7 @@
                 <li class="voice-channel" data-voice-name="AI Hangout">✦ <span>AI Hangout</span></li>
             </ul>
 
-            <section class="voice-panel" id="voicePanel" aria-label="Selected voice channel controls" hidden>
+            <section class="voice-panel" id="voicePanel" aria-label="Voice channel controls" hidden>
                 <div class="voice-status" id="voiceStatus" aria-live="polite">Select a voice channel</div>
                 <div class="voice-buttons">
                     <button type="button" class="voice-toggle-btn" id="voiceToggleBtn">Join Voice</button>
@@ -59,9 +59,7 @@
                 </div>
                 <div class="voice-participants">
                     <h4>IN VOICE <span id="voiceParticipantCount">0</span></h4>
-                    <ul id="voiceParticipants" aria-live="polite">
-                        <li class="voice-empty">Select a channel to see who's here.</li>
-                    </ul>
+                    <ul id="voiceParticipants" aria-live="polite"><li class="voice-empty">Choose a voice lounge.</li></ul>
                 </div>
                 <div id="remoteAudioContainer" class="remote-audio-container" aria-label="Remote voice audio"></div>
             </section>
@@ -82,9 +80,8 @@
                     <div class="channel-title"># <span>general</span></div>
                     <div class="sub-header">A little space to share what matters.</div>
                 </div>
-                <div class="header-actions"><span class="secure-label">✦ MEMBER LOUNGE</span></div>
+                <span class="secure-label">✦ MEMBER LOUNGE</span>
             </header>
-
             <div class="messages" id="messages" aria-live="polite"></div>
             <form class="message-box" id="messageForm">
                 <label class="upload-button" for="mediaInput" title="Share an image, GIF, video, or audio file" aria-label="Choose media to share">＋</label>
@@ -98,23 +95,18 @@
         <aside class="members">
             <div class="members-section">
                 <h3 class="section-heading">COMMUNITY</h3>
-                <ul id="onlineMembers" class="online-list">
-                    <li id="currentUser"><i></i><span>Member</span><em>you</em></li>
-                </ul>
+                <ul id="onlineMembers" class="online-list"><li id="currentUser"><i></i><span>Member</span><em>you</em></li></ul>
             </div>
             <div class="media-section">
                 <h3 class="section-heading">SHARED MOMENTS</h3>
                 <p class="media-intro">Images, GIFs, videos and audio shared by the community.</p>
-                <div id="sharedMedia" class="shared-media" aria-live="polite">
-                    <p class="media-empty">Nothing shared here yet.</p>
-                </div>
+                <div id="sharedMedia" class="shared-media" aria-live="polite"><p class="media-empty">Nothing shared here yet.</p></div>
             </div>
             <div class="members-footer">DIAMOND LOUNGE <span>✦</span></div>
         </aside>
     </div>
-
-    <script type="module" src="script.js"></script>
-    <script type="module" src="voice-ui.js"></script>
-    <script type="module" src="media.js"></script>
+    <script type="module" src="script.js?v=3"></script>
+    <script type="module" src="voice.js?v=3"></script>
+    <script type="module" src="media.js?v=3"></script>
 </body>
 </html>
