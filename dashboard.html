@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Diamond Lounge Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SERVER BAR -->
+
+    <div class="servers">
+
+        <div class="server-logo">
+            💎
+        </div>
+
+        <div class="server-icon">🎮</div>
+        <div class="server-icon">🎵</div>
+        <div class="server-icon">🎬</div>
+        <div class="server-icon">🏆</div>
+        <div class="server-icon">➕</div>
+
+    </div>
+
+    <!-- CHANNELS -->
+
+    <div class="channels">
+
+        <h3>CHANNELS</h3>
+
+        <ul>
+
+            <li># general <span class="badge">3</span></li>
+            <li># gaming <span class="badge">12</span></li>
+            <li># streaming <span class="badge">2</span></li>
+            <li># announcements</li>
+
+        </ul>
+
+        <div class="profile-card">
+
+            <div class="profile-name">
+                💎 Jeffrey Gustave
+            </div>
+
+            <div class="profile-status">
+                🟢 Online
+            </div>
+
+            <div class="profile-actions">
+                ⚙️ Settings
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CHAT -->
+
+    <div class="chat-area">
+
+        <div class="chat-header">
+
+            💎 Diamond Lounge
+
+            <div class="sub-header">
+                Premium Community Platform
+            </div>
+
+        </div>
+
+        <div class="messages" id="messages">
+
+            <div class="message">
+                <strong>Jeffrey:</strong>
+                Welcome to Diamond Lounge 💎
+            </div>
+
+            <div class="message">
+                <strong>System:</strong>
+                Type a message and press Enter.
+            </div>
+
+        </div>
+
+        <div class="message-box">
+
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Send a message...">
+
+            <button onclick="sendMessage()">
+                Send
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ONLINE USERS -->
+
+    <div class="members">
+
+        <h3>ONLINE</h3>
+
+        <ul>
+
+            <li>🟢 Jeffrey</li>
+            <li>🟢 Gamer01</li>
+            <li>🟡 MusicFan</li>
+            <li>🔴 Streamer</li>
+
+        </ul>
+
+    </div>
+
+</div>
+
+<script>
+
+function sendMessage() {
+
+    const input =
+        document.getElementById("messageInput");
+
+    const message =
+        input.value.trim();
+
+    if(message === "") return;
+
+    const messages =
+        document.getElementById("messages");
+
+    const newMessage =
+        document.createElement("div");
+
+    newMessage.className = "message";
+
+    newMessage.innerHTML =
+        "<strong>Jeffrey
