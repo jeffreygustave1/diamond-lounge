@@ -2,11 +2,9 @@
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Diamond Lounge</title>
+<title>Diamond Lounge Dashboard</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -14,114 +12,132 @@
 
 <body>
 
-<header>
+<div class="dashboard">
 
-<div class="logo-container">
+    <div class="servers">
 
-<img src="diamond.gif" alt="Diamond Logo" class="logo">
+        <div class="server-logo">💎</div>
 
-<h1>Diamond Lounge</h1>
+        <div class="server-icon">🎮</div>
+        <div class="server-icon">🎵</div>
+        <div class="server-icon">🎬</div>
+        <div class="server-icon">🏆</div>
+        <div class="server-icon">➕</div>
 
-<p class="tagline">
-Chat. Stream. Connect.
-</p>
+    </div>
+
+    <div class="channels">
+
+        <h3>CHANNELS</h3>
+
+        <ul>
+
+            <li># general <span class="badge">3</span></li>
+            <li># gaming <span class="badge">12</span></li>
+            <li># streaming <span class="badge">2</span></li>
+            <li># announcements</li>
+
+        </ul>
+
+        <div class="profile-card">
+
+            <div
+                class="profile-name"
+                id="profileName">
+
+                💎 Member
+
+            </div>
+
+            <div class="profile-status">
+
+                🟢 Online
+
+            </div>
+
+            <div class="profile-actions">
+
+                ⚙️ Settings
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="chat-area">
+
+        <div class="chat-header">
+
+            💎 Diamond Lounge
+
+            <div class="sub-header">
+
+                Premium Community Platform
+
+            </div>
+
+            <button
+                class="clear-btn"
+                onclick="clearChat()">
+
+                Clear Chat
+
+            </button>
+
+        </div>
+
+        <div
+            class="messages"
+            id="messages">
+
+            <div class="message">
+
+                <strong>System:</strong>
+                Welcome to Diamond Lounge 💎
+
+            </div>
+
+        </div>
+
+        <div class="message-box">
+
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Send a message..." />
+
+            <button onclick="sendMessage()">
+
+                Send
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="members">
+
+        <h3>ONLINE</h3>
+
+        <ul id="onlineMembers">
+
+            <li id="currentUser">
+                🟢 Member
+            </li>
+
+            <li>🟢 Gamer01</li>
+            <li>🟡 MusicFan</li>
+            <li>🔴 Streamer</li>
+
+        </ul>
+
+    </div>
 
 </div>
 
-<nav>
-
-<ul>
-
-<li><a href="#">Home</a></li>
-<li><a href="#">Communities</a></li>
-<li><a href="#">Features</a></li>
-<li><a href="#">Contact</a></li>
-
-</ul>
-
-</nav>
-
-</header>
-
-<main>
-
-<section class="hero">
-
-<h2>Where Communities Come Together</h2>
-
-<p>
-Create servers, join voice channels, chat in real time,
-stream your screen, and build lasting communities.
-</p>
-
-<div class="buttons">
-
-<a href="create-account.html" class="btn-primary">
-Join Free
-</a>
-
-<a href="#" class="btn-secondary">
-Learn More
-</a>
-
-</div>
-
-</section>
-
-<section class="features">
-
-<div class="card">
-
-<h3>💬 Text Chat</h3>
-
-<p>
-Organized channels with real-time messaging.
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>🎙 Voice Rooms</h3>
-
-<p>
-Hang out and talk instantly with friends.
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>📺 Streaming</h3>
-
-<p>
-Share games, videos, and presentations.
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>💎 Premium Communities</h3>
-
-<p>
-Build private or public spaces around any topic.
-</p>
-
-</div>
-
-</section>
-
-</main>
-
-<footer>
-
-<p>
-© 2026 Diamond Lounge | Created by Jeffrey Gustave
-</p>
-
-</footer>
+<script src="script.js"></script>
 
 </body>
-
 </html>

@@ -1,4 +1,24 @@
+const currentUser =
+    localStorage.getItem("diamondUsername") ||
+    "Member";
+
 window.onload = function () {
+
+    const profileName =
+        document.getElementById("profileName");
+
+    if (profileName) {
+        profileName.innerHTML =
+            "💎 " + currentUser;
+    }
+
+    const currentUserElement =
+        document.getElementById("currentUser");
+
+    if (currentUserElement) {
+        currentUserElement.innerHTML =
+            "🟢 " + currentUser;
+    }
 
     const messages =
         document.getElementById("messages");
@@ -13,12 +33,18 @@ window.onload = function () {
         const newMessage =
             document.createElement("div");
 
-        newMessage.className = "message";
+        newMessage.className =
+            "message";
 
         newMessage.innerHTML =
-            "<strong>Jeffrey:</strong> " + message;
+            "<strong>" +
+            currentUser +
+            ":</strong> " +
+            message;
 
-        messages.appendChild(newMessage);
+        messages.appendChild(
+            newMessage
+        );
 
     });
 
@@ -27,40 +53,56 @@ window.onload = function () {
 function sendMessage() {
 
     const input =
-        document.getElementById("messageInput");
+        document.getElementById(
+            "messageInput"
+        );
 
     const message =
         input.value.trim();
 
     if (message === "") {
-
         return;
-
     }
 
     const messages =
-        document.getElementById("messages");
+        document.getElementById(
+            "messages"
+        );
 
     const newMessage =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    newMessage.className = "message";
+    newMessage.className =
+        "message";
 
     newMessage.innerHTML =
-        "<strong>Jeffrey:</strong> " + message;
+        "<strong>" +
+        currentUser +
+        ":</strong> " +
+        message;
 
-    messages.appendChild(newMessage);
+    messages.appendChild(
+        newMessage
+    );
 
     const savedMessages =
         JSON.parse(
-            localStorage.getItem("chatMessages")
+            localStorage.getItem(
+                "chatMessages"
+            )
         ) || [];
 
-    savedMessages.push(message);
+    savedMessages.push(
+        message
+    );
 
     localStorage.setItem(
         "chatMessages",
-        JSON.stringify(savedMessages)
+        JSON.stringify(
+            savedMessages
+        )
     );
 
     input.value = "";
@@ -72,29 +114,41 @@ function sendMessage() {
 
 function clearChat() {
 
-    localStorage.removeItem("chatMessages");
+    localStorage.removeItem(
+        "chatMessages"
+    );
 
     location.reload();
 
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    const input =
-        document.getElementById("messageInput");
+        const input =
+            document.getElementById(
+                "messageInput"
+            );
 
-    if (input) {
+        if (input) {
 
-        input.addEventListener("keypress", function (event) {
+            input.addEventListener(
+                "keypress",
+                function (event) {
 
-            if (event.key === "Enter") {
+                    if (
+                        event.key === "Enter"
+                    ) {
 
-                sendMessage();
+                        sendMessage();
 
-            }
+                    }
 
-        });
+                }
+            );
+
+        }
 
     }
-
-});
+);
