@@ -4,70 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#101114">
-    <title>Sign in | Diamond Lounge</title>
+    <meta name="description" content="Diamond Lounge — a private place to connect, talk, and share.">
+    <title>Diamond Lounge | A place to belong</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=7">
-    <link rel="stylesheet" href="brand.css?v=7">
+    <link rel="stylesheet" href="brand.css?v=8">
 </head>
-<body class="auth-page">
-    <main class="login-container">
-        <a class="auth-brand" href="index.html"><img src="diamond.gif" alt="" class="auth-brand-gem"> DIAMOND LOUNGE</a>
-        <h1>Welcome back</h1>
-        <p class="login-subtitle">Your lounge is waiting.</p>
-        <form id="loginForm" class="login-form">
-            <label for="loginEmail">Email address</label>
-            <input type="email" id="loginEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
-            <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" name="password" placeholder="Your password" autocomplete="current-password" required>
-            <button type="submit" class="login-button" id="loginButton">Sign in</button>
-            <p id="errorMessage" role="alert" aria-live="polite"></p>
-        </form>
-        <p class="signup-link">New to the lounge? <a href="create-account.html">Create an account</a></p>
-        <a class="back-home" href="index.html">← Back to Diamond Lounge</a>
+<body class="landing-page">
+    <header class="landing-nav">
+        <a class="brand-lockup" href="index.html">
+            <img class="brand-gem-image" src="diamond.gif" alt="">
+            <span>DIAMOND LOUNGE</span>
+        </a>
+        <nav aria-label="Main navigation">
+            <a href="login.html">Sign in</a>
+            <a class="nav-cta" href="create-account.html">Join the lounge</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="landing-hero">
+            <span class="landing-kicker">A PRIVATE COMMUNITY, BEAUTIFULLY CONNECTED</span>
+            <h1>Your people.<br><em>Your place.</em></h1>
+            <p>A considered space to talk, share the moments, and spend time together — all in one lounge.</p>
+            <div class="landing-actions">
+                <a class="primary-link" href="create-account.html">Create your account <span>→</span></a>
+                <a class="secondary-link" href="login.html">I already have an account</a>
+            </div>
+            <div class="landing-ornament" aria-hidden="true"><span></span> ✦ <span></span></div>
+        </section>
+
+        <section class="landing-features" aria-label="Community features">
+            <article><span>01</span><h2>Conversations</h2><p>Keep up with the community in a shared lounge.</p></article>
+            <article><span>02</span><h2>Voice rooms</h2><p>Drop into a room and talk with your people.</p></article>
+            <article><span>03</span><h2>Shared moments</h2><p>Post images, GIFs, videos, and audio for members.</p></article>
+        </section>
     </main>
-    <script type="module">
-        import { auth } from "./firebase.js";
-        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 
-        const form = document.getElementById("loginForm");
-        const button = document.getElementById("loginButton");
-        const errorMessage = document.getElementById("errorMessage");
-        const errors = {
-            "auth/invalid-credential": "Incorrect email or password.",
-            "auth/user-not-found": "No account was found with this email.",
-            "auth/wrong-password": "Incorrect email or password.",
-            "auth/invalid-email": "Please enter a valid email address.",
-            "auth/user-disabled": "This account has been disabled. Contact support.",
-            "auth/too-many-requests": "Too many attempts. Please try again later.",
-            "auth/network-request-failed": "Network error. Check your connection and try again.",
-            "auth/operation-not-allowed": "Enable Email/Password sign-in in Firebase Authentication.",
-            "auth/unauthorized-domain": "Add jeffreygustave1.github.io under Firebase Authentication → Settings → Authorized domains.",
-            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console."
-        };
-
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            if (!form.reportValidity()) return;
-            errorMessage.textContent = "";
-            button.disabled = true;
-            button.textContent = "Signing in…";
-
-            try {
-                await signInWithEmailAndPassword(
-                    auth,
-                    document.getElementById("loginEmail").value.trim(),
-                    document.getElementById("loginPassword").value
-                );
-                window.location.assign("dashboard.html");
-            } catch (error) {
-                console.error("Login error:", error);
-                errorMessage.textContent = errors[error.code] || `Sign in failed${error.code ? ` (${error.code})` : ". Check your connection and try again."}`;
-                button.disabled = false;
-                button.textContent = "Sign in";
-            }
-        });
-    </script>
+    <footer class="landing-footer">DIAMOND LOUNGE <span>✦</span> MADE FOR YOUR COMMUNITY</footer>
 </body>
 </html>
