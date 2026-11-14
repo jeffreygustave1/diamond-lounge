@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
     <link rel="stylesheet" href="luxury.css?v=9">
     <link rel="stylesheet" href="branding-polish.css?v=9">
     <link rel="stylesheet" href="dm.css?v=1">
@@ -20,12 +20,12 @@
 <body>
 <div class="dashboard">
 
-    <!-- MOBILE DRAWER CONTENT + DESKTOP SERVER RAIL -->
+    <!-- MOBILE DRAWER + SERVER RAIL -->
     <div class="mobile-sidebar" id="mobileSidebar">
 
-        <!-- LEFT SERVER RAIL -->
         <aside class="servers" aria-label="Servers and direct messages">
 
+            <!-- DIRECT MESSAGES -->
             <button
                 class="server-icon dm-home selected"
                 id="dmHomeButton"
@@ -38,25 +38,44 @@
 
             <div class="server-divider"></div>
 
-            <button class="server-icon" type="button" title="Gaming community" aria-label="Gaming community">🎮</button>
-            <button class="server-icon" type="button" title="Music community" aria-label="Music community">♫</button>
-            <button class="server-icon" type="button" title="Cinema community" aria-label="Cinema community">▶</button>
-            <button class="server-icon add-server" type="button" title="Add a server" aria-label="Add a server">＋</button>
+            <!-- DEFAULT COMMUNITY SERVER -->
+            <button
+                class="server-icon selected"
+                id="mainServerButton"
+                type="button"
+                title="VIP-LOUNGE"
+                aria-label="Open VIP-LOUNGE"
+                aria-pressed="false">
+                🎮
+            </button>
+
+            <!-- MEMBER-CREATED SERVERS WILL APPEAR HERE -->
+
+            <!-- CREATE SERVER -->
+            <button
+                class="server-icon add-server"
+                id="createServerButton"
+                type="button"
+                title="Create a server"
+                aria-label="Create a server">
+                ＋
+            </button>
+
         </aside>
 
 
-        <!-- LEFT CHANNEL / DM SIDEBAR -->
+        <!-- CHANNEL / DM SIDEBAR -->
         <aside class="channels" id="channelsSidebar">
 
-            <!-- NORMAL LOUNGE SIDEBAR -->
+            <!-- MAIN LOUNGE SIDEBAR -->
             <section id="loungeSidebar">
 
                 <div class="workspace-heading">
-                    <span class="eyebrow">PRIVATE COMMUNITY</span>
+                    <span class="eyebrow">MAIN COMMUNITY</span>
 
                     <div class="workspace-title">
                         <img src="diamond.gif" alt="" class="workspace-gem">
-                        <h1>Diamond Lounge</h1>
+                        <h1>VIP-LOUNGE</h1>
                     </div>
 
                     <span class="online-label"><i></i> Lounge is open</span>
@@ -167,11 +186,12 @@
     <!-- MAIN CONTENT -->
     <main class="chat-area">
 
-        <!-- EXISTING PUBLIC CHAT -->
+        <!-- PUBLIC CHAT -->
         <section id="loungeView" class="lounge-view">
 
             <header class="chat-header">
                 <div class="chat-header-main">
+
                     <button
                         class="mobile-menu-button"
                         type="button"
@@ -189,7 +209,7 @@
                     </div>
                 </div>
 
-                <span class="secure-label">✦ MEMBER LOUNGE</span>
+                <span class="secure-label">✦ VIP-LOUNGE</span>
             </header>
 
             <div class="messages" id="messages" aria-live="polite"></div>
@@ -223,6 +243,7 @@
 
             <header class="chat-header">
                 <div class="chat-header-main">
+
                     <button
                         class="mobile-menu-button"
                         type="button"
@@ -261,6 +282,7 @@
 
             <header class="chat-header dm-conversation-header">
                 <div class="chat-header-main dm-contact-heading">
+
                     <button
                         class="mobile-menu-button"
                         type="button"
@@ -305,7 +327,7 @@
     </main>
 
 
-    <!-- RIGHT COMMUNITY SIDEBAR -->
+    <!-- COMMUNITY SIDEBAR -->
     <aside class="members" id="communitySidebar">
 
         <div class="members-section">
@@ -337,8 +359,73 @@
 </div>
 
 
+<!-- CREATE SERVER WINDOW -->
+<div class="server-modal-backdrop" id="serverModal" hidden>
+    <section class="server-modal" role="dialog" aria-modal="true" aria-labelledby="serverModalTitle">
+
+        <button
+            type="button"
+            class="server-modal-close"
+            id="closeServerModal"
+            aria-label="Close">
+            ×
+        </button>
+
+        <div class="server-modal-icon">✦</div>
+
+        <span class="eyebrow">BUILD YOUR COMMUNITY</span>
+
+        <h2 id="serverModalTitle">Create a server</h2>
+
+        <p class="server-modal-description">
+            Give your community a name and decide who can join.
+        </p>
+
+        <form id="createServerForm">
+
+            <label for="serverName">SERVER NAME</label>
+
+            <input
+                id="serverName"
+                name="serverName"
+                type="text"
+                maxlength="40"
+                minlength="2"
+                placeholder="My new community"
+                autocomplete="off"
+                required>
+
+            <label for="serverVisibility">WHO CAN JOIN?</label>
+
+            <select id="serverVisibility" name="serverVisibility" required>
+                <option value="private">Private — Invite only</option>
+                <option value="public">Public — Anyone can join</option>
+            </select>
+
+            <p class="server-privacy-note">
+                You can change your server's visibility later.
+            </p>
+
+            <div class="server-modal-actions">
+                <button type="button" class="server-cancel-button" id="cancelServerCreation">
+                    Cancel
+                </button>
+
+                <button type="submit" class="server-create-button" id="confirmCreateServer">
+                    Create server
+                </button>
+            </div>
+
+            <div id="serverCreateStatus" role="status" aria-live="polite"></div>
+
+        </form>
+
+    </section>
+</div>
+
+
 <!-- APPLICATION SCRIPTS -->
-<script type="module" src="script.js?v=9"></script>
+<script type="module" src="script.js?v=10"></script>
 <script type="module" src="voice.js?v=9"></script>
 <script type="module" src="media.js?v=9"></script>
 
