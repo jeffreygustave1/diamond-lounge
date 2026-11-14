@@ -1,114 +1,118 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Diamond Lounge Login</title>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
 <div class="login-container">
 
-<img src="diamond.gif" alt="Diamond Logo" class="login-logo">
+    <img src="diamond.gif" alt="Diamond Logo" class="login-logo">
 
-<h1>Welcome Back</h1>
+    <h1>Welcome Back</h1>
 
-<p class="login-subtitle">
-Sign into Diamond Lounge
-</p>
+    <p class="login-subtitle">
+        Sign into Diamond Lounge
+    </p>
 
-<form id="loginForm" class="login-form">
+    <form id="loginForm" class="login-form">
 
-<input
-type="text"
-id="loginUsername"
-placeholder="Username"
-required>
+        <input
+            type="email"
+            id="loginEmail"
+            placeholder="Email Address"
+            required>
 
-<input
-type="password"
-id="loginPassword"
-placeholder="Password"
-required>
+        <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password"
+            required>
 
-<button
-type="submit"
-class="login-button">
+        <button
+            type="submit"
+            class="login-button"
+            id="loginButton">
 
-Login
+            Login
 
-</button>
+        </button>
 
-</form>
+        <p id="errorMessage" role="alert"></p>
 
-<p class="signup-link">
+    </form>
 
-Don't have an account?
-
-<a href="create-account.html">
-Create One
-</a>
-
-</p>
+    <p class="signup-link">
+        Don't have an account?
+        <a href="create-account.html">Create One</a>
+    </p>
 
 </div>
 
-<script>
+<script type="module">
 
-document
-.getElementById("loginForm")
-.addEventListener("submit", function(event){
+import { auth } from "./firebase.js";
 
-event.preventDefault();
+import {
+    signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 
-const username =
-localStorage.getItem(
-"diamondUsername"
-);
+const form = document.getElementById("loginForm");
+const button = document.getElementById("loginButton");
+const errorMessage = document.getElementById("errorMessage");
 
-const password =
-localStorage.getItem(
-"diamondPassword"
-);
+form.addEventListener("submit", async (event) => {
 
-const enteredUsername =
-document.getElementById(
-"loginUsername"
-).value;
+    event.preventDefault();
 
-const enteredPassword =
-document.getElementById(
-"loginPassword"
-).value;
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
 
-if(
-enteredUsername === username &&
-enteredPassword === password
-){
+    errorMessage.textContent = "";
 
-window.location.href =
-"dashboard.html";
+    button.disabled = true;
+    button.textContent = "Signing In...";
 
-}
-else{
+    try {
 
-alert(
-"Wrong username or password"
-);
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
 
-}
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+
+        console.error("Login error:", error);
+
+        const errors = {
+            "auth/invalid-credential": "Incorrect email or password.",
+            "auth/user-not-found": "No account found with this email.",
+            "auth/wrong-password": "Incorrect password.",
+            "auth/invalid-email": "Please enter a valid email.",
+            "auth/too-many-requests": "Too many attempts. Please try again later.",
+            "auth/network-request-failed": "Network error. Check your internet connection."
+        };
+
+        errorMessage.textContent =
+            errors[error.code] || "Login failed. Please try again.";
+
+        button.disabled = false;
+        button.textContent = "Login";
+
+    }
 
 });
 
 </script>
 
 </body>
-
 </html>
