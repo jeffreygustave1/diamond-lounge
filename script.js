@@ -31,6 +31,15 @@ const sendButton = document.getElementById("sendMessageButton");
 
 
 // ==========================================
+// MOBILE NAVIGATION ELEMENTS
+// ==========================================
+
+const dashboard = document.querySelector(".dashboard");
+const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
+const mobileMenuButtons = document.querySelectorAll(".mobile-menu-button");
+
+
+// ==========================================
 // DIRECT MESSAGE ELEMENTS
 // ==========================================
 
@@ -70,6 +79,64 @@ let stopDirectMessagesListener = null;
 let members = [];
 let selectedMember = null;
 let currentConversationId = null;
+
+
+// ==========================================
+// MOBILE DRAWER CONTROLS
+// ==========================================
+
+function setMobileSidebar(open) {
+    if (!dashboard) return;
+
+    dashboard.classList.toggle("mobile-nav-open", open);
+
+    mobileMenuButtons.forEach((button) => {
+        button.setAttribute("aria-expanded", String(open));
+        button.setAttribute(
+            "aria-label",
+            open ? "Close navigation menu" : "Open navigation menu"
+        );
+    });
+}
+
+
+function toggleMobileSidebar() {
+    if (!dashboard) return;
+
+    const isOpen = dashboard.classList.contains("mobile-nav-open");
+
+    setMobileSidebar(!isOpen);
+}
+
+
+// Hamburger buttons
+mobileMenuButtons.forEach((button) => {
+    button.addEventListener("click", toggleMobileSidebar);
+});
+
+
+// Backdrop closes the drawer
+mobileSidebarBackdrop?.addEventListener("click", () => {
+    setMobileSidebar(false);
+});
+
+
+// Escape closes the drawer
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        setMobileSidebar(false);
+    }
+});
+
+
+// Selecting a text channel closes the mobile drawer
+document.getElementById("channelsSidebar")?.addEventListener("click", (event) => {
+    const channel = event.target.closest(".text-channel");
+
+    if (channel) {
+        setMobileSidebar(false);
+    }
+});
 
 
 // ==========================================
@@ -351,6 +418,9 @@ function showConversationView() {
     if (communitySidebar) communitySidebar.hidden = true;
 
     document.body.classList.add("dm-mode");
+
+    // Selecting a member returns to the conversation.
+    setMobileSidebar(false);
 }
 
 
@@ -752,6 +822,8 @@ window.clearChat = () => {
 
 window.logout = async () => {
     try {
+        setMobileSidebar(false);
+
         stopDirectMessages();
         stopMembersListener?.();
         stopMessagesListener?.();
