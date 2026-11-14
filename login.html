@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=6">
-    <link rel="stylesheet" href="brand.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="brand.css?v=7">
 </head>
 <body class="auth-page">
     <main class="login-container">
@@ -18,9 +18,9 @@
         <p class="login-subtitle">Your lounge is waiting.</p>
         <form id="loginForm" class="login-form">
             <label for="loginEmail">Email address</label>
-            <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required>
+            <input type="email" id="loginEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
             <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password" required>
+            <input type="password" id="loginPassword" name="password" placeholder="Your password" autocomplete="current-password" required>
             <button type="submit" class="login-button" id="loginButton">Sign in</button>
             <p id="errorMessage" role="alert" aria-live="polite"></p>
         </form>
@@ -43,14 +43,17 @@
             "auth/too-many-requests": "Too many attempts. Please try again later.",
             "auth/network-request-failed": "Network error. Check your connection and try again.",
             "auth/operation-not-allowed": "Enable Email/Password sign-in in Firebase Authentication.",
-            "auth/unauthorized-domain": "Add jeffreygustave1.github.io to Firebase Authentication's authorized domains."
+            "auth/unauthorized-domain": "Add jeffreygustave1.github.io under Firebase Authentication → Settings → Authorized domains.",
+            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console."
         };
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
+            if (!form.reportValidity()) return;
             errorMessage.textContent = "";
             button.disabled = true;
             button.textContent = "Signing in…";
+
             try {
                 await signInWithEmailAndPassword(
                     auth,
@@ -60,7 +63,7 @@
                 window.location.assign("dashboard.html");
             } catch (error) {
                 console.error("Login error:", error);
-                errorMessage.textContent = errors[error.code] || `Sign in failed${error.code ? ` (${error.code})` : ""}. Check the browser console.`;
+                errorMessage.textContent = errors[error.code] || `Sign in failed${error.code ? ` (${error.code})` : ". Check your connection and try again."}`;
                 button.disabled = false;
                 button.textContent = "Sign in";
             }
