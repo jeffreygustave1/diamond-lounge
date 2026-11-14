@@ -34,10 +34,13 @@
                 <li class="voice-channel" data-voice-name="AI Hangout">🤖 AI Hangout</li>
             </ul>
 
-            <section class="voice-panel" aria-label="Voice controls">
+            <!-- This panel is moved into the selected voice channel by voice-ui.js. -->
+            <section class="voice-panel" id="voicePanel" aria-label="Selected voice channel controls" hidden>
                 <div class="voice-status" id="voiceStatus" aria-live="polite">Select a voice channel</div>
-                <button type="button" class="voice-toggle-btn" id="voiceToggleBtn">Join Voice</button>
-                <button type="button" class="voice-toggle-btn secondary" id="muteToggleBtn" disabled>Mute</button>
+                <div class="voice-buttons">
+                    <button type="button" class="voice-toggle-btn" id="voiceToggleBtn">Join Voice</button>
+                    <button type="button" class="voice-toggle-btn secondary" id="muteToggleBtn" disabled>Mute</button>
+                </div>
                 <div class="voice-participants">
                     <h4>IN VOICE <span id="voiceParticipantCount">0</span></h4>
                     <ul id="voiceParticipants" aria-live="polite">
@@ -80,5 +83,6 @@
     </div>
 
     <script type="module" src="script.js"></script>
+    <script type="module" src="voice-ui.js"></script>
 </body>
 </html>
