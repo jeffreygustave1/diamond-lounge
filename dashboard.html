@@ -28,11 +28,17 @@
 
             <h3 class="voice-title">🎤 VOICE CHANNELS</h3>
             <ul>
-                <li class="voice-channel">🔊 General Voice</li>
-                <li class="voice-channel">🎮 Gaming Voice</li>
-                <li class="voice-channel">🎵 Music Lounge</li>
-                <li class="voice-channel">🤖 AI Hangout</li>
+                <li class="voice-channel" data-voice-name="General Voice">🔊 General Voice</li>
+                <li class="voice-channel" data-voice-name="Gaming Voice">🎮 Gaming Voice</li>
+                <li class="voice-channel" data-voice-name="Music Lounge">🎵 Music Lounge</li>
+                <li class="voice-channel" data-voice-name="AI Hangout">🤖 AI Hangout</li>
             </ul>
+
+            <div class="voice-panel">
+                <div class="voice-status" id="voiceStatus">Voice channel: none</div>
+                <button type="button" class="voice-toggle-btn" id="voiceToggleBtn">Join Voice</button>
+                <button type="button" class="voice-toggle-btn secondary" id="muteToggleBtn">Mute</button>
+            </div>
 
             <div class="profile-card">
                 <div class="profile-name" id="profileName">💎 Member</div>

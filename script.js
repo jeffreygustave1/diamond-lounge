@@ -1,4 +1,3 @@
-
 import { auth, db } from "./firebase.js";
 
 import {
@@ -23,9 +22,121 @@ let chatReady = false;
 const messagesElement = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 
-// Firebase authentication
-onAuthStateChanged(auth, (user) => {
+let selectedVoiceChannel = null;
+let localVoiceStream = null;
+let voiceMuted = false;
+const voiceStatus = document.getElementById("voiceStatus");
+const voiceToggleBtn = document.getElementById("voiceToggleBtn");
+const muteToggleBtn = document.getElementById("muteToggleBtn");
 
+function updateVoiceStatus(message) {
+    if (voiceStatus) {
+        voiceStatus.textContent = message;
+    }
+}
+
+function stopVoiceStream() {
+    if (!localVoiceStream) return;
+
+    localVoiceStream.getTracks().forEach((track) => track.stop());
+    localVoiceStream = null;
+    voiceMuted = false;
+
+    if (muteToggleBtn) {
+        muteToggleBtn.textContent = "Mute";
+    }
+
+    if (voiceToggleBtn) {
+        voiceToggleBtn.textContent = selectedVoiceChannel ? "Join Voice" : "Join Voice";
+    }
+}
+
+async function toggleVoiceChat() {
+    if (!selectedVoiceChannel) {
+        alert("Select a voice channel first.");
+        return;
+    }
+
+    if (localVoiceStream) {
+        stopVoiceStream();
+        updateVoiceStatus(`Voice channel: ${selectedVoiceChannel} • disconnected`);
+        return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Your browser does not support microphone access.");
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        localVoiceStream = stream;
+
+        const audioElement = new Audio();
+        audioElement.srcObject = stream;
+        audioElement.autoplay = true;
+        audioElement.muted = false;
+
+        document.body.appendChild(audioElement);
+
+        if (voiceToggleBtn) {
+            voiceToggleBtn.textContent = "Leave Voice";
+        }
+
+        if (muteToggleBtn) {
+            muteToggleBtn.disabled = false;
+        }
+
+        updateVoiceStatus(`Voice channel: ${selectedVoiceChannel} • live`);
+    } catch (error) {
+        console.error("Microphone access error:", error);
+        alert("Microphone access was blocked. Please allow microphone permission and try again.");
+    }
+}
+
+function toggleMute() {
+    if (!localVoiceStream) {
+        return;
+    }
+
+    voiceMuted = !voiceMuted;
+    localVoiceStream.getAudioTracks().forEach((track) => {
+        track.enabled = !voiceMuted;
+    });
+
+    if (muteToggleBtn) {
+        muteToggleBtn.textContent = voiceMuted ? "Unmute" : "Mute";
+    }
+
+    updateVoiceStatus(
+        `Voice channel: ${selectedVoiceChannel} • ${voiceMuted ? "muted" : "live"}`
+    );
+}
+
+function setSelectedVoiceChannel(channelElement) {
+    document.querySelectorAll(".voice-channel").forEach((item) => {
+        item.classList.toggle("active", item === channelElement);
+    });
+
+    selectedVoiceChannel = channelElement ? channelElement.dataset.voiceName : null;
+
+    if (localVoiceStream && selectedVoiceChannel) {
+        updateVoiceStatus(`Voice channel: ${selectedVoiceChannel} • live`);
+    } else if (selectedVoiceChannel) {
+        updateVoiceStatus(`Voice channel: ${selectedVoiceChannel} • ready`);
+    } else {
+        updateVoiceStatus("Voice channel: none");
+    }
+
+    if (voiceToggleBtn) {
+        voiceToggleBtn.textContent = localVoiceStream ? "Leave Voice" : "Join Voice";
+    }
+}
+
+onAuthStateChanged(auth, (user) => {
     if (!user) {
         window.location.href = "login.html";
         return;
@@ -49,14 +160,10 @@ onAuthStateChanged(auth, (user) => {
         chatReady = true;
         loadMessages();
     }
-
 });
 
-// REAL-TIME FIRESTORE MESSAGES
 function loadMessages() {
-
     const messagesRef = collection(db, "messages");
-
     const messagesQuery = query(
         messagesRef,
         orderBy("timestamp", "asc"),
@@ -64,11 +171,11 @@ function loadMessages() {
     );
 
     onSnapshot(messagesQuery, (snapshot) => {
+        if (!messagesElement) return;
 
         messagesElement.innerHTML = "";
 
         snapshot.forEach((documentSnapshot) => {
-
             const data = documentSnapshot.data();
 
             const message = document.createElement("div");
@@ -81,31 +188,23 @@ function loadMessages() {
 
             message.appendChild(author);
             message.appendChild(messageText);
-
             messagesElement.appendChild(message);
-
         });
 
         messagesElement.scrollTop = messagesElement.scrollHeight;
-
     }, (error) => {
-
         console.error("Firestore error:", error);
 
-        messagesElement.textContent =
-            "Unable to load messages. Please check your connection.";
-
+        if (messagesElement) {
+            messagesElement.textContent = "Unable to load messages. Please check your connection.";
+        }
     });
-
 }
 
-// SEND MESSAGE TO FIRESTORE
 window.sendMessage = async function () {
-
-    if (!currentUid) return;
+    if (!currentUid || !input) return;
 
     const text = input.value.trim();
-
     if (!text) return;
 
     if (text.length > 2000) {
@@ -114,80 +213,57 @@ window.sendMessage = async function () {
     }
 
     try {
-
         await addDoc(collection(db, "messages"), {
-
             uid: currentUid,
             username: currentUser,
             text: text,
             timestamp: serverTimestamp()
-
         });
 
         input.value = "";
         input.focus();
-
     } catch (error) {
-
         console.error("Message error:", error);
-
         alert("Message could not be sent. Please try again.");
-
     }
-
 };
 
-// CLOUD CHAT IS SHARED.
-// This button does not delete messages from Firebase.
 window.clearChat = function () {
-
     alert("Cloud messages are shared with everyone and cannot be cleared from this button.");
-
 };
 
-// FIREBASE LOGOUT
 window.logout = async function () {
-
     try {
-
+        stopVoiceStream();
         await signOut(auth);
         window.location.href = "login.html";
-
     } catch (error) {
-
         console.error("Logout error:", error);
         alert("Unable to log out.");
-
     }
-
 };
 
-// ENTER TO SEND
 if (input) {
-
     input.addEventListener("keydown", (event) => {
-
         if (event.key === "Enter") {
             window.sendMessage();
         }
-
     });
-
 }
 
-// VOICE CHANNEL SELECTION
-document.querySelectorAll(".voice-channel").forEach(channel => {
-
+document.querySelectorAll(".voice-channel").forEach((channel) => {
     channel.addEventListener("click", () => {
-
-        document.querySelectorAll(".voice-channel").forEach(item => {
-            item.classList.remove("active");
-        });
-
-        channel.classList.add("active");
-
+        setSelectedVoiceChannel(channel);
     });
-
 });
+
+if (voiceToggleBtn) {
+    voiceToggleBtn.addEventListener("click", toggleVoiceChat);
+}
+
+if (muteToggleBtn) {
+    muteToggleBtn.disabled = true;
+    muteToggleBtn.addEventListener("click", toggleMute);
+}
 
 console.log("Diamond Lounge Real-Time Chat Ready 💎");
