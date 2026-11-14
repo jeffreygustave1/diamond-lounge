@@ -14,6 +14,15 @@
     --gold-bright: #e1c98f;
     --muted: #98979a;
     --text: #f4f0e8;
+
+    /* Crystal typography palette */
+    --glass-white: #f5fbff;
+    --glass-mid: #dce8ed;
+    --glass-silver: #b9cbd2;
+    --glass-muted: #aebdc4;
+    --glass-shine: rgba(255,255,255,.45);
+    --glass-glow: rgba(205,225,235,.18);
+    --champagne-glow: rgba(226,205,157,.18);
 }
 
 * {
@@ -439,8 +448,6 @@ button {
     min-height: 0;
     flex: 1;
     flex-direction: column;
-
-    /* Clear glass: let the original background show through */
     background: transparent;
 
     -webkit-backdrop-filter: blur(1px) saturate(170%);
@@ -450,7 +457,6 @@ button {
     border-right: 1px solid rgba(255,255,255,.045);
 }
 
-/* Very subtle glass reflection — no dark overlay */
 .chat-area::before {
     content: "";
     position: absolute;
@@ -467,7 +473,6 @@ button {
     );
 }
 
-/* Fine champagne-white glass edge */
 .chat-area::after {
     content: "";
     position: absolute;
@@ -488,7 +493,6 @@ button {
     );
 }
 
-/* Keep all chat content above the glass reflections */
 .chat-area > * {
     position: relative;
     z-index: 1;
@@ -885,7 +889,6 @@ button {
         overflow: hidden;
     }
 
-    /* The two left sidebars become one sliding drawer */
     .mobile-sidebar {
         position: fixed;
         z-index: 1002;
@@ -909,7 +912,6 @@ button {
         transform: translateX(0);
     }
 
-    /* Server rail inside the drawer */
     .servers {
         width: 54px;
         min-width: 54px;
@@ -925,7 +927,6 @@ button {
         border-radius: 13px;
     }
 
-    /* Channel and DM panel inside the drawer */
     .channels {
         width: auto;
         min-width: 0;
@@ -953,7 +954,6 @@ button {
         flex: none;
     }
 
-    /* Dark overlay behind the drawer */
     .mobile-sidebar-backdrop {
         position: fixed;
         z-index: 1001;
@@ -976,7 +976,6 @@ button {
         pointer-events: auto;
     }
 
-    /* Full-screen clear glass chat */
     .chat-area {
         width: 100%;
         height: 100%;
@@ -1002,7 +1001,6 @@ button {
         overflow: hidden;
     }
 
-    /* Compact mobile header */
     .chat-header {
         min-height: 66px;
         padding: 10px 13px;
@@ -1035,7 +1033,6 @@ button {
         display: none;
     }
 
-    /* Messages use the available screen space */
     .messages {
         min-height: 0;
         flex: 1;
@@ -1053,7 +1050,6 @@ button {
         backdrop-filter: blur(2px) saturate(145%);
     }
 
-    /* Composer stays at the bottom */
     .message-box {
         flex: none;
         gap: 7px;
@@ -1089,12 +1085,10 @@ button {
         font-size: 10px;
     }
 
-    /* DM welcome view */
     .dm-welcome {
         padding: 20px 15px;
     }
 
-    /* Private conversation header */
     .dm-conversation-header {
         padding: 10px 13px;
     }
@@ -1107,9 +1101,277 @@ button {
         min-width: 0;
     }
 
-    /* Keep phone safe areas clear */
     .message-box:last-of-type {
         margin-bottom: max(5px, env(safe-area-inset-bottom));
+    }
+}
+
+
+/* ==========================================
+   CRYSTAL TYPOGRAPHY — PEARLESCENT GLASS
+========================================== */
+
+/* Main brand heading */
+.workspace-heading h1 {
+    background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #e9f1f4 30%,
+        #c5d5dc 58%,
+        #f2e9d6 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(220,240,250,.18));
+}
+
+/* Small labels and section headings */
+.eyebrow,
+.section-heading,
+.secure-label {
+    color: #d7c69f;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.18),
+        0 0 9px rgba(226,205,157,.16);
+}
+
+/* Channel names */
+.text-channel span,
+.voice-channel > span {
+    color: rgba(225,235,240,.86);
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.16),
+        0 0 7px rgba(205,225,235,.12);
+}
+
+.text-channel:hover span,
+.voice-channel:hover > span {
+    color: #f5fbff;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.3),
+        0 0 10px rgba(220,240,250,.22);
+}
+
+.text-channel.selected span,
+.voice-channel.active > span {
+    color: #f2e6c9;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.2),
+        0 0 10px rgba(226,205,157,.2);
+}
+
+/* Channel title and its secondary line */
+.channel-title {
+    color: #f0dfb8;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.24),
+        0 0 10px rgba(226,205,157,.2);
+}
+
+.channel-title span {
+    color: #eaf2f5;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.2),
+        0 0 8px rgba(205,225,235,.16);
+}
+
+.sub-header,
+.online-label {
+    color: rgba(202,215,222,.76);
+    text-shadow: 0 1px 0 rgba(255,255,255,.1);
+}
+
+/* Profile name and status */
+.profile-name {
+    color: #edf5f8;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.2),
+        0 0 8px rgba(205,225,235,.15);
+}
+
+.profile-status {
+    color: #a8c5a7;
+    text-shadow: 0 0 7px rgba(130,190,135,.16);
+}
+
+/* Online member names */
+.online-list li {
+    color: #e4edf0;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.13),
+        0 0 7px rgba(205,225,235,.1);
+}
+
+.online-list em {
+    color: #aab8bf;
+    text-shadow: 0 0 6px rgba(205,225,235,.12);
+}
+
+/* Voice panel typography */
+.voice-status,
+.voice-empty {
+    color: #bdcbd0;
+    text-shadow: 0 1px 0 rgba(255,255,255,.12);
+}
+
+.voice-participants h4 {
+    color: #d0dce1;
+    text-shadow: 0 0 7px rgba(205,225,235,.13);
+}
+
+#voiceParticipantCount {
+    color: #e8d5a9;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.25),
+        0 0 9px rgba(226,205,157,.2);
+}
+
+#voiceParticipants li {
+    color: #e2eaed;
+    text-shadow: 0 1px 0 rgba(255,255,255,.12);
+}
+
+/* Actual message lettering: glass-like sheen without sacrificing clarity */
+.message {
+    color: rgba(237,243,246,.94);
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.16),
+        0 -1px 0 rgba(25,35,42,.3),
+        0 0 8px rgba(205,225,235,.1);
+}
+
+/* Message usernames */
+.message strong {
+    color: #f0dfb8;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.26),
+        0 0 9px rgba(226,205,157,.2);
+}
+
+/* Message timestamps and metadata */
+.message time,
+.message .timestamp,
+.message-time,
+.message-timestamp,
+.chat-timestamp,
+.dm-timestamp,
+.message-meta,
+.message-meta time {
+    color: rgba(190,207,215,.7);
+    font-size: .82em;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.13),
+        0 0 7px rgba(205,225,235,.12);
+}
+
+/* Message links */
+.message a {
+    color: #c6dce8;
+    text-decoration-color: rgba(198,220,232,.4);
+    text-shadow: 0 0 8px rgba(205,225,235,.18);
+}
+
+.message a:hover {
+    color: #ffffff;
+    text-decoration-color: rgba(255,255,255,.7);
+}
+
+/* Community media text */
+.media-intro,
+.shared-media-name,
+.media-empty {
+    color: #c0cbd0;
+    text-shadow: 0 1px 0 rgba(255,255,255,.1);
+}
+
+.members-footer {
+    color: #a6b2b8;
+    text-shadow: 0 0 7px rgba(205,225,235,.1);
+}
+
+.members-footer span {
+    color: #e5d3aa;
+    text-shadow: 0 0 8px rgba(226,205,157,.2);
+}
+
+/* Upload status */
+.upload-status {
+    color: #ead9b2;
+    text-shadow: 0 0 8px rgba(226,205,157,.17);
+}
+
+/* Input text stays crisp and readable */
+.message-box input[type="text"] {
+    color: #f0f6f8;
+    text-shadow: 0 0 5px rgba(205,225,235,.1);
+}
+
+.message-box input::placeholder {
+    color: rgba(205,216,221,.58);
+}
+
+/* Glass sheen on the message composer */
+.message-box {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        inset 0 -1px 0 rgba(255,255,255,.025),
+        0 4px 18px rgba(0,0,0,.08),
+        0 0 12px rgba(205,225,235,.035);
+}
+
+/* Subtle reflective finish on channel and profile surfaces */
+.profile-card,
+.voice-panel,
+.shared-media-card {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.075),
+        0 3px 14px rgba(0,0,0,.08);
+}
+
+/* DM typography — safe additions for common DM text elements */
+.dm-welcome h1,
+.dm-welcome h2,
+.dm-sidebar-heading h2,
+.dm-contact-heading h2,
+.dm-conversation-header h2,
+.dm-contact-name,
+.dm-user-name,
+.dm-conversation-title {
+    color: #edf5f8;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.2),
+        0 0 9px rgba(205,225,235,.16);
+}
+
+/* DM secondary labels and timestamps */
+.dm-welcome p,
+.dm-contact-heading p,
+.dm-contact-status,
+.dm-message-time,
+.dm-timestamp {
+    color: rgba(195,210,218,.78);
+    text-shadow: 0 1px 0 rgba(255,255,255,.1);
+}
+
+/* Keep the glass typography readable on smaller screens */
+@media (max-width: 600px) {
+    .message {
+        color: rgba(241,246,248,.96);
+        text-shadow:
+            0 1px 0 rgba(255,255,255,.15),
+            0 0 6px rgba(205,225,235,.1);
+    }
+
+    .message strong {
+        color: #f2e3c2;
+    }
+
+    .channel-title,
+    .profile-name {
+        text-shadow:
+            0 1px 0 rgba(255,255,255,.2),
+            0 0 7px rgba(205,225,235,.14);
     }
 }
 
