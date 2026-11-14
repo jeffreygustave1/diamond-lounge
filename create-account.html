@@ -8,12 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="brand.css">
+    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="brand.css?v=6">
 </head>
 <body class="auth-page">
     <main class="login-container">
-        <a class="auth-brand" href="index.html"><span>💎</span> DIAMOND LOUNGE</a>
+        <a class="auth-brand" href="index.html"><img src="diamond.gif" alt="" class="auth-brand-gem"> DIAMOND LOUNGE</a>
         <h1>Make yourself at home</h1>
         <p class="login-subtitle">Create your place in the lounge.</p>
         <form id="createAccountForm" class="login-form">
@@ -41,8 +41,8 @@
             "auth/invalid-email": "Please enter a valid email address.",
             "auth/weak-password": "Your password must contain at least 6 characters.",
             "auth/network-request-failed": "Network error. Check your connection and try again.",
-            "auth/operation-not-allowed": "Email/password sign-up is not enabled for this project.",
-            "auth/unauthorized-domain": "This website domain is not authorized in Firebase Authentication."
+            "auth/operation-not-allowed": "Enable Email/Password sign-in in Firebase Authentication.",
+            "auth/unauthorized-domain": "Add jeffreygustave1.github.io to Firebase Authentication's authorized domains."
         };
 
         form.addEventListener("submit", async (event) => {
@@ -58,12 +58,12 @@
                 try {
                     await updateProfile(credential.user, { displayName: username });
                 } catch (profileError) {
-                    console.warn("Account created but display name was not saved:", profileError);
+                    console.warn("Account created but display name could not be saved:", profileError);
                 }
                 window.location.assign("dashboard.html");
             } catch (error) {
                 console.error("Account creation error:", error);
-                errorMessage.textContent = errors[error.code] || "Could not create your account. Please try again.";
+                errorMessage.textContent = errors[error.code] || `Account creation failed${error.code ? ` (${error.code})` : ""}. Check the browser console.`;
                 button.disabled = false;
                 button.textContent = "Create account";
             }

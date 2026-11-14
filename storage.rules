@@ -3,6 +3,8 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /uploads/{userId}/{fileName} {
+      // Signed-in users can read community media. A user can create files only
+      // inside their own folder; overwrite and delete are not enabled.
       allow read: if request.auth != null;
       allow create: if request.auth != null
         && request.auth.uid == userId

@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import {
     addDoc, collection, limit, onSnapshot, orderBy, query, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
@@ -7,53 +7,50 @@ import {
 const messagesElement = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const messageForm = document.getElementById("messageForm");
-let currentUser = "Member";
-let currentUid = null;
-let chatReady = false;
+let currentUser = null;
+let chatLoaded = false;
 
 onAuthStateChanged(auth, (user) => {
     if (!user) {
-        window.location.href = "login.html";
+        window.location.replace("login.html");
         return;
     }
 
-    currentUid = user.uid;
-    currentUser = user.displayName || user.email || "Member";
+    currentUser = user;
+    const displayName = user.displayName || user.email || "Member";
     const profileName = document.getElementById("profileName");
     const currentUserElement = document.getElementById("currentUser");
-    if (profileName) profileName.textContent = currentUser;
-    if (currentUserElement) {
-        const name = currentUserElement.querySelector("span");
-        if (name) name.textContent = currentUser;
-        else currentUserElement.textContent = "🟢 " + currentUser;
-    }
-    if (!chatReady) {
-        chatReady = true;
+    if (profileName) profileName.textContent = displayName;
+    const currentName = currentUserElement?.querySelector("span");
+    if (currentName) currentName.textContent = displayName;
+
+    if (!chatLoaded) {
+        chatLoaded = true;
         loadMessages();
     }
 });
 
-function appendAttachment(message, attachment) {
+function renderAttachment(message, attachment) {
     if (!attachment || typeof attachment.url !== "string" || !attachment.url.startsWith("https://firebasestorage.googleapis.com/")) return;
     const type = typeof attachment.type === "string" ? attachment.type : "";
-    let preview;
+    let element;
     if (type.startsWith("image/")) {
-        preview = document.createElement("img");
-        preview.alt = attachment.name || "Shared image";
-        preview.loading = "lazy";
+        element = document.createElement("img");
+        element.alt = attachment.name || "Shared image";
+        element.loading = "lazy";
     } else if (type.startsWith("video/")) {
-        preview = document.createElement("video");
-        preview.controls = true;
-        preview.preload = "metadata";
+        element = document.createElement("video");
+        element.controls = true;
+        element.preload = "metadata";
     } else if (type.startsWith("audio/")) {
-        preview = document.createElement("audio");
-        preview.controls = true;
-        preview.preload = "metadata";
+        element = document.createElement("audio");
+        element.controls = true;
+        element.preload = "metadata";
     }
-    if (!preview) return;
-    preview.src = attachment.url;
-    preview.className = "message-attachment";
-    message.appendChild(preview);
+    if (!element) return;
+    element.src = attachment.url;
+    element.className = "message-attachment";
+    message.appendChild(element);
 }
 
 function loadMessages() {
@@ -61,25 +58,25 @@ function loadMessages() {
     onSnapshot(messagesQuery, (snapshot) => {
         if (!messagesElement) return;
         messagesElement.replaceChildren();
-        snapshot.forEach((messageSnapshot) => {
-            const data = messageSnapshot.data();
-            const message = document.createElement("div");
+        snapshot.forEach((entry) => {
+            const data = entry.data();
+            const message = document.createElement("article");
             message.className = "message";
             const author = document.createElement("strong");
             author.textContent = `${data.username || "Member"}: `;
             message.append(author, document.createTextNode(data.text || ""));
-            appendAttachment(message, data.attachment);
+            renderAttachment(message, data.attachment);
             messagesElement.appendChild(message);
         });
         messagesElement.scrollTop = messagesElement.scrollHeight;
     }, (error) => {
-        console.error("Firestore error:", error);
-        if (messagesElement) messagesElement.textContent = "Unable to load messages. Please check your connection.";
+        console.error("Chat listener failed:", error);
+        if (messagesElement) messagesElement.textContent = "Messages could not load. Check Firestore rules and connection.";
     });
 }
 
 async function sendMessage() {
-    if (!currentUid || !input) return;
+    if (!currentUser || !input) return;
     const text = input.value.trim();
     if (!text) return;
     if (text.length > 2000) {
@@ -88,32 +85,31 @@ async function sendMessage() {
     }
     try {
         await addDoc(collection(db, "messages"), {
-            uid: currentUid,
-            username: currentUser.slice(0, 30),
+            uid: currentUser.uid,
+            username: (currentUser.displayName || currentUser.email || "Member").slice(0, 30),
             text,
             timestamp: serverTimestamp()
         });
         input.value = "";
         input.focus();
     } catch (error) {
-        console.error("Message error:", error);
-        alert("Message could not be sent. Please try again.");
+        console.error("Message send failed:", error);
+        alert(error.code === "permission-denied"
+            ? "Firestore denied this message. Publish the provided firestore.rules."
+            : "Message could not be sent. Check your connection and try again.");
     }
 }
 
 window.sendMessage = sendMessage;
-window.clearChat = function () {
-    alert("Shared lounge messages are visible to everyone and cannot be cleared here.");
-};
-window.logout = async function () {
+window.clearChat = () => alert("Shared lounge messages are visible to everyone and cannot be cleared here.");
+window.logout = async () => {
     try {
         if (window.leaveVoiceChat) await window.leaveVoiceChat();
-        const { signOut } = await import("https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js");
         await signOut(auth);
-        window.location.href = "login.html";
+        window.location.replace("login.html");
     } catch (error) {
-        console.error("Logout error:", error);
-        alert("Unable to log out.");
+        console.error("Logout failed:", error);
+        alert("Unable to log out. Please try again.");
     }
 };
 

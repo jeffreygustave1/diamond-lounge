@@ -3,7 +3,8 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
 
-// Firebase web app configuration for Diamond Lounge.
+// Firebase web app configuration. Web app config is intended to be used in
+// client code; protect data with Firestore and Storage security rules.
 const firebaseConfig = {
     apiKey: "AIzaSyCyYt66fWu-jMN8PrU6SA7eEZ0XBIYl9to",
     authDomain: "diamond-lounge-7caf6.firebaseapp.com",
