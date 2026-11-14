@@ -1,14 +1,22 @@
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import {
-    addDoc, collection, limit, onSnapshot, orderBy, query, serverTimestamp
+    addDoc,
+    collection,
+    limit,
+    onSnapshot,
+    orderBy,
+    query,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
 const messagesElement = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const messageForm = document.getElementById("messageForm");
+const sendButton = document.getElementById("sendMessageButton");
 let currentUser = null;
 let chatLoaded = false;
+let stopMessagesListener = null;
 
 onAuthStateChanged(auth, (user) => {
     if (!user) {
@@ -31,7 +39,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function renderAttachment(message, attachment) {
-    if (!attachment || typeof attachment.url !== "string" || !attachment.url.startsWith("https://firebasestorage.googleapis.com/")) return;
+    if (!attachment || typeof attachment.url !== "string" || !/^https:\/\/firebasestorage\.googleapis\.com\//i.test(attachment.url)) return;
     const type = typeof attachment.type === "string" ? attachment.type : "";
     let element;
     if (type.startsWith("image/")) {
@@ -54,9 +62,9 @@ function renderAttachment(message, attachment) {
 }
 
 function loadMessages() {
+    if (!messagesElement) return;
     const messagesQuery = query(collection(db, "messages"), orderBy("timestamp", "asc"), limit(100));
-    onSnapshot(messagesQuery, (snapshot) => {
-        if (!messagesElement) return;
+    stopMessagesListener = onSnapshot(messagesQuery, (snapshot) => {
         messagesElement.replaceChildren();
         snapshot.forEach((entry) => {
             const data = entry.data();
@@ -71,18 +79,22 @@ function loadMessages() {
         messagesElement.scrollTop = messagesElement.scrollHeight;
     }, (error) => {
         console.error("Chat listener failed:", error);
-        if (messagesElement) messagesElement.textContent = "Messages could not load. Check Firestore rules and connection.";
+        messagesElement.textContent = error.code === "permission-denied"
+            ? "Firestore denied chat access. Publish the messages rules from firestore.rules."
+            : "Messages could not load. Check your connection and Firebase setup.";
     });
 }
 
 async function sendMessage() {
-    if (!currentUser || !input) return;
+    if (!currentUser || !input || !sendButton) return;
     const text = input.value.trim();
     if (!text) return;
     if (text.length > 2000) {
         alert("Messages cannot exceed 2000 characters.");
         return;
     }
+
+    sendButton.disabled = true;
     try {
         await addDoc(collection(db, "messages"), {
             uid: currentUser.uid,
@@ -95,8 +107,10 @@ async function sendMessage() {
     } catch (error) {
         console.error("Message send failed:", error);
         alert(error.code === "permission-denied"
-            ? "Firestore denied this message. Publish the provided firestore.rules."
-            : "Message could not be sent. Check your connection and try again.");
+            ? "Firestore denied this message. Publish the rules from firestore.rules."
+            : `Message could not be sent${error.code ? ` (${error.code})` : ". Check your connection."}`);
+    } finally {
+        sendButton.disabled = false;
     }
 }
 
@@ -117,3 +131,5 @@ messageForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     void sendMessage();
 });
+
+window.addEventListener("pagehide", () => stopMessagesListener?.());
