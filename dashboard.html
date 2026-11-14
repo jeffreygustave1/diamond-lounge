@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,17 +16,34 @@
 <body>
     <div class="dashboard">
         <aside class="servers" aria-label="Servers and direct messages">
-            <a class="server-icon dm-home selected" href="index.html" title="Diamond Lounge home" aria-label="Diamond Lounge home"><img src="diamond.gif" alt="Diamond Lounge animated diamond"></a>
+            <a class="server-icon dm-home selected" href="index.html" title="Diamond Lounge home" aria-label="Diamond Lounge home">
+                <img src="diamond.gif" alt="Diamond Lounge animated diamond">
+            </a>
             <div class="server-divider"></div>
             <button class="server-icon" type="button" title="Gaming community" aria-label="Gaming community">🎮</button>
             <button class="server-icon" type="button" title="Music community" aria-label="Music community">♫</button>
             <button class="server-icon" type="button" title="Cinema community" aria-label="Cinema community">▶</button>
             <button class="server-icon add-server" type="button" title="Add a server" aria-label="Add a server">＋</button>
         </aside>
+
         <aside class="channels">
-            <div class="workspace-heading"><span class="eyebrow">PRIVATE COMMUNITY</span><div class="workspace-title"><img src="diamond.gif" alt="" class="workspace-gem"><h1>Diamond Lounge</h1></div><span class="online-label"><i></i> Lounge is open</span></div>
+            <div class="workspace-heading">
+                <span class="eyebrow">PRIVATE COMMUNITY</span>
+                <div class="workspace-title">
+                    <img src="diamond.gif" alt="" class="workspace-gem">
+                    <h1>Diamond Lounge</h1>
+                </div>
+                <span class="online-label"><i></i> Lounge is open</span>
+            </div>
+
             <h3 class="section-heading">TEXT CHANNELS</h3>
-            <ul class="text-channels"><li class="text-channel selected"># <span>general</span></li><li class="text-channel"># <span>gaming</span></li><li class="text-channel"># <span>streaming</span></li><li class="text-channel"># <span>announcements</span></li></ul>
+            <ul class="text-channels">
+                <li class="text-channel selected"># <span>general</span></li>
+                <li class="text-channel"># <span>gaming</span></li>
+                <li class="text-channel"># <span>streaming</span></li>
+                <li class="text-channel"># <span>announcements</span></li>
+            </ul>
+
             <h3 class="section-heading voice-title">VOICE LOUNGES</h3>
             <ul class="voice-channel-list">
                 <li class="voice-channel" data-voice-name="General Voice" role="button" tabindex="0">🔊 <span>General Voice</span></li>
@@ -33,22 +51,75 @@
                 <li class="voice-channel" data-voice-name="Music Lounge" role="button" tabindex="0">♫ <span>Music Lounge</span></li>
                 <li class="voice-channel" data-voice-name="AI Hangout" role="button" tabindex="0">✦ <span>AI Hangout</span></li>
             </ul>
+
             <section class="voice-panel" id="voicePanel" aria-label="Voice channel controls" hidden>
                 <div class="voice-status" id="voiceStatus" aria-live="polite">Select a voice channel</div>
-                <div class="voice-buttons"><button type="button" class="voice-toggle-btn" id="voiceToggleBtn">Join Voice</button><button type="button" class="voice-toggle-btn secondary" id="muteToggleBtn" disabled>Mute</button></div>
-                <div class="voice-participants"><h4>IN VOICE <span id="voiceParticipantCount">0</span></h4><ul id="voiceParticipants" aria-live="polite"><li class="voice-empty">Choose a voice lounge.</li></ul></div>
+                <div class="voice-buttons">
+                    <button type="button" class="voice-toggle-btn" id="voiceToggleBtn">Join Voice</button>
+                    <button type="button" class="voice-toggle-btn secondary" id="muteToggleBtn" disabled>Mute</button>
+                </div>
+                <div class="voice-participants">
+                    <h4>IN VOICE <span id="voiceParticipantCount">0</span></h4>
+                    <ul id="voiceParticipants" aria-live="polite">
+                        <li class="voice-empty">Choose a voice lounge.</li>
+                    </ul>
+                </div>
                 <div id="remoteAudioContainer" class="remote-audio-container" aria-label="Remote voice audio"></div>
             </section>
-            <div class="profile-card"><div class="profile-avatar"><img src="diamond.gif" alt=""></div><div class="profile-copy"><div class="profile-name" id="profileName">Member</div><div class="profile-status">Available</div></div><button class="logout-btn" onclick="logout()" aria-label="Log out">↗</button></div>
+
+            <!-- PROFILE: THE DIAMOND IS NOW THE LOGOUT BUTTON -->
+            <div class="profile-card">
+                <button class="profile-avatar" type="button" onclick="logout()" aria-label="Log out" title="Log out">
+                    <img src="diamond.gif" alt="Log out">
+                </button>
+                <div class="profile-copy">
+                    <div class="profile-name" id="profileName">Member</div>
+                    <div class="profile-status">Available</div>
+                </div>
+            </div>
         </aside>
+
         <main class="chat-area">
-            <header class="chat-header"><div><div class="channel-title"># <span>general</span></div><div class="sub-header">A little space to share what matters.</div></div><span class="secure-label">✦ MEMBER LOUNGE</span></header>
+            <header class="chat-header">
+                <div>
+                    <div class="channel-title"># <span>general</span></div>
+                    <div class="sub-header">A little space to share what matters.</div>
+                </div>
+                <span class="secure-label">✦ MEMBER LOUNGE</span>
+            </header>
+
             <div class="messages" id="messages" aria-live="polite"></div>
-            <form class="message-box" id="messageForm"><label class="upload-button" for="mediaInput" title="Share an image, GIF, video, or audio file" aria-label="Choose media to share">＋</label><input type="file" id="mediaInput" accept="image/*,video/*,audio/*" hidden><input type="text" id="messageInput" placeholder="Write something to the lounge…" maxlength="2000" autocomplete="off"><button type="submit" id="sendMessageButton">Send</button></form>
+
+            <form class="message-box" id="messageForm">
+                <label class="upload-button" for="mediaInput" title="Share an image, GIF, video, or audio file" aria-label="Choose media to share">＋</label>
+                <input type="file" id="mediaInput" accept="image/*,video/*,audio/*" hidden>
+                <input type="text" id="messageInput" placeholder="Write something to the lounge…" maxlength="2000" autocomplete="off">
+                <button type="submit" id="sendMessageButton">Send</button>
+            </form>
+
             <div id="uploadStatus" class="upload-status" role="status" aria-live="polite"></div>
         </main>
-        <aside class="members"><div class="members-section"><h3 class="section-heading">COMMUNITY</h3><ul id="onlineMembers" class="online-list"><li id="currentUser"><i></i><span>Member</span><em>you</em></li></ul></div><div class="media-section"><h3 class="section-heading">SHARED MOMENTS</h3><p class="media-intro">Images, GIFs, videos and audio shared by the community.</p><div id="sharedMedia" class="shared-media" aria-live="polite"><p class="media-empty">Nothing shared here yet.</p></div></div><div class="members-footer">DIAMOND LOUNGE <span>✦</span></div></aside>
+
+        <aside class="members">
+            <div class="members-section">
+                <h3 class="section-heading">COMMUNITY</h3>
+                <ul id="onlineMembers" class="online-list">
+                    <li id="currentUser"><i></i><span>Member</span><em>you</em></li>
+                </ul>
+            </div>
+
+            <div class="media-section">
+                <h3 class="section-heading">SHARED MOMENTS</h3>
+                <p class="media-intro">Images, GIFs, videos and audio shared by the community.</p>
+                <div id="sharedMedia" class="shared-media" aria-live="polite">
+                    <p class="media-empty">Nothing shared here yet.</p>
+                </div>
+            </div>
+
+            <div class="members-footer">DIAMOND LOUNGE <span>✦</span></div>
+        </aside>
     </div>
+
     <script type="module" src="script.js?v=8"></script>
     <script type="module" src="voice.js?v=8"></script>
     <script type="module" src="media.js?v=8"></script>
