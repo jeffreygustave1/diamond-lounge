@@ -450,8 +450,8 @@ button {
     flex-direction: column;
     background: transparent;
 
-    -webkit-backdrop-filter: blur(1px) saturate(170%);
-    backdrop-filter: blur(1px) saturate(170%);
+    -webkit-backdrop-filter: blur(4px) saturate(170%);
+    backdrop-filter: blur(4px) saturate(170%);
 
     border-left: 1px solid rgba(255,255,255,.045);
     border-right: 1px solid rgba(255,255,255,.045);
@@ -985,8 +985,8 @@ button {
         overflow: hidden;
 
         background: transparent;
-        -webkit-backdrop-filter: blur(1px) saturate(160%);
-        backdrop-filter: blur(1px) saturate(160%);
+        -webkit-backdrop-filter: blur(4px) saturate(160%);
+        backdrop-filter: blur(4px) saturate(160%);
     }
 
     .lounge-view,
