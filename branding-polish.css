@@ -21,7 +21,7 @@
     flex: none;
     filter: drop-shadow(0 0 9px rgba(199, 169, 107, .35));
 
-    transform: scale(13);
+    transform: scale(4);
     transform-origin: center center;
 }
 
@@ -34,22 +34,19 @@
     cursor: pointer;
 }
 
-/* Top-left diamond - RESTORED SIZE AND POSITION */
+/* Top-left diamond - preserve original successful settings */
 .servers .dm-home img {
     width: 93px;
     height: 93px;
     object-fit: contain;
     display: block;
-
     position: relative;
     left: -25px;
     top: -24px;
-
     transform: scale(4);
     transform-origin: center center;
 }
 
-/* Keep top-left diamond unchanged on hover */
 .servers .dm-home:hover img {
     transform: scale(4);
 }
