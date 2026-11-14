@@ -1,3 +1,4 @@
+
 /* Diamond Lounge — luxury dark-and-gold dashboard theme */
 :root{
     color-scheme:dark;
@@ -23,6 +24,7 @@ button{color:inherit;}
 .server-divider{width:28px;height:1px;margin:3px 0;background:var(--line);}
 .server-icon{width:46px;height:46px;flex:none;display:grid;place-items:center;padding:0;border:1px solid transparent;border-radius:16px;background:#1a1b1f;color:var(--gold-bright);font-size:16px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s;}
 .server-icon.selected,.server-icon:hover{background:#332d20;border-color:rgba(199,169,107,.44);}
+
 .channels{width:275px;flex:none;display:flex;flex-direction:column;padding:24px 16px 14px;overflow-y:auto;background:rgba(20,21,24,.96);border-right:1px solid var(--line);}
 .workspace-heading{padding:0 10px 24px;margin-bottom:20px;border-bottom:1px solid var(--line);}
 .workspace-heading h1{margin:7px 0 11px;font-family:"Playfair Display",Georgia,serif;font-size:23px;line-height:1.2;font-weight:600;}
@@ -40,6 +42,7 @@ button{color:inherit;}
 .voice-channel{position:relative;margin-top:3px;background:transparent;flex-wrap:wrap;}
 .voice-channel:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 .voice-channel .voice-panel{width:100%;flex-basis:100%;cursor:default;}
+
 .voice-panel{position:relative;z-index:2;margin:8px 0 6px;padding:12px;background:#19191c;border:1px solid var(--line);border-radius:10px;}
 .voice-panel[hidden]{display:none!important;}
 .voice-status{min-height:0;margin:0 0 9px;color:var(--muted);font-size:11px;line-height:1.4;}
@@ -56,8 +59,25 @@ button{color:inherit;}
 .voice-empty{color:var(--muted);}
 .voice-speaking-indicator{color:#79aa7a;margin-right:4px;}
 .remote-audio-container{display:none;}
+
 .profile-card{display:flex;align-items:center;gap:10px;margin-top:auto;padding:12px;border:1px solid var(--line);border-radius:11px;background:#191a1d;}
-.profile-avatar{width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:10px;background:#302a1e;}
+.profile-avatar{
+    width:32px;
+    height:32px;
+    flex:none;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:#302a1e;
+    overflow:visible;
+}
+.profile-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    transform:scale(2);
+    transform-origin:center;
+}
 .profile-copy{min-width:0;flex:1;}
 .profile-name{overflow:hidden;color:var(--text);font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;}
 .profile-status{margin-top:3px;color:#8ea28b;font-size:10px;}
