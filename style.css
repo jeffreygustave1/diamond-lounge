@@ -75,7 +75,7 @@ button{color:inherit;}
     width:100%;
     height:100%;
     object-fit:contain;
-    transform:scale(4);
+    transform:scale(7);
     transform-origin:center;
 }
 .profile-copy{min-width:0;flex:1;}
