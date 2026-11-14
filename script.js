@@ -35,8 +35,6 @@ const sendButton = document.getElementById("sendMessageButton");
 // ==========================================
 
 const dmHomeButton = document.getElementById("dmHomeButton");
-const backToLoungeButton = document.getElementById("backToLoungeButton");
-const dmBackButton = document.getElementById("dmBackButton");
 
 const loungeSidebar = document.getElementById("loungeSidebar");
 const dmSidebar = document.getElementById("dmSidebar");
@@ -209,7 +207,6 @@ function loadMessages() {
                 message.className = "message";
 
                 const author = document.createElement("strong");
-
                 author.textContent = `${data.username || "Member"}: `;
 
                 message.append(
@@ -308,12 +305,14 @@ function showDirectMessages() {
 
     document.body.classList.add("dm-mode");
 
-    if (dmStatus) dmStatus.textContent = "";
+    if (dmStatus) {
+        dmStatus.textContent = "";
+        dmStatus.classList.remove("error");
+    }
 
     if (memberSearch) {
         memberSearch.value = "";
         renderMembers();
-        memberSearch.focus();
     }
 }
 
@@ -495,6 +494,8 @@ async function openConversation(member) {
         member.uid
     );
 
+    const openingConversationId = currentConversationId;
+
     showConversationView();
 
     if (dmContactName) {
@@ -511,7 +512,10 @@ async function openConversation(member) {
         dmMessages.appendChild(loading);
     }
 
-    if (dmStatus) dmStatus.textContent = "";
+    if (dmStatus) {
+        dmStatus.textContent = "";
+        dmStatus.classList.remove("error");
+    }
 
     renderMembers();
 
@@ -519,7 +523,7 @@ async function openConversation(member) {
         const conversationRef = doc(
             db,
             "conversations",
-            currentConversationId
+            openingConversationId
         );
 
         const conversationSnapshot = await getDoc(conversationRef);
@@ -534,13 +538,10 @@ async function openConversation(member) {
             });
         }
 
-        // Do not start a listener if the user opened another
-        // conversation while this one was being prepared.
+        // Don't open a conversation if the user has navigated away
+        // or selected a different member while it was loading.
         if (
-            currentConversationId !== getConversationId(
-                currentUser.uid,
-                member.uid
-            ) ||
+            currentConversationId !== openingConversationId ||
             selectedMember?.uid !== member.uid
         ) {
             return;
@@ -550,6 +551,8 @@ async function openConversation(member) {
 
     } catch (error) {
         console.error("Private conversation failed:", error);
+
+        if (currentConversationId !== openingConversationId) return;
 
         if (dmMessages) {
             dmMessages.textContent =
@@ -709,11 +712,15 @@ async function sendDirectMessage() {
 // BUTTONS AND EVENTS
 // ==========================================
 
-dmHomeButton?.addEventListener("click", showDirectMessages);
-
-backToLoungeButton?.addEventListener("click", showLounge);
-
-dmBackButton?.addEventListener("click", showDirectMessages);
+// The large diamond toggles between the Lounge and DMs.
+// It also works while a private conversation is open.
+dmHomeButton?.addEventListener("click", () => {
+    if (dmSidebar && !dmSidebar.hidden) {
+        showLounge();
+    } else {
+        showDirectMessages();
+    }
+});
 
 memberSearch?.addEventListener("input", renderMembers);
 
