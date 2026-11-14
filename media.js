@@ -1,10 +1,18 @@
 import { auth, db, storage } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import {
-    addDoc, collection, limit, onSnapshot, orderBy, query, serverTimestamp
+    addDoc,
+    collection,
+    limit,
+    onSnapshot,
+    orderBy,
+    query,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 import {
-    getDownloadURL, ref, uploadBytesResumable
+    getDownloadURL,
+    ref,
+    uploadBytesResumable
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
@@ -22,10 +30,12 @@ onAuthStateChanged(auth, (user) => {
     onSnapshot(mediaQuery, (snapshot) => {
         mediaGallery.replaceChildren();
         let count = 0;
+
         snapshot.forEach((messageSnapshot) => {
             const data = messageSnapshot.data();
             const attachment = data.attachment;
             if (!attachment?.url || !/^https:\/\/firebasestorage\.googleapis\.com\//i.test(attachment.url)) return;
+
             const type = typeof attachment.type === "string" ? attachment.type : "";
             let preview;
             if (type.startsWith("image/")) {
@@ -56,6 +66,7 @@ onAuthStateChanged(auth, (user) => {
             card.append(label, preview);
             mediaGallery.appendChild(card);
         });
+
         if (!count) {
             const empty = document.createElement("p");
             empty.className = "media-empty";
@@ -83,50 +94,53 @@ mediaInput?.addEventListener("change", async () => {
         return;
     }
     if (file.size === 0 || file.size > MAX_FILE_SIZE) {
-        setStatus("This file must be no larger than 25 MB.", true);
+        setStatus("Files must be larger than 0 and no bigger than 25 MB.", true);
         mediaInput.value = "";
         return;
     }
 
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "upload";
     const objectRef = ref(storage, `uploads/${signedInUser.uid}/${Date.now()}_${safeName}`);
-    setStatus(`Starting upload for ${file.name}…`);
-    const startedAt = Date.now();
-    let lastProgressAt = startedAt;
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendMessageButton");
+    const uploadLabel = document.querySelector('label[for="mediaInput"]');
+    let lastProgressAt = Date.now();
+    let diagnosticTimer;
+    let unsubscribe = () => {};
+
+    mediaInput.disabled = true;
+    if (sendButton) sendButton.disabled = true;
+    if (uploadLabel) uploadLabel.setAttribute("aria-disabled", "true");
+    setStatus(`Connecting to Firebase Storage for ${file.name}…`);
 
     try {
         activeUpload = uploadBytesResumable(objectRef, file, { contentType: file.type });
         await new Promise((resolve, reject) => {
-            activeUpload.on("state_changed", (snapshot) => {
+            unsubscribe = activeUpload.on("state_changed", (snapshot) => {
                 lastProgressAt = Date.now();
                 const percent = snapshot.totalBytes
                     ? Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
                     : 0;
-                const transferred = formatBytes(snapshot.bytesTransferred);
-                const total = formatBytes(snapshot.totalBytes);
-                setStatus(`Uploading ${file.name} · ${percent}% (${transferred} of ${total})`);
+                setStatus(`Uploading ${file.name} · ${percent}% (${formatBytes(snapshot.bytesTransferred)} of ${formatBytes(snapshot.totalBytes)})`);
             }, reject, resolve);
 
-            // Give clear guidance when Firebase Storage is unavailable instead of
-            // leaving an unexplained 0% message on screen.
-            const diagnosticTimer = window.setInterval(() => {
-                if (!activeUpload || Date.now() - lastProgressAt < 12000) return;
-                if (Date.now() - startedAt > 12000) {
-                    setStatus("Upload has not started yet. Check Firebase Storage is enabled, the bucket is correct, and Storage rules are published.", true);
+            diagnosticTimer = window.setInterval(() => {
+                if (Date.now() - lastProgressAt > 15000) {
+                    setStatus("Upload is stalled. Check that Firebase Storage is enabled, its bucket matches firebase.js, and Storage rules are published.", true);
+                    lastProgressAt = Date.now();
                 }
-            }, 3000);
-            activeUpload.then?.(() => clearInterval(diagnosticTimer));
-            activeUpload.catch?.(() => clearInterval(diagnosticTimer));
+            }, 5000);
         });
 
         const downloadUrl = await getDownloadURL(activeUpload.snapshot.ref);
         const username = (signedInUser.displayName || signedInUser.email || "Member").slice(0, 30);
-        const textInput = document.getElementById("messageInput");
-        const caption = textInput?.value.trim();
+        const caption = messageInput?.value.trim();
+        const mediaDescription = file.type.startsWith("image/") ? "an image" : file.type.startsWith("video/") ? "a video" : "audio";
+
         await addDoc(collection(db, "messages"), {
             uid: signedInUser.uid,
             username,
-            text: (caption || `Shared ${file.type.startsWith("image/") ? "an image" : file.type.startsWith("video/") ? "a video" : "audio"}`).slice(0, 2000),
+            text: (caption || `Shared ${mediaDescription}`).slice(0, 2000),
             attachment: {
                 name: file.name.slice(0, 120),
                 type: file.type,
@@ -135,14 +149,20 @@ mediaInput?.addEventListener("change", async () => {
             },
             timestamp: serverTimestamp()
         });
-        if (textInput) textInput.value = "";
+
+        if (messageInput) messageInput.value = "";
         setStatus("Shared with the lounge.");
     } catch (error) {
         console.error("Media upload failed:", error);
         setStatus(uploadErrorMessage(error), true);
     } finally {
+        if (diagnosticTimer) window.clearInterval(diagnosticTimer);
+        unsubscribe();
         activeUpload = null;
+        mediaInput.disabled = false;
         mediaInput.value = "";
+        if (sendButton) sendButton.disabled = false;
+        if (uploadLabel) uploadLabel.removeAttribute("aria-disabled");
     }
 });
 

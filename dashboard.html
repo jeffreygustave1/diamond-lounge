@@ -8,9 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=4">
-    <link rel="stylesheet" href="luxury.css?v=4">
-    <link rel="stylesheet" href="branding-polish.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="luxury.css?v=5">
+    <link rel="stylesheet" href="branding-polish.css?v=5">
 </head>
 <body>
     <div class="dashboard">
@@ -22,7 +22,6 @@
             <button class="server-icon" type="button" title="Cinema community" aria-label="Cinema community">▶</button>
             <button class="server-icon add-server" type="button" title="Add a server" aria-label="Add a server">＋</button>
         </aside>
-
         <aside class="channels">
             <div class="workspace-heading">
                 <span class="eyebrow">PRIVATE COMMUNITY</span>
@@ -51,18 +50,16 @@
             </section>
             <div class="profile-card"><div class="profile-avatar"><img src="diamond.gif" alt=""></div><div class="profile-copy"><div class="profile-name" id="profileName">Member</div><div class="profile-status">Available</div></div><button class="logout-btn" onclick="logout()" aria-label="Log out">↗</button></div>
         </aside>
-
         <main class="chat-area">
             <header class="chat-header"><div><div class="channel-title"># <span>general</span></div><div class="sub-header">A little space to share what matters.</div></div><span class="secure-label">✦ MEMBER LOUNGE</span></header>
             <div class="messages" id="messages" aria-live="polite"></div>
             <form class="message-box" id="messageForm"><label class="upload-button" for="mediaInput" title="Share an image, GIF, video, or audio file" aria-label="Choose media to share">＋</label><input type="file" id="mediaInput" accept="image/*,video/*,audio/*" hidden><input type="text" id="messageInput" placeholder="Write something to the lounge…" maxlength="2000" autocomplete="off"><button type="submit" id="sendMessageButton">Send</button></form>
             <div id="uploadStatus" class="upload-status" role="status" aria-live="polite"></div>
         </main>
-
         <aside class="members"><div class="members-section"><h3 class="section-heading">COMMUNITY</h3><ul id="onlineMembers" class="online-list"><li id="currentUser"><i></i><span>Member</span><em>you</em></li></ul></div><div class="media-section"><h3 class="section-heading">SHARED MOMENTS</h3><p class="media-intro">Images, GIFs, videos and audio shared by the community.</p><div id="sharedMedia" class="shared-media" aria-live="polite"><p class="media-empty">Nothing shared here yet.</p></div></div><div class="members-footer">DIAMOND LOUNGE <span>✦</span></div></aside>
     </div>
-    <script type="module" src="script.js?v=4"></script>
-    <script type="module" src="voice.js?v=4"></script>
-    <script type="module" src="media.js?v=4"></script>
+    <script type="module" src="script.js?v=5"></script>
+    <script type="module" src="voice.js?v=5"></script>
+    <script type="module" src="media.js?v=5"></script>
 </body>
 </html>
