@@ -1,12 +1,12 @@
-// Load saved messages when page opens
-
 window.onload = function () {
-
-    const savedMessages =
-        JSON.parse(localStorage.getItem("chatMessages")) || [];
 
     const messages =
         document.getElementById("messages");
+
+    const savedMessages =
+        JSON.parse(
+            localStorage.getItem("chatMessages")
+        ) || [];
 
     savedMessages.forEach(function (message) {
 
@@ -24,8 +24,6 @@ window.onload = function () {
 
 };
 
-// Send Message
-
 function sendMessage() {
 
     const input =
@@ -35,7 +33,9 @@ function sendMessage() {
         input.value.trim();
 
     if (message === "") {
+
         return;
+
     }
 
     const messages =
@@ -51,8 +51,10 @@ function sendMessage() {
 
     messages.appendChild(newMessage);
 
-    let savedMessages =
-        JSON.parse(localStorage.getItem("chatMessages")) || [];
+    const savedMessages =
+        JSON.parse(
+            localStorage.getItem("chatMessages")
+        ) || [];
 
     savedMessages.push(message);
 
@@ -65,9 +67,16 @@ function sendMessage() {
 
     messages.scrollTop =
         messages.scrollHeight;
+
 }
 
-// Enter Key
+function clearChat() {
+
+    localStorage.removeItem("chatMessages");
+
+    location.reload();
+
+}
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -89,13 +98,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
-
-// Clear Chat
-
-function clearChat() {
-
-    localStorage.removeItem("chatMessages");
-
-    location.reload();
-
-}
