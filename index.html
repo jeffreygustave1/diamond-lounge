@@ -1,143 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diamond Lounge Dashboard</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101114">
+    <meta name="description" content="Diamond Lounge — a private place to connect, talk, and share." />
+    <title>Diamond Lounge | A place to belong</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="brand.css">
 </head>
+<body class="landing-page">
+    <header class="landing-nav">
+        <a class="brand-lockup" href="index.html"><span class="brand-gem">💎</span><span>DIAMOND LOUNGE</span></a>
+        <nav aria-label="Main navigation">
+            <a href="login.html">Sign in</a>
+            <a class="nav-cta" href="create-account.html">Join the lounge</a>
+        </nav>
+    </header>
 
-<body>
-
-<div class="dashboard">
-
-    <div class="servers">
-
-        <div class="server-logo">💎</div>
-
-        <div class="server-icon">🎮</div>
-        <div class="server-icon">🎵</div>
-        <div class="server-icon">🎬</div>
-        <div class="server-icon">🏆</div>
-        <div class="server-icon">➕</div>
-
-    </div>
-
-    <div class="channels">
-
-        <h3>CHANNELS</h3>
-
-        <ul>
-
-            <li># general <span class="badge">3</span></li>
-            <li># gaming <span class="badge">12</span></li>
-            <li># streaming <span class="badge">2</span></li>
-            <li># announcements</li>
-
-        </ul>
-
-        <div class="profile-card">
-
-            <div
-                class="profile-name"
-                id="profileName">
-
-                💎 Member
-
+    <main>
+        <section class="landing-hero">
+            <span class="landing-kicker">A PRIVATE COMMUNITY, BEAUTIFULLY CONNECTED</span>
+            <h1>Your people.<br><em>Your place.</em></h1>
+            <p>A considered space to talk, share the moments, and spend time together — all in one lounge.</p>
+            <div class="landing-actions">
+                <a class="primary-link" href="create-account.html">Create your account <span>→</span></a>
+                <a class="secondary-link" href="login.html">I already have an account</a>
             </div>
-
-            <div class="profile-status">
-
-                🟢 Online
-
-            </div>
-
-            <div class="profile-actions">
-
-                ⚙️ Settings
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="chat-area">
-
-        <div class="chat-header">
-
-            💎 Diamond Lounge
-
-            <div class="sub-header">
-
-                Premium Community Platform
-
-            </div>
-
-            <button
-                class="clear-btn"
-                onclick="clearChat()">
-
-                Clear Chat
-
-            </button>
-
-        </div>
-
-        <div
-            class="messages"
-            id="messages">
-
-            <div class="message">
-
-                <strong>System:</strong>
-                Welcome to Diamond Lounge 💎
-
-            </div>
-
-        </div>
-
-        <div class="message-box">
-
-            <input
-                type="text"
-                id="messageInput"
-                placeholder="Send a message..." />
-
-            <button onclick="sendMessage()">
-
-                Send
-
-            </button>
-
-        </div>
-
-    </div>
-
-    <div class="members">
-
-        <h3>ONLINE</h3>
-
-        <ul id="onlineMembers">
-
-            <li id="currentUser">
-                🟢 Member
-            </li>
-
-            <li>🟢 Gamer01</li>
-            <li>🟡 MusicFan</li>
-            <li>🔴 Streamer</li>
-
-        </ul>
-
-    </div>
-
-</div>
-
-<script type="module" src="script.js"></script>
-
+            <div class="landing-ornament"><span></span> ✦ <span></span></div>
+        </section>
+        <section class="landing-features" aria-label="Community features">
+            <article><span>01</span><h2>Conversations</h2><p>Keep up with the community in a shared lounge.</p></article>
+            <article><span>02</span><h2>Voice rooms</h2><p>Drop into a room and talk with your people.</p></article>
+            <article><span>03</span><h2>Shared moments</h2><p>Post images, GIFs, videos, and audio for members.</p></article>
+        </section>
+    </main>
+    <footer class="landing-footer">DIAMOND LOUNGE <span>✦</span> MADE FOR YOUR COMMUNITY</footer>
 </body>
 </html>

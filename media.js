@@ -9,11 +9,7 @@ import {
     query,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
-import {
-    getDownloadURL,
-    ref,
-    uploadBytesResumable
-} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
+import { getDownloadURL, ref, uploadBytesResumable } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const mediaInput = document.getElementById("mediaInput");
@@ -23,17 +19,15 @@ let signedInUser = null;
 
 onAuthStateChanged(auth, (user) => {
     signedInUser = user;
-    if (!user) return;
+    if (!user || !mediaGallery) return;
 
     const mediaQuery = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(50));
     onSnapshot(mediaQuery, (snapshot) => {
-        if (!mediaGallery) return;
         mediaGallery.replaceChildren();
         let count = 0;
-
         snapshot.forEach((messageSnapshot) => {
             const data = messageSnapshot.data();
-            if (!data.attachment?.url || !/^https:\/\//i.test(data.attachment.url)) return;
+            if (!data.attachment?.url || !/^https:\/\/firebasestorage\.googleapis\.com\//i.test(data.attachment.url)) return;
             count += 1;
 
             const card = document.createElement("article");
@@ -61,18 +55,13 @@ onAuthStateChanged(auth, (user) => {
                 preview.src = url;
                 preview.controls = true;
                 preview.preload = "metadata";
-            } else {
-                preview = document.createElement("a");
-                preview.href = url;
-                preview.textContent = "Open shared file";
-                preview.target = "_blank";
-                preview.rel = "noopener noreferrer";
             }
-            preview.classList.add("shared-media-preview");
-            card.appendChild(preview);
-            mediaGallery.appendChild(card);
+            if (preview) {
+                preview.classList.add("shared-media-preview");
+                card.appendChild(preview);
+                mediaGallery.appendChild(card);
+            }
         });
-
         if (!count) {
             const empty = document.createElement("p");
             empty.className = "media-empty";
@@ -81,26 +70,25 @@ onAuthStateChanged(auth, (user) => {
         }
     }, (error) => {
         console.error("Shared media listener failed:", error);
-        if (mediaGallery) mediaGallery.textContent = "Shared media could not be loaded.";
+        mediaGallery.textContent = "Shared media could not be loaded.";
     });
 });
 
 mediaInput?.addEventListener("change", async () => {
     const file = mediaInput.files?.[0];
     if (!file) return;
-
     if (!signedInUser) {
         showStatus("Please sign in before sharing a file.", true);
         mediaInput.value = "";
         return;
     }
-    if (!(file.type.startsWith("image/") || file.type.startsWith("video/") || file.type.startsWith("audio/"))) {
+    if (!/^(image|video|audio)\//.test(file.type)) {
         showStatus("Choose an image, GIF, video, or audio file.", true);
         mediaInput.value = "";
         return;
     }
-    if (file.size > MAX_FILE_SIZE) {
-        showStatus("Files must be 25 MB or smaller.", true);
+    if (file.size === 0 || file.size > MAX_FILE_SIZE) {
+        showStatus("Files must be larger than 0 and no bigger than 25 MB.", true);
         mediaInput.value = "";
         return;
     }
@@ -108,7 +96,6 @@ mediaInput?.addEventListener("change", async () => {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "upload";
     const objectRef = ref(storage, `uploads/${signedInUser.uid}/${Date.now()}_${safeName}`);
     showStatus(`Uploading ${file.name}…`);
-
     try {
         const task = uploadBytesResumable(objectRef, file, { contentType: file.type });
         await new Promise((resolve, reject) => {
@@ -118,22 +105,23 @@ mediaInput?.addEventListener("change", async () => {
             }, reject, resolve);
         });
         const url = await getDownloadURL(task.snapshot.ref);
-        const name = signedInUser.displayName || signedInUser.email || "Member";
-        const messageText = inputText();
+        const username = (signedInUser.displayName || signedInUser.email || "Member").slice(0, 30);
+        const text = document.getElementById("messageInput")?.value.trim();
         await addDoc(collection(db, "messages"), {
             uid: signedInUser.uid,
-            username: name.slice(0, 30),
-            text: messageText || `Shared ${file.type.startsWith("image/") ? "an image" : file.type.startsWith("video/") ? "a video" : "audio"}`,
+            username,
+            text: (text || `Shared ${file.type.startsWith("image/") ? "an image" : file.type.startsWith("video/") ? "a video" : "audio"}`).slice(0, 2000),
             attachment: { name: file.name.slice(0, 120), type: file.type, url, size: file.size },
             timestamp: serverTimestamp()
         });
-        if (messageInput()) messageInput().value = "";
+        const input = document.getElementById("messageInput");
+        if (input) input.value = "";
         showStatus("Shared with the lounge.");
     } catch (error) {
         console.error("Media upload failed:", error);
         showStatus(error.code === "storage/unauthorized"
-            ? "Upload blocked. Publish the Storage rules from storage.rules."
-            : "Upload failed. Check Firebase Storage is enabled and try again.", true);
+            ? "Upload blocked. Publish the rules from storage.rules in Firebase Storage."
+            : "Upload failed. Confirm Firebase Storage is enabled and try again.", true);
     } finally {
         mediaInput.value = "";
     }
@@ -143,12 +131,4 @@ function showStatus(message, isError = false) {
     if (!uploadStatus) return;
     uploadStatus.textContent = message;
     uploadStatus.classList.toggle("error", isError);
-}
-
-function inputText() {
-    return messageInput()?.value.trim() || "";
-}
-
-function messageInput() {
-    return document.getElementById("messageInput");
 }

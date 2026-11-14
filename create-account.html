@@ -3,99 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account | Diamond Lounge</title>
+    <meta name="theme-color" content="#101114">
+    <title>Create an account | Diamond Lounge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="brand.css">
 </head>
-<body>
+<body class="auth-page">
     <main class="login-container">
-        <img src="diamond.gif" alt="Diamond Logo" class="login-logo">
-        <h1>Create Account</h1>
-        <p class="login-subtitle">Join Diamond Lounge</p>
-
+        <a class="auth-brand" href="index.html"><span>💎</span> DIAMOND LOUNGE</a>
+        <h1>Make yourself at home</h1>
+        <p class="login-subtitle">Create your place in the lounge.</p>
         <form id="createAccountForm" class="login-form">
-            <input
-                type="text"
-                id="username"
-                placeholder="Username"
-                autocomplete="nickname"
-                required
-                minlength="3"
-                maxlength="30">
-
-            <input
-                type="email"
-                id="email"
-                placeholder="Email Address"
-                autocomplete="email"
-                required>
-
-            <input
-                type="password"
-                id="password"
-                placeholder="Password (minimum 6 characters)"
-                autocomplete="new-password"
-                required
-                minlength="6">
-
-            <button type="submit" class="login-button" id="createButton">
-                Create Account
-            </button>
+            <label for="username">Display name</label>
+            <input type="text" id="username" placeholder="How should we call you?" autocomplete="nickname" required minlength="3" maxlength="30">
+            <label for="email">Email address</label>
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="At least 6 characters" autocomplete="new-password" required minlength="6">
+            <button type="submit" class="login-button" id="createButton">Create account</button>
             <p id="errorMessage" role="alert" aria-live="polite"></p>
         </form>
-
-        <p class="signup-link">
-            Already have an account?
-            <a href="login.html">Login</a>
-        </p>
+        <p class="signup-link">Already a member? <a href="login.html">Sign in</a></p>
+        <a class="back-home" href="index.html">← Back to Diamond Lounge</a>
     </main>
-
     <script type="module">
         import { auth } from "./firebase.js";
-        import {
-            createUserWithEmailAndPassword,
-            updateProfile
-        } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 
         const form = document.getElementById("createAccountForm");
         const button = document.getElementById("createButton");
         const errorMessage = document.getElementById("errorMessage");
-
         const errors = {
-            "auth/email-already-in-use": "This email already has an account. Try logging in instead.",
+            "auth/email-already-in-use": "This email already has an account. Try signing in instead.",
             "auth/invalid-email": "Please enter a valid email address.",
             "auth/weak-password": "Your password must contain at least 6 characters.",
-            "auth/network-request-failed": "Network error. Check your internet connection and try again.",
-            "auth/operation-not-allowed": "Email/password sign-up is not enabled for this Firebase project.",
-            "auth/unauthorized-domain": "This website domain is not authorized in Firebase Authentication settings."
+            "auth/network-request-failed": "Network error. Check your connection and try again.",
+            "auth/operation-not-allowed": "Email/password sign-up is not enabled for this project.",
+            "auth/unauthorized-domain": "This website domain is not authorized in Firebase Authentication."
         };
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             errorMessage.textContent = "";
             button.disabled = true;
-            button.textContent = "Creating Account...";
-
+            button.textContent = "Creating your account…";
             const username = document.getElementById("username").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
-
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-                // Account creation succeeds before profile updates; don't tell the user
-                // signup failed if only the optional display-name update has a problem.
+                const credential = await createUserWithEmailAndPassword(auth, email, password);
                 try {
-                    await updateProfile(userCredential.user, { displayName: username });
+                    await updateProfile(credential.user, { displayName: username });
                 } catch (profileError) {
-                    console.warn("Account created, but the display name could not be saved:", profileError);
+                    console.warn("Account created but display name was not saved:", profileError);
                 }
-
                 window.location.assign("dashboard.html");
             } catch (error) {
                 console.error("Account creation error:", error);
                 errorMessage.textContent = errors[error.code] || "Could not create your account. Please try again.";
                 button.disabled = false;
-                button.textContent = "Create Account";
+                button.textContent = "Create account";
             }
         });
     </script>
