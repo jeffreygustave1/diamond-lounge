@@ -1,154 +1,124 @@
-const currentUser =
-    localStorage.getItem("diamondUsername") ||
-    "Member";
+document.addEventListener("DOMContentLoaded", function () {
 
-window.onload = function () {
+    const channels =
+        document.querySelectorAll(".voice-channel");
 
-    const profileName =
-        document.getElementById("profileName");
+    channels.forEach(function (channel) {
 
-    if (profileName) {
-        profileName.innerHTML =
-            "💎 " + currentUser;
-    }
+        channel.addEventListener("click", function () {
 
-    const currentUserElement =
-        document.getElementById("currentUser");
+            channels.forEach(function (item) {
+                item.classList.remove("active");
+            });
 
-    if (currentUserElement) {
-        currentUserElement.innerHTML =
-            "🟢 " + currentUser;
-    }
+            channel.classList.add("active");
 
-    const messages =
-        document.getElementById("messages");
+            const voiceMessage =
+                document.createElement("div");
 
-    const savedMessages =
-        JSON.parse(
-            localStorage.getItem("chatMessages")
-        ) || [];
+            voiceMessage.className = "message";
 
-    savedMessages.forEach(function (message) {
+            voiceMessage.innerHTML =
+                "<strong>System:</strong> You joined " +
+                channel.textContent.trim();
 
-        const newMessage =
-            document.createElement("div");
+            const messages =
+                document.getElementById("messages");
 
-        newMessage.className =
-            "message";
+            if (messages) {
+                messages.appendChild(voiceMessage);
+                messages.scrollTop =
+                    messages.scrollHeight;
+            }
 
-        newMessage.innerHTML =
-            "<strong>" +
-            currentUser +
-            ":</strong> " +
-            message;
-
-        messages.appendChild(
-            newMessage
-        );
+        });
 
     });
 
+});
+
+const currentUser = localStorage.getItem("diamondUsername") || "Member";
+
+window.onload = function () {
+    const profileName = document.getElementById("profileName");
+
+    if (profileName) {
+        profileName.textContent = "💎 " + currentUser;
+    }
+
+    const currentUserElement = document.getElementById("currentUser");
+
+    if (currentUserElement) {
+        currentUserElement.textContent = "🟢 " + currentUser;
+    }
+
+    const messages = document.getElementById("messages");
+
+    if (!messages) return;
+
+    const savedMessages =
+        JSON.parse(localStorage.getItem("chatMessages")) || [];
+
+    savedMessages.forEach(function (message) {
+        const newMessage = document.createElement("div");
+
+        newMessage.className = "message";
+
+        newMessage.innerHTML =
+            "<strong>" + currentUser + ":</strong> " + message;
+
+        messages.appendChild(newMessage);
+    });
 };
 
 function sendMessage() {
+    const input = document.getElementById("messageInput");
 
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
+    if (!input) return;
 
-    const message =
-        input.value.trim();
+    const message = input.value.trim();
 
-    if (message === "") {
-        return;
-    }
+    if (message === "") return;
 
-    const messages =
-        document.getElementById(
-            "messages"
-        );
+    const messages = document.getElementById("messages");
 
-    const newMessage =
-        document.createElement(
-            "div"
-        );
+    const newMessage = document.createElement("div");
 
-    newMessage.className =
-        "message";
+    newMessage.className = "message";
 
     newMessage.innerHTML =
-        "<strong>" +
-        currentUser +
-        ":</strong> " +
-        message;
+        "<strong>" + currentUser + ":</strong> " + message;
 
-    messages.appendChild(
-        newMessage
-    );
+    messages.appendChild(newMessage);
 
     const savedMessages =
-        JSON.parse(
-            localStorage.getItem(
-                "chatMessages"
-            )
-        ) || [];
+        JSON.parse(localStorage.getItem("chatMessages")) || [];
 
-    savedMessages.push(
-        message
-    );
+    savedMessages.push(message);
 
     localStorage.setItem(
         "chatMessages",
-        JSON.stringify(
-            savedMessages
-        )
+        JSON.stringify(savedMessages)
     );
 
     input.value = "";
 
-    messages.scrollTop =
-        messages.scrollHeight;
-
+    messages.scrollTop = messages.scrollHeight;
 }
 
 function clearChat() {
-
-    localStorage.removeItem(
-        "chatMessages"
-    );
-
+    localStorage.removeItem("chatMessages");
     location.reload();
-
 }
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("messageInput");
 
-        const input =
-            document.getElementById(
-                "messageInput"
-            );
+    if (!input) return;
 
-        if (input) {
-
-            input.addEventListener(
-                "keypress",
-                function (event) {
-
-                    if (
-                        event.key === "Enter"
-                    ) {
-
-                        sendMessage();
-
-                    }
-
-                }
-            );
-
+    input.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            sendMessage();
         }
-
-    }
-);
+    });
+});

@@ -325,3 +325,28 @@ transform:scale(1);
 }
 
 }
+
+.voice-title{
+    margin-top:25px;
+    margin-bottom:12px;
+}
+
+.voice-channel{
+    padding:12px;
+    margin-top:8px;
+    background:#0d1117;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.voice-channel:hover{
+    background:#238636;
+    transform:translateX(5px);
+}
+
+.voice-channel.active{
+    background:#238636;
+    color:white;
+    font-weight:bold;
+}
