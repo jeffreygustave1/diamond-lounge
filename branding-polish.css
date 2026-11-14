@@ -21,7 +21,8 @@
     flex: none;
     filter: drop-shadow(0 0 9px rgba(199, 169, 107, .35));
 
-    transform: scale(4);
+    /* 13x visual size, same center position */
+    transform: scale(13);
     transform-origin: center center;
 }
 
@@ -34,7 +35,7 @@
     cursor: pointer;
 }
 
-/* Diamond inside the square */
+/* Diamond inside the square - KEEP AS IS */
 .servers .dm-home img {
     width: 93px;
     height: 93px;
@@ -48,7 +49,7 @@
     transform-origin: center center;
 }
 
-/* Keep the same size on hover */
+/* Keep square diamond size consistent on hover */
 .servers .dm-home:hover img {
     transform: scale(4);
 }
