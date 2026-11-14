@@ -12,7 +12,6 @@
     margin: 0;
 }
 
-/* Diamond beside Diamond Lounge title */
 .workspace-title .workspace-gem {
     display: block;
     width: 90px;
@@ -20,12 +19,9 @@
     object-fit: contain;
     flex: none;
     filter: drop-shadow(0 0 9px rgba(199, 169, 107, .35));
-
-    transform: scale(4);
-    transform-origin: center center;
 }
 
-/* Top-left home server square */
+/* Home server icon */
 .servers .dm-home {
     display: grid;
     place-items: center;
@@ -34,7 +30,7 @@
     cursor: pointer;
 }
 
-/* Diamond inside the square */
+/* Diamond positioning */
 .servers .dm-home img {
     width: 93px;
     height: 93px;
@@ -43,14 +39,11 @@
     position: relative;
     left: -25px;
     top: -24px;
-
-    transform: scale(4);
-    transform-origin: center center;
 }
 
-/* Keep the same size on hover */
+/* No enlargement when hovering */
 .servers .dm-home:hover img {
-    transform: scale(4);
+    transform: none;
 }
 
 .servers .server-icon:not(.dm-home) {
