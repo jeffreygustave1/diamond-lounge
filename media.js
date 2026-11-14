@@ -1,21 +1,18 @@
 import { auth, db, storage } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import {
-    addDoc,
-    collection,
-    limit,
-    onSnapshot,
-    orderBy,
-    query,
-    serverTimestamp
+    addDoc, collection, limit, onSnapshot, orderBy, query, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
-import { getDownloadURL, ref, uploadBytesResumable } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
+import {
+    getDownloadURL, ref, uploadBytesResumable
+} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const mediaInput = document.getElementById("mediaInput");
 const uploadStatus = document.getElementById("uploadStatus");
 const mediaGallery = document.getElementById("sharedMedia");
 let signedInUser = null;
+let activeUpload = null;
 
 onAuthStateChanged(auth, (user) => {
     signedInUser = user;
@@ -27,40 +24,37 @@ onAuthStateChanged(auth, (user) => {
         let count = 0;
         snapshot.forEach((messageSnapshot) => {
             const data = messageSnapshot.data();
-            if (!data.attachment?.url || !/^https:\/\/firebasestorage\.googleapis\.com\//i.test(data.attachment.url)) return;
-            count += 1;
-
-            const card = document.createElement("article");
-            card.className = "shared-media-card";
-            const name = document.createElement("div");
-            name.className = "shared-media-name";
-            name.textContent = `${data.username || "Member"} · ${data.attachment.name || "Shared media"}`;
-            card.appendChild(name);
-
-            const url = data.attachment.url;
-            const type = data.attachment.type || "";
+            const attachment = data.attachment;
+            if (!attachment?.url || !/^https:\/\/firebasestorage\.googleapis\.com\//i.test(attachment.url)) return;
+            const type = typeof attachment.type === "string" ? attachment.type : "";
             let preview;
             if (type.startsWith("image/")) {
                 preview = document.createElement("img");
-                preview.src = url;
-                preview.alt = data.attachment.name || "Shared image";
+                preview.src = attachment.url;
+                preview.alt = attachment.name || "Shared image";
                 preview.loading = "lazy";
             } else if (type.startsWith("video/")) {
                 preview = document.createElement("video");
-                preview.src = url;
+                preview.src = attachment.url;
                 preview.controls = true;
                 preview.preload = "metadata";
             } else if (type.startsWith("audio/")) {
                 preview = document.createElement("audio");
-                preview.src = url;
+                preview.src = attachment.url;
                 preview.controls = true;
                 preview.preload = "metadata";
             }
-            if (preview) {
-                preview.classList.add("shared-media-preview");
-                card.appendChild(preview);
-                mediaGallery.appendChild(card);
-            }
+            if (!preview) return;
+
+            count += 1;
+            const card = document.createElement("article");
+            card.className = "shared-media-card";
+            const label = document.createElement("div");
+            label.className = "shared-media-name";
+            label.textContent = `${data.username || "Member"} · ${attachment.name || "Shared media"}`;
+            preview.classList.add("shared-media-preview");
+            card.append(label, preview);
+            mediaGallery.appendChild(card);
         });
         if (!count) {
             const empty = document.createElement("p");
@@ -70,65 +64,118 @@ onAuthStateChanged(auth, (user) => {
         }
     }, (error) => {
         console.error("Shared media listener failed:", error);
-        mediaGallery.textContent = "Shared media could not be loaded.";
+        mediaGallery.textContent = "Shared media could not be loaded. Check Firestore access.";
     });
 });
 
 mediaInput?.addEventListener("change", async () => {
     const file = mediaInput.files?.[0];
     if (!file) return;
+
     if (!signedInUser) {
-        showStatus("Please sign in before sharing a file.", true);
+        setStatus("Please sign in before sharing a file.", true);
         mediaInput.value = "";
         return;
     }
-    if (!/^(image|video|audio)\//.test(file.type)) {
-        showStatus("Choose an image, GIF, video, or audio file.", true);
+    if (!/^(image|video|audio)\//i.test(file.type)) {
+        setStatus("Choose an image, GIF, video, or audio file.", true);
         mediaInput.value = "";
         return;
     }
     if (file.size === 0 || file.size > MAX_FILE_SIZE) {
-        showStatus("Files must be larger than 0 and no bigger than 25 MB.", true);
+        setStatus("This file must be no larger than 25 MB.", true);
         mediaInput.value = "";
         return;
     }
 
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "upload";
     const objectRef = ref(storage, `uploads/${signedInUser.uid}/${Date.now()}_${safeName}`);
-    showStatus(`Uploading ${file.name}…`);
+    setStatus(`Starting upload for ${file.name}…`);
+    const startedAt = Date.now();
+    let lastProgressAt = startedAt;
+
     try {
-        const task = uploadBytesResumable(objectRef, file, { contentType: file.type });
+        activeUpload = uploadBytesResumable(objectRef, file, { contentType: file.type });
         await new Promise((resolve, reject) => {
-            task.on("state_changed", (snapshot) => {
-                const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                showStatus(`Uploading ${file.name} · ${percent}%`);
+            activeUpload.on("state_changed", (snapshot) => {
+                lastProgressAt = Date.now();
+                const percent = snapshot.totalBytes
+                    ? Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+                    : 0;
+                const transferred = formatBytes(snapshot.bytesTransferred);
+                const total = formatBytes(snapshot.totalBytes);
+                setStatus(`Uploading ${file.name} · ${percent}% (${transferred} of ${total})`);
             }, reject, resolve);
+
+            // Give clear guidance when Firebase Storage is unavailable instead of
+            // leaving an unexplained 0% message on screen.
+            const diagnosticTimer = window.setInterval(() => {
+                if (!activeUpload || Date.now() - lastProgressAt < 12000) return;
+                if (Date.now() - startedAt > 12000) {
+                    setStatus("Upload has not started yet. Check Firebase Storage is enabled, the bucket is correct, and Storage rules are published.", true);
+                }
+            }, 3000);
+            activeUpload.then?.(() => clearInterval(diagnosticTimer));
+            activeUpload.catch?.(() => clearInterval(diagnosticTimer));
         });
-        const url = await getDownloadURL(task.snapshot.ref);
+
+        const downloadUrl = await getDownloadURL(activeUpload.snapshot.ref);
         const username = (signedInUser.displayName || signedInUser.email || "Member").slice(0, 30);
-        const text = document.getElementById("messageInput")?.value.trim();
+        const textInput = document.getElementById("messageInput");
+        const caption = textInput?.value.trim();
         await addDoc(collection(db, "messages"), {
             uid: signedInUser.uid,
             username,
-            text: (text || `Shared ${file.type.startsWith("image/") ? "an image" : file.type.startsWith("video/") ? "a video" : "audio"}`).slice(0, 2000),
-            attachment: { name: file.name.slice(0, 120), type: file.type, url, size: file.size },
+            text: (caption || `Shared ${file.type.startsWith("image/") ? "an image" : file.type.startsWith("video/") ? "a video" : "audio"}`).slice(0, 2000),
+            attachment: {
+                name: file.name.slice(0, 120),
+                type: file.type,
+                url: downloadUrl,
+                size: file.size
+            },
             timestamp: serverTimestamp()
         });
-        const input = document.getElementById("messageInput");
-        if (input) input.value = "";
-        showStatus("Shared with the lounge.");
+        if (textInput) textInput.value = "";
+        setStatus("Shared with the lounge.");
     } catch (error) {
         console.error("Media upload failed:", error);
-        showStatus(error.code === "storage/unauthorized"
-            ? "Upload blocked. Publish the rules from storage.rules in Firebase Storage."
-            : "Upload failed. Confirm Firebase Storage is enabled and try again.", true);
+        setStatus(uploadErrorMessage(error), true);
     } finally {
+        activeUpload = null;
         mediaInput.value = "";
     }
 });
 
-function showStatus(message, isError = false) {
+function uploadErrorMessage(error) {
+    switch (error?.code) {
+        case "storage/unauthorized":
+            return "Upload permission denied. Publish storage.rules in Firebase Storage and sign in again.";
+        case "storage/bucket-not-found":
+        case "storage/project-not-found":
+            return "Firebase Storage bucket not found. Enable Storage and verify storageBucket in firebase.js.";
+        case "storage/quota-exceeded":
+            return "Firebase Storage quota exceeded. Check your Firebase plan and usage.";
+        case "storage/retry-limit-exceeded":
+        case "storage/canceled":
+            return "Upload stopped because the connection failed or was canceled. Try again on a stable connection.";
+        case "storage/unknown":
+            return "Firebase Storage could not complete the upload. Check Storage setup, rules, and browser console.";
+        case "permission-denied":
+            return "The file uploaded but Firestore rejected its message. Publish the messages rules from firestore.rules.";
+        default:
+            return `Upload failed${error?.code ? ` (${error.code})` : ""}. Verify Firebase Storage is enabled and try again.`;
+    }
+}
+
+function setStatus(message, isError = false) {
     if (!uploadStatus) return;
     uploadStatus.textContent = message;
     uploadStatus.classList.toggle("error", isError);
+}
+
+function formatBytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
+    const units = ["B", "KB", "MB", "GB"];
+    const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    return `${(bytes / (1024 ** index)).toFixed(index ? 1 : 0)} ${units[index]}`;
 }

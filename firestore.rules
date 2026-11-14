@@ -4,7 +4,6 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /messages/{messageId} {
       allow read: if request.auth != null;
-
       allow create: if request.auth != null
         && request.resource.data.keys().hasAll(['uid', 'username', 'text', 'timestamp'])
         && request.resource.data.keys().hasOnly(['uid', 'username', 'text', 'timestamp', 'attachment'])
@@ -33,7 +32,6 @@ service cloud.firestore {
             && request.resource.data.attachment.size <= 25 * 1024 * 1024
           )
         );
-
       allow update, delete: if false;
     }
 
@@ -52,21 +50,32 @@ service cloud.firestore {
 
     match /voiceRooms/{roomId}/calls/{callId} {
       allow read: if request.auth != null
-        && (resource.data.callerUid == request.auth.uid
-          || resource.data.calleeUid == request.auth.uid);
+        && (resource.data.callerUid == request.auth.uid || resource.data.calleeUid == request.auth.uid);
       allow create: if request.auth != null
         && request.resource.data.callerUid == request.auth.uid
         && request.resource.data.calleeUid is string
         && request.resource.data.calleeUid != request.auth.uid
         && request.resource.data.callerSessionId is string
-        && request.resource.data.calleeSessionId is string;
+        && request.resource.data.calleeSessionId is string
+        && request.resource.data.offer == null
+        && request.resource.data.answer == null
+        && request.resource.data.createdAt is number;
       allow update: if request.auth != null
         && request.resource.data.callerUid == resource.data.callerUid
         && request.resource.data.calleeUid == resource.data.calleeUid
-        && ((request.auth.uid == resource.data.callerUid
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['offer']))
-          || (request.auth.uid == resource.data.calleeUid
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answer'])));
+        && (
+          (request.auth.uid == resource.data.callerUid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['offer'])
+            && request.resource.data.offer is map
+            && request.resource.data.offer.type == 'offer'
+            && request.resource.data.offer.sdp is string)
+          ||
+          (request.auth.uid == resource.data.calleeUid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answer'])
+            && request.resource.data.answer is map
+            && request.resource.data.answer.type == 'answer'
+            && request.resource.data.answer.sdp is string)
+        );
       allow delete: if request.auth != null && request.auth.uid == resource.data.callerUid;
 
       match /candidates/{candidateId} {
@@ -75,8 +84,7 @@ service cloud.firestore {
         }
         function isCallParticipant() {
           return request.auth != null
-            && (callData().callerUid == request.auth.uid
-              || callData().calleeUid == request.auth.uid);
+            && (callData().callerUid == request.auth.uid || callData().calleeUid == request.auth.uid);
         }
         allow read: if isCallParticipant();
         allow create: if isCallParticipant()

@@ -1,21 +1,7 @@
-/* Keep the selected channel expandable and make every brand diamond legible. */
-.workspace-title{display:flex;align-items:center;gap:10px;margin:9px 0 12px;min-width:0;}
-.workspace-title h1{margin:0;white-space:nowrap;}
-.workspace-title .workspace-gem{display:block;width:40px;height:40px;flex:none;object-fit:contain;filter:drop-shadow(0 0 9px rgba(199,169,107,.35));}
-.servers .dm-home{display:grid;place-items:center;padding:0;overflow:hidden;text-decoration:none;}
-.servers .dm-home img{display:block;width:38px;height:38px;object-fit:contain;}
-.servers .dm-home:hover img{transform:scale(1.06);}
-.servers .server-icon:not(.dm-home){flex:none;display:grid;place-items:center;padding:0;cursor:pointer;}
-.servers .add-server{color:#8eae84;}
-.profile-avatar img{display:block;width:30px;height:30px;object-fit:contain;}
-.voice-channel{flex-wrap:wrap;}
-.voice-channel>span{flex:1;}
-.voice-channel .voice-panel{width:100%;flex-basis:100%;}
-.voice-panel[hidden]{display:none!important;}
-.voice-channel .voice-buttons button{position:relative;z-index:1;}
-.voice-participant{display:flex;align-items:center;gap:6px;}
-@media(max-width:600px){
-    .workspace-title .workspace-gem{width:34px;height:34px;}
-    .workspace-title h1{font-size:17px;}
-    .servers .dm-home img{width:32px;height:32px;}
-}
+/* The published GitHub Pages address is controlled by the repository name. */
+/* Keep the responsive channel layout and rich button hit areas reliable. */
+.voice-channel{position:relative;}
+.voice-channel:focus-visible{outline:2px solid #c7a96b;outline-offset:2px;}
+.voice-channel .voice-panel{position:relative;z-index:2;}
+.voice-panel button{pointer-events:auto;}
+.upload-status{min-height:22px;height:auto;line-height:1.4;padding-bottom:4px;}
