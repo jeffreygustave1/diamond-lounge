@@ -10,8 +10,8 @@
 }
 .workspace-title .workspace-gem{
     display:block;
-    width:30px;
-    height:30px;
+    width:90px;
+    height:90px;
     object-fit:contain;
     flex:none;
     filter:drop-shadow(0 0 9px rgba(199,169,107,.35));
@@ -20,13 +20,12 @@
     display:grid;
     place-items:center;
     padding:0;
-    overflow:hidden;
+    overflow:visible;
     cursor:pointer;
-    text-decoration:none;
 }
 .servers .dm-home img{
-    width:31px;
-    height:31px;
+    width:93px;
+    height:93px;
     object-fit:contain;
     display:block;
 }
@@ -46,11 +45,8 @@
     height:25px;
     object-fit:contain;
 }
-.voice-channel{position:relative;}
-.voice-channel:focus-visible{outline:2px solid #c7a96b;outline-offset:2px;}
-.voice-channel .voice-panel{position:relative;z-index:2;}
-.voice-panel button{pointer-events:auto;}
 @media(max-width:600px){
-    .workspace-title .workspace-gem{width:26px;height:26px;}
+    .workspace-title .workspace-gem{width:78px;height:78px;}
     .workspace-title h1{font-size:18px;}
+    .servers .dm-home img{width:93px;height:93px;}
 }
