@@ -22,7 +22,7 @@
     filter: drop-shadow(0 0 9px rgba(199, 169, 107, .35));
 
     /* Double visual size without moving its center */
-    transform: scale(8);
+    transform: scale(6);
     transform-origin: center center;
 }
 
