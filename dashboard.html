@@ -10,23 +10,28 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="luxury.css">
+    <link rel="stylesheet" href="branding-polish.css">
 </head>
 <body>
     <div class="dashboard">
-        <aside class="servers" aria-label="Servers">
-            <div class="server-logo" title="Diamond Lounge">💎</div>
+        <aside class="servers" aria-label="Servers and direct messages">
+            <button class="server-icon dm-home selected" id="dmHomeButton" type="button" title="Diamond Lounge direct messages" aria-label="Diamond Lounge direct messages">
+                <img src="diamond.gif" alt="">
+            </button>
             <div class="server-divider"></div>
-            <button class="server-icon selected" aria-label="Diamond Lounge">DL</button>
-            <button class="server-icon" aria-label="Gaming">🎮</button>
-            <button class="server-icon" aria-label="Music">♫</button>
-            <button class="server-icon" aria-label="Cinema">▶</button>
-            <button class="server-icon add-server" aria-label="Add a server">＋</button>
+            <button class="server-icon" type="button" title="Gaming community" aria-label="Gaming community">🎮</button>
+            <button class="server-icon" type="button" title="Music community" aria-label="Music community">♫</button>
+            <button class="server-icon" type="button" title="Cinema community" aria-label="Cinema community">▶</button>
+            <button class="server-icon add-server" type="button" title="Add a server" aria-label="Add a server">＋</button>
         </aside>
 
         <aside class="channels">
             <div class="workspace-heading">
                 <span class="eyebrow">PRIVATE COMMUNITY</span>
-                <h1>Diamond Lounge</h1>
+                <div class="workspace-title">
+                    <img src="diamond.gif" alt="" class="workspace-gem">
+                    <h1>Diamond Lounge</h1>
+                </div>
                 <span class="online-label"><i></i> Lounge is open</span>
             </div>
 
@@ -62,7 +67,7 @@
             </section>
 
             <div class="profile-card">
-                <div class="profile-avatar">💎</div>
+                <div class="profile-avatar"><img src="diamond.gif" alt=""></div>
                 <div class="profile-copy">
                     <div class="profile-name" id="profileName">Member</div>
                     <div class="profile-status">Available</div>
@@ -95,8 +100,6 @@
                 <h3 class="section-heading">COMMUNITY</h3>
                 <ul id="onlineMembers" class="online-list">
                     <li id="currentUser"><i></i><span>Member</span><em>you</em></li>
-                    <li><i></i><span>Gamer01</span></li>
-                    <li><i class="away"></i><span>MusicFan</span></li>
                 </ul>
             </div>
             <div class="media-section">

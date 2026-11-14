@@ -1,0 +1,51 @@
+/* Animated Diamond Lounge identity and compact server rail. */
+.workspace-title{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin:7px 0 11px;
+}
+.workspace-title h1{
+    margin:0;
+}
+.workspace-title .workspace-gem{
+    display:block;
+    width:30px;
+    height:30px;
+    object-fit:contain;
+    flex:none;
+    filter:drop-shadow(0 0 9px rgba(199,169,107,.35));
+}
+.servers .dm-home{
+    display:grid;
+    place-items:center;
+    padding:0;
+    overflow:hidden;
+    cursor:pointer;
+}
+.servers .dm-home img{
+    width:31px;
+    height:31px;
+    object-fit:contain;
+    display:block;
+}
+.servers .dm-home:hover img{
+    transform:scale(1.08);
+}
+.servers .server-icon:not(.dm-home){
+    flex:none;
+    display:grid;
+    place-items:center;
+    padding:0;
+    cursor:pointer;
+}
+.servers .add-server{color:#8eae84;}
+.profile-avatar img{
+    width:25px;
+    height:25px;
+    object-fit:contain;
+}
+@media(max-width:600px){
+    .workspace-title .workspace-gem{width:26px;height:26px;}
+    .workspace-title h1{font-size:18px;}
+}
