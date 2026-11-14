@@ -2,26 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
-// Replace these values with your Firebase project credentials.
-// You can find them in Firebase Console > Project settings > Your apps > Web app.
+// Firebase web app configuration from the Diamond Lounge Firebase project.
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCyYt66fWu-jMN8PrU6SA7eEZ0XBIYl9to",
+    authDomain: "diamond-lounge-7caf6.firebaseapp.com",
+    projectId: "diamond-lounge-7caf6",
+    storageBucket: "diamond-lounge-7caf6.firebasestorage.app",
+    messagingSenderId: "773006638410",
+    appId: "1:773006638410:web:f39a00e63b494cd7f015b3"
 };
-
-// Prevent the app from initializing with fake placeholder values.
-const hasRealConfig =
-    firebaseConfig.apiKey !== "YOUR_API_KEY" &&
-    firebaseConfig.projectId !== "YOUR_PROJECT_ID" &&
-    firebaseConfig.appId !== "YOUR_APP_ID";
-
-if (!hasRealConfig) {
-    console.error("Firebase is not configured yet. Add your real project config to firebase.js.");
-}
 
 const app = initializeApp(firebaseConfig);
 
