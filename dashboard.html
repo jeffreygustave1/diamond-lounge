@@ -1,156 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diamond Lounge Dashboard</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Lounge Dashboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+    <div class="dashboard">
+        <div class="servers">
+            <div class="server-logo">💎</div>
+            <div class="server-icon">🎮</div>
+            <div class="server-icon">🎵</div>
+            <div class="server-icon">🎬</div>
+            <div class="server-icon">🏆</div>
+            <div class="server-icon">➕</div>
+        </div>
 
-<div class="dashboard">
+        <div class="channels">
+            <h3>TEXT CHANNELS</h3>
+            <ul>
+                <li># general <span class="badge">3</span></li>
+                <li># gaming <span class="badge">12</span></li>
+                <li># streaming <span class="badge">2</span></li>
+                <li># announcements</li>
+            </ul>
 
-    <div class="servers">
+            <h3 class="voice-title">🎤 VOICE CHANNELS</h3>
+            <ul>
+                <li class="voice-channel">🔊 General Voice</li>
+                <li class="voice-channel">🎮 Gaming Voice</li>
+                <li class="voice-channel">🎵 Music Lounge</li>
+                <li class="voice-channel">🤖 AI Hangout</li>
+            </ul>
 
-        <div class="server-logo">💎</div>
-
-        <div class="server-icon">🎮</div>
-        <div class="server-icon">🎵</div>
-        <div class="server-icon">🎬</div>
-        <div class="server-icon">🏆</div>
-        <div class="server-icon">➕</div>
-
-    </div>
-
-    <div class="channels">
-
-        <h3>TEXT CHANNELS</h3>
-
-        <ul>
-
-            <li># general <span class="badge">3</span></li>
-            <li># gaming <span class="badge">12</span></li>
-            <li># streaming <span class="badge">2</span></li>
-            <li># announcements</li>
-
-        </ul>
-
-        <h3 class="voice-title">
-            🎤 VOICE CHANNELS
-        </h3>
-
-        <ul>
-
-            <li class="voice-channel">🔊 General Voice</li>
-            <li class="voice-channel">🎮 Gaming Voice</li>
-            <li class="voice-channel">🎵 Music Lounge</li>
-            <li class="voice-channel">🤖 AI Hangout</li>
-
-        </ul>
-
-        <div class="profile-card">
-
-            <div class="profile-name" id="profileName">
-                💎 Member
+            <div class="profile-card">
+                <div class="profile-name" id="profileName">💎 Member</div>
+                <div class="profile-status">🟢 Online</div>
+                <div class="profile-actions">⚙️ Settings</div>
+                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
             </div>
+        </div>
 
-            <div class="profile-status">
-                🟢 Online
+        <div class="chat-area">
+            <div class="chat-header">
+                💎 Diamond Lounge
+                <div class="sub-header">Premium Community Platform</div>
+                <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
             </div>
-
-            <div class="profile-actions">
-    ⚙️ Settings
-</div>
-
-<button
-    class="logout-btn"
-    onclick="logout()">
-
-    🚪 Logout
-
-</button>
-
-        </div>
-
-    </div>
-
-    <div class="chat-area">
-
-        <div class="chat-header">
-
-            💎 Diamond Lounge
-
-            <div class="sub-header">
-                Premium Community Platform
+            <div class="messages" id="messages"></div>
+            <div class="message-box">
+                <input type="text" id="messageInput" placeholder="Send a message...">
+                <button onclick="sendMessage()">Send</button>
             </div>
-
-            <button
-                class="clear-btn"
-                onclick="clearChat()">
-
-                Clear Chat
-
-            </button>
-
         </div>
 
-        <div
-            class="messages"
-            id="messages">
-
+        <div class="members">
+            <h3>ONLINE</h3>
+            <ul id="onlineMembers">
+                <li id="currentUser">🟢 Member</li>
+                <li>🟢 Gamer01</li>
+                <li>🟡 MusicFan</li>
+                <li>🔴 Streamer</li>
+            </ul>
         </div>
-
-        <div class="message-box">
-
-            <input
-                type="text"
-                id="messageInput"
-                placeholder="Send a message...">
-
-            <button onclick="sendMessage()">
-                Send
-            </button>
-
-        </div>
-
     </div>
 
-    <div class="members">
-
-        <h3>ONLINE</h3>
-
-        <ul id="onlineMembers">
-
-            <li id="currentUser">
-                🟢 Member
-            </li>
-
-            <li>🟢 Gamer01</li>
-            <li>🟡 MusicFan</li>
-            <li>🔴 Streamer</li>
-
-        </ul>
-
-    </div>
-
-</div>
-
-<script>
-window.firebaseConfig = {
-  apiKey: "AIzaSyCyYt66fWu-jMN8PrU6SA7eEZ0XBIYl9to",
-  authDomain: "diamond-lounge-7caf6.firebaseapp.com",
-  projectId: "diamond-lounge-7caf6",
-  storageBucket: "diamond-lounge-7caf6.firebasestorage.app",
-  messagingSenderId: "773006638410",
-  appId: "1:773006638410:web:f39a00e63b494cd7f015b3"
-};
-</script>
-
-<script type="module" src="script.js"></script>
-
+    <script type="module" src="script.js"></script>
 </body>
 </html>
