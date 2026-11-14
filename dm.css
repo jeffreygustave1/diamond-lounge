@@ -4,6 +4,13 @@
    Luxury dark-and-gold interface
 ========================================== */
 
+/* Hide navigation arrows and back buttons.
+   The large diamond handles all navigation. */
+#backToLoungeButton,
+#dmBackButton {
+    display: none !important;
+}
+
 .dm-sidebar-heading {
     padding: 5px 10px 20px;
     border-bottom: 1px solid var(--line);
@@ -24,27 +31,8 @@
     line-height: 1.5;
 }
 
-.dm-back-button {
-    width: 100%;
-    margin: 15px 0;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #1b1c20;
-    color: #c7bda9;
-    text-align: left;
-    font-size: 11px;
-    cursor: pointer;
-    transition: background .2s, color .2s;
-}
-
-.dm-back-button:hover {
-    background: #302a1e;
-    color: var(--gold-bright);
-}
-
 .dm-search-wrap {
-    margin: 0 0 12px;
+    margin: 15px 0 12px;
 }
 
 .dm-search-wrap input {
@@ -144,10 +132,7 @@
     text-align: center;
 }
 
-
-/* ==========================================
-   DIRECT MESSAGE HOME
-========================================== */
+/* DIRECT MESSAGE HOME */
 
 .dm-home-view,
 .dm-conversation-view,
@@ -199,26 +184,12 @@
     line-height: 1.7;
 }
 
-
-/* ==========================================
-   PRIVATE CONVERSATION
-========================================== */
+/* PRIVATE CONVERSATION */
 
 .dm-contact-heading {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.dm-mobile-back {
-    display: none;
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #1c1d20;
-    color: var(--gold-bright);
-    cursor: pointer;
 }
 
 .dm-messages {
@@ -260,10 +231,7 @@
     cursor: wait;
 }
 
-
-/* ==========================================
-   HIDDEN / MODE HANDLING
-========================================== */
+/* HIDDEN / MODE HANDLING */
 
 [hidden] {
     display: none !important;
@@ -277,13 +245,9 @@
     background: rgba(20, 21, 24, .98);
 }
 
-
-/* ==========================================
-   MOBILE
-========================================== */
+/* MOBILE */
 
 @media (max-width: 600px) {
-
     .dm-sidebar-heading {
         padding-bottom: 14px;
     }
@@ -313,11 +277,6 @@
 
     .dm-welcome h2 {
         font-size: 28px;
-    }
-
-    .dm-mobile-back {
-        display: grid;
-        place-items: center;
     }
 
     .dm-conversation-header {
