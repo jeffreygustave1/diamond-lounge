@@ -21,8 +21,7 @@
     flex: none;
     filter: drop-shadow(0 0 9px rgba(199, 169, 107, .35));
 
-    /* Double visual size without moving its center */
-    transform: scale(2);
+    transform: scale(4);
     transform-origin: center center;
 }
 
@@ -45,14 +44,13 @@
     left: -25px;
     top: -24px;
 
-    /* Double visual size without moving its center */
-    transform: scale(2);
+    transform: scale(4);
     transform-origin: center center;
 }
 
-/* Keep size consistent on hover */
+/* Keep the same size on hover */
 .servers .dm-home:hover img {
-    transform: scale(2);
+    transform: scale(4);
 }
 
 .servers .server-icon:not(.dm-home) {
