@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,26 +17,41 @@
         <a class="auth-brand" href="index.html"><img src="diamond.gif" alt="" class="auth-brand-gem"> DIAMOND LOUNGE</a>
         <h1>Make yourself at home</h1>
         <p class="login-subtitle">Create your place in the lounge.</p>
+
         <form id="createAccountForm" class="login-form">
             <label for="username">Display name</label>
             <input type="text" id="username" name="username" placeholder="How should we call you?" autocomplete="nickname" required minlength="3" maxlength="30">
+
             <label for="email">Email address</label>
             <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="At least 6 characters" autocomplete="new-password" required minlength="6">
+
             <button type="submit" class="login-button" id="createButton">Create account</button>
             <p id="errorMessage" role="alert" aria-live="polite"></p>
         </form>
+
         <p class="signup-link">Already a member? <a href="login.html">Sign in</a></p>
         <a class="back-home" href="index.html">← Back to Diamond Lounge</a>
     </main>
+
     <script type="module">
-        import { auth } from "./firebase.js";
-        import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { auth, db } from "./firebase.js";
+        import {
+            createUserWithEmailAndPassword,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import {
+            doc,
+            setDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const form = document.getElementById("createAccountForm");
         const button = document.getElementById("createButton");
         const errorMessage = document.getElementById("errorMessage");
+
         const errors = {
             "auth/email-already-in-use": "This email already has an account. Try signing in instead.",
             "auth/invalid-email": "Please enter a valid email address.",
@@ -49,6 +65,7 @@
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             if (!form.reportValidity()) return;
+
             errorMessage.textContent = "";
             button.disabled = true;
             button.textContent = "Creating your account…";
@@ -56,6 +73,7 @@
             const username = document.getElementById("username").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
+
             if (username.length < 3 || username.length > 30) {
                 errorMessage.textContent = "Display name must be between 3 and 30 characters.";
                 button.disabled = false;
@@ -65,15 +83,27 @@
 
             try {
                 const credential = await createUserWithEmailAndPassword(auth, email, password);
-                try {
-                    await updateProfile(credential.user, { displayName: username });
-                } catch (profileError) {
-                    console.warn("Account created, but display name could not be saved:", profileError);
-                }
+                const user = credential.user;
+
+                await updateProfile(user, { displayName: username });
+
+                await setDoc(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    displayName: username,
+                    createdAt: serverTimestamp()
+                });
+
                 window.location.assign("dashboard.html");
+
             } catch (error) {
                 console.error("Account creation error:", error);
-                errorMessage.textContent = errors[error.code] || `Account creation failed${error.code ? ` (${error.code})` : ". Check your connection and try again."}`;
+
+                if (auth.currentUser) {
+                    errorMessage.textContent = "Your account was created, but your member profile could not be saved. Please contact the lounge administrator before creating another account.";
+                } else {
+                    errorMessage.textContent = errors[error.code] || `Account creation failed${error.code ? ` (${error.code})` : ". Check your connection and try again."}`;
+                }
+
                 button.disabled = false;
                 button.textContent = "Create account";
             }
