@@ -34,7 +34,7 @@
     cursor: pointer;
 }
 
-/* Top-left diamond - preserve original successful settings */
+/* Diamond inside the square */
 .servers .dm-home img {
     width: 93px;
     height: 93px;
@@ -43,10 +43,12 @@
     position: relative;
     left: -25px;
     top: -24px;
+
     transform: scale(4);
     transform-origin: center center;
 }
 
+/* Keep the same size on hover */
 .servers .dm-home:hover img {
     transform: scale(4);
 }
