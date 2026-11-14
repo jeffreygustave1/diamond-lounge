@@ -1,0 +1,335 @@
+
+/* ==========================================
+   DIAMOND LOUNGE — DIRECT MESSAGES
+   Luxury dark-and-gold interface
+========================================== */
+
+.dm-sidebar-heading {
+    padding: 5px 10px 20px;
+    border-bottom: 1px solid var(--line);
+}
+
+.dm-sidebar-heading h2 {
+    margin: 9px 0 5px;
+    color: var(--text);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.dm-sidebar-heading p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.dm-back-button {
+    width: 100%;
+    margin: 15px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #1b1c20;
+    color: #c7bda9;
+    text-align: left;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+
+.dm-back-button:hover {
+    background: #302a1e;
+    color: var(--gold-bright);
+}
+
+.dm-search-wrap {
+    margin: 0 0 12px;
+}
+
+.dm-search-wrap input {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    outline: none;
+    border: 1px solid rgba(199, 169, 107, .2);
+    border-radius: 8px;
+    background: #111215;
+    color: var(--text);
+    font-size: 12px;
+}
+
+.dm-search-wrap input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(199, 169, 107, .08);
+}
+
+.dm-search-wrap input::placeholder {
+    color: #77767a;
+}
+
+.dm-member-list {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dm-member-list li {
+    padding: 0;
+}
+
+.dm-member-button {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 8px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: background .18s, border-color .18s;
+}
+
+.dm-member-button:hover,
+.dm-member-button.active {
+    border-color: rgba(199, 169, 107, .16);
+    background: rgba(199, 169, 107, .09);
+}
+
+.dm-member-avatar {
+    width: 36px;
+    height: 36px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(199, 169, 107, .35);
+    border-radius: 50%;
+    background: linear-gradient(145deg, #393020, #1c1a16);
+    color: var(--gold-bright);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 15px;
+}
+
+.dm-member-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dm-member-copy strong {
+    overflow: hidden;
+    color: #e8e2d7;
+    font-size: 12px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dm-member-copy small {
+    color: #88858a;
+    font-size: 10px;
+}
+
+.dm-empty {
+    padding: 15px 9px;
+    color: #858187;
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+
+/* ==========================================
+   DIRECT MESSAGE HOME
+========================================== */
+
+.dm-home-view,
+.dm-conversation-view,
+.lounge-view {
+    min-width: 0;
+    min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.dm-welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 35px 24px;
+    text-align: center;
+}
+
+.dm-welcome-gem {
+    width: 105px;
+    height: 105px;
+    margin-bottom: 20px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 22px rgba(199, 169, 107, .22));
+}
+
+.dm-welcome h2 {
+    margin: 13px 0;
+    color: var(--text);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(29px, 4vw, 43px);
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.dm-welcome h2 em {
+    color: var(--gold-bright);
+    font-weight: 600;
+}
+
+.dm-welcome p {
+    max-width: 360px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* ==========================================
+   PRIVATE CONVERSATION
+========================================== */
+
+.dm-contact-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dm-mobile-back {
+    display: none;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #1c1d20;
+    color: var(--gold-bright);
+    cursor: pointer;
+}
+
+.dm-messages {
+    display: flex;
+    flex-direction: column;
+}
+
+.dm-message {
+    align-self: flex-start;
+}
+
+.dm-message.own-message {
+    align-self: flex-end;
+    border-color: rgba(199, 169, 107, .18);
+    border-radius: 12px 4px 12px 12px;
+    background: #29251e;
+}
+
+.dm-message.own-message strong {
+    color: var(--gold-bright);
+}
+
+.dm-message-box {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.dm-message-box input[type="text"] {
+    min-width: 0;
+    flex: 1;
+}
+
+.dm-message-box button {
+    flex: none;
+}
+
+.dm-message-box button:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+
+
+/* ==========================================
+   HIDDEN / MODE HANDLING
+========================================== */
+
+[hidden] {
+    display: none !important;
+}
+
+.dm-mode .members {
+    display: none !important;
+}
+
+.dm-mode .channels {
+    background: rgba(20, 21, 24, .98);
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .dm-sidebar-heading {
+        padding-bottom: 14px;
+    }
+
+    .dm-sidebar-heading h2 {
+        font-size: 22px;
+    }
+
+    .dm-member-button {
+        gap: 8px;
+        padding: 9px 5px;
+    }
+
+    .dm-member-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .dm-welcome {
+        padding: 20px 12px;
+    }
+
+    .dm-welcome-gem {
+        width: 82px;
+        height: 82px;
+    }
+
+    .dm-welcome h2 {
+        font-size: 28px;
+    }
+
+    .dm-mobile-back {
+        display: grid;
+        place-items: center;
+    }
+
+    .dm-conversation-header {
+        padding: 12px;
+    }
+
+    .dm-message-box {
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+
+    .dm-message-box button {
+        padding: 9px 12px;
+    }
+}
