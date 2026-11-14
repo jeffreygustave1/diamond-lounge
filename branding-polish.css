@@ -12,6 +12,15 @@
     margin: 0;
 }
 
+/* Home server icon */
+.servers .dm-home {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+}
+
 /* Diamond beside Diamond Lounge title */
 .workspace-title .workspace-gem {
     display: block;
@@ -23,6 +32,12 @@
 
     transform: scale(4);
     transform-origin: center center;
+}
+
+
+/* No enlargement when hovering */
+.servers .dm-home:hover img {
+    transform: none;
 }
 
 /* Top-left home server square */
