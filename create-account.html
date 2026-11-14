@@ -1,105 +1,126 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Create Account</title>
-
+<title>Create Account | Diamond Lounge</title>
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
 <div class="login-container">
 
-<img src="diamond.gif" alt="Diamond Logo" class="login-logo">
+    <img src="diamond.gif" alt="Diamond Logo" class="login-logo">
 
-<h1>Create Account</h1>
+    <h1>Create Account</h1>
 
-<p class="login-subtitle">
-Join Diamond Lounge
-</p>
+    <p class="login-subtitle">Join Diamond Lounge</p>
 
-<form id="createAccountForm" class="login-form">
+    <form id="createAccountForm" class="login-form">
 
-<input
-type="text"
-id="username"
-placeholder="Username"
-required>
+        <input
+            type="text"
+            id="username"
+            placeholder="Username"
+            required
+            minlength="3"
+            maxlength="30">
 
-<input
-type="email"
-id="email"
-placeholder="Email Address"
-required>
+        <input
+            type="email"
+            id="email"
+            placeholder="Email Address"
+            required>
 
-<input
-type="password"
-id="password"
-placeholder="Password"
-required>
+        <input
+            type="password"
+            id="password"
+            placeholder="Password (minimum 6 characters)"
+            required
+            minlength="6">
 
-<button
-type="submit"
-class="login-button">
+        <button type="submit" class="login-button" id="createButton">
+            Create Account
+        </button>
 
-Create Account
+        <p id="errorMessage" role="alert"></p>
 
-</button>
+    </form>
 
-</form>
-
-<p class="signup-link">
-
-Already have an account?
-
-<a href="login.html">
-Login
-</a>
-
-</p>
+    <p class="signup-link">
+        Already have an account?
+        <a href="login.html">Login</a>
+    </p>
 
 </div>
 
-<script>
+<script type="module">
 
-document
-.getElementById("createAccountForm")
-.addEventListener("submit", function(event){
+import { auth } from "./firebase.js";
 
-event.preventDefault();
+import {
+    createUserWithEmailAndPassword,
+    updateProfile
+} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 
-localStorage.setItem(
-"diamondUsername",
-document.getElementById("username").value
-);
+const form = document.getElementById("createAccountForm");
+const button = document.getElementById("createButton");
+const errorMessage = document.getElementById("errorMessage");
 
-localStorage.setItem(
-"diamondEmail",
-document.getElementById("email").value
-);
+form.addEventListener("submit", async (event) => {
 
-localStorage.setItem(
-"diamondPassword",
-document.getElementById("password").value
-);
+    event.preventDefault();
 
-alert(
-"Account created successfully!"
-);
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-window.location.href =
-"login.html";
+    errorMessage.textContent = "";
+    button.disabled = true;
+    button.textContent = "Creating Account...";
+
+    try {
+
+        const userCredential =
+            await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
+        await updateProfile(userCredential.user, {
+            displayName: username
+        });
+
+        alert("Welcome to Diamond Lounge, " + username + "! 💎");
+
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+
+        console.error(error);
+
+        const errors = {
+            "auth/email-already-in-use": "This email already has an account.",
+            "auth/invalid-email": "Please enter a valid email address.",
+            "auth/weak-password": "Your password must contain at least 6 characters.",
+            "auth/network-request-failed": "Network error. Please try again."
+        };
+
+        errorMessage.textContent =
+            errors[error.code] || error.message;
+
+        button.disabled = false;
+        button.textContent = "Create Account";
+
+    }
 
 });
 
 </script>
 
 </body>
-
 </html>
