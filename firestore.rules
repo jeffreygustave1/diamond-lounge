@@ -45,8 +45,8 @@ service cloud.firestore {
     // PRIVATE CONVERSATIONS
     match /conversations/{conversationId} {
 
-      // Allow checking whether a conversation exists.
-      // Existing conversation contents remain participant-only.
+      // Allow signed-in users to check whether a conversation exists.
+      // Existing conversation contents remain private.
       allow get: if request.auth != null
         && (
           !exists(
@@ -58,7 +58,7 @@ service cloud.firestore {
       // Do not allow collection-wide conversation listing.
       allow list: if false;
 
-      // Only two different authenticated members can create a conversation.
+      // Only create conversations with exactly two different participants.
       allow create: if request.auth != null
         && request.resource.data.keys().hasAll([
           'participantUids', 'createdAt'
@@ -107,7 +107,7 @@ service cloud.firestore {
       }
     }
 
-    // VOICE CHANNEL PRESENCE
+    // VOICE-CHANNEL PRESENCE
     match /voiceRooms/{roomId}/participants/{userId} {
       allow read: if request.auth != null;
 
@@ -168,7 +168,6 @@ service cloud.firestore {
 
       // ICE CANDIDATES
       match /candidates/{candidateId} {
-
         function callData() {
           return get(
             /databases/$(database)/documents/voiceRooms/$(roomId)/calls/$(callId)
