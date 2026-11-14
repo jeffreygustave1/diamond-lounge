@@ -45,44 +45,25 @@
 
         <ul>
 
-            <li class="voice-channel">
-                🔊 General Voice
-            </li>
-
-            <li class="voice-channel">
-                🎮 Gaming Voice
-            </li>
-
-            <li class="voice-channel">
-                🎵 Music Lounge
-            </li>
-
-            <li class="voice-channel">
-                🤖 AI Hangout
-            </li>
+            <li class="voice-channel">🔊 General Voice</li>
+            <li class="voice-channel">🎮 Gaming Voice</li>
+            <li class="voice-channel">🎵 Music Lounge</li>
+            <li class="voice-channel">🤖 AI Hangout</li>
 
         </ul>
 
         <div class="profile-card">
 
-            <div
-                class="profile-name"
-                id="profileName">
-
+            <div class="profile-name" id="profileName">
                 💎 Member
-
             </div>
 
             <div class="profile-status">
-
                 🟢 Online
-
             </div>
 
             <div class="profile-actions">
-
                 ⚙️ Settings
-
             </div>
 
         </div>
@@ -96,9 +77,7 @@
             💎 Diamond Lounge
 
             <div class="sub-header">
-
                 Premium Community Platform
-
             </div>
 
             <button
@@ -115,13 +94,6 @@
             class="messages"
             id="messages">
 
-            <div class="message">
-
-                <strong>System:</strong>
-                Welcome to Diamond Lounge 💎
-
-            </div>
-
         </div>
 
         <div class="message-box">
@@ -132,9 +104,7 @@
                 placeholder="Send a message...">
 
             <button onclick="sendMessage()">
-
                 Send
-
             </button>
 
         </div>
@@ -161,7 +131,18 @@
 
 </div>
 
-<script src="script.js"></script>
+<script>
+window.firebaseConfig = {
+  apiKey: "AIzaSyCyYt66fWu-jMN8PrU6SA7eEZ0XBIYl9to",
+  authDomain: "diamond-lounge-7caf6.firebaseapp.com",
+  projectId: "diamond-lounge-7caf6",
+  storageBucket: "diamond-lounge-7caf6.firebasestorage.app",
+  messagingSenderId: "773006638410",
+  appId: "1:773006638410:web:f39a00e63b494cd7f015b3"
+};
+</script>
+
+<script type="module" src="script.js"></script>
 
 </body>
 </html>

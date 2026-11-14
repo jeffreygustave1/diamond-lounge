@@ -1,124 +1,90 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 
-    const channels =
-        document.querySelectorAll(".voice-channel");
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    query,
+    orderBy,
+    onSnapshot,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-    channels.forEach(function (channel) {
+const currentUser =
+    localStorage.getItem("diamondUsername") ||
+    "Member";
 
-        channel.addEventListener("click", function () {
+const firebaseConfig =
+    window.firebaseConfig;
 
-            channels.forEach(function (item) {
-                item.classList.remove("active");
-            });
+const app =
+    initializeApp(firebaseConfig);
 
-            channel.classList.add("active");
+const db =
+    getFirestore(app);
 
-            const voiceMessage =
-                document.createElement("div");
-
-            voiceMessage.className = "message";
-
-            voiceMessage.innerHTML =
-                "<strong>System:</strong> You joined " +
-                channel.textContent.trim();
-
-            const messages =
-                document.getElementById("messages");
-
-            if (messages) {
-                messages.appendChild(voiceMessage);
-                messages.scrollTop =
-                    messages.scrollHeight;
-            }
-
-        });
-
-    });
-
-});
-
-const currentUser = localStorage.getItem("diamondUsername") || "Member";
-
-window.onload = function () {
-    const profileName = document.getElementById("profileName");
-
-    if (profileName) {
-        profileName.textContent = "💎 " + currentUser;
-    }
-
-    const currentUserElement = document.getElementById("currentUser");
-
-    if (currentUserElement) {
-        currentUserElement.textContent = "🟢 " + currentUser;
-    }
-
-    const messages = document.getElementById("messages");
-
-    if (!messages) return;
-
-    const savedMessages =
-        JSON.parse(localStorage.getItem("chatMessages")) || [];
-
-    savedMessages.forEach(function (message) {
-        const newMessage = document.createElement("div");
-
-        newMessage.className = "message";
-
-        newMessage.innerHTML =
-            "<strong>" + currentUser + ":</strong> " + message;
-
-        messages.appendChild(newMessage);
-    });
-};
-
-function sendMessage() {
-    const input = document.getElementById("messageInput");
-
-    if (!input) return;
-
-    const message = input.value.trim();
-
-    if (message === "") return;
-
-    const messages = document.getElementById("messages");
-
-    const newMessage = document.createElement("div");
-
-    newMessage.className = "message";
-
-    newMessage.innerHTML =
-        "<strong>" + currentUser + ":</strong> " + message;
-
-    messages.appendChild(newMessage);
-
-    const savedMessages =
-        JSON.parse(localStorage.getItem("chatMessages")) || [];
-
-    savedMessages.push(message);
-
-    localStorage.setItem(
-        "chatMessages",
-        JSON.stringify(savedMessages)
+const messagesRef =
+    collection(
+        db,
+        "messages"
     );
 
-    input.value = "";
+window.onload = function () {
 
-    messages.scrollTop = messages.scrollHeight;
-}
+    const profileName =
+        document.getElementById(
+            "profileName"
+        );
 
-function clearChat() {
-    localStorage.removeItem("chatMessages");
-    location.reload();
-}
+    if (profileName) {
 
-document.addEventListener("DOMContentLoaded", function () {
-    const input = document.getElementById("messageInput");
+        profileName.textContent =
+            "💎 " + currentUser;
 
-    if (!input) return;
+    }
 
-    input.addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-            sendMessage();
+    const currentUserElement =
+        document.getElementById(
+            "currentUser"
+        );
+
+    if (currentUserElement) {
+
+        currentUserElement.textContent =
+            "🟢 " + currentUser;
+
+    }
+
+};
+
+let chatLoaded = false;
+
+const messagesContainer =
+    document.getElementById(
+        "messages"
+    );
+
+const messagesQuery =
+    query(
+        messagesRef,
+        orderBy(
+            "timestamp"
+        )
+    );
+
+onSnapshot(
+    messagesQuery,
+    function(snapshot){
+
+        if(!messagesContainer){
+            return;
         }
-    });
-});
+
+        messagesContainer.innerHTML = "";
+
+        snapshot.forEach(function(doc){
+
+            const data =
+                doc.data();
+
+        
