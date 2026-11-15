@@ -73,6 +73,8 @@ const channelDescriptions = {
 
 let currentUser = null;
 let activeTextChannel = null;
+window.getActiveTextChannel = () => activeTextChannel;
+
 
 let stopMessagesListener = null;
 let stopMembersListener = null;
