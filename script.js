@@ -545,6 +545,7 @@ const profileForm = document.getElementById("profileForm");
 const profileDisplayName = document.getElementById("profileDisplayName");
 const profileStatus = document.getElementById("profileStatus");
 const profilePreviewImage = document.getElementById("profilePreviewImage");
+const myProfilePicture = document.getElementById("myProfilePicture");
 const profileChoiceButtons = [...document.querySelectorAll(".profile-choice")];
 
 const AVATAR_STYLES = {
@@ -566,13 +567,21 @@ function applyAvatar(key) {
     currentAvatar = AVATAR_STYLES[key] ? key : "diamond";
     const style = avatarStyleFor(currentAvatar);
 
-    [logoutButton, profileButton].forEach((element) => {
-        if (!element) return;
-        element.style.background = style.background;
-    });
+    // The small picture sits beside the name, inside the profile box.
+    if (myProfilePicture) {
+        myProfilePicture.style.background = style.background;
+        myProfilePicture.style.color = style.color;
+        myProfilePicture.textContent = currentAvatar === "diamond" ? "\u2726" : style.glyph;
+    }
 
     if (profilePreviewImage) {
-        profilePreviewImage.style.display = "none";
+        profilePreviewImage.style.background = style.background;
+        profilePreviewImage.style.color = style.color;
+        profilePreviewImage.style.display = "flex";
+        profilePreviewImage.style.alignItems = "center";
+        profilePreviewImage.style.justifyContent = "center";
+        profilePreviewImage.style.fontSize = "40px";
+        profilePreviewImage.textContent = currentAvatar === "diamond" ? "\u2726" : style.glyph;
     }
 
     profileChoiceButtons.forEach((button) => {
@@ -591,11 +600,7 @@ async function loadProfile() {
             if (profileName) profileName.textContent = data.displayName;
         }
 
-        if (typeof data.avatar === "string") {
-            applyAvatar(data.avatar);
-        } else {
-            applyAvatar("diamond");
-        }
+        applyAvatar(typeof data.avatar === "string" ? data.avatar : "diamond");
     } catch (error) {
         console.warn("Profile could not be read:", error);
         applyAvatar("diamond");
