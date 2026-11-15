@@ -815,11 +815,18 @@ channelItems.forEach((channel) => {
             item.setAttribute("aria-expanded", String(active));
         });
 
-        // Only the clicked channel reveals a Join button, right beside it.
-        joinSlots.forEach((slot) => { slot.hidden = true; });
-        const ownSlot = channel.closest(".voice-row")?.querySelector(".voice-join-slot");
-        if (ownSlot) ownSlot.hidden = false;
+// Show the Join button beside whichever channel was selected.
+joinSlots.forEach((slot) => { slot.hidden = true; });
 
+const ownRow = channel.closest(".voice-row");
+const ownSlot = ownRow?.querySelector(".voice-join-slot");
+
+if (ownSlot) {
+    ownSlot.hidden = false;
+
+    // Move the single shared Join button into this channel.
+    if (joinButton) ownSlot.appendChild(joinButton);
+}
         selectedChannel = nextName;
         roomId = nextRoom;
 
