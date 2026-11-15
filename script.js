@@ -546,6 +546,7 @@ const profileDisplayName = document.getElementById("profileDisplayName");
 const profileStatus = document.getElementById("profileStatus");
 const profilePreviewImage = document.getElementById("profilePreviewImage");
 const myProfilePicture = document.getElementById("myProfilePicture");
+const profileUploadInput = document.getElementById("profileUploadInput");
 const profileChoiceButtons = [...document.querySelectorAll(".profile-choice")];
 
 const AVATAR_STYLES = {
@@ -558,6 +559,7 @@ const AVATAR_STYLES = {
 };
 
 let currentAvatar = "diamond";
+let uploadedPicture = "";
 
 function avatarStyleFor(key) {
     return AVATAR_STYLES[key] || AVATAR_STYLES.diamond;
@@ -567,14 +569,35 @@ function applyAvatar(key) {
     currentAvatar = AVATAR_STYLES[key] ? key : "diamond";
     const style = avatarStyleFor(currentAvatar);
 
-    // The small picture sits beside the name, inside the profile box.
+    // A chosen picture wins over the preset colours.
+    if (uploadedPicture) {
+        if (myProfilePicture) {
+            myProfilePicture.style.background = "transparent";
+            myProfilePicture.style.backgroundImage = `url(${uploadedPicture})`;
+            myProfilePicture.style.backgroundSize = "cover";
+            myProfilePicture.style.backgroundPosition = "center";
+            myProfilePicture.textContent = "";
+        }
+        if (profilePreviewImage) {
+            profilePreviewImage.style.background = "transparent";
+            profilePreviewImage.style.backgroundImage = `url(${uploadedPicture})`;
+            profilePreviewImage.style.backgroundSize = "cover";
+            profilePreviewImage.style.backgroundPosition = "center";
+            profilePreviewImage.textContent = "";
+        }
+        profileChoiceButtons.forEach((b) => b.classList.remove("selected"));
+        return;
+    }
+
     if (myProfilePicture) {
+        myProfilePicture.style.backgroundImage = "none";
         myProfilePicture.style.background = style.background;
         myProfilePicture.style.color = style.color;
         myProfilePicture.textContent = currentAvatar === "diamond" ? "\u2726" : style.glyph;
     }
 
     if (profilePreviewImage) {
+        profilePreviewImage.style.backgroundImage = "none";
         profilePreviewImage.style.background = style.background;
         profilePreviewImage.style.color = style.color;
         profilePreviewImage.style.display = "flex";
@@ -647,8 +670,68 @@ profileModal?.addEventListener("click", (event) => {
 });
 
 profileChoiceButtons.forEach((button) => {
-    button.addEventListener("click", () => applyAvatar(button.dataset.avatar));
+    button.addEventListener("click", () => {
+        uploadedPicture = "";
+        applyAvatar(button.dataset.avatar);
+    });
 });
+
+/* Choose a real picture from the device. */
+if (profileUploadInput) {
+    profileUploadInput.addEventListener("change", () => {
+        const file = profileUploadInput.files?.[0];
+        if (!file) return;
+
+        if (!/^image\//i.test(file.type)) {
+            if (profileStatus) {
+                profileStatus.textContent = "Choose an image file.";
+                profileStatus.className = "error";
+            }
+            profileUploadInput.value = "";
+            return;
+        }
+
+        if (file.size > 400 * 1024) {
+            if (profileStatus) {
+                profileStatus.textContent = "Pictures must be smaller than 400 KB.";
+                profileStatus.className = "error";
+            }
+            profileUploadInput.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            uploadedPicture = String(reader.result || "");
+
+            if (myProfilePicture) {
+                myProfilePicture.style.background = "transparent";
+                myProfilePicture.style.backgroundImage = `url(${uploadedPicture})`;
+                myProfilePicture.style.backgroundSize = "cover";
+                myProfilePicture.style.backgroundPosition = "center";
+                myProfilePicture.textContent = "";
+            }
+
+            if (profilePreviewImage) {
+                profilePreviewImage.style.background = "transparent";
+                profilePreviewImage.style.backgroundImage = `url(${uploadedPicture})`;
+                profilePreviewImage.style.backgroundSize = "cover";
+                profilePreviewImage.style.backgroundPosition = "center";
+                profilePreviewImage.textContent = "";
+            }
+
+            profileChoiceButtons.forEach((b) => b.classList.remove("selected"));
+
+            if (profileStatus) {
+                profileStatus.textContent = "Picture ready. Save to keep it.";
+                profileStatus.className = "success";
+            }
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
 
 profileForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -674,6 +757,7 @@ profileForm?.addEventListener("submit", async (event) => {
                 uid: currentUser.uid,
                 displayName: nextName,
                 avatar: currentAvatar,
+                picture: uploadedPicture.slice(0, 400000),
                 createdAt: serverTimestamp()
             },
             { merge: true }
