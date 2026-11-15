@@ -830,7 +830,10 @@ if (ownSlot) {
         selectedChannel = nextName;
         roomId = nextRoom;
 
-        if (panel && panel.parentElement !== channel) channel.appendChild(panel);
+       // Keep the shared control panel inside the selected channel row.
+if (panel && ownRow && panel.parentElement !== ownRow) {
+    ownRow.appendChild(panel);
+}
         if (panel) panel.hidden = false;
 
         watchParticipants();
