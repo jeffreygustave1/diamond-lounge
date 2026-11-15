@@ -155,11 +155,13 @@
 
 /* MASSIVE CENTER DIAMOND */
 .dm-welcome-gem {
-    width: 82px;
-    height: auto;
-    margin-bottom: 24px;
+    width: 105px;
+    height: 105px;
+    margin-bottom: 20px;
     object-fit: contain;
-    filter: drop-shadow(0 0 50px rgba(199, 169, 107, .40));
+    transform: scale(4);
+    transform-origin: center center;
+    filter: drop-shadow(0 0 22px rgba(199, 169, 107, .22));
 }
 
 .dm-welcome h2 {
