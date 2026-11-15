@@ -1740,3 +1740,366 @@ button {
 
 .mobile-sidebar-backdrop { pointer-events: none; }
 .dashboard.mobile-nav-open .mobile-sidebar-backdrop { pointer-events: auto; }
+
+/* ==========================================
+   DIAMOND LOUNGE — FINAL FEATURE STYLES
+   Profile card, neon frame, voice controls,
+   camera and screen-share tiles.
+========================================== */
+
+/* ---------- PROFILE CARD ---------- */
+
+.profile-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: auto;
+    padding: 11px;
+    border: 1px solid rgba(226, 205, 157, .22);
+    border-radius: 13px;
+    background: #141518;
+    overflow: hidden;
+}
+
+.profile-avatar {
+    width: 34px;
+    height: 34px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: #302a1e;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 2px rgba(226, 205, 157, .35);
+}
+
+.profile-avatar:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+}
+
+.profile-avatar img {
+    width: 78%;
+    height: 78%;
+    object-fit: contain;
+    transform: none !important;
+    pointer-events: none;
+}
+
+.profile-copy {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 5px 7px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background .16s ease;
+}
+
+.profile-copy:hover,
+.profile-copy:focus-visible {
+    background: rgba(199, 169, 107, .1);
+    outline: none;
+}
+
+.profile-name {
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-status {
+    margin-top: 0;
+    color: #8ea28b;
+    font-size: 10px;
+}
+
+/* ---------- NEON RGB EDGE ---------- */
+/* The glow follows the rounded border of the profile box only. */
+
+.profile-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: linear-gradient(
+        130deg,
+        #ff2d55,
+        #ff9500,
+        #ffe31a,
+        #34d058,
+        #28c8ff,
+        #7b61ff,
+        #ff2d55
+    );
+    background-size: 320% 320%;
+    animation: neonRing 6s linear infinite;
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: .95;
+}
+
+.profile-card::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    z-index: -1;
+    border-radius: 18px;
+    background: inherit;
+    box-shadow:
+        0 0 12px rgba(255, 45, 85, .28),
+        0 0 22px rgba(40, 200, 255, .22),
+        0 0 34px rgba(123, 97, 255, .16);
+    animation: neonPulse 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.profile-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes neonRing {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes neonPulse {
+    0%, 100% { opacity: .5; }
+    50%      { opacity: .95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-card::after,
+    .profile-card::before {
+        animation: none;
+    }
+}
+
+/* ---------- PROFILE MODAL ---------- */
+
+.profile-modal-preview {
+    display: grid;
+    place-items: center;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 18px;
+    border: 1px solid rgba(226, 205, 157, .28);
+    border-radius: 22px;
+    background: linear-gradient(145deg, #2b2924, #141416);
+}
+
+.profile-modal-preview img {
+    width: 62%;
+    height: 62%;
+    object-fit: contain;
+}
+
+.profile-modal-choices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.profile-choice {
+    padding: 9px 6px;
+    border: 1px solid #3a383d;
+    border-radius: 9px;
+    background: #22232a;
+    color: #d8d4cb;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .16s ease, color .16s ease, background .16s ease;
+}
+
+.profile-choice:hover {
+    border-color: rgba(199, 169, 107, .5);
+    color: var(--gold-bright);
+}
+
+.profile-choice.selected {
+    border-color: var(--gold-bright);
+    background: rgba(199, 169, 107, .16);
+    color: var(--gold-bright);
+}
+
+/* ---------- VOICE CONTROLS (DISCORD-STYLE ROW) ---------- */
+
+.voice-controls {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.voice-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    padding: 9px 3px;
+    border: 1px solid #3c3a40;
+    border-radius: 9px;
+    background: #232327;
+    color: #ddd8cd;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background .16s ease, border-color .16s ease, color .16s ease;
+}
+
+.voice-control:hover:not(:disabled) {
+    background: #2e2d33;
+    border-color: rgba(199, 169, 107, .45);
+    color: var(--gold-bright);
+}
+
+.voice-control:disabled {
+    opacity: .42;
+    cursor: not-allowed;
+}
+
+.voice-control[aria-pressed="true"] {
+    background: rgba(199, 169, 107, .18);
+    border-color: var(--gold-bright);
+    color: var(--gold-bright);
+}
+
+.voice-control-icon {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.voice-control-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.voice-participant {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.voice-badges {
+    margin-left: auto;
+    color: var(--gold);
+    font-size: 10px;
+    font-style: normal;
+    letter-spacing: .05em;
+}
+
+/* ---------- REMOTE CAMERA / SCREEN TILES ---------- */
+
+.remote-video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 7px;
+    margin-top: 11px;
+}
+
+.remote-video-grid:empty {
+    display: none;
+}
+
+.remote-video-tile {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: #101114;
+}
+
+.remote-video-tile video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: #101114;
+}
+
+.remote-video-tile figcaption {
+    padding: 4px 6px;
+    overflow: hidden;
+    color: #b9b5ac;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Keep mobile taps working on the whole channel row. */
+@media (max-width: 600px) {
+    .voice-controls {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .profile-modal-choices {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ---------- CHANNEL BUTTON RESET ---------- */
+.text-channel,
+.voice-channel {
+    border: 0;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    background: transparent;
+}
+
+.text-channels li,
+.voice-channel-list li {
+    padding: 0 !important;
+    list-style: none;
+}
+
+.text-channel .channel-symbol {
+    color: #8e8879;
+    font-weight: 700;
+    min-width: 12px;
+}
+
+.voice-channel-list {
+    padding: 0;
+}
