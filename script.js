@@ -1,10 +1,9 @@
-
 import { auth, db } from "./firebase.js";
 
 import {
     onAuthStateChanged,
     signOut
-} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+} from "[gstatic.com](https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js)";
 
 import {
     addDoc,
@@ -16,47 +15,36 @@ import {
     orderBy,
     query,
     serverTimestamp,
-    setDoc
-} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
-
-
-// ==========================================
-// PUBLIC CHAT ELEMENTS
-// ==========================================
+    setDoc,
+    where
+} from "[gstatic.com](https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js)";
 
 const messagesElement = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const messageForm = document.getElementById("messageForm");
 const sendButton = document.getElementById("sendMessageButton");
 
-
-// ==========================================
-// MOBILE NAVIGATION ELEMENTS
-// ==========================================
+const activeChannelName = document.getElementById("activeChannelName");
+const activeChannelDescription = document.getElementById("activeChannelDescription");
+const textChannelButtons = [...document.querySelectorAll(".text-channel")];
 
 const dashboard = document.querySelector(".dashboard");
 const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
 const mobileMenuButtons = document.querySelectorAll(".mobile-menu-button");
 
-
-// ==========================================
-// DIRECT MESSAGE ELEMENTS
-// ==========================================
-
 const dmHomeButton = document.getElementById("dmHomeButton");
-
+const mainServerButton = document.getElementById("mainServerButton");
 const loungeSidebar = document.getElementById("loungeSidebar");
 const dmSidebar = document.getElementById("dmSidebar");
 
+const emptyView = document.getElementById("emptyView");
 const loungeView = document.getElementById("loungeView");
 const dmHomeView = document.getElementById("dmHomeView");
 const dmConversationView = document.getElementById("dmConversationView");
-
 const communitySidebar = document.getElementById("communitySidebar");
 
 const memberSearch = document.getElementById("memberSearch");
 const dmMemberList = document.getElementById("dmMemberList");
-
 const dmContactName = document.getElementById("dmContactName");
 const dmMessages = document.getElementById("dmMessages");
 const dmMessageForm = document.getElementById("dmMessageForm");
@@ -64,26 +52,36 @@ const dmMessageInput = document.getElementById("dmMessageInput");
 const dmSendButton = document.getElementById("dmSendButton");
 const dmStatus = document.getElementById("dmStatus");
 
+const createServerButton = document.getElementById("createServerButton");
+const serverModal = document.getElementById("serverModal");
+const closeServerModalButton = document.getElementById("closeServerModal");
+const cancelServerCreation = document.getElementById("cancelServerCreation");
+const createServerForm = document.getElementById("createServerForm");
+const serverNameInput = document.getElementById("serverName");
+const serverVisibilityInput = document.getElementById("serverVisibility");
+const serverCreateStatus = document.getElementById("serverCreateStatus");
+const createdServers = document.getElementById("createdServers");
 
-// ==========================================
-// APPLICATION STATE
-// ==========================================
+const channelDescriptions = {
+    general: "A little space to share what matters.",
+    gaming: "Talk games, teams, releases, and play sessions.",
+    streaming: "Share streams, clips, schedules, and creator updates.",
+    announcements: "Important Diamond Lounge news and updates.",
+    memes: "Share memes and community jokes.",
+    "off-topic": "Everything that does not fit another channel."
+};
 
 let currentUser = null;
-let chatLoaded = false;
+let activeTextChannel = null;
 
 let stopMessagesListener = null;
 let stopMembersListener = null;
 let stopDirectMessagesListener = null;
+let stopServersListener = null;
 
 let members = [];
 let selectedMember = null;
 let currentConversationId = null;
-
-
-// ==========================================
-// MOBILE DRAWER CONTROLS
-// ==========================================
 
 function setMobileSidebar(open) {
     if (!dashboard) return;
@@ -99,49 +97,118 @@ function setMobileSidebar(open) {
     });
 }
 
-
 function toggleMobileSidebar() {
-    if (!dashboard) return;
-
-    const isOpen = dashboard.classList.contains("mobile-nav-open");
-
-    setMobileSidebar(!isOpen);
+    setMobileSidebar(!dashboard?.classList.contains("mobile-nav-open"));
 }
 
-
-// Hamburger buttons
 mobileMenuButtons.forEach((button) => {
     button.addEventListener("click", toggleMobileSidebar);
 });
 
-
-// Backdrop closes the drawer
 mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-
-// Escape closes the drawer
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         setMobileSidebar(false);
+        closeServerModal();
     }
 });
 
+function hideMainViews() {
+    if (emptyView) emptyView.hidden = true;
+    if (loungeView) loungeView.hidden = true;
+    if (dmHomeView) dmHomeView.hidden = true;
+    if (dmConversationView) dmConversationView.hidden = true;
+}
 
-// Selecting a text channel closes the mobile drawer
-document.getElementById("channelsSidebar")?.addEventListener("click", (event) => {
-    const channel = event.target.closest(".text-channel");
+function showEmptyView() {
+    stopMessages();
 
-    if (channel) {
+    activeTextChannel = null;
+    hideMainViews();
+
+    if (emptyView) emptyView.hidden = false;
+    if (communitySidebar) communitySidebar.hidden = true;
+
+    textChannelButtons.forEach((button) => {
+        button.classList.remove("selected");
+        button.setAttribute("aria-pressed", "false");
+    });
+}
+
+function showLoungeSidebar() {
+    if (dmSidebar) dmSidebar.hidden = true;
+    if (loungeSidebar) loungeSidebar.hidden = false;
+
+    dmHomeButton?.classList.remove("selected");
+    dmHomeButton?.setAttribute("aria-pressed", "false");
+
+    mainServerButton?.classList.add("selected");
+    mainServerButton?.setAttribute("aria-pressed", "true");
+
+    document.body.classList.remove("dm-mode");
+}
+
+function openTextChannel(channelName) {
+    if (!currentUser || !channelName) return;
+
+    const clickedActiveChannel =
+        activeTextChannel === channelName &&
+        loungeView &&
+        !loungeView.hidden;
+
+    if (clickedActiveChannel) {
+        showEmptyView();
         setMobileSidebar(false);
+        return;
     }
+
+    stopDirectMessages();
+    selectedMember = null;
+    currentConversationId = null;
+
+    showLoungeSidebar();
+    hideMainViews();
+
+    activeTextChannel = channelName;
+
+    if (loungeView) loungeView.hidden = false;
+    if (communitySidebar) communitySidebar.hidden = false;
+
+    textChannelButtons.forEach((button) => {
+        const selected = button.dataset.channel === channelName;
+        button.classList.toggle("selected", selected);
+        button.setAttribute("aria-pressed", String(selected));
+    });
+
+    if (activeChannelName) {
+        activeChannelName.textContent = channelName;
+    }
+
+    if (activeChannelDescription) {
+        activeChannelDescription.textContent =
+            channelDescriptions[channelName] || `Welcome to #${channelName}.`;
+    }
+
+    if (input) {
+        input.placeholder = `Message #${channelName}`;
+    }
+
+    loadMessages(channelName);
+    setMobileSidebar(false);
+}
+
+textChannelButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", "false");
+
+    button.addEventListener("click", () => {
+        openTextChannel(button.dataset.channel);
+    });
 });
 
-
-// ==========================================
-// AUTHENTICATION
-// ==========================================
+window.openTextChannel = openTextChannel;
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -151,45 +218,30 @@ onAuthStateChanged(auth, async (user) => {
 
     currentUser = user;
 
-    // Never use the email address as a public display name.
     const displayName = (user.displayName || "Member").slice(0, 30);
-
     const profileName = document.getElementById("profileName");
     const currentUserElement = document.getElementById("currentUser");
 
-    if (profileName) {
-        profileName.textContent = displayName;
-    }
+    if (profileName) profileName.textContent = displayName;
 
     const currentName = currentUserElement?.querySelector("span");
+    if (currentName) currentName.textContent = displayName;
 
-    if (currentName) {
-        currentName.textContent = displayName;
-    }
-
-    if (!chatLoaded) {
-        chatLoaded = true;
-        loadMessages();
-    }
-
-    // Create a profile for existing accounts if one is missing.
     try {
         await ensureUserProfile();
         loadMembers();
+        loadServers();
     } catch (error) {
-        console.error("Member profile setup failed:", error);
+        console.error("Profile setup failed:", error);
 
         if (dmMemberList) {
             dmMemberList.textContent =
                 "Member profiles could not load. Please refresh and try again.";
         }
     }
+
+    showEmptyView();
 });
-
-
-// ==========================================
-// MEMBER PROFILE SETUP
-// ==========================================
 
 async function ensureUserProfile() {
     if (!currentUser) return;
@@ -206,11 +258,6 @@ async function ensureUserProfile() {
     }
 }
 
-
-// ==========================================
-// PUBLIC CHAT ATTACHMENTS
-// ==========================================
-
 function renderAttachment(message, attachment) {
     if (
         !attachment ||
@@ -220,10 +267,7 @@ function renderAttachment(message, attachment) {
         return;
     }
 
-    const type = typeof attachment.type === "string"
-        ? attachment.type
-        : "";
-
+    const type = typeof attachment.type === "string" ? attachment.type : "";
     let element;
 
     if (type.startsWith("image/")) {
@@ -244,20 +288,23 @@ function renderAttachment(message, attachment) {
 
     element.src = attachment.url;
     element.className = "message-attachment";
-
     message.appendChild(element);
 }
 
+function stopMessages() {
+    stopMessagesListener?.();
+    stopMessagesListener = null;
+}
 
-// ==========================================
-// LOAD PUBLIC CHAT
-// ==========================================
+function loadMessages(channelName) {
+    if (!messagesElement || !channelName) return;
 
-function loadMessages() {
-    if (!messagesElement) return;
+    stopMessages();
+    messagesElement.textContent = "Loading messages...";
 
     const messagesQuery = query(
         collection(db, "messages"),
+        where("channelId", "==", channelName),
         orderBy("timestamp", "asc"),
         limit(100)
     );
@@ -265,24 +312,28 @@ function loadMessages() {
     stopMessagesListener = onSnapshot(
         messagesQuery,
         (snapshot) => {
+            if (activeTextChannel !== channelName) return;
+
             messagesElement.replaceChildren();
+
+            if (snapshot.empty) {
+                const empty = document.createElement("p");
+                empty.className = "channel-empty";
+                empty.textContent = `This is the beginning of #${channelName}.`;
+                messagesElement.appendChild(empty);
+                return;
+            }
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
-
                 const message = document.createElement("article");
                 message.className = "message";
 
                 const author = document.createElement("strong");
                 author.textContent = `${data.username || "Member"}: `;
 
-                message.append(
-                    author,
-                    document.createTextNode(data.text || "")
-                );
-
+                message.append(author, document.createTextNode(data.text || ""));
                 renderAttachment(message, data.attachment);
-
                 messagesElement.appendChild(message);
             });
 
@@ -292,23 +343,19 @@ function loadMessages() {
             console.error("Chat listener failed:", error);
 
             messagesElement.textContent =
-                error.code === "permission-denied"
-                    ? "Firestore denied chat access. Check your published messages rules."
-                    : "Messages could not load. Check your connection and Firebase setup.";
+                error.code === "failed-precondition"
+                    ? "This channel needs a Firestore index. Open the index link in the browser console once, create it, and reload."
+                    : error.code === "permission-denied"
+                        ? "Firestore denied channel access. Publish the updated rules."
+                        : "Messages could not load.";
         }
     );
 }
 
-
-// ==========================================
-// SEND PUBLIC MESSAGE
-// ==========================================
-
 async function sendMessage() {
-    if (!currentUser || !input || !sendButton) return;
+    if (!currentUser || !input || !sendButton || !activeTextChannel) return;
 
     const text = input.value.trim();
-
     if (!text) return;
 
     if (text.length > 2000) {
@@ -322,60 +369,56 @@ async function sendMessage() {
         await addDoc(collection(db, "messages"), {
             uid: currentUser.uid,
             username: (currentUser.displayName || "Member").slice(0, 30),
+            channelId: activeTextChannel,
             text,
             timestamp: serverTimestamp()
         });
 
         input.value = "";
         input.focus();
-
     } catch (error) {
         console.error("Message send failed:", error);
 
         alert(
             error.code === "permission-denied"
-                ? "Firestore denied this message. Check your published messages rules."
-                : `Message could not be sent${error.code ? ` (${error.code})` : ". Check your connection."}`
+                ? "Firestore denied this message. Publish the updated rules."
+                : "Message could not be sent."
         );
-
     } finally {
         sendButton.disabled = false;
     }
 }
 
-
-// ==========================================
-// DIRECT MESSAGE NAVIGATION
-// ==========================================
+messageForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void sendMessage();
+});
 
 function showDirectMessages() {
     if (!currentUser) return;
 
+    stopMessages();
     stopDirectMessages();
 
+    activeTextChannel = null;
     selectedMember = null;
     currentConversationId = null;
 
     if (loungeSidebar) loungeSidebar.hidden = true;
     if (dmSidebar) dmSidebar.hidden = false;
 
-    if (loungeView) loungeView.hidden = true;
-    if (dmHomeView) dmHomeView.hidden = false;
-    if (dmConversationView) dmConversationView.hidden = true;
+    hideMainViews();
 
+    if (dmHomeView) dmHomeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
 
-    if (dmHomeButton) {
-        dmHomeButton.classList.add("selected");
-        dmHomeButton.setAttribute("aria-pressed", "true");
-    }
+    dmHomeButton?.classList.add("selected");
+    dmHomeButton?.setAttribute("aria-pressed", "true");
+
+    mainServerButton?.classList.remove("selected");
+    mainServerButton?.setAttribute("aria-pressed", "false");
 
     document.body.classList.add("dm-mode");
-
-    if (dmStatus) {
-        dmStatus.textContent = "";
-        dmStatus.classList.remove("error");
-    }
 
     if (memberSearch) {
         memberSearch.value = "";
@@ -383,58 +426,30 @@ function showDirectMessages() {
     }
 }
 
-
-function showLounge() {
-    stopDirectMessages();
-
-    selectedMember = null;
-    currentConversationId = null;
-
-    if (dmSidebar) dmSidebar.hidden = true;
-    if (loungeSidebar) loungeSidebar.hidden = false;
-
-    if (dmHomeView) dmHomeView.hidden = true;
-    if (dmConversationView) dmConversationView.hidden = true;
-    if (loungeView) loungeView.hidden = false;
-
-    if (communitySidebar) communitySidebar.hidden = false;
-
-    if (dmHomeButton) {
-        dmHomeButton.classList.remove("selected");
-        dmHomeButton.setAttribute("aria-pressed", "false");
+dmHomeButton?.addEventListener("click", () => {
+    if (
+        (dmHomeView && !dmHomeView.hidden) ||
+        (dmConversationView && !dmConversationView.hidden)
+    ) {
+        showEmptyView();
+        showLoungeSidebar();
+    } else {
+        showDirectMessages();
     }
 
-    document.body.classList.remove("dm-mode");
-}
-
-
-function showConversationView() {
-    if (dmHomeView) dmHomeView.hidden = true;
-    if (dmConversationView) dmConversationView.hidden = false;
-    if (loungeView) loungeView.hidden = true;
-
-    if (dmSidebar) dmSidebar.hidden = false;
-    if (loungeSidebar) loungeSidebar.hidden = true;
-    if (communitySidebar) communitySidebar.hidden = true;
-
-    document.body.classList.add("dm-mode");
-
-    // Selecting a member returns to the conversation.
     setMobileSidebar(false);
-}
+});
 
-
-// ==========================================
-// LOAD MEMBER DIRECTORY
-// ==========================================
+mainServerButton?.addEventListener("click", () => {
+    showLoungeSidebar();
+    showEmptyView();
+    setMobileSidebar(false);
+});
 
 function loadMembers() {
     if (!dmMemberList) return;
 
-    if (stopMembersListener) {
-        stopMembersListener();
-        stopMembersListener = null;
-    }
+    stopMembersListener?.();
 
     const membersQuery = query(
         collection(db, "users"),
@@ -465,37 +480,25 @@ function loadMembers() {
         },
         (error) => {
             console.error("Member directory failed:", error);
-
-            dmMemberList.textContent =
-                error.code === "permission-denied"
-                    ? "Firestore denied access to member profiles. Check the users rules."
-                    : "Members could not load. Please try again.";
+            dmMemberList.textContent = "Members could not load.";
         }
     );
 }
-
-
-// ==========================================
-// DISPLAY MEMBER DIRECTORY
-// ==========================================
 
 function renderMembers() {
     if (!dmMemberList) return;
 
     dmMemberList.replaceChildren();
 
-    const searchText = (memberSearch?.value || "")
-        .trim()
-        .toLowerCase();
+    const searchText = (memberSearch?.value || "").trim().toLowerCase();
 
     const filteredMembers = members.filter((member) =>
         member.displayName.toLowerCase().includes(searchText)
     );
 
-    if (filteredMembers.length === 0) {
+    if (!filteredMembers.length) {
         const empty = document.createElement("li");
         empty.className = "dm-empty";
-
         empty.textContent = searchText
             ? "No members match your search."
             : "No other members have joined yet.";
@@ -541,53 +544,33 @@ function renderMembers() {
     });
 }
 
-
-// ==========================================
-// CREATE / OPEN PRIVATE CONVERSATION
-// ==========================================
+memberSearch?.addEventListener("input", renderMembers);
 
 function getConversationId(firstUid, secondUid) {
-    return [firstUid, secondUid]
-        .sort()
-        .join("_");
+    return [firstUid, secondUid].sort().join("_");
 }
 
-
 async function openConversation(member) {
-    if (!currentUser || !member || !member.uid) return;
+    if (!currentUser || !member?.uid) return;
 
     stopDirectMessages();
 
     selectedMember = member;
-    currentConversationId = getConversationId(
-        currentUser.uid,
-        member.uid
-    );
-
+    currentConversationId = getConversationId(currentUser.uid, member.uid);
     const openingConversationId = currentConversationId;
 
-    showConversationView();
+    hideMainViews();
 
-    if (dmContactName) {
-        dmContactName.textContent = member.displayName;
-    }
-
-    if (dmMessages) {
-        dmMessages.replaceChildren();
-
-        const loading = document.createElement("p");
-        loading.className = "dm-empty";
-        loading.textContent = "Opening private conversation...";
-
-        dmMessages.appendChild(loading);
-    }
-
-    if (dmStatus) {
-        dmStatus.textContent = "";
-        dmStatus.classList.remove("error");
-    }
+    if (dmConversationView) dmConversationView.hidden = false;
+    if (communitySidebar) communitySidebar.hidden = true;
+    if (dmContactName) dmContactName.textContent = member.displayName;
 
     renderMembers();
+    setMobileSidebar(false);
+
+    if (dmMessages) {
+        dmMessages.textContent = "Opening private conversation...";
+    }
 
     try {
         const conversationRef = doc(
@@ -600,55 +583,29 @@ async function openConversation(member) {
 
         if (!conversationSnapshot.exists()) {
             await setDoc(conversationRef, {
-                participantUids: [
-                    currentUser.uid,
-                    member.uid
-                ],
+                participantUids: [currentUser.uid, member.uid],
                 createdAt: serverTimestamp()
             });
         }
 
-        // Don't open a conversation if the user has navigated away
-        // or selected a different member while it was loading.
-        if (
-            currentConversationId !== openingConversationId ||
-            selectedMember?.uid !== member.uid
-        ) {
-            return;
-        }
-
+        if (currentConversationId !== openingConversationId) return;
         loadDirectMessages();
-
     } catch (error) {
         console.error("Private conversation failed:", error);
-
-        if (currentConversationId !== openingConversationId) return;
 
         if (dmMessages) {
             dmMessages.textContent =
                 error.code === "permission-denied"
-                    ? "Access denied. Check your published conversation rules."
+                    ? "Access denied. Check the conversation rules."
                     : "This private conversation could not be opened.";
         }
     }
 }
 
-
-// ==========================================
-// STOP PRIVATE MESSAGE LISTENER
-// ==========================================
-
 function stopDirectMessages() {
-    if (stopDirectMessagesListener) {
-        stopDirectMessagesListener();
-        stopDirectMessagesListener = null;
-    }
+    stopDirectMessagesListener?.();
+    stopDirectMessagesListener = null;
 }
-
-
-// ==========================================
-// LOAD PRIVATE MESSAGES
-// ==========================================
 
 function loadDirectMessages() {
     if (!currentConversationId || !dmMessages) return;
@@ -656,12 +613,7 @@ function loadDirectMessages() {
     stopDirectMessages();
 
     const privateMessagesQuery = query(
-        collection(
-            db,
-            "conversations",
-            currentConversationId,
-            "messages"
-        ),
+        collection(db, "conversations", currentConversationId, "messages"),
         orderBy("timestamp", "asc"),
         limit(100)
     );
@@ -675,14 +627,12 @@ function loadDirectMessages() {
                 const empty = document.createElement("p");
                 empty.className = "dm-empty";
                 empty.textContent = "This is the beginning of your conversation.";
-
                 dmMessages.appendChild(empty);
                 return;
             }
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
-
                 const message = document.createElement("article");
                 message.className = "message dm-message";
 
@@ -693,11 +643,7 @@ function loadDirectMessages() {
                 const author = document.createElement("strong");
                 author.textContent = `${data.username || "Member"}: `;
 
-                message.append(
-                    author,
-                    document.createTextNode(data.text || "")
-                );
-
+                message.append(author, document.createTextNode(data.text || ""));
                 dmMessages.appendChild(message);
             });
 
@@ -705,19 +651,10 @@ function loadDirectMessages() {
         },
         (error) => {
             console.error("Private message listener failed:", error);
-
-            dmMessages.textContent =
-                error.code === "permission-denied"
-                    ? "You don't have permission to read this conversation."
-                    : "Private messages could not load.";
+            dmMessages.textContent = "Private messages could not load.";
         }
     );
 }
-
-
-// ==========================================
-// SEND PRIVATE MESSAGE
-// ==========================================
 
 async function sendDirectMessage() {
     if (
@@ -731,13 +668,7 @@ async function sendDirectMessage() {
     }
 
     const text = dmMessageInput.value.trim();
-
     if (!text) return;
-
-    if (text.length > 2000) {
-        alert("Messages cannot exceed 2000 characters.");
-        return;
-    }
 
     dmSendButton.disabled = true;
 
@@ -752,103 +683,188 @@ async function sendDirectMessage() {
             {
                 uid: currentUser.uid,
                 username: (currentUser.displayName || "Member").slice(0, 30),
-                text,
+                text: text.slice(0, 2000),
                 timestamp: serverTimestamp()
             }
         );
 
         dmMessageInput.value = "";
         dmMessageInput.focus();
-
     } catch (error) {
         console.error("Private message send failed:", error);
 
         if (dmStatus) {
-            dmStatus.textContent =
-                error.code === "permission-denied"
-                    ? "Firebase denied this private message. Check the conversation rules."
-                    : "Your message could not be sent. Please try again.";
-
+            dmStatus.textContent = "Your message could not be sent.";
             dmStatus.classList.add("error");
         }
-
     } finally {
         dmSendButton.disabled = false;
     }
 }
-
-
-// ==========================================
-// BUTTONS AND EVENTS
-// ==========================================
-
-// The large diamond toggles between the Lounge and DMs.
-// It also works while a private conversation is open.
-dmHomeButton?.addEventListener("click", () => {
-    if (dmSidebar && !dmSidebar.hidden) {
-        showLounge();
-    } else {
-        showDirectMessages();
-    }
-});
-
-memberSearch?.addEventListener("input", renderMembers);
-
-messageForm?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    void sendMessage();
-});
 
 dmMessageForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     void sendDirectMessage();
 });
 
+function openServerModal() {
+    if (!serverModal) return;
 
-// ==========================================
-// EXISTING PUBLIC FUNCTIONS
-// ==========================================
+    serverModal.hidden = false;
+    document.body.classList.add("modal-open");
+
+    if (serverCreateStatus) {
+        serverCreateStatus.textContent = "";
+        serverCreateStatus.className = "";
+    }
+
+    requestAnimationFrame(() => serverNameInput?.focus());
+}
+
+function closeServerModal() {
+    if (!serverModal || serverModal.hidden) return;
+
+    serverModal.hidden = true;
+    document.body.classList.remove("modal-open");
+    createServerForm?.reset();
+
+    if (serverCreateStatus) {
+        serverCreateStatus.textContent = "";
+        serverCreateStatus.className = "";
+    }
+}
+
+createServerButton?.addEventListener("click", openServerModal);
+closeServerModalButton?.addEventListener("click", closeServerModal);
+cancelServerCreation?.addEventListener("click", closeServerModal);
+
+serverModal?.addEventListener("click", (event) => {
+    if (event.target === serverModal) {
+        closeServerModal();
+    }
+});
+
+createServerForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!currentUser || !serverNameInput || !serverVisibilityInput) return;
+
+    const name = serverNameInput.value.trim();
+    const visibility = serverVisibilityInput.value;
+
+    if (name.length < 2 || name.length > 40) {
+        serverCreateStatus.textContent =
+            "Server names must contain 2 to 40 characters.";
+        serverCreateStatus.className = "error";
+        return;
+    }
+
+    const submitButton = document.getElementById("confirmCreateServer");
+    submitButton.disabled = true;
+    serverCreateStatus.textContent = "Creating your server...";
+    serverCreateStatus.className = "";
+
+    try {
+        await addDoc(collection(db, "servers"), {
+            name,
+            nameLower: name.toLowerCase(),
+            visibility,
+            ownerUid: currentUser.uid,
+            memberUids: [currentUser.uid],
+            createdAt: serverTimestamp()
+        });
+
+        serverCreateStatus.textContent = "Server created.";
+        serverCreateStatus.className = "success";
+
+        window.setTimeout(closeServerModal, 500);
+    } catch (error) {
+        console.error("Server creation failed:", error);
+        serverCreateStatus.textContent =
+            error.code === "permission-denied"
+                ? "Firebase denied server creation. Publish the updated rules."
+                : "The server could not be created.";
+        serverCreateStatus.className = "error";
+    } finally {
+        submitButton.disabled = false;
+    }
+});
+
+function loadServers() {
+    if (!currentUser || !createdServers) return;
+
+    stopServersListener?.();
+
+    const serversQuery = query(
+        collection(db, "servers"),
+        where("memberUids", "array-contains", currentUser.uid)
+    );
+
+    stopServersListener = onSnapshot(
+        serversQuery,
+        (snapshot) => {
+            createdServers.replaceChildren();
+
+            snapshot.forEach((entry) => {
+                const data = entry.data();
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className = "server-icon created-server";
+                button.title = data.name || "Server";
+                button.setAttribute(
+                    "aria-label",
+                    `Open ${data.name || "server"}`
+                );
+                button.textContent =
+                    (data.name || "S").trim().charAt(0).toUpperCase();
+
+                button.addEventListener("click", () => {
+                    alert(
+                        `${data.name || "This server"} was created successfully. ` +
+                        "Its custom channel workspace can be added next."
+                    );
+                });
+
+                createdServers.appendChild(button);
+            });
+        },
+        (error) => {
+            console.error("Server list failed:", error);
+        }
+    );
+}
 
 window.sendMessage = sendMessage;
 
 window.clearChat = () => {
-    alert("Shared lounge messages are visible to everyone and cannot be cleared here.");
+    alert("Shared lounge messages cannot be cleared here.");
 };
-
-
-// ==========================================
-// LOGOUT — BOTTOM PROFILE DIAMOND
-// ==========================================
 
 window.logout = async () => {
     try {
         setMobileSidebar(false);
 
+        stopMessages();
         stopDirectMessages();
         stopMembersListener?.();
-        stopMessagesListener?.();
+        stopServersListener?.();
 
         if (window.leaveVoiceChat) {
             await window.leaveVoiceChat();
         }
 
         await signOut(auth);
-
         window.location.replace("login.html");
-
     } catch (error) {
         console.error("Logout failed:", error);
         alert("Unable to log out. Please try again.");
     }
 };
 
-
-// ==========================================
-// CLEANUP
-// ==========================================
-
 window.addEventListener("pagehide", () => {
-    stopMessagesListener?.();
+    stopMessages();
     stopMembersListener?.();
+    stopServersListener?.();
     stopDirectMessages();
 });
