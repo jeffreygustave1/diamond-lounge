@@ -12,10 +12,13 @@ const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 const panel = document.getElementById("voicePanel");
 const channelItems = [...document.querySelectorAll(".voice-channel")];
 const joinButton = document.getElementById("joinVoiceButton");
+const joinRow = document.querySelector(".voice-join-row");
 const muteButton = document.getElementById("muteToggleBtn");
 const cameraButton = document.getElementById("cameraToggleBtn");
 const screenButton = document.getElementById("screenToggleBtn");
 const leaveButton = document.getElementById("leaveVoiceButton");
+const controlsRow = document.getElementById("voiceControls");
+const leaveRow = document.getElementById("voiceLeaveRow");
 const statusElement = document.getElementById("voiceStatus");
 const participantsElement = document.getElementById("voiceParticipants");
 const countElement = document.getElementById("voiceParticipantCount");
@@ -607,8 +610,10 @@ async function joinVoice() {
         cameraOn = false;
         screenOn = false;
 
-        setPressed(joinButton, true);
-        if (joinButton) joinButton.querySelector(".voice-control-label").textContent = "Joined";
+        // Only now does the control row appear.
+        if (controlsRow) controlsRow.hidden = false;
+        if (leaveRow) leaveRow.hidden = false;
+        if (joinRow) joinRow.hidden = true;
 
         [muteButton, cameraButton, screenButton, leaveButton].forEach((button) => {
             if (button) button.disabled = false;
@@ -638,7 +643,6 @@ async function joinVoice() {
         localStream = null;
 
         setPressed(joinButton, false);
-        if (joinButton) joinButton.querySelector(".voice-control-label").textContent = "Join";
 
         [muteButton, cameraButton, screenButton, leaveButton].forEach((button) => {
             if (button) button.disabled = true;
@@ -684,6 +688,10 @@ async function leaveVoice() {
         if (button) button.disabled = true;
     });
 
+    if (controlsRow) controlsRow.hidden = true;
+    if (leaveRow) leaveRow.hidden = true;
+    if (joinRow) joinRow.hidden = false;
+
     if (muteButton) {
         muteButton.querySelector(".voice-control-label").textContent = "Mute";
         setPressed(muteButton, false);
@@ -696,10 +704,7 @@ async function leaveVoice() {
         screenButton.querySelector(".voice-control-label").textContent = "Screen";
         setPressed(screenButton, false);
     }
-    if (joinButton) {
-        joinButton.querySelector(".voice-control-label").textContent = "Join";
-        setPressed(joinButton, false);
-    }
+    if (joinButton) setPressed(joinButton, false);
 
     renderParticipants();
 
@@ -750,6 +755,9 @@ channelItems.forEach((channel) => {
             channel.classList.remove("active");
             channel.setAttribute("aria-expanded", "false");
             if (panel) panel.hidden = true;
+            if (controlsRow) controlsRow.hidden = true;
+            if (leaveRow) leaveRow.hidden = true;
+            if (joinRow) joinRow.hidden = false;
 
             stopParticipants?.(); stopParticipants = null;
             stopCalls?.(); stopCalls = null;
