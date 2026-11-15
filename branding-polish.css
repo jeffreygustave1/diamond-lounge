@@ -1,5 +1,10 @@
 
-/* Diamond Lounge identity and compact server rail */
+/* ==========================================
+   DIAMOND LOUNGE — BRANDING & PROFILE
+   Luxury identity and compact server rail
+========================================== */
+
+/* ---------- WORKSPACE TITLE ---------- */
 
 .workspace-title {
     display: flex;
@@ -20,13 +25,12 @@
     object-fit: contain;
     flex: none;
     filter: drop-shadow(0 0 9px rgba(199, 169, 107, .35));
-
-    /* Double visual size without moving its center */
     transform: scale(6);
     transform-origin: center center;
 }
 
-/* Top-left home server square */
+/* ---------- SERVER RAIL ---------- */
+
 .servers .dm-home {
     display: grid;
     place-items: center;
@@ -35,7 +39,7 @@
     cursor: pointer;
 }
 
-/* Diamond inside the square */
+/* Diamond inside home server button */
 .servers .dm-home img {
     width: 93px;
     height: 93px;
@@ -44,13 +48,10 @@
     position: relative;
     left: -25px;
     top: -24px;
-
-    /* Double visual size without moving its center */
     transform: scale(2);
     transform-origin: center center;
 }
 
-/* Keep size consistent on hover */
 .servers .dm-home:hover img {
     transform: scale(2);
 }
@@ -67,18 +68,178 @@
     color: #8eae84;
 }
 
-/* Restore the logout diamond to its original scale */
-.profile-avatar img {
+/* ==========================================
+   PROFILE BAR
+   LEFT: Diamond logout button
+   CENTER: Username
+   RIGHT: Profile picture
+========================================== */
+
+.profile-card {
+    position: relative;
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    flex: none;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform: scale(5);
-    transform-origin: center center;
+    min-height: 58px;
+    margin-top: auto;
+    padding: 9px 8px !important;
+    box-sizing: border-box;
+    border: 0 !important;
+    border-radius: 11px;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+/* Keep existing animated neon border */
+.profile-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+        115deg,
+        #ff2d55, #ff9500, #ffe31a, #34d058,
+        #28c8ff, #7b61ff, #ff2d55
+    );
+    background-size: 600% 600%;
+    animation: neonRing 3.2s linear infinite;
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
     pointer-events: none;
 }
 
-/* Mobile adjustments */
+/* LEFT — Diamond logout button */
+.profile-card .profile-avatar {
+    position: relative;
+    z-index: 2;
+    order: 1 !important;
+    flex: 0 0 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: grid;
+    place-items: center;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 8px;
+    background: transparent !important;
+    cursor: pointer;
+    overflow: visible !important;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.profile-card .profile-avatar:hover {
+    background: rgba(199, 169, 107, .08) !important;
+}
+
+/* Restore diamond to scale 5 */
+.profile-card .profile-avatar img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scale(5) !important;
+    transform-origin: center center !important;
+    pointer-events: none;
+}
+
+/* CENTER — Username and picture container */
+.profile-card .profile-identity {
+    position: relative;
+    z-index: 2;
+    order: 2 !important;
+    flex: 1 1 0 !important;
+    min-width: 0;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 32px;
+    align-items: center;
+    gap: 8px;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    text-align: center;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.profile-card .profile-identity:hover,
+.profile-card .profile-identity:focus,
+.profile-card .profile-identity:focus-visible {
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* Center username */
+.profile-card .profile-copy {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center !important;
+    justify-content: center;
+    text-align: center !important;
+}
+
+.profile-card .profile-name {
+    width: 100%;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Remove status underneath username */
+.profile-card .profile-status {
+    display: none !important;
+}
+
+/* RIGHT — Actual profile picture */
+.profile-card .member-picture {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    width: 32px !important;
+    height: 32px !important;
+    flex: none !important;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(199, 169, 107, .35);
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background-color: #1d1e22;
+    background-size: cover;
+    background-position: center;
+    color: var(--gold-bright);
+}
+
+/* Keep profile card contents above decorative effects */
+.profile-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* ---------- MOBILE ADJUSTMENTS ---------- */
+
 @media (max-width: 600px) {
+
     .workspace-title .workspace-gem {
         width: 78px;
         height: 78px;
@@ -92,89 +253,19 @@
         width: 93px;
         height: 93px;
     }
-}
 
+    .profile-card {
+        gap: 6px !important;
+        padding: 8px 4px !important;
+    }
 
-/* ==========================================
-   DIAMOND LOUNGE — PROFILE BAR REPAIR
-   Logout diamond LEFT
-   Username CENTER
-   Profile picture RIGHT
-========================================== */
+    .profile-card .profile-identity {
+        gap: 5px;
+        grid-template-columns: minmax(0, 1fr) 30px;
+    }
 
-.profile-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    padding: 8px 10px !important;
-    overflow: visible !important;
-}
-
-/* Diamond remains the logout button */
-.profile-card .profile-avatar {
-    order: 1 !important;
-    flex: 0 0 32px !important;
-    width: 32px !important;
-    height: 32px !important;
-    background: transparent !important;
-    border: 0 !important;
-    overflow: visible !important;
-}
-
-/* Username and picture container */
-.profile-card .profile-identity {
-    order: 2 !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 8px !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    text-align: center !important;
-}
-
-/* Remove background on hover */
-.profile-card .profile-identity:hover,
-.profile-card .profile-identity:focus-visible {
-    background: transparent !important;
-    outline: none;
-}
-
-/* Center username */
-.profile-card .profile-copy {
-    flex: 1 !important;
-    min-width: 0 !important;
-    text-align: center !important;
-    align-items: center !important;
-}
-
-/* Remove Available underneath username */
-.profile-card .profile-status {
-    display: none !important;
-}
-
-/* Profile picture stays on the right */
-.profile-card .member-picture {
-    order: 2 !important;
-    flex: 0 0 32px !important;
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-}
-
-/* Keep diamond image enlarged */
-.profile-card .profile-avatar img {
-    width: 100% !important;
-    height: 100% !important;
-    transform: scale(5) !important;
-    transform-origin: center center !important;
+    .profile-card .member-picture {
+        width: 30px !important;
+        height: 30px !important;
+    }
 }
