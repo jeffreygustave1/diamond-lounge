@@ -138,17 +138,19 @@ mediaInput?.addEventListener("change", async () => {
         const mediaDescription = file.type.startsWith("image/") ? "an image" : file.type.startsWith("video/") ? "a video" : "audio";
 
         await addDoc(collection(db, "messages"), {
-            uid: signedInUser.uid,
-            username,
-            text: (caption || `Shared ${mediaDescription}`).slice(0, 2000),
-            attachment: {
-                name: file.name.slice(0, 120),
-                type: file.type,
-                url: downloadUrl,
-                size: file.size
-            },
-            timestamp: serverTimestamp()
-        });
+    uid: signedInUser.uid,
+    username,
+    channelId,
+    text: (caption || `Shared ${mediaDescription}`).slice(0, 2000),
+    attachment: {
+        name: file.name.slice(0, 120),
+        type: file.type,
+        url: downloadUrl,
+        size: file.size
+    },
+    timestamp: serverTimestamp()
+});
+
 
         if (messageInput) messageInput.value = "";
         setStatus("Shared with the lounge.");
