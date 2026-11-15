@@ -12,13 +12,13 @@ const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 const panel = document.getElementById("voicePanel");
 const channelItems = [...document.querySelectorAll(".voice-channel")];
 const joinButton = document.getElementById("joinVoiceButton");
-const joinRow = document.querySelector(".voice-join-row");
 const muteButton = document.getElementById("muteToggleBtn");
 const cameraButton = document.getElementById("cameraToggleBtn");
 const screenButton = document.getElementById("screenToggleBtn");
 const leaveButton = document.getElementById("leaveVoiceButton");
 const controlsRow = document.getElementById("voiceControls");
 const leaveRow = document.getElementById("voiceLeaveRow");
+const joinSlots = [...document.querySelectorAll(".voice-join-slot")];
 const statusElement = document.getElementById("voiceStatus");
 const participantsElement = document.getElementById("voiceParticipants");
 const countElement = document.getElementById("voiceParticipantCount");
@@ -613,7 +613,6 @@ async function joinVoice() {
         // Only now does the control row appear.
         if (controlsRow) controlsRow.hidden = false;
         if (leaveRow) leaveRow.hidden = false;
-        if (joinRow) joinRow.hidden = true;
 
         [muteButton, cameraButton, screenButton, leaveButton].forEach((button) => {
             if (button) button.disabled = false;
@@ -690,7 +689,6 @@ async function leaveVoice() {
 
     if (controlsRow) controlsRow.hidden = true;
     if (leaveRow) leaveRow.hidden = true;
-    if (joinRow) joinRow.hidden = false;
 
     if (muteButton) {
         muteButton.querySelector(".voice-control-label").textContent = "Mute";
@@ -757,7 +755,10 @@ channelItems.forEach((channel) => {
             if (panel) panel.hidden = true;
             if (controlsRow) controlsRow.hidden = true;
             if (leaveRow) leaveRow.hidden = true;
-            if (joinRow) joinRow.hidden = false;
+
+            channel.closest(".voice-row")
+                ?.querySelector(".voice-join-slot")
+                ?.setAttribute("hidden", "");
 
             stopParticipants?.(); stopParticipants = null;
             stopCalls?.(); stopCalls = null;
@@ -774,6 +775,11 @@ channelItems.forEach((channel) => {
             item.classList.toggle("active", active);
             item.setAttribute("aria-expanded", String(active));
         });
+
+        // Only the clicked channel reveals a Join button, right beside it.
+        joinSlots.forEach((slot) => { slot.hidden = true; });
+        const ownSlot = channel.closest(".voice-row")?.querySelector(".voice-join-slot");
+        if (ownSlot) ownSlot.hidden = false;
 
         selectedChannel = nextName;
         roomId = nextRoom;
