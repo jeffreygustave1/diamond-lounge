@@ -423,57 +423,11 @@ button {
    PROFILE / LOGOUT
 ========================================== */
 
-.profile-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: auto;
-    padding: 12px;
-    border: 1px solid var(--line);
-    border-radius: 11px;
-    background: #191a1d;
-}
 
-.profile-avatar {
-    width: 32px;
-    height: 32px;
-    flex: none;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    background: #302a1e;
-    overflow: visible;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    transition: background .2s ease, transform .2s ease;
-}
 
-.profile-avatar:hover {
-    background: #403722;
-    transform: scale(1.05);
-}
 
-.profile-avatar:focus-visible {
-    outline: 2px solid var(--gold-bright);
-    outline-offset: 4px;
-}
 
-.profile-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform: scale(5);
-    transform-origin: center;
-    pointer-events: none;
-}
 
-.profile-copy {
-    min-width: 0;
-    flex: 1;
-}
 
 .profile-name {
     overflow: hidden;
@@ -1213,190 +1167,7 @@ button {
         margin-top: 16px;
     }
 
-    .profile-card {
-        flex: none;
-    }
-
-    .mobile-sidebar-backdrop {
-        position: fixed;
-        z-index: 1001;
-        inset: 0;
-        display: block;
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        border: 0;
-        background: rgba(0,0,0,.68);
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity .25s ease, visibility .25s ease;
-    }
-
-    .dashboard.mobile-nav-open .mobile-sidebar-backdrop {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
-
-    .chat-area {
-        width: 100%;
-        height: 100%;
-        min-width: 0;
-        min-height: 0;
-        flex: 1;
-        overflow: hidden;
-
-        background: transparent;
-        -webkit-backdrop-filter: blur(4px) saturate(160%);
-        backdrop-filter: blur(4px) saturate(160%);
-    }
-
-    .lounge-view,
-    .dm-home-view,
-    .dm-conversation-view {
-        width: 100%;
-        height: 100%;
-        min-width: 0;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    .chat-header {
-        min-height: 66px;
-        padding: 10px 13px;
-        gap: 8px;
-        font-size: 14px;
-
-        background: rgba(255,255,255,.012);
-        -webkit-backdrop-filter: blur(1px) saturate(160%);
-        backdrop-filter: blur(1px) saturate(160%);
-    }
-
-    .chat-header-main {
-        gap: 11px;
-    }
-
-    .mobile-menu-button {
-        display: flex;
-    }
-
-    .channel-title {
-        font-size: 15px;
-    }
-
-    .sub-header {
-        margin-top: 3px;
-        font-size: 10px;
-    }
-
-    .secure-label {
-        display: none;
-    }
-
-    .messages {
-        min-height: 0;
-        flex: 1;
-        padding: 15px 12px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .message {
-        max-width: 100%;
-        padding: 10px 12px;
-        font-size: 13px;
-        background: rgba(20,22,27,.36);
-        -webkit-backdrop-filter: blur(2px) saturate(145%);
-        backdrop-filter: blur(2px) saturate(145%);
-    }
-
-    .message-box {
-        flex: none;
-        gap: 7px;
-        margin: 0 9px 5px;
-        padding: 7px 8px;
-        border-radius: 12px;
-
-        background: rgba(255,255,255,.025);
-        -webkit-backdrop-filter: blur(2px) saturate(160%);
-        backdrop-filter: blur(2px) saturate(160%);
-    }
-
-    .message-box input[type="text"] {
-        min-width: 0;
-        font-size: 13px;
-    }
-
-    .message-box button {
-        padding: 9px 12px;
-        font-size: 11px;
-    }
-
-    .upload-button {
-        width: 30px;
-        height: 30px;
-    }
-
-    .upload-status {
-        flex: none;
-        min-height: 15px;
-        margin: 0 12px;
-        padding-bottom: 3px;
-        font-size: 10px;
-    }
-
-    .dm-welcome {
-        padding: 20px 15px;
-    }
-
-    .dm-conversation-header {
-        padding: 10px 13px;
-    }
-
-    .dm-contact-heading {
-        min-width: 0;
-    }
-
-    .dm-contact-heading > div {
-        min-width: 0;
-    }
-
-    .message-box:last-of-type {
-        margin-bottom: max(5px, env(safe-area-inset-bottom));
-    }
-
-    /* Create Server modal on mobile */
-
-    #serverModal {
-        align-items: center;
-        padding: 16px;
-        padding-top: max(16px, env(safe-area-inset-top));
-        padding-bottom: max(16px, env(safe-area-inset-bottom));
-    }
-
-    #serverModal > div,
-    #serverModal .modal-content,
-    #serverModal .server-modal-content {
-        width: 100%;
-        max-height: 88dvh;
-        padding: 23px 19px;
-        border-radius: 15px;
-    }
-
-    #serverModal .modal-actions,
-    #serverModal .server-modal-actions {
-        flex-wrap: wrap;
-    }
-
-    #serverModal .modal-actions button,
-    #serverModal .server-modal-actions button {
-        flex: 1;
-    }
-}
-
+    
 
 /* ==========================================
    CRYSTAL TYPOGRAPHY — PEARLESCENT GLASS
@@ -1612,13 +1383,6 @@ button {
 }
 
 /* Subtle reflective finish on channel and profile surfaces */
-.profile-card,
-.voice-panel,
-.shared-media-card {
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.075),
-        0 3px 14px rgba(0,0,0,.08);
-}
 
 /* DM typography */
 .dm-welcome h1,
@@ -1750,76 +1514,13 @@ button {
 
 /* ---------- PROFILE CARD ---------- */
 
-.profile-card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    margin-top: auto;
-    padding: 11px;
-    border: 1px solid rgba(226, 205, 157, .22);
-    border-radius: 13px;
-    background: #141518;
-    overflow: hidden;
-}
 
-.profile-avatar {
-    width: 32px;
-    height: 32px;
-    flex: none;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    border: 0;
-    border-radius: 10px;
-    background: #302a1e;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    overflow: visible;
-    transition: transform .18s ease, box-shadow .18s ease;
-}
 
-.profile-avatar:hover {
-    transform: scale(1.06);
-    box-shadow: 0 0 0 2px rgba(226, 205, 157, .35);
-}
 
-.profile-avatar:focus-visible {
-    outline: 2px solid var(--gold-bright);
-    outline-offset: 3px;
-}
 
-.profile-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform: scale(5);
-    transform-origin: center center;
-    pointer-events: none;
-}
 
-.profile-copy {
-    min-width: 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    padding: 5px 7px;
-    border: 0;
-    border-radius: 9px;
-    background: transparent;
-    text-align: left;
-    cursor: pointer;
-    transition: background .16s ease;
-}
 
 .profile-copy:hover,
-.profile-copy:focus-visible {
-    background: rgba(199, 169, 107, .1);
-    outline: none;
-}
 
 .profile-name {
     max-width: 100%;
@@ -1840,55 +1541,8 @@ button {
 /* ---------- NEON RGB EDGE ---------- */
 /* The glow follows the rounded border of the profile box only. */
 
-.profile-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    padding: 2px;
-    border-radius: inherit;
-    background: linear-gradient(
-        115deg,
-        #ff2d55, #ff9500, #ffe31a, #34d058, #28c8ff, #7b61ff,
-        #ff2d55, #ff9500, #ffe31a, #34d058, #28c8ff, #7b61ff,
-        #ff2d55
-    );
-    background-size: 600% 600%;
-    animation: neonRing 3.2s linear infinite;
-    -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: .95;
-}
 
-.profile-card::before {
-    content: "";
-    position: absolute;
-    inset: -9px;
-    z-index: -1;
-    border-radius: 22px;
-    background: linear-gradient(
-        115deg,
-        rgba(255,45,85,.55), rgba(255,149,0,.55), rgba(255,227,26,.55),
-        rgba(52,208,88,.55), rgba(40,200,255,.55), rgba(123,97,255,.55),
-        rgba(255,45,85,.55)
-    );
-    background-size: 600% 600%;
-    filter: blur(11px);
-    animation: neonRing 3.2s linear infinite, neonPulse 2.4s ease-in-out infinite;
-    pointer-events: none;
-}
 
-.profile-card > * {
-    position: relative;
-    z-index: 1;
-}
 
 @keyframes neonRing {
     0%   { background-position: 0% 50%; }
@@ -1902,11 +1556,7 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
     .profile-card::after,
-    .profile-card::before {
-        animation: none;
-    }
-}
-
+    
 /* ---------- PROFILE MODAL ---------- */
 
 .profile-modal-preview {
@@ -2111,73 +1761,14 @@ button {
 
 /* ---------- PROFILE BOX: name + picture + diamond ---------- */
 
-.profile-card {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px;
-}
 
-.profile-identity {
-    min-width: 0;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 6px 8px;
-    border: 0;
-    border-radius: 9px;
-    background: transparent;
-    text-align: left;
-    cursor: pointer;
-    transition: background .16s ease;
-}
 
 .profile-identity:hover,
-.profile-identity:focus-visible {
-    background: rgba(199, 169, 107, .1);
-    outline: none;
-}
 
-.profile-copy {
-    min-width: 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-}
 
 /* The picture sits to the RIGHT of the name and never touches the diamond. */
-.member-picture {
-    width: 30px;
-    height: 30px;
-    flex: none;
-    display: grid;
-    place-items: center;
-    margin-left: auto;
-    order: 2;
-    border-radius: 9px;
-    border: 1px solid rgba(226, 205, 157, .3);
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1;
-    background: linear-gradient(145deg, #2b2924, #141416);
-    color: var(--gold-bright);
-}
 
 /* The logout diamond keeps its full original size. */
-.profile-avatar {
-    width: 32px;
-    height: 32px;
-    flex: none;
-    order: 3;
-    border-radius: 10px;
-    background: #302a1e;
-    overflow: visible;
-}
 
 .profile-avatar img {
     width: 100%;
@@ -2189,17 +1780,7 @@ button {
 
 /* ---------- NEON EDGE: FLOWING ---------- */
 
-.profile-card::after {
-    background-size: 700% 700% !important;
-    animation: neonRing 2.6s linear infinite !important;
-}
 
-.profile-card::before {
-    background-size: 700% 700% !important;
-    animation: neonRing 2.6s linear infinite,
-               neonPulse 1.8s ease-in-out infinite !important;
-    filter: blur(12px) saturate(1.5);
-}
 
 /* ---------- EMPTY SPOT: LIQUID GLASS PANEL ---------- */
 
@@ -2431,9 +2012,7 @@ button {
     .empty-channel-view { padding: 16px; }
     .liquid-glass-panel { padding: 34px 22px; border-radius: 20px; }
     .glass-gem { width: 70px; height: 70px; transform: scale(2.6); margin-bottom: 22px; }
-    .profile-avatar { width: 30px; height: 30px; }
-    .member-picture { width: 26px; height: 26px; font-size: 12px; }
-}
+        }
 
 /* ==========================================
    FINAL LAYOUT — PROFILE CARD ORDER, GLASS
@@ -2441,79 +2020,11 @@ button {
 ========================================== */
 
 /* Diamond LEFT · name MIDDLE · picture RIGHT */
-.profile-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 9px !important;
-}
 
-.profile-avatar {
-    order: 1 !important;
-    width: 32px !important;
-    height: 32px !important;
-    flex: none !important;
-    overflow: visible !important;
-    background: #302a1e !important;
-    border: 0 !important;
-    border-radius: 10px !important;
-    display: grid !important;
-    place-items: center !important;
-    padding: 0 !important;
-    cursor: pointer !important;
-}
 
-.profile-avatar img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    transform: scale(5) !important;
-    transform-origin: center center !important;
-    pointer-events: none !important;
-}
 
-.profile-identity {
-    order: 2 !important;
-    min-width: 0 !important;
-    flex: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 9px !important;
-    padding: 5px 8px !important;
-    border: 0 !important;
-    border-radius: 9px !important;
-    background: transparent !important;
-    cursor: pointer !important;
-}
 
-.profile-copy {
-    order: 1 !important;
-    min-width: 0 !important;
-    flex: 0 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 2px !important;
-    text-align: center !important;
-}
 
-.member-picture {
-    order: 2 !important;
-    width: 30px !important;
-    height: 30px !important;
-    flex: none !important;
-    display: grid !important;
-    place-items: center !important;
-    border-radius: 9px !important;
-    border: 1px solid rgba(226, 205, 157, .3) !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    line-height: 1 !important;
-    overflow: hidden !important;
-    background-size: cover !important;
-    background-position: center !important;
-}
 
 /* ---------- GLASS BACKGROUND FOR THE CHAT / MESSAGE AREA ---------- */
 
@@ -3050,4 +2561,169 @@ button {
     .voice-count {
         font-size: 8px;
     }
+}
+
+/* ==========================================
+   PROFILE BOX — SINGLE AUTHORITATIVE RULE
+   Diamond LEFT · name MIDDLE · picture RIGHT
+========================================== */
+
+.profile-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex: none;
+    width: 100%;
+    min-height: 58px;
+    margin-top: auto;
+    padding: 9px 10px;
+    border: 1px solid rgba(226, 205, 157, .22);
+    border-radius: 13px;
+    background: #141518;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+.profile-avatar {
+    order: 1;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: #302a1e;
+    cursor: pointer;
+    overflow: visible;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.profile-avatar:hover { background: #3b3524; }
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(5);
+    transform-origin: center center;
+    pointer-events: none;
+}
+
+.profile-identity {
+    order: 2;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 7px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.profile-identity:hover,
+.profile-identity:focus-visible {
+    background: rgba(199, 169, 107, .1);
+    outline: none;
+}
+
+.profile-copy {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+}
+
+.profile-name {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-status {
+    color: #8ea28b;
+    font-size: 10px;
+}
+
+.member-picture {
+    order: 2;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    border: 1px solid rgba(226, 205, 157, .3);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-color: #1d1e22;
+    color: var(--gold-bright);
+}
+
+/* Neon RGB edge — flowing. */
+.profile-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    padding: 2px;
+    border-radius: inherit;
+    background: linear-gradient(
+        115deg,
+        #ff2d55, #ff9500, #ffe31a, #34d058, #28c8ff, #7b61ff,
+        #ff2d55, #ff9500, #ffe31a, #34d058, #28c8ff, #7b61ff,
+        #ff2d55
+    );
+    background-size: 600% 600%;
+    animation: neonRing 3.2s linear infinite;
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.profile-card::before {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    z-index: 0;
+    border-radius: 20px;
+    background: linear-gradient(
+        115deg,
+        rgba(255,45,85,.5), rgba(255,149,0,.5), rgba(255,227,26,.5),
+        rgba(52,208,88,.5), rgba(40,200,255,.5), rgba(123,97,255,.5),
+        rgba(255,45,85,.5)
+    );
+    background-size: 600% 600%;
+    filter: blur(11px);
+    animation: neonRing 3.2s linear infinite;
+    pointer-events: none;
+}
+
+.profile-card > * { position: relative; z-index: 2; }
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-card::after, .profile-card::before { animation: none; }
 }
