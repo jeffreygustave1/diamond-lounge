@@ -114,7 +114,111 @@
                     </li>
         </ul>
 
-        <h3 class="section-heading voice-title">VOICE LOUNGES</h3>
+        
+<h3 class="section-heading voice-title">VOICE LOUNGES</h3>
+
+<ul class="voice-channel-list">
+
+    <!-- GENERAL VOICE -->
+    <li class="voice-row">
+        <div class="voice-row-head">
+            <button class="voice-channel" type="button"
+                    data-voice-name="General Voice"
+                    aria-expanded="false">
+                <span>🔊</span><span>General Voice</span>
+            </button>
+
+            <div class="voice-join-slot" id="voiceJoinSlot" hidden>
+                <span class="voice-count" data-voice-count="General Voice">
+                    No one in voice
+                </span>
+                <button type="button" class="voice-join-button glass-button"
+                        id="joinVoiceButton">Join</button>
+            </div>
+        </div>
+
+        <!-- SHARED VOICE CONTROLS -->
+        <section class="voice-panel" id="voicePanel"
+                 aria-label="Voice channel controls" hidden>
+
+            <p id="voiceStatus" role="status" aria-live="polite"></p>
+
+            <div class="voice-leave-row" id="voiceLeaveRow" hidden>
+                <button type="button" class="voice-control danger"
+                        id="leaveVoiceButton" disabled aria-pressed="false">
+                    <span class="voice-control-icon">✕</span>
+                    <span class="voice-control-label">Leave</span>
+                </button>
+            </div>
+
+            <div class="voice-controls" id="voiceControls" hidden>
+                <button type="button" class="voice-control"
+                        id="muteToggleBtn" disabled aria-pressed="false">
+                    <span class="voice-control-icon">🎙️</span>
+                    <span class="voice-control-label">Mute</span>
+                </button>
+
+                <button type="button" class="voice-control"
+                        id="cameraToggleBtn" disabled aria-pressed="false">
+                    <span class="voice-control-icon">📷</span>
+                    <span class="voice-control-label">Camera</span>
+                </button>
+
+                <button type="button" class="voice-control"
+                        id="screenToggleBtn" disabled aria-pressed="false">
+                    <span class="voice-control-icon">🖥️</span>
+                    <span class="voice-control-label">Screen</span>
+                </button>
+            </div>
+
+            <div class="voice-participant-info">
+                <span>Participants: <strong id="voiceParticipantCount">0</strong></span>
+                <ul id="voiceParticipants" class="voice-participant-list">
+                    <li class="voice-empty">No one is here yet.</li>
+                </ul>
+            </div>
+
+            <div id="remoteVideoGrid" class="remote-video-grid"></div>
+            <div id="remoteAudioContainer" class="remote-audio-container"></div>
+        </section>
+    </li>
+
+    <!-- GAMING VOICE -->
+    <li class="voice-row">
+        <div class="voice-row-head">
+            <button class="voice-channel" type="button"
+                    data-voice-name="Gaming Voice"
+                    aria-expanded="false">
+                <span>🎮</span><span>Gaming Voice</span>
+            </button>
+
+            <div class="voice-join-slot" hidden>
+                <span class="voice-count" data-voice-count="Gaming Voice">
+                    No one in voice
+                </span>
+            </div>
+        </div>
+    </li>
+
+    <!-- AFK -->
+    <li class="voice-row">
+        <div class="voice-row-head">
+            <button class="voice-channel" type="button"
+                    data-voice-name="AFK"
+                    aria-expanded="false">
+                <span>🌙</span><span>AFK</span>
+            </button>
+
+            <div class="voice-join-slot" hidden>
+                <span class="voice-count" data-voice-count="AFK">
+                    No one in voice
+                </span>
+            </div>
+        </div>
+    </li>
+
+</ul>
+
 
         <ul class="voice-channel-list">
                     <li class="voice-row">
