@@ -2433,3 +2433,233 @@ button {
     .profile-avatar { width: 30px; height: 30px; }
     .member-picture { width: 26px; height: 26px; font-size: 12px; }
 }
+
+/* ==========================================
+   FINAL LAYOUT — PROFILE CARD ORDER, GLASS
+   CHAT BACKGROUND, AND GLASS JOIN BUTTON
+========================================== */
+
+/* Diamond LEFT · name MIDDLE · picture RIGHT */
+.profile-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 9px !important;
+}
+
+.profile-avatar {
+    order: 1 !important;
+    width: 32px !important;
+    height: 32px !important;
+    flex: none !important;
+    overflow: visible !important;
+    background: #302a1e !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+}
+
+.profile-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scale(5) !important;
+    transform-origin: center center !important;
+    pointer-events: none !important;
+}
+
+.profile-identity {
+    order: 2 !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 9px !important;
+    padding: 5px 8px !important;
+    border: 0 !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+    cursor: pointer !important;
+}
+
+.profile-copy {
+    order: 1 !important;
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px !important;
+    text-align: center !important;
+}
+
+.member-picture {
+    order: 2 !important;
+    width: 30px !important;
+    height: 30px !important;
+    flex: none !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 9px !important;
+    border: 1px solid rgba(226, 205, 157, .3) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    overflow: hidden !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+/* ---------- GLASS BACKGROUND FOR THE CHAT / MESSAGE AREA ---------- */
+
+/* The messages area and its surroundings become the same liquid glass. */
+.messages,
+.dm-messages {
+    position: relative;
+    border-radius: 18px;
+    margin: 14px 3% 0;
+    padding: 22px 22px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    background:
+        linear-gradient(
+            150deg,
+            rgba(255, 255, 255, .13) 0%,
+            rgba(255, 255, 255, .05) 40%,
+            rgba(255, 255, 255, .02) 65%,
+            rgba(255, 255, 255, .09) 100%
+        );
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .3),
+        inset 0 -1px 0 rgba(255, 255, 255, .08),
+        0 18px 50px rgba(0, 0, 0, .38);
+    backdrop-filter: blur(22px) saturate(1.6) brightness(1.06);
+    -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(1.06);
+    overflow-y: auto;
+}
+
+/* The chat column keeps the warm lounge backdrop the glass sits on. */
+.chat-area {
+    position: relative;
+    background:
+        radial-gradient(ellipse at 22% 12%, rgba(199, 169, 107, .10), transparent 58%),
+        radial-gradient(ellipse at 78% 86%, rgba(90, 130, 220, .09), transparent 58%),
+        linear-gradient(145deg, rgba(23, 24, 27, .88), rgba(15, 16, 18, .96));
+}
+
+/* ---------- GLASS SURFACES (message box, join button) ---------- */
+
+.glass-surface,
+.glass-button {
+    border: 1px solid rgba(255, 255, 255, .22) !important;
+    background:
+        linear-gradient(
+            150deg,
+            rgba(255, 255, 255, .17) 0%,
+            rgba(255, 255, 255, .06) 45%,
+            rgba(255, 255, 255, .03) 65%,
+            rgba(255, 255, 255, .12) 100%
+        ) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .38),
+        0 10px 30px rgba(0, 0, 0, .35) !important;
+    backdrop-filter: blur(18px) saturate(1.6) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.6) !important;
+}
+
+.message-box.glass-surface input[type="text"] {
+    color: var(--text);
+}
+
+.message-box.glass-surface {
+    border-radius: 14px !important;
+    margin: 10px 3% 10px !important;
+}
+
+.message-box.glass-surface button[type="submit"] {
+    border: 1px solid rgba(255, 255, 255, .28) !important;
+    background: linear-gradient(135deg, rgba(226, 205, 157, .88), rgba(160, 132, 78, .88)) !important;
+    color: #17140f !important;
+}
+
+/* ---------- VOICE ROWS WITH A GLASS JOIN BUTTON BESIDE THE CHANNEL ---------- */
+
+.voice-channel-list {
+    padding: 0;
+    list-style: none;
+}
+
+.voice-row {
+    list-style: none;
+}
+
+.voice-row-head {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.voice-join-slot {
+    padding: 0 4px 8px;
+}
+
+.voice-join-slot[hidden] {
+    display: none !important;
+}
+
+.voice-join-button {
+    width: 100% !important;
+    padding: 9px 10px !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: .06em !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, .4);
+}
+
+.voice-join-button:hover {
+    filter: brightness(1.12);
+}
+
+/* ---------- PROFILE UPLOAD BUTTON ---------- */
+
+.profile-upload {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 11px 10px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, .4);
+}
+
+.profile-upload-note {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .messages,
+    .dm-messages {
+        margin: 10px 10px 0;
+        padding: 16px 12px;
+        border-radius: 14px;
+    }
+
+    .message-box.glass-surface {
+        margin: 8px 10px 8px !important;
+    }
+}
