@@ -19,6 +19,8 @@ const leaveButton = document.getElementById("leaveVoiceButton");
 const controlsRow = document.getElementById("voiceControls");
 const leaveRow = document.getElementById("voiceLeaveRow");
 const joinSlots = [...document.querySelectorAll(".voice-join-slot")];
+const countElements = [...document.querySelectorAll("[data-voice-count]")];
+const stopCounts = new Map();
 const statusElement = document.getElementById("voiceStatus");
 const participantsElement = document.getElementById("voiceParticipants");
 const countElement = document.getElementById("voiceParticipantCount");
@@ -47,6 +49,43 @@ const mediaTracks = new Map();
 
 function setStatus(text) {
     if (statusElement) statusElement.textContent = text;
+}
+
+/* Count the people actually connected to each voice lounge. */
+function watchChannelCounts() {
+    countElements.forEach((element) => {
+        const name = element.dataset.voiceCount;
+        if (!name) return;
+
+        const room = makeRoomId(name);
+
+        stopCounts.get(room)?.();
+        stopCounts.delete(room);
+
+        const unsubscribe = onSnapshot(
+            collection(db, "voiceRooms", room, "participants"),
+            (snapshot) => {
+                let live = 0;
+
+                snapshot.forEach((entry) => {
+                    const heartbeatAt = Number(entry.data()?.heartbeatAt || 0);
+                    if (Date.now() - heartbeatAt < STALE_AFTER_MS) live += 1;
+                });
+
+                element.textContent =
+                    live === 0 ? "No one in voice"
+                    : live === 1 ? "1 in voice"
+                    : `${live} in voice`;
+
+                element.classList.toggle("has-people", live > 0);
+            },
+            () => {
+                element.textContent = "No one in voice";
+            }
+        );
+
+        stopCounts.set(room, unsubscribe);
+    });
 }
 
 function makeRoomId(name) {
@@ -804,13 +843,22 @@ screenButton?.addEventListener("click", (event) => { event.stopPropagation(); vo
 
 onAuthStateChanged(auth, (nextUser) => {
     user = nextUser;
-    if (!nextUser) { if (localStream) void leaveVoice(); return; }
+    if (!nextUser) {
+        stopCounts.forEach((stop) => stop());
+        stopCounts.clear();
+        if (localStream) void leaveVoice();
+        return;
+    }
+
+    watchChannelCounts();
     if (selectedChannel) watchParticipants();
 });
 
 window.leaveVoiceChat = leaveVoice;
 
 window.addEventListener("pagehide", () => {
+    stopCounts.forEach((stop) => stop());
+    stopCounts.clear();
     if (heartbeatTimer) clearInterval(heartbeatTimer);
     localStream?.getTracks().forEach((track) => track.stop());
     cameraStream?.getTracks().forEach((track) => track.stop());
