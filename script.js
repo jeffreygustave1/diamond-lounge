@@ -141,6 +141,8 @@ function showEmptyView() {
 
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
+
+    // Clicking the channel that is already open folds it away again.
     if (activeTextChannel === channelName && loungeView && !loungeView.hidden) {
         showEmptyView();
         setMobileSidebar(false);
@@ -195,6 +197,7 @@ onAuthStateChanged(auth, async (user) => {
         console.error("Profile setup failed:", error);
         if (dmMemberList) dmMemberList.textContent = "Member profiles could not load.";
     }
+    await loadProfile();
     showLoungeSidebar();
     showEmptyView();
 });
@@ -526,11 +529,175 @@ async function logoutUser() {
         alert("Unable to log out. Please try again.");
     }
 }
+
+// The diamond logs out. The name beside it opens the profile editor.
 logoutButton?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
     void logoutUser();
 });
+
+const profileButton = document.getElementById("profileButton");
+const profileModal = document.getElementById("profileModal");
+const closeProfileModalButton = document.getElementById("closeProfileModal");
+const cancelProfileEdit = document.getElementById("cancelProfileEdit");
+const profileForm = document.getElementById("profileForm");
+const profileDisplayName = document.getElementById("profileDisplayName");
+const profileStatus = document.getElementById("profileStatus");
+const profilePreviewImage = document.getElementById("profilePreviewImage");
+const profileChoiceButtons = [...document.querySelectorAll(".profile-choice")];
+
+const AVATAR_STYLES = {
+    diamond: { background: "linear-gradient(145deg,#2b2924,#141416)", color: "#e1c98f", glyph: "\u2726" },
+    gold: { background: "linear-gradient(145deg,#c7a96b,#8b7040)", color: "#1a1610", glyph: "G" },
+    silver: { background: "linear-gradient(145deg,#c9ccd2,#8d9198)", color: "#191a1d", glyph: "S" },
+    emerald: { background: "linear-gradient(145deg,#4f8a63,#2c5740)", color: "#eef7f0", glyph: "E" },
+    ruby: { background: "linear-gradient(145deg,#a5535a,#6f2f36)", color: "#fbeeee", glyph: "R" },
+    royal: { background: "linear-gradient(145deg,#5a5fa5,#33376f)", color: "#eeeffb", glyph: "V" }
+};
+
+let currentAvatar = "diamond";
+
+function avatarStyleFor(key) {
+    return AVATAR_STYLES[key] || AVATAR_STYLES.diamond;
+}
+
+function applyAvatar(key) {
+    currentAvatar = AVATAR_STYLES[key] ? key : "diamond";
+    const style = avatarStyleFor(currentAvatar);
+
+    [logoutButton, profileButton].forEach((element) => {
+        if (!element) return;
+        element.style.background = style.background;
+    });
+
+    if (profilePreviewImage) {
+        profilePreviewImage.style.display = "none";
+    }
+
+    profileChoiceButtons.forEach((button) => {
+        button.classList.toggle("selected", button.dataset.avatar === currentAvatar);
+    });
+}
+
+async function loadProfile() {
+    if (!currentUser) return;
+
+    try {
+        const snapshot = await getDoc(doc(db, "users", currentUser.uid));
+        const data = snapshot.exists() ? snapshot.data() : {};
+
+        if (typeof data.displayName === "string" && data.displayName) {
+            if (profileName) profileName.textContent = data.displayName;
+        }
+
+        if (typeof data.avatar === "string") {
+            applyAvatar(data.avatar);
+        } else {
+            applyAvatar("diamond");
+        }
+    } catch (error) {
+        console.warn("Profile could not be read:", error);
+        applyAvatar("diamond");
+    }
+}
+
+function openProfileModal() {
+    if (!profileModal || !currentUser) return;
+
+    if (profileDisplayName) {
+        profileDisplayName.value = profileName?.textContent?.trim() || "Member";
+    }
+
+    if (profileStatus) {
+        profileStatus.textContent = "";
+        profileStatus.className = "";
+    }
+
+    applyAvatar(currentAvatar);
+    profileModal.hidden = false;
+    document.body.classList.add("modal-open");
+    requestAnimationFrame(() => profileDisplayName?.focus());
+}
+
+function closeProfileModal() {
+    if (!profileModal || profileModal.hidden) return;
+
+    profileModal.hidden = true;
+    document.body.classList.remove("modal-open");
+    if (profileStatus) profileStatus.textContent = "";
+}
+
+profileButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openProfileModal();
+});
+
+closeProfileModalButton?.addEventListener("click", closeProfileModal);
+cancelProfileEdit?.addEventListener("click", closeProfileModal);
+
+profileModal?.addEventListener("click", (event) => {
+    if (event.target === profileModal) closeProfileModal();
+});
+
+profileChoiceButtons.forEach((button) => {
+    button.addEventListener("click", () => applyAvatar(button.dataset.avatar));
+});
+
+profileForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!currentUser) return;
+
+    const nextName = (profileDisplayName?.value || "").trim().slice(0, 30);
+    if (nextName.length < 2) {
+        if (profileStatus) {
+            profileStatus.textContent = "Display names need at least 2 characters.";
+            profileStatus.className = "error";
+        }
+        return;
+    }
+
+    const saveButton = document.getElementById("saveProfileButton");
+    if (saveButton) saveButton.disabled = true;
+
+    try {
+        // Only fields this user owns are written, so existing rules still apply.
+        await setDoc(
+            doc(db, "users", currentUser.uid),
+            {
+                uid: currentUser.uid,
+                displayName: nextName,
+                avatar: currentAvatar,
+                createdAt: serverTimestamp()
+            },
+            { merge: true }
+        );
+
+        if (profileName) profileName.textContent = nextName;
+        const currentName = document.getElementById("currentUser")?.querySelector("span");
+        if (currentName) currentName.textContent = nextName;
+
+        if (profileStatus) {
+            profileStatus.textContent = "Profile saved.";
+            profileStatus.className = "success";
+        }
+
+        window.setTimeout(closeProfileModal, 500);
+    } catch (error) {
+        console.error("Profile save failed:", error);
+        if (profileStatus) {
+            profileStatus.textContent =
+                error.code === "permission-denied"
+                    ? "Firestore rejected the profile update. Allow profile updates in your users rules."
+                    : "Your profile could not be saved.";
+            profileStatus.className = "error";
+        }
+    } finally {
+        if (saveButton) saveButton.disabled = false;
+    }
+});
+
 window.logout = logoutUser;
 window.sendMessage = sendMessage;
 window.clearChat = () => alert("Shared lounge messages cannot be cleared here.");
