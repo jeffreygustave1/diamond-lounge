@@ -38,6 +38,10 @@ const logoutButton = document.getElementById("logoutButton");
 const loungeSidebar = document.getElementById("loungeSidebar");
 const dmSidebar = document.getElementById("dmSidebar");
 const emptyView = document.getElementById("emptyView");
+const serverView = document.getElementById("serverView");
+const serverViewName = document.getElementById("serverViewName");
+const serverViewVisibility = document.getElementById("serverViewVisibility");
+const serverWelcomeName = document.getElementById("serverWelcomeName");
 const loungeView = document.getElementById("loungeView");
 const dmHomeView = document.getElementById("dmHomeView");
 const dmConversationView = document.getElementById("dmConversationView");
@@ -114,6 +118,7 @@ function stopDirectMessages() {
 
 function hideMainViews() {
     if (emptyView) emptyView.hidden = true;
+    if (serverView) serverView.hidden = true;
     if (loungeView) loungeView.hidden = true;
     if (dmHomeView) dmHomeView.hidden = true;
     if (dmConversationView) dmConversationView.hidden = true;
@@ -323,6 +328,10 @@ dmHomeButton?.addEventListener("click", (event) => {
 mainServerButton?.addEventListener("click", () => {
     showLoungeSidebar();
     showEmptyView();
+    document.querySelectorAll(".server-icon").forEach((icon) => {
+        icon.classList.remove("selected");
+    });
+    mainServerButton?.classList.add("selected");
     setMobileSidebar(false);
 });
 
@@ -512,18 +521,14 @@ createServerForm?.addEventListener("submit", async (event) => {
             createdAt: serverTimestamp()
         });
         closeServerModal();
+
+        const server = { name, visibility: serverVisibilityInput.value };
+
         if (createdServers) {
-            const icon = document.createElement("button");
-            icon.type = "button";
-            icon.className = "server-icon created-server";
-            icon.title = name;
-            icon.setAttribute("aria-label", `Open ${name}`);
-            icon.textContent = name.trim().charAt(0).toUpperCase();
-            icon.addEventListener("click", () => {
-                alert(`${name} was created. Its own channels can be added next.`);
-            });
-            createdServers.appendChild(icon);
+            createdServers.appendChild(makeServerIcon(server));
         }
+
+        openServer(server);
     } catch (error) {
         console.error("Server creation failed:", error);
         if (serverCreateStatus) {
@@ -533,6 +538,51 @@ createServerForm?.addEventListener("submit", async (event) => {
         }
     }
 });
+
+function openServer(server) {
+    stopPublicMessages();
+    stopDirectMessages();
+
+    activeTextChannel = null;
+    selectedMember = null;
+    currentConversationId = null;
+
+    showLoungeSidebar();
+    hideMainViews();
+
+    if (serverView) serverView.hidden = false;
+    if (communitySidebar) communitySidebar.hidden = true;
+
+    if (serverViewName) serverViewName.textContent = server.name;
+    if (serverWelcomeName) serverWelcomeName.textContent = server.name;
+    if (serverViewVisibility) {
+        serverViewVisibility.textContent =
+            server.visibility === "public"
+                ? "Public server — anyone can join"
+                : "Private server — invite only";
+    }
+
+    document.querySelectorAll(".server-icon").forEach((icon) => {
+        icon.classList.remove("selected");
+    });
+    server.button?.classList.add("selected");
+
+    setMobileSidebar(false);
+}
+
+function makeServerIcon(server) {
+    const icon = document.createElement("button");
+    icon.type = "button";
+    icon.className = "server-icon created-server";
+    icon.title = server.name;
+    icon.setAttribute("aria-label", `Open ${server.name}`);
+    icon.textContent = server.name.trim().charAt(0).toUpperCase();
+
+    server.button = icon;
+    icon.addEventListener("click", () => openServer(server));
+
+    return icon;
+}
 
 async function loadServerIcons() {
     if (!currentUser || !createdServers) return;
@@ -546,17 +596,11 @@ async function loadServerIcons() {
 
         snapshot.forEach((entry) => {
             const data = entry.data();
-            const name = data.name || "Server";
-            const icon = document.createElement("button");
-            icon.type = "button";
-            icon.className = "server-icon created-server";
-            icon.title = name;
-            icon.setAttribute("aria-label", `Open ${name}`);
-            icon.textContent = name.trim().charAt(0).toUpperCase();
-            icon.addEventListener("click", () => {
-                alert(`${name} was created. Its own channels can be added next.`);
-            });
-            createdServers.appendChild(icon);
+            const server = {
+                name: data.name || "Server",
+                visibility: data.visibility || "private"
+            };
+            createdServers.appendChild(makeServerIcon(server));
         });
     } catch (error) {
         console.warn("Saved servers could not be listed:", error);
