@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +6,11 @@
     <meta name="theme-color" content="#101114">
     <title>Diamond Lounge</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="[fonts.googleapis.com](https://fonts.googleapis.com)">
+    <link rel="preconnect" href="[fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap)" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=11">
     <link rel="stylesheet" href="luxury.css?v=9">
     <link rel="stylesheet" href="branding-polish.css?v=9">
     <link rel="stylesheet" href="dm.css?v=1">
@@ -20,38 +19,33 @@
 <body>
 <div class="dashboard">
 
-    <!-- MOBILE DRAWER + SERVER RAIL -->
     <div class="mobile-sidebar" id="mobileSidebar">
-
         <aside class="servers" aria-label="Servers and direct messages">
 
-            <!-- DIRECT MESSAGES -->
             <button
-                class="server-icon dm-home selected"
+                class="server-icon dm-home"
                 id="dmHomeButton"
                 type="button"
                 title="Direct Messages"
                 aria-label="Open Direct Messages"
-                aria-pressed="true">
+                aria-pressed="false">
                 <img src="diamond.gif" alt="Diamond Lounge Direct Messages">
             </button>
 
             <div class="server-divider"></div>
 
-            <!-- DEFAULT COMMUNITY SERVER -->
             <button
                 class="server-icon selected"
                 id="mainServerButton"
                 type="button"
                 title="VIP-LOUNGE"
                 aria-label="Open VIP-LOUNGE"
-                aria-pressed="false">
+                aria-pressed="true">
                 🎮
             </button>
 
-            <!-- MEMBER-CREATED SERVERS WILL APPEAR HERE -->
+            <div id="createdServers" class="created-servers"></div>
 
-            <!-- CREATE SERVER -->
             <button
                 class="server-icon add-server"
                 id="createServerButton"
@@ -60,16 +54,10 @@
                 aria-label="Create a server">
                 ＋
             </button>
-
         </aside>
 
-
-        <!-- CHANNEL / DM SIDEBAR -->
         <aside class="channels" id="channelsSidebar">
-
-            <!-- MAIN LOUNGE SIDEBAR -->
             <section id="loungeSidebar">
-
                 <div class="workspace-heading">
                     <span class="eyebrow">MAIN COMMUNITY</span>
 
@@ -84,54 +72,132 @@
                 <h3 class="section-heading">TEXT CHANNELS</h3>
 
                 <ul class="text-channels">
-                    <li class="text-channel selected"># <span>general</span></li>
-                    <li class="text-channel"># <span>gaming</span></li>
-                    <li class="text-channel"># <span>streaming</span></li>
-                    <li class="text-channel"># <span>announcements</span></li>
+                    <li>
+                        <button class="text-channel" type="button" data-channel="general">
+                            <span class="channel-symbol">#</span>
+                            <span>general</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="text-channel" type="button" data-channel="gaming">
+                            <span class="channel-symbol">#</span>
+                            <span>gaming</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="text-channel" type="button" data-channel="streaming">
+                            <span class="channel-symbol">#</span>
+                            <span>streaming</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="text-channel" type="button" data-channel="announcements">
+                            <span class="channel-symbol">#</span>
+                            <span>announcements</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="text-channel" type="button" data-channel="memes">
+                            <span class="channel-symbol">#</span>
+                            <span>memes</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="text-channel" type="button" data-channel="off-topic">
+                            <span class="channel-symbol">#</span>
+                            <span>off-topic</span>
+                        </button>
+                    </li>
                 </ul>
 
                 <h3 class="section-heading voice-title">VOICE LOUNGES</h3>
 
                 <ul class="voice-channel-list">
-                    <li class="voice-channel" data-voice-name="General Voice" role="button" tabindex="0">🔊 <span>General Voice</span></li>
-                    <li class="voice-channel" data-voice-name="Gaming Voice" role="button" tabindex="0">🎮 <span>Gaming Voice</span></li>
-                    <li class="voice-channel" data-voice-name="Music Lounge" role="button" tabindex="0">♫ <span>Music Lounge</span></li>
-                    <li class="voice-channel" data-voice-name="AI Hangout" role="button" tabindex="0">✦ <span>AI Hangout</span></li>
+                    <li>
+                        <button class="voice-channel" type="button" data-voice-name="General Voice">
+                            <span>🔊</span><span>General Voice</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="voice-channel" type="button" data-voice-name="827 Radio One">
+                            <span>📻</span><span>827 Radio One</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="voice-channel" type="button" data-voice-name="Gaming Voice">
+                            <span>🎮</span><span>Gaming Voice</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="voice-channel" type="button" data-voice-name="Music Lounge">
+                            <span>♫</span><span>Music Lounge</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="voice-channel" type="button" data-voice-name="AI Hangout">
+                            <span>✦</span><span>AI Hangout</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="voice-channel" type="button" data-voice-name="AFK">
+                            <span>🌙</span><span>AFK</span>
+                        </button>
+                    </li>
                 </ul>
 
-                <section class="voice-panel" id="voicePanel" aria-label="Voice channel controls" hidden>
-                    <div class="voice-status" id="voiceStatus" aria-live="polite">Select a voice channel</div>
+                <section
+                    class="voice-panel"
+                    id="voicePanel"
+                    aria-label="Voice channel controls"
+                    hidden>
+
+                    <div class="voice-status" id="voiceStatus" aria-live="polite">
+                        Select a voice channel
+                    </div>
 
                     <div class="voice-buttons">
-                        <button type="button" class="voice-toggle-btn" id="voiceToggleBtn">Join Voice</button>
-                        <button type="button" class="voice-toggle-btn secondary" id="muteToggleBtn" disabled>Mute</button>
+                        <button type="button" class="voice-toggle-btn" id="voiceToggleBtn">
+                            Join Voice
+                        </button>
+
+                        <button
+                            type="button"
+                            class="voice-toggle-btn secondary"
+                            id="voiceTextBtn">
+                            Open Text
+                        </button>
+
+                        <button
+                            type="button"
+                            class="voice-toggle-btn secondary"
+                            id="muteToggleBtn"
+                            disabled>
+                            Mute
+                        </button>
                     </div>
 
                     <div class="voice-participants">
                         <h4>IN VOICE <span id="voiceParticipantCount">0</span></h4>
+
                         <ul id="voiceParticipants" aria-live="polite">
                             <li class="voice-empty">Choose a voice lounge.</li>
                         </ul>
                     </div>
 
-                    <div id="remoteAudioContainer" class="remote-audio-container" aria-label="Remote voice audio"></div>
+                    <div
+                        id="remoteAudioContainer"
+                        class="remote-audio-container"
+                        aria-label="Remote voice audio">
+                    </div>
                 </section>
-
             </section>
 
-
-            <!-- DIRECT MESSAGES SIDEBAR -->
             <section id="dmSidebar" hidden>
-
                 <div class="dm-sidebar-heading">
                     <span class="eyebrow">YOUR CONNECTIONS</span>
                     <h2>Messages</h2>
                     <p>Private conversations, just between you.</p>
                 </div>
-
-                <button class="dm-back-button" id="backToLoungeButton" type="button">
-                    ← Back to Lounge
-                </button>
 
                 <div class="dm-search-wrap">
                     <input
@@ -147,11 +213,8 @@
                 <ul id="dmMemberList" class="dm-member-list" aria-live="polite">
                     <li class="dm-empty">Loading members...</li>
                 </ul>
-
             </section>
 
-
-            <!-- PROFILE / LOGOUT -->
             <div class="profile-card">
                 <button
                     class="profile-avatar"
@@ -167,13 +230,9 @@
                     <div class="profile-status">Available</div>
                 </div>
             </div>
-
         </aside>
-
     </div>
 
-
-    <!-- MOBILE DRAWER BACKDROP -->
     <button
         class="mobile-sidebar-backdrop"
         id="mobileSidebarBackdrop"
@@ -182,30 +241,44 @@
         tabindex="-1">
     </button>
 
-
-    <!-- MAIN CONTENT -->
     <main class="chat-area">
+        <section id="emptyView" class="empty-channel-view">
+            <button
+                class="mobile-menu-button empty-menu-button"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-controls="mobileSidebar"
+                aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
 
-        <!-- PUBLIC CHAT -->
-        <section id="loungeView" class="lounge-view">
+            <div class="empty-channel-copy">
+                <img src="diamond.gif" alt="" class="empty-channel-gem">
+                <span class="eyebrow">DIAMOND LOUNGE</span>
+                <h2>Select a channel</h2>
+                <p>Choose a text channel, voice lounge, or direct message.</p>
+            </div>
+        </section>
 
+        <section id="loungeView" class="lounge-view" hidden>
             <header class="chat-header">
                 <div class="chat-header-main">
-
                     <button
                         class="mobile-menu-button"
                         type="button"
                         aria-label="Open navigation menu"
                         aria-controls="mobileSidebar"
                         aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <span></span><span></span><span></span>
                     </button>
 
                     <div>
-                        <div class="channel-title"># <span>general</span></div>
-                        <div class="sub-header">A little space to share what matters.</div>
+                        <div class="channel-title">
+                            # <span id="activeChannelName">general</span>
+                        </div>
+                        <div class="sub-header" id="activeChannelDescription">
+                            A little space to share what matters.
+                        </div>
                     </div>
                 </div>
 
@@ -218,15 +291,19 @@
                 <label
                     class="upload-button"
                     for="mediaInput"
-                    title="Share an image, GIF, video, or audio file"
+                    title="Share media"
                     aria-label="Choose media to share">＋</label>
 
-                <input type="file" id="mediaInput" accept="image/*,video/*,audio/*" hidden>
+                <input
+                    type="file"
+                    id="mediaInput"
+                    accept="image/*,video/*,audio/*"
+                    hidden>
 
                 <input
                     type="text"
                     id="messageInput"
-                    placeholder="Write something to the lounge…"
+                    placeholder="Message #general"
                     maxlength="2000"
                     autocomplete="off">
 
@@ -234,25 +311,18 @@
             </form>
 
             <div id="uploadStatus" class="upload-status" role="status" aria-live="polite"></div>
-
         </section>
 
-
-        <!-- DIRECT MESSAGES HOME -->
         <section id="dmHomeView" class="dm-home-view" hidden>
-
             <header class="chat-header">
                 <div class="chat-header-main">
-
                     <button
                         class="mobile-menu-button"
                         type="button"
                         aria-label="Open navigation menu"
                         aria-controls="mobileSidebar"
                         aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <span></span><span></span><span></span>
                     </button>
 
                     <div>
@@ -266,35 +336,23 @@
 
             <div class="dm-welcome">
                 <img src="diamond.gif" alt="" class="dm-welcome-gem">
-
                 <span class="eyebrow">DIAMOND LOUNGE</span>
-
                 <h2>Your conversations.<br><em>Your people.</em></h2>
-
                 <p>Choose a member from the left to start a private conversation.</p>
             </div>
-
         </section>
 
-
-        <!-- PRIVATE CONVERSATION -->
         <section id="dmConversationView" class="dm-conversation-view" hidden>
-
             <header class="chat-header dm-conversation-header">
                 <div class="chat-header-main dm-contact-heading">
-
                     <button
                         class="mobile-menu-button"
                         type="button"
                         aria-label="Open navigation menu"
                         aria-controls="mobileSidebar"
                         aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <span></span><span></span><span></span>
                     </button>
-
-                    <button id="dmBackButton" class="dm-mobile-back" type="button" aria-label="Back to messages">←</button>
 
                     <div>
                         <div class="channel-title">✦ <span id="dmContactName">Member</span></div>
@@ -321,15 +379,10 @@
             </form>
 
             <div id="dmStatus" class="upload-status" role="status" aria-live="polite"></div>
-
         </section>
-
     </main>
 
-
-    <!-- COMMUNITY SIDEBAR -->
-    <aside class="members" id="communitySidebar">
-
+    <aside class="members" id="communitySidebar" hidden>
         <div class="members-section">
             <h3 class="section-heading">COMMUNITY</h3>
 
@@ -344,8 +397,7 @@
 
         <div class="media-section">
             <h3 class="section-heading">SHARED MOMENTS</h3>
-
-            <p class="media-intro">Images, GIFs, videos and audio shared by the community.</p>
+            <p class="media-intro">Media shared in the community.</p>
 
             <div id="sharedMedia" class="shared-media" aria-live="polite">
                 <p class="media-empty">Nothing shared here yet.</p>
@@ -353,15 +405,15 @@
         </div>
 
         <div class="members-footer">DIAMOND LOUNGE <span>✦</span></div>
-
     </aside>
-
 </div>
 
-
-<!-- CREATE SERVER WINDOW -->
 <div class="server-modal-backdrop" id="serverModal" hidden>
-    <section class="server-modal" role="dialog" aria-modal="true" aria-labelledby="serverModalTitle">
+    <section
+        class="server-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="serverModalTitle">
 
         <button
             type="button"
@@ -372,19 +424,15 @@
         </button>
 
         <div class="server-modal-icon">✦</div>
-
         <span class="eyebrow">BUILD YOUR COMMUNITY</span>
-
-        <h2 id="serverModalTitle">Create a server</h2>
+        <h2 id="serverModalTitle">Create your server</h2>
 
         <p class="server-modal-description">
-            Give your community a name and decide who can join.
+            Start with a name and choose who can join.
         </p>
 
         <form id="createServerForm">
-
             <label for="serverName">SERVER NAME</label>
-
             <input
                 id="serverName"
                 name="serverName"
@@ -396,38 +444,34 @@
                 required>
 
             <label for="serverVisibility">WHO CAN JOIN?</label>
-
             <select id="serverVisibility" name="serverVisibility" required>
-                <option value="private">Private — Invite only</option>
-                <option value="public">Public — Anyone can join</option>
+                <option value="private">Private - Invite only</option>
+                <option value="public">Public - Anyone can join</option>
             </select>
 
-            <p class="server-privacy-note">
-                You can change your server's visibility later.
-            </p>
-
             <div class="server-modal-actions">
-                <button type="button" class="server-cancel-button" id="cancelServerCreation">
+                <button
+                    type="button"
+                    class="server-cancel-button"
+                    id="cancelServerCreation">
                     Cancel
                 </button>
 
-                <button type="submit" class="server-create-button" id="confirmCreateServer">
+                <button
+                    type="submit"
+                    class="server-create-button"
+                    id="confirmCreateServer">
                     Create server
                 </button>
             </div>
 
             <div id="serverCreateStatus" role="status" aria-live="polite"></div>
-
         </form>
-
     </section>
 </div>
 
-
-<!-- APPLICATION SCRIPTS -->
-<script type="module" src="script.js?v=10"></script>
-<script type="module" src="voice.js?v=9"></script>
+<script type="module" src="script.js?v=11"></script>
+<script type="module" src="voice.js?v=11"></script>
 <script type="module" src="media.js?v=9"></script>
-
 </body>
 </html>
