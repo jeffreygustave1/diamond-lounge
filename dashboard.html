@@ -115,7 +115,90 @@
         </ul>
 
         
+
 <h3 class="section-heading voice-title">VOICE LOUNGES</h3>
+
+<ul class="voice-channel-list">
+
+    <!-- GENERAL VOICE -->
+    <li class="voice-row">
+        <div class="voice-row-head">
+            <button class="voice-channel"
+                    type="button"
+                    data-voice-name="General Voice"
+                    aria-expanded="false">
+                <span class="voice-channel-icon">🔊</span>
+                <span>General Voice</span>
+            </button>
+
+            <div class="voice-join-slot" hidden>
+                <span class="voice-count" data-voice-count="General Voice">0</span>
+                <button class="voice-join-button" id="joinVoiceButton" type="button">
+                    Join
+                </button>
+            </div>
+        </div>
+
+        <section class="voice-panel" id="voicePanel" hidden>
+            <div class="voice-panel-status" id="voiceStatus">
+                Select a voice lounge
+            </div>
+
+            <div id="voiceLeaveRow" hidden>
+                <button id="leaveVoiceButton" type="button">Leave</button>
+            </div>
+
+            <div id="voiceControls" hidden>
+                <button id="muteToggleBtn" type="button">Mute</button>
+                <button id="cameraToggleBtn" type="button">Camera</button>
+                <button id="screenToggleBtn" type="button">Share Screen</button>
+            </div>
+
+            <div class="voice-participants">
+                <span id="voiceParticipantCount">0</span>
+                <div id="voiceParticipants"></div>
+            </div>
+
+            <div id="remoteVideoGrid"></div>
+            <div id="remoteAudioContainer"></div>
+        </section>
+    </li>
+
+    <!-- MUSIC LOUNGE -->
+    <li class="voice-row">
+        <div class="voice-row-head">
+            <button class="voice-channel"
+                    type="button"
+                    data-voice-name="Music Lounge"
+                    aria-expanded="false">
+                <span class="voice-channel-icon">♫</span>
+                <span>Music Lounge</span>
+            </button>
+
+            <div class="voice-join-slot" hidden>
+                <span class="voice-count" data-voice-count="Music Lounge">0</span>
+            </div>
+        </div>
+    </li>
+
+    <!-- AFK -->
+    <li class="voice-row">
+        <div class="voice-row-head">
+            <button class="voice-channel"
+                    type="button"
+                    data-voice-name="AFK"
+                    aria-expanded="false">
+                <span class="voice-channel-icon">🌙</span>
+                <span>AFK</span>
+            </button>
+
+            <div class="voice-join-slot" hidden>
+                <span class="voice-count" data-voice-count="AFK">0</span>
+            </div>
+        </div>
+    </li>
+
+</ul>
 
 <ul class="voice-channel-list">
 
