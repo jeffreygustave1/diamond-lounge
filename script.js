@@ -10,6 +10,7 @@ import {
     collection,
     doc,
     getDoc,
+    getDocs,
     limit,
     onSnapshot,
     orderBy,
@@ -56,6 +57,7 @@ const serverModal = document.getElementById("serverModal");
 const closeServerModalButton = document.getElementById("closeServerModal");
 const cancelServerCreation = document.getElementById("cancelServerCreation");
 const createServerForm = document.getElementById("createServerForm");
+const createdServers = document.getElementById("createdServers");
 const serverNameInput = document.getElementById("serverName");
 const serverVisibilityInput = document.getElementById("serverVisibility");
 const serverCreateStatus = document.getElementById("serverCreateStatus");
@@ -198,6 +200,7 @@ onAuthStateChanged(auth, async (user) => {
         if (dmMemberList) dmMemberList.textContent = "Member profiles could not load.";
     }
     await loadProfile();
+    loadServerIcons();
     showLoungeSidebar();
     showEmptyView();
 });
@@ -509,11 +512,56 @@ createServerForm?.addEventListener("submit", async (event) => {
             createdAt: serverTimestamp()
         });
         closeServerModal();
+        if (createdServers) {
+            const icon = document.createElement("button");
+            icon.type = "button";
+            icon.className = "server-icon created-server";
+            icon.title = name;
+            icon.setAttribute("aria-label", `Open ${name}`);
+            icon.textContent = name.trim().charAt(0).toUpperCase();
+            icon.addEventListener("click", () => {
+                alert(`${name} was created. Its own channels can be added next.`);
+            });
+            createdServers.appendChild(icon);
+        }
     } catch (error) {
         console.error("Server creation failed:", error);
-        if (serverCreateStatus) serverCreateStatus.textContent = "The server could not be created.";
+        if (serverCreateStatus) {
+            serverCreateStatus.textContent = error.code === "permission-denied"
+                ? "Firebase rejected this. Publish the servers rule."
+                : "The server could not be created.";
+        }
     }
 });
+
+async function loadServerIcons() {
+    if (!currentUser || !createdServers) return;
+
+    try {
+        const snapshot = await getDocs(
+            query(collection(db, "servers"), where("memberUids", "array-contains", currentUser.uid))
+        );
+
+        createdServers.replaceChildren();
+
+        snapshot.forEach((entry) => {
+            const data = entry.data();
+            const name = data.name || "Server";
+            const icon = document.createElement("button");
+            icon.type = "button";
+            icon.className = "server-icon created-server";
+            icon.title = name;
+            icon.setAttribute("aria-label", `Open ${name}`);
+            icon.textContent = name.trim().charAt(0).toUpperCase();
+            icon.addEventListener("click", () => {
+                alert(`${name} was created. Its own channels can be added next.`);
+            });
+            createdServers.appendChild(icon);
+        });
+    } catch (error) {
+        console.warn("Saved servers could not be listed:", error);
+    }
+}
 
 async function logoutUser() {
     try {
@@ -547,6 +595,9 @@ const profileStatus = document.getElementById("profileStatus");
 const profilePreviewImage = document.getElementById("profilePreviewImage");
 const myProfilePicture = document.getElementById("myProfilePicture");
 const profileUploadInput = document.getElementById("profileUploadInput");
+const profileCrop = document.getElementById("profileCrop");
+const cropImage = document.getElementById("cropImage");
+const cropZoom = document.getElementById("cropZoom");
 const profileChoiceButtons = [...document.querySelectorAll(".profile-choice")];
 
 const AVATAR_STYLES = {
@@ -560,6 +611,13 @@ const AVATAR_STYLES = {
 
 let currentAvatar = "diamond";
 let uploadedPicture = "";
+let rawPicture = "";
+let cropScale = 1;
+let cropX = 0;
+let cropY = 0;
+let dragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
 
 function avatarStyleFor(key) {
     return AVATAR_STYLES[key] || AVATAR_STYLES.diamond;
@@ -669,9 +727,78 @@ profileModal?.addEventListener("click", (event) => {
     if (event.target === profileModal) closeProfileModal();
 });
 
+/* ---------- CROP THE CHOSEN PICTURE ---------- */
+
+function applyCropTransform() {
+    if (!cropImage) return;
+    cropImage.style.transform =
+        `translate(${cropX}px, ${cropY}px) scale(${cropScale})`;
+}
+
+cropZoom?.addEventListener("input", () => {
+    cropScale = Number(cropZoom.value) / 100;
+    applyCropTransform();
+});
+
+cropImage?.addEventListener("pointerdown", (event) => {
+    dragging = true;
+    dragStartX = event.clientX - cropX;
+    dragStartY = event.clientY - cropY;
+    cropImage.setPointerCapture(event.pointerId);
+});
+
+cropImage?.addEventListener("pointermove", (event) => {
+    if (!dragging) return;
+    cropX = event.clientX - dragStartX;
+    cropY = event.clientY - dragStartY;
+    applyCropTransform();
+});
+
+["pointerup", "pointercancel"].forEach((type) => {
+    cropImage?.addEventListener(type, () => { dragging = false; });
+});
+
+/* Bake the crop into a small square picture. */
+function renderCroppedPicture() {
+    return new Promise((resolve) => {
+        if (!rawPicture) { resolve(""); return; }
+
+        const image = new Image();
+
+        image.onload = () => {
+            const SIZE = 192;
+            const canvas = document.createElement("canvas");
+            canvas.width = SIZE;
+            canvas.height = SIZE;
+
+            const ctx = canvas.getContext("2d");
+            if (!ctx) { resolve(""); return; }
+
+            // Match the on-screen crop frame (160px) so what is dragged is what is saved.
+            const FRAME = 160;
+            const ratio = SIZE / FRAME;
+            const baseScale = Math.max(FRAME / image.width, FRAME / image.height);
+            const scale = baseScale * cropScale * ratio;
+
+            const drawW = image.width * scale;
+            const drawH = image.height * scale;
+            const dx = SIZE / 2 - drawW / 2 + cropX * ratio;
+            const dy = SIZE / 2 - drawH / 2 + cropY * ratio;
+
+            ctx.drawImage(image, dx, dy, drawW, drawH);
+            resolve(canvas.toDataURL("image/jpeg", 0.85));
+        };
+
+        image.onerror = () => resolve("");
+        image.src = rawPicture;
+    });
+}
+
 profileChoiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
         uploadedPicture = "";
+        rawPicture = "";
+        if (profileCrop) profileCrop.hidden = true;
         applyAvatar(button.dataset.avatar);
     });
 });
@@ -703,28 +830,21 @@ if (profileUploadInput) {
         const reader = new FileReader();
 
         reader.onload = () => {
-            uploadedPicture = String(reader.result || "");
+            rawPicture = String(reader.result || "");
+            cropScale = 1;
+            cropX = 0;
+            cropY = 0;
 
-            if (myProfilePicture) {
-                myProfilePicture.style.background = "transparent";
-                myProfilePicture.style.backgroundImage = `url(${uploadedPicture})`;
-                myProfilePicture.style.backgroundSize = "cover";
-                myProfilePicture.style.backgroundPosition = "center";
-                myProfilePicture.textContent = "";
+            if (profileCrop) profileCrop.hidden = false;
+            if (cropZoom) cropZoom.value = "100";
+
+            if (cropImage) {
+                cropImage.src = rawPicture;
+                cropImage.style.transform = "translate(0px, 0px) scale(1)";
             }
-
-            if (profilePreviewImage) {
-                profilePreviewImage.style.background = "transparent";
-                profilePreviewImage.style.backgroundImage = `url(${uploadedPicture})`;
-                profilePreviewImage.style.backgroundSize = "cover";
-                profilePreviewImage.style.backgroundPosition = "center";
-                profilePreviewImage.textContent = "";
-            }
-
-            profileChoiceButtons.forEach((b) => b.classList.remove("selected"));
 
             if (profileStatus) {
-                profileStatus.textContent = "Picture ready. Save to keep it.";
+                profileStatus.textContent = "Drag to position, then Save.";
                 profileStatus.className = "success";
             }
         };
@@ -750,6 +870,10 @@ profileForm?.addEventListener("submit", async (event) => {
     if (saveButton) saveButton.disabled = true;
 
     try {
+        if (rawPicture) {
+            uploadedPicture = await renderCroppedPicture();
+        }
+
         // Only fields this user owns are written, so existing rules still apply.
         await setDoc(
             doc(db, "users", currentUser.uid),
