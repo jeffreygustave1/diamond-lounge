@@ -3073,3 +3073,72 @@ body.modal-open {
     }
 }
 
+   /* Match the circled Direct Messages heading font.
+   Size, spacing, and position remain unchanged. */
+.empty-channel-copy h2 {
+    font-family: "Playfair Display", Georgia, serif !important;
+    font-weight: 600 !important;
+    font-style: normal;
+}
+
+/* Enlarge only the centered empty-view diamond.
+   Transform scaling preserves its center position and does not move the text. */
+.empty-channel-gem {
+    transform: scale(6) !important;
+    transform-origin: center center !important;
+}
+
+/* Keep all interactive controls above decorative layers. */
+.servers,
+.channels,
+#loungeSidebar,
+.text-channels,
+.voice-channel-list {
+    position: relative;
+    z-index: 10;
+}
+
+.server-icon,
+.profile-avatar,
+.text-channel,
+.voice-channel {
+    position: relative;
+    z-index: 11;
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+/* Ensure each channel button owns its complete clickable row. */
+.text-channels li,
+.voice-channel-list li {
+    position: relative;
+    padding: 0 !important;
+}
+
+.text-channel,
+.voice-channel {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 40px;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px !important;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #aaa9aa;
+    text-align: left;
+    font: inherit;
+}
+
+/* Do not let a decorative overlay capture clicks. */
+.mobile-sidebar-backdrop:not(.dashboard.mobile-nav-open *) {
+    pointer-events: none;
+}
+
+.profile-avatar {
+    border: 0;
+    cursor: pointer;
+}
+
+
