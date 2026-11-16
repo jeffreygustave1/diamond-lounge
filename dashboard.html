@@ -830,8 +830,39 @@
 </div>
 
 <!-- APPLICATION SCRIPTS -->
+<!-- APPLICATION SCRIPTS -->
 <script type="module" src="script.js?v=22"></script>
 <script type="module" src="voice.js?v=22"></script>
+
+<!-- ANIMATED DIAMOND FAVICON -->
+<script>
+(() => {
+    const gif = new Image();
+    gif.src = "diamond-favicon.gif?v=2";
+
+    gif.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+
+        const ctx = canvas.getContext("2d");
+        const favicon = document.querySelector('link[rel="icon"]');
+
+        if (!favicon) return;
+
+        const updateFavicon = () => {
+            ctx.clearRect(0, 0, 32, 32);
+            ctx.drawImage(gif, 0, 0, 32, 32);
+            favicon.href = canvas.toDataURL("image/png");
+        };
+
+        updateFavicon();
+        setInterval(updateFavicon, 100);
+    };
+})();
+</script>
+
+</body>
 
 </body>
 </html>
