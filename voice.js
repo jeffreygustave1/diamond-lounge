@@ -1,3 +1,4 @@
+
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import {
@@ -40,6 +41,7 @@ let stopCalls = null;
 let muted = false;
 let cameraOn = false;
 let screenOn = false;
+let joining = false;
 
 const participants = new Map();
 const peers = new Map();
@@ -51,7 +53,6 @@ function setStatus(text) {
     if (statusElement) statusElement.textContent = text;
 }
 
-/* Count the people actually connected to each voice lounge. */
 function watchChannelCounts() {
     countElements.forEach((element) => {
         const name = element.dataset.voiceCount;
@@ -131,8 +132,8 @@ function renderParticipants() {
 
         const badges = document.createElement("em");
         badges.className = "voice-badges";
-        if (person.cameraOn) badges.textContent += "\ud83d\udcf7";
-        if (person.screenOn) badges.textContent += "\ud83d\udda5\ufe0f";
+        if (person.cameraOn) badges.textContent += "📷";
+        if (person.screenOn) badges.textContent += "🖥️";
 
         item.append(dot, label, badges);
         participantsElement.appendChild(item);
@@ -153,6 +154,7 @@ function closePeer(uid) {
     peer.pc.onicecandidate = null;
     peer.pc.close();
     peer.audio?.remove();
+    document.getElementById(`tile-${uid}`)?.remove();
     peers.delete(uid);
 }
 
@@ -225,11 +227,8 @@ function makePeer(person, callRef) {
         const stream = event.streams[0];
         if (!stream) return;
 
-        const isVideo = event.track.kind === "video";
-
-        if (isVideo) {
-            const label = person.name;
-            attachRemoteVideo(person.uid, label, stream);
+        if (event.track.kind === "video") {
+            attachRemoteVideo(person.uid, person.name, stream);
             return;
         }
 
@@ -335,7 +334,10 @@ async function startOutgoingCall(person) {
         });
 
         peer.unsubCall = onSnapshot(callRef, async (snapshot) => {
-            if (!snapshot.exists()) { closePeer(person.uid); return; }
+            if (!snapshot.exists()) {
+                closePeer(person.uid);
+                return;
+            }
 
             const answer = snapshot.data().answer;
             if (answer && !peer.pc.remoteDescription) {
@@ -495,10 +497,16 @@ async function refreshPresenceFlags() {
 
 function getSender(peer, kind) {
     if (kind === "camera") {
-        return peer.pc.getSenders().find((sender) => sender.track?.kind === "video" && sender.track === cameraStream?.getVideoTracks()[0]);
+        return peer.pc.getSenders().find((sender) =>
+            sender.track?.kind === "video" &&
+            sender.track === cameraStream?.getVideoTracks()[0]
+        );
     }
     if (kind === "screen") {
-        return peer.pc.getSenders().find((sender) => sender.track?.kind === "video" && sender.track === screenStream?.getVideoTracks()[0]);
+        return peer.pc.getSenders().find((sender) =>
+            sender.track?.kind === "video" &&
+            sender.track === screenStream?.getVideoTracks()[0]
+        );
     }
     return null;
 }
@@ -612,7 +620,6 @@ async function toggleScreen() {
     if (screenButton) screenButton.querySelector(".voice-control-label").textContent = "Sharing";
 
     const track = screenStream.getVideoTracks()[0];
-
     track.onended = () => void toggleScreen();
 
     peers.forEach((peer, uid) => {
@@ -629,27 +636,37 @@ async function toggleScreen() {
 ========================================== */
 
 async function joinVoice() {
-    if (!user) { setStatus("Sign in before joining a voice lounge."); return; }
-    if (!selectedChannel || !roomId) { setStatus("Click a voice lounge first."); return; }
-    if (localStream) return;
+    if (!user) {
+        setStatus("Sign in before joining a voice lounge.");
+        return;
+    }
+
+    if (!selectedChannel || !roomId) {
+        setStatus("Click a voice lounge first.");
+        return;
+    }
+
+    if (localStream || joining) return;
 
     if (!navigator.mediaDevices?.getUserMedia) {
         setStatus("Microphone access requires HTTPS and a supported browser.");
         return;
     }
 
-    joinButton.disabled = true;
+    joining = true;
+    if (joinButton) joinButton.disabled = true;
     setStatus("Requesting microphone permission...");
 
     try {
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        sessionId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        sessionId = globalThis.crypto?.randomUUID?.() ||
+            `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
         muted = false;
         cameraOn = false;
         screenOn = false;
 
-        // Only now does the control row appear.
         if (controlsRow) controlsRow.hidden = false;
         if (leaveRow) leaveRow.hidden = false;
 
@@ -658,6 +675,7 @@ async function joinVoice() {
         });
 
         const presenceRef = doc(db, "voiceRooms", roomId, "participants", user.uid);
+
         const heartbeat = () => setDoc(presenceRef, {
             uid: user.uid,
             name: (user.displayName || "Member").slice(0, 80),
@@ -668,8 +686,13 @@ async function joinVoice() {
         });
 
         await heartbeat();
+
         heartbeatTimer = setInterval(() => {
-            if (localStream) heartbeat().catch((error) => console.warn("Presence refresh failed:", error));
+            if (localStream) {
+                heartbeat().catch((error) =>
+                    console.warn("Presence refresh failed:", error)
+                );
+            }
         }, HEARTBEAT_MS);
 
         watchIncomingCalls();
@@ -680,8 +703,6 @@ async function joinVoice() {
         localStream?.getTracks().forEach((track) => track.stop());
         localStream = null;
 
-        setPressed(joinButton, false);
-
         [muteButton, cameraButton, screenButton, leaveButton].forEach((button) => {
             if (button) button.disabled = true;
         });
@@ -690,7 +711,8 @@ async function joinVoice() {
             ? "Microphone permission was blocked."
             : "Could not join voice. Check microphone access and Firebase rules.");
     } finally {
-        joinButton.disabled = false;
+        joining = false;
+        if (joinButton) joinButton.disabled = false;
     }
 }
 
@@ -701,8 +723,11 @@ async function leaveVoice() {
     if (heartbeatTimer) clearInterval(heartbeatTimer);
     heartbeatTimer = null;
 
-    stopCalls?.(); stopCalls = null;
-    stopParticipants?.(); stopParticipants = null;
+    stopCalls?.();
+    stopCalls = null;
+
+    stopParticipants?.();
+    stopParticipants = null;
 
     localStream?.getTracks().forEach((track) => track.stop());
     cameraStream?.getTracks().forEach((track) => track.stop());
@@ -741,11 +766,12 @@ async function leaveVoice() {
         screenButton.querySelector(".voice-control-label").textContent = "Screen";
         setPressed(screenButton, false);
     }
-    if (joinButton) setPressed(joinButton, false);
 
     renderParticipants();
 
-    await Promise.allSettled([...outgoingCalls.values()].map((callRef) => deleteDoc(callRef)));
+    await Promise.allSettled([...outgoingCalls.values()].map((callRef) =>
+        deleteDoc(callRef)
+    ));
     outgoingCalls.clear();
 
     if (oldRoom && oldUid) {
@@ -763,105 +789,118 @@ function toggleMute() {
     if (!localStream) return;
 
     muted = !muted;
-    localStream.getAudioTracks().forEach((track) => { track.enabled = !muted; });
+    localStream.getAudioTracks().forEach((track) => {
+        track.enabled = !muted;
+    });
 
     if (muteButton) {
-        muteButton.querySelector(".voice-control-label").textContent = muted ? "Unmuted" : "Mute";
+        muteButton.querySelector(".voice-control-label").textContent =
+            muted ? "Unmuted" : "Mute";
     }
-    setPressed(muteButton, muted);
 
+    setPressed(muteButton, muted);
     setStatus(`${muted ? "Muted in" : "Connected to"} ${selectedChannel}`);
 }
 
 /* ==========================================
-   CHANNEL SELECTION — CLICK AGAIN TO FOLD
+   CHANNEL SELECTION — AUTO JOIN
 ========================================== */
 
 channelItems.forEach((channel) => {
     channel.addEventListener("click", async (event) => {
         if (event.target.closest("#voicePanel")) return;
 
-        const nextName = channel.dataset.voiceName || channel.textContent.trim();
+        const nextName = channel.dataset.voiceName ||
+            channel.textContent.trim();
         const nextRoom = makeRoomId(nextName);
 
-        const isOpenChannel = channel.classList.contains("active") && panel && !panel.hidden;
-
-        if (isOpenChannel) {
-            if (localStream) await leaveVoice();
-
-            channel.classList.remove("active");
-            channel.setAttribute("aria-expanded", "false");
-            if (panel) panel.hidden = true;
-            if (controlsRow) controlsRow.hidden = true;
-            if (leaveRow) leaveRow.hidden = true;
-
-            channel.closest(".voice-row")
-                ?.querySelector(".voice-join-slot")
-                ?.setAttribute("hidden", "");
-
-            stopParticipants?.(); stopParticipants = null;
-            stopCalls?.(); stopCalls = null;
-
-            selectedChannel = null;
-            roomId = null;
+        // Clicking the channel already connected to does nothing.
+        if (localStream && nextRoom === roomId) {
             return;
         }
 
-        if (localStream && nextRoom !== roomId) await leaveVoice();
+        // If connected elsewhere, leave that room first.
+        if (localStream && nextRoom !== roomId) {
+            await leaveVoice();
+        }
 
+        // Mark the newly selected channel.
         channelItems.forEach((item) => {
             const active = item === channel;
             item.classList.toggle("active", active);
             item.setAttribute("aria-expanded", String(active));
         });
 
-// Show the Join button beside whichever channel was selected.
-joinSlots.forEach((slot) => { slot.hidden = true; });
+        // Keep the old Join buttons hidden.
+        joinSlots.forEach((slot) => {
+            slot.hidden = true;
+        });
 
-const ownRow = channel.closest(".voice-row");
-const ownSlot = ownRow?.querySelector(".voice-join-slot");
-
-if (ownSlot) {
-    ownSlot.hidden = false;
-
-    // Move the single shared Join button into this channel.
-    if (joinButton) ownSlot.appendChild(joinButton);
-}
         selectedChannel = nextName;
         roomId = nextRoom;
 
-       // Keep the shared control panel inside the selected channel row.
-if (panel && ownRow && panel.parentElement !== ownRow) {
-    ownRow.appendChild(panel);
-}
+        // Move the voice panel into the selected channel row.
+        const ownRow = channel.closest(".voice-row");
+
+        if (panel && ownRow && panel.parentElement !== ownRow) {
+            ownRow.appendChild(panel);
+        }
+
         if (panel) panel.hidden = false;
 
+        // Start watching the selected room, then connect automatically.
         watchParticipants();
-        if (localStream) watchIncomingCalls();
-
-        setStatus(localStream
-            ? `Connected to ${selectedChannel}`
-            : `Selected ${selectedChannel} — join to talk`);
+        await joinVoice();
     });
 });
 
-joinButton?.addEventListener("click", (event) => { event.stopPropagation(); void joinVoice(); });
-leaveButton?.addEventListener("click", (event) => { event.stopPropagation(); void leaveVoice(); });
-muteButton?.addEventListener("click", (event) => { event.stopPropagation(); toggleMute(); });
-cameraButton?.addEventListener("click", (event) => { event.stopPropagation(); void toggleCamera(); });
-screenButton?.addEventListener("click", (event) => { event.stopPropagation(); void toggleScreen(); });
+/* ==========================================
+   VOICE CONTROLS
+========================================== */
+
+// The Join button is no longer needed.
+// Clicking a voice channel now connects automatically.
+
+leaveButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    void leaveVoice();
+});
+
+muteButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleMute();
+});
+
+cameraButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    void toggleCamera();
+});
+
+screenButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    void toggleScreen();
+});
+
+/* ==========================================
+   AUTHENTICATION
+========================================== */
 
 onAuthStateChanged(auth, (nextUser) => {
     user = nextUser;
+
     if (!nextUser) {
         stopCounts.forEach((stop) => stop());
         stopCounts.clear();
+
         if (localStream) void leaveVoice();
         return;
     }
 
     watchChannelCounts();
-    if (selectedChannel) watchParticipants();
+
+    if (selectedChannel) {
+        watchParticipants();
+    }
 });
 
 window.leaveVoiceChat = leaveVoice;
@@ -869,9 +908,12 @@ window.leaveVoiceChat = leaveVoice;
 window.addEventListener("pagehide", () => {
     stopCounts.forEach((stop) => stop());
     stopCounts.clear();
+
     if (heartbeatTimer) clearInterval(heartbeatTimer);
+
     localStream?.getTracks().forEach((track) => track.stop());
     cameraStream?.getTracks().forEach((track) => track.stop());
     screenStream?.getTracks().forEach((track) => track.stop());
+
     closeAllPeers();
 });
