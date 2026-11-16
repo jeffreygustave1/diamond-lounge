@@ -154,7 +154,8 @@ function closePeer(uid) {
     peer.pc.onicecandidate = null;
     peer.pc.close();
     peer.audio?.remove();
-    document.getElementById(`tile-${uid}`)?.remove();
+    document.getElementById(`tile-camera-${uid}`)?.remove();
+document.getElementById(`tile-screen-${uid}`)?.remove();
     peers.delete(uid);
 }
 
@@ -162,7 +163,41 @@ function closeAllPeers() {
     [...peers.keys()].forEach(closePeer);
 }
 
-function attachRemoteVideo(uid, label, stream) {
+
+function attachRemoteVideo(uid, label, stream, kind = "camera") {
+    if (!videoGrid || !stream) return;
+
+    const tileId = `tile-${kind}-${uid}`;
+    let tile = document.getElementById(tileId);
+
+    if (!tile) {
+        tile = document.createElement("figure");
+        tile.id = tileId;
+        tile.className = `remote-video-tile remote-video-${kind}`;
+        tile.hidden = true;
+
+        const video = document.createElement("video");
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true;
+        video.style.objectFit = kind === "screen" ? "contain" : "cover";
+
+        const caption = document.createElement("figcaption");
+        caption.textContent =
+            `${label} — ${kind === "screen" ? "Screen" : "Camera"}`;
+
+        tile.append(video, caption);
+        videoGrid.appendChild(tile);
+    }
+
+    const video = tile.querySelector("video");
+
+    if (video && video.srcObject !== stream) {
+        video.srcObject = stream;
+        video.play().catch(() => {});
+    }
+}
+
     if (!videoGrid || !stream) return;
 
     const tileId = `tile-${uid}`;
@@ -192,7 +227,185 @@ function attachRemoteVideo(uid, label, stream) {
     }
 }
 
+
 function makePeer(person, callRef) {
+    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+
+    const peer = {
+        pc,
+        callRef,
+        audio: null,
+        unsubCall: null,
+        unsubCandidates: null,
+        candidateIds: new Set(),
+        waitingCandidates: [],
+        videoTransceivers: [],
+        videoSenders: {}
+    };
+
+    peers.set(person.uid, peer);
+
+    // Audio connection
+    localStream?.getAudioTracks().forEach((track) => {
+        pc.addTrack(track, localStream);
+    });
+
+    // Reserve two video connections before the call starts.
+    // This allows camera and screen sharing to start later
+    // without renegotiating the connection.
+
+    const cameraTrack = cameraStream?.getVideoTracks()[0];
+    const screenTrack = screenStream?.getVideoTracks()[0];
+
+    const cameraTransceiver = cameraTrack
+        ? pc.addTransceiver(cameraTrack, {
+            direction: "sendrecv",
+            streams: [cameraStream]
+        })
+        : pc.addTransceiver("video", {
+            direction: "sendrecv"
+        });
+
+    const screenTransceiver = screenTrack
+        ? pc.addTransceiver(screenTrack, {
+            direction: "sendrecv",
+            streams: [screenStream]
+        })
+        : pc.addTransceiver("video", {
+            direction: "sendrecv"
+        });
+
+    peer.videoTransceivers = [
+        cameraTransceiver,
+        screenTransceiver
+    ];
+
+    peer.videoSenders = {
+        camera: cameraTransceiver.sender,
+        screen: screenTransceiver.sender
+    };
+
+    pc.ontrack = (event) => {
+        if (event.track.kind === "video") {
+            const videoIndex =
+                peer.videoTransceivers.indexOf(event.transceiver);
+
+            const kind = videoIndex === 1 ? "screen" : "camera";
+
+            const stream = event.streams[0] ||
+                new MediaStream([event.track]);
+
+            attachRemoteVideo(
+                person.uid,
+                person.name,
+                stream,
+                kind
+            );
+
+            const tile = document.getElementById(
+                `tile-${kind}-${person.uid}`
+            );
+
+            event.track.onunmute = () => {
+                if (tile) tile.hidden = false;
+            };
+
+            event.track.onmute = () => {
+                if (tile) tile.hidden = true;
+            };
+
+            if (!event.track.muted && tile) {
+                tile.hidden = false;
+            }
+
+            return;
+        }
+
+        if (!peer.audio) {
+            peer.audio = document.createElement("audio");
+            peer.audio.autoplay = true;
+            peer.audio.playsInline = true;
+            peer.audio.dataset.peer = person.uid;
+            audioContainer?.appendChild(peer.audio);
+        }
+
+        const audioStream = event.streams[0] ||
+            new MediaStream([event.track]);
+
+        peer.audio.srcObject = audioStream;
+
+        peer.audio.play().catch(() => {
+            setStatus(
+                "Voice connected. Click the page once if audio is blocked."
+            );
+        });
+    };
+
+    pc.onicecandidate = async (event) => {
+        if (!event.candidate || !user) return;
+
+        try {
+            await addDoc(collection(callRef, "candidates"), {
+                uid: user.uid,
+                candidate: event.candidate.toJSON()
+            });
+        } catch (error) {
+            console.error("ICE candidate write failed:", error);
+        }
+    };
+
+    pc.onconnectionstatechange = () => {
+        if (pc.connectionState === "failed") {
+            setStatus(
+                "Voice connection failed. This network may need a TURN server."
+            );
+        }
+
+        if (["failed", "closed"].includes(pc.connectionState)) {
+            closePeer(person.uid);
+        }
+    };
+
+    peer.unsubCandidates = onSnapshot(
+        collection(callRef, "candidates"),
+        (snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (
+                    change.type !== "added" ||
+                    peer.candidateIds.has(change.doc.id)
+                ) return;
+
+                peer.candidateIds.add(change.doc.id);
+
+                const data = change.doc.data();
+
+                if (data.uid === user?.uid || !data.candidate) return;
+
+                const candidate = new RTCIceCandidate(data.candidate);
+
+                if (!pc.remoteDescription) {
+                    peer.waitingCandidates.push(candidate);
+                    return;
+                }
+
+                try {
+                    await pc.addIceCandidate(candidate);
+                } catch (error) {
+                    console.warn(
+                        "Could not add ICE candidate:",
+                        error
+                    );
+                }
+            });
+        },
+        (error) => {
+            console.error("Candidate listener failed:", error);
+        }
+    );
+
+    return peer;
+}
+
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
 
     const peer = {
@@ -495,63 +708,45 @@ async function refreshPresenceFlags() {
     }
 }
 
-function getSender(peer, kind) {
-    if (kind === "camera") {
-        return peer.pc.getSenders().find((sender) =>
-            sender.track?.kind === "video" &&
-            sender.track === cameraStream?.getVideoTracks()[0]
-        );
-    }
-    if (kind === "screen") {
-        return peer.pc.getSenders().find((sender) =>
-            sender.track?.kind === "video" &&
-            sender.track === screenStream?.getVideoTracks()[0]
-        );
-    }
-    return null;
-}
 
-async function renegotiateWith(uid) {
-    const peer = peers.get(uid);
-    if (!peer || !peer.callRef || !user) return;
+async function replaceVideoTrack(kind, track) {
+    const updates = [];
 
-    try {
-        await setDoc(peer.callRef, {
-            callerUid: user.uid,
-            callerSessionId: sessionId,
-            calleeUid: uid,
-            calleeSessionId: participants.get(uid)?.sessionId || "",
-            offer: null,
-            answer: null,
-            createdAt: Date.now()
-        }, { merge: false });
+    peers.forEach((peer) => {
+        const sender = peer.videoSenders?.[kind];
 
-        const offer = await peer.pc.createOffer();
-        await peer.pc.setLocalDescription(offer);
+        if (sender) {
+            updates.push(
+                sender.replaceTrack(track || null).catch((error) => {
+                    console.error(
+                        `Could not update ${kind} track:`,
+                        error
+                    );
+                })
+            );
+        }
+    });
 
-        await updateDoc(peer.callRef, {
-            offer: { type: offer.type, sdp: offer.sdp }
-        });
-    } catch (error) {
-        console.warn("Could not renegotiate with", uid, error);
-    }
+    await Promise.all(updates);
 }
 
 async function toggleCamera() {
     if (!localStream) return;
 
     if (cameraOn) {
-        cameraStream?.getTracks().forEach((track) => track.stop());
-        cameraStream = null;
         cameraOn = false;
-        setPressed(cameraButton, false);
-        if (cameraButton) cameraButton.querySelector(".voice-control-label").textContent = "Camera";
 
-        peers.forEach((peer, uid) => {
-            const sender = getSender(peer, "camera");
-            if (sender) peer.pc.removeTrack(sender);
-            void renegotiateWith(uid);
-        });
+        const oldStream = cameraStream;
+        cameraStream = null;
+
+        oldStream?.getTracks().forEach((track) => track.stop());
+
+        await replaceVideoTrack("camera", null);
+
+        setPressed(cameraButton, false);
+
+        const label = cameraButton?.querySelector(".voice-control-label");
+        if (label) label.textContent = "Camera";
 
         setStatus("Camera off");
         await refreshPresenceFlags();
@@ -559,29 +754,107 @@ async function toggleCamera() {
     }
 
     try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: true
+        });
+
+        const track = cameraStream.getVideoTracks()[0];
+
+        await replaceVideoTrack("camera", track);
+
+        cameraOn = true;
+        setPressed(cameraButton, true);
+
+        const label = cameraButton?.querySelector(".voice-control-label");
+        if (label) label.textContent = "Camera on";
+
+        setStatus("Camera on");
+        await refreshPresenceFlags();
+
     } catch (error) {
         console.error("Camera permission failed:", error);
+        cameraStream?.getTracks().forEach((track) => track.stop());
+        cameraStream = null;
+        cameraOn = false;
         setStatus("Camera permission was blocked.");
-        return;
     }
+}
 
-    cameraOn = true;
-    setPressed(cameraButton, true);
-    if (cameraButton) cameraButton.querySelector(".voice-control-label").textContent = "Camera on";
+async function stopScreenShare() {
+    if (!screenOn) return;
 
-    const track = cameraStream.getVideoTracks()[0];
+    screenOn = false;
 
-    peers.forEach((peer, uid) => {
-        peer.pc.addTrack(track, cameraStream);
-        void renegotiateWith(uid);
-    });
+    const oldStream = screenStream;
+    screenStream = null;
 
-    setStatus("Camera on");
+    oldStream?.getTracks().forEach((track) => track.stop());
+
+    await replaceVideoTrack("screen", null);
+
+    setPressed(screenButton, false);
+
+    const label = screenButton?.querySelector(".voice-control-label");
+    if (label) label.textContent = "Screen";
+
+    setStatus("Screen share stopped");
     await refreshPresenceFlags();
 }
 
 async function toggleScreen() {
+    if (!localStream) return;
+
+    if (screenOn) {
+        await stopScreenShare();
+        return;
+    }
+
+    try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: true,
+            audio: false
+        });
+
+        const track = screenStream.getVideoTracks()[0];
+
+        screenOn = true;
+
+        track.onended = () => {
+            if (screenOn) {
+                void stopScreenShare();
+            }
+        };
+
+        await replaceVideoTrack("screen", track);
+
+        setPressed(screenButton, true);
+
+        const label = screenButton?.querySelector(".voice-control-label");
+        if (label) label.textContent = "Sharing";
+
+        setStatus("Sharing your screen");
+        await refreshPresenceFlags();
+
+    } catch (error) {
+        console.error("Screen share failed:", error);
+
+        screenStream?.getTracks().forEach((track) => track.stop());
+        screenStream = null;
+        screenOn = false;
+
+        setPressed(screenButton, false);
+
+        const label = screenButton?.querySelector(".voice-control-label");
+        if (label) label.textContent = "Screen";
+
+        setStatus(
+            error.name === "NotAllowedError"
+                ? "Screen share was cancelled."
+                : "Could not start screen sharing."
+        );
+    }
+}
+ {
     if (!localStream) return;
 
     if (screenOn) {
