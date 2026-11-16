@@ -2732,3 +2732,7 @@ button {
 .workspace-gem {
     pointer-events: none;
 }
+
+   .workspace-gem {
+    pointer-events: none !important;
+}
