@@ -906,23 +906,53 @@ import { parseGIF, decompressFrames } from
                 frame.dims.top
             );
 
-            iconCtx.clearRect(0, 0, 32, 32);
+           iconCtx.clearRect(0, 0, 32, 32);
 
-            const scale = Math.min(
-                32 / sourceCanvas.width,
-                32 / sourceCanvas.height
-            );
+// Find the visible diamond, ignoring transparent padding.
+const pixels = sourceCtx.getImageData(
+    0, 0,
+    sourceCanvas.width,
+    sourceCanvas.height
+).data;
 
-            const width = sourceCanvas.width * scale;
-            const height = sourceCanvas.height * scale;
+let minX = sourceCanvas.width;
+let minY = sourceCanvas.height;
+let maxX = 0;
+let maxY = 0;
 
-            iconCtx.drawImage(
-                sourceCanvas,
-                (32 - width) / 2,
-                (32 - height) / 2,
-                width,
-                height
-            );
+for (let y = 0; y < sourceCanvas.height; y++) {
+    for (let x = 0; x < sourceCanvas.width; x++) {
+        const alpha = pixels[(y * sourceCanvas.width + x) * 4 + 3];
+
+        if (alpha > 10) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+        }
+    }
+}
+
+if (maxX >= minX && maxY >= minY) {
+    const cropWidth = maxX - minX + 1;
+    const cropHeight = maxY - minY + 1;
+
+    const scale = Math.min(
+        32 / cropWidth,
+        32 / cropHeight
+    );
+
+    const width = cropWidth * scale;
+    const height = cropHeight * scale;
+
+    iconCtx.drawImage(
+        sourceCanvas,
+        minX, minY, cropWidth, cropHeight,
+        (32 - width) / 2,
+        (32 - height) / 2,
+        width, height
+    );
+}
 
             favicon.href = iconCanvas.toDataURL("image/png");
 
