@@ -9,6 +9,7 @@ import {
 import {
     addDoc,
     collection,
+    deleteDoc,
     doc,
     getDoc,
     getDocs,
@@ -29,7 +30,7 @@ const activeChannelName = document.getElementById("activeChannelName");
 const activeChannelDescription = document.getElementById("activeChannelDescription");
 const textChannelButtons = [...document.querySelectorAll(".text-channel")];
 
-// Fix the workspace decoration intercepting clicks on text channels.
+// Prevent the workspace decoration from intercepting channel clicks.
 function disableWorkspaceGemOverlay() {
     document.querySelectorAll(".workspace-gem").forEach((gem) => {
         gem.style.setProperty("pointer-events", "none", "important");
@@ -84,19 +85,31 @@ const channelDescriptions = {
 
 let currentUser = null;
 let activeTextChannel = null;
+let activeCreatedServerId = null;
+
 let stopMessagesListener = null;
 let stopMembersListener = null;
 let stopDirectMessagesListener = null;
+
 let members = [];
 let selectedMember = null;
 let currentConversationId = null;
 
+// --------------------------------------------------
+// MOBILE NAVIGATION
+// --------------------------------------------------
+
 function setMobileSidebar(open) {
     if (!dashboard) return;
+
     dashboard.classList.toggle("mobile-nav-open", open);
+
     mobileMenuButtons.forEach((button) => {
         button.setAttribute("aria-expanded", String(open));
-        button.setAttribute("aria-label", open ? "Close navigation menu" : "Open navigation menu");
+        button.setAttribute(
+            "aria-label",
+            open ? "Close navigation menu" : "Open navigation menu"
+        );
     });
 }
 
@@ -106,14 +119,13 @@ mobileMenuButtons.forEach((button) => {
     });
 });
 
-mobileSidebarBackdrop?.addEventListener("click", () => setMobileSidebar(false));
-
-document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-        setMobileSidebar(false);
-        closeServerModal();
-    }
+mobileSidebarBackdrop?.addEventListener("click", () => {
+    setMobileSidebar(false);
 });
+
+// --------------------------------------------------
+// VIEW AND LISTENER MANAGEMENT
+// --------------------------------------------------
 
 function stopPublicMessages() {
     stopMessagesListener?.();
@@ -136,17 +148,24 @@ function hideMainViews() {
 function showLoungeSidebar() {
     if (dmSidebar) dmSidebar.hidden = true;
     if (loungeSidebar) loungeSidebar.hidden = false;
+
     dmHomeButton?.classList.remove("selected");
     dmHomeButton?.setAttribute("aria-pressed", "false");
+
     mainServerButton?.classList.add("selected");
     mainServerButton?.setAttribute("aria-pressed", "true");
+
     document.body.classList.remove("dm-mode");
 }
 
 function showEmptyView() {
     stopPublicMessages();
+
     activeTextChannel = null;
+    activeCreatedServerId = null;
+
     hideMainViews();
+
     if (emptyView) emptyView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
 
@@ -156,17 +175,27 @@ function showEmptyView() {
     });
 }
 
+// --------------------------------------------------
+// TEXT CHANNELS
+// --------------------------------------------------
+
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
 
-    // Clicking the channel that is already open folds it away again.
-    if (activeTextChannel === channelName && loungeView && !loungeView.hidden) {
+    if (
+        activeTextChannel === channelName &&
+        loungeView &&
+        !loungeView.hidden
+    ) {
         showEmptyView();
         setMobileSidebar(false);
         return;
     }
 
     stopDirectMessages();
+
+    activeCreatedServerId = null;
+
     showLoungeSidebar();
     hideMainViews();
 
@@ -190,6 +219,7 @@ function openTextChannel(channelName) {
 
     textChannelButtons.forEach((button) => {
         const selected = button.dataset.channel === channelName;
+
         button.classList.toggle("selected", selected);
         button.setAttribute("aria-pressed", String(selected));
     });
@@ -204,11 +234,16 @@ textChannelButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+
         openTextChannel(button.dataset.channel);
     });
 });
 
 window.openTextChannel = openTextChannel;
+
+// --------------------------------------------------
+// AUTHENTICATION
+// --------------------------------------------------
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -219,26 +254,34 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
 
     const displayName = (user.displayName || "Member").slice(0, 30);
+
     const profileName = document.getElementById("profileName");
     const currentUserElement = document.getElementById("currentUser");
 
-    if (profileName) profileName.textContent = displayName;
+    if (profileName) {
+        profileName.textContent = displayName;
+    }
 
     const currentName = currentUserElement?.querySelector("span");
-    if (currentName) currentName.textContent = displayName;
+
+    if (currentName) {
+        currentName.textContent = displayName;
+    }
 
     try {
         await ensureUserProfile();
         loadMembers();
     } catch (error) {
         console.error("Profile setup failed:", error);
+
         if (dmMemberList) {
             dmMemberList.textContent = "Member profiles could not load.";
         }
     }
 
     await loadProfile();
-    loadServerIcons();
+    await loadServerIcons();
+
     showLoungeSidebar();
     showEmptyView();
 });
@@ -258,10 +301,15 @@ async function ensureUserProfile() {
     }
 }
 
+// --------------------------------------------------
+// PUBLIC MESSAGES
+// --------------------------------------------------
+
 function loadMessages(channelName) {
     if (!messagesElement || !channelName) return;
 
     stopPublicMessages();
+
     messagesElement.textContent = "Loading messages...";
 
     const messagesQuery = query(
@@ -271,47 +319,67 @@ function loadMessages(channelName) {
         limit(100)
     );
 
-    stopMessagesListener = onSnapshot(messagesQuery, (snapshot) => {
-        if (activeTextChannel !== channelName) return;
+    stopMessagesListener = onSnapshot(
+        messagesQuery,
+        (snapshot) => {
+            if (activeTextChannel !== channelName) return;
 
-        messagesElement.replaceChildren();
+            messagesElement.replaceChildren();
 
-        if (snapshot.empty) {
-            const empty = document.createElement("p");
-            empty.className = "channel-empty";
-            empty.textContent = `This is the beginning of #${channelName}.`;
-            messagesElement.appendChild(empty);
-            return;
+            if (snapshot.empty) {
+                const empty = document.createElement("p");
+                empty.className = "channel-empty";
+                empty.textContent =
+                    `This is the beginning of #${channelName}.`;
+
+                messagesElement.appendChild(empty);
+                return;
+            }
+
+            snapshot.forEach((entry) => {
+                const data = entry.data();
+
+                const message = document.createElement("article");
+                message.className = "message";
+
+                const author = document.createElement("strong");
+                author.textContent = `${data.username || "Member"}: `;
+
+                message.append(
+                    author,
+                    document.createTextNode(data.text || "")
+                );
+
+                messagesElement.appendChild(message);
+            });
+
+            messagesElement.scrollTop = messagesElement.scrollHeight;
+        },
+        (error) => {
+            console.error("Channel listener failed:", error);
+
+            messagesElement.textContent =
+                error.code === "failed-precondition"
+                    ? "This channel requires a Firestore index."
+                    : error.code === "permission-denied"
+                        ? "Firestore denied channel access. Publish the updated rules."
+                        : "Messages could not load.";
         }
-
-        snapshot.forEach((entry) => {
-            const data = entry.data();
-            const message = document.createElement("article");
-            message.className = "message";
-
-            const author = document.createElement("strong");
-            author.textContent = `${data.username || "Member"}: `;
-
-            message.append(author, document.createTextNode(data.text || ""));
-            messagesElement.appendChild(message);
-        });
-
-        messagesElement.scrollTop = messagesElement.scrollHeight;
-    }, (error) => {
-        console.error("Channel listener failed:", error);
-
-        messagesElement.textContent = error.code === "failed-precondition"
-            ? "This channel requires a Firestore index."
-            : error.code === "permission-denied"
-                ? "Firestore denied channel access. Publish the updated rules."
-                : "Messages could not load.";
-    });
+    );
 }
 
 async function sendMessage() {
-    if (!currentUser || !input || !sendButton || !activeTextChannel) return;
+    if (
+        !currentUser ||
+        !input ||
+        !sendButton ||
+        !activeTextChannel
+    ) {
+        return;
+    }
 
     const text = input.value.trim();
+
     if (!text) return;
 
     sendButton.disabled = true;
@@ -345,6 +413,10 @@ messageForm?.addEventListener("submit", (event) => {
     void sendMessage();
 });
 
+// --------------------------------------------------
+// DIRECT MESSAGES
+// --------------------------------------------------
+
 function showDirectMessages() {
     if (!currentUser) return;
 
@@ -352,6 +424,8 @@ function showDirectMessages() {
     stopDirectMessages();
 
     activeTextChannel = null;
+    activeCreatedServerId = null;
+
     selectedMember = null;
     currentConversationId = null;
 
@@ -403,6 +477,8 @@ mainServerButton?.addEventListener("click", () => {
     });
 
     mainServerButton?.classList.add("selected");
+    mainServerButton?.setAttribute("aria-pressed", "true");
+
     setMobileSidebar(false);
 });
 
@@ -416,29 +492,33 @@ function loadMembers() {
         orderBy("displayName", "asc")
     );
 
-    stopMembersListener = onSnapshot(membersQuery, (snapshot) => {
-        members = [];
+    stopMembersListener = onSnapshot(
+        membersQuery,
+        (snapshot) => {
+            members = [];
 
-        snapshot.forEach((entry) => {
-            const data = entry.data();
+            snapshot.forEach((entry) => {
+                const data = entry.data();
 
-            if (
-                data.uid &&
-                data.uid !== currentUser?.uid &&
-                typeof data.displayName === "string"
-            ) {
-                members.push({
-                    uid: data.uid,
-                    displayName: data.displayName
-                });
-            }
-        });
+                if (
+                    data.uid &&
+                    data.uid !== currentUser?.uid &&
+                    typeof data.displayName === "string"
+                ) {
+                    members.push({
+                        uid: data.uid,
+                        displayName: data.displayName
+                    });
+                }
+            });
 
-        renderMembers();
-    }, (error) => {
-        console.error("Member directory failed:", error);
-        dmMemberList.textContent = "Members could not load.";
-    });
+            renderMembers();
+        },
+        (error) => {
+            console.error("Member directory failed:", error);
+            dmMemberList.textContent = "Members could not load.";
+        }
+    );
 }
 
 function renderMembers() {
@@ -446,7 +526,9 @@ function renderMembers() {
 
     dmMemberList.replaceChildren();
 
-    const searchText = (memberSearch?.value || "").trim().toLowerCase();
+    const searchText = (memberSearch?.value || "")
+        .trim()
+        .toLowerCase();
 
     const filtered = members.filter((member) =>
         member.displayName.toLowerCase().includes(searchText)
@@ -455,6 +537,7 @@ function renderMembers() {
     if (!filtered.length) {
         const empty = document.createElement("li");
         empty.className = "dm-empty";
+
         empty.textContent = searchText
             ? "No members match your search."
             : "No other members have joined yet.";
@@ -491,7 +574,9 @@ function renderMembers() {
         copy.append(name, status);
         button.append(avatar, copy);
 
-        button.addEventListener("click", () => void openConversation(member));
+        button.addEventListener("click", () => {
+            void openConversation(member);
+        });
 
         item.appendChild(button);
         dmMemberList.appendChild(item);
@@ -509,8 +594,13 @@ async function openConversation(member) {
 
     stopDirectMessages();
 
+    activeCreatedServerId = null;
     selectedMember = member;
-    currentConversationId = getConversationId(currentUser.uid, member.uid);
+
+    currentConversationId = getConversationId(
+        currentUser.uid,
+        member.uid
+    );
 
     const openingId = currentConversationId;
 
@@ -518,7 +608,10 @@ async function openConversation(member) {
 
     if (dmConversationView) dmConversationView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
-    if (dmContactName) dmContactName.textContent = member.displayName;
+
+    if (dmContactName) {
+        dmContactName.textContent = member.displayName;
+    }
 
     renderMembers();
     setMobileSidebar(false);
@@ -545,7 +638,8 @@ async function openConversation(member) {
         console.error("Private conversation failed:", error);
 
         if (dmMessages) {
-            dmMessages.textContent = "This private conversation could not be opened.";
+            dmMessages.textContent =
+                "This private conversation could not be opened.";
         }
     }
 }
@@ -561,38 +655,49 @@ function loadDirectMessages() {
         limit(100)
     );
 
-    stopDirectMessagesListener = onSnapshot(privateQuery, (snapshot) => {
-        dmMessages.replaceChildren();
+    stopDirectMessagesListener = onSnapshot(
+        privateQuery,
+        (snapshot) => {
+            dmMessages.replaceChildren();
 
-        if (snapshot.empty) {
-            const empty = document.createElement("p");
-            empty.className = "dm-empty";
-            empty.textContent = "This is the beginning of your conversation.";
-            dmMessages.appendChild(empty);
-            return;
-        }
+            if (snapshot.empty) {
+                const empty = document.createElement("p");
+                empty.className = "dm-empty";
+                empty.textContent =
+                    "This is the beginning of your conversation.";
 
-        snapshot.forEach((entry) => {
-            const data = entry.data();
-            const message = document.createElement("article");
-            message.className = "message dm-message";
-
-            if (data.uid === currentUser?.uid) {
-                message.classList.add("own-message");
+                dmMessages.appendChild(empty);
+                return;
             }
 
-            const author = document.createElement("strong");
-            author.textContent = `${data.username || "Member"}: `;
+            snapshot.forEach((entry) => {
+                const data = entry.data();
 
-            message.append(author, document.createTextNode(data.text || ""));
-            dmMessages.appendChild(message);
-        });
+                const message = document.createElement("article");
+                message.className = "message dm-message";
 
-        dmMessages.scrollTop = dmMessages.scrollHeight;
-    }, (error) => {
-        console.error("Private message listener failed:", error);
-        dmMessages.textContent = "Private messages could not load.";
-    });
+                if (data.uid === currentUser?.uid) {
+                    message.classList.add("own-message");
+                }
+
+                const author = document.createElement("strong");
+                author.textContent = `${data.username || "Member"}: `;
+
+                message.append(
+                    author,
+                    document.createTextNode(data.text || "")
+                );
+
+                dmMessages.appendChild(message);
+            });
+
+            dmMessages.scrollTop = dmMessages.scrollHeight;
+        },
+        (error) => {
+            console.error("Private message listener failed:", error);
+            dmMessages.textContent = "Private messages could not load.";
+        }
+    );
 }
 
 async function sendDirectMessage() {
@@ -607,6 +712,7 @@ async function sendDirectMessage() {
     }
 
     const text = dmMessageInput.value.trim();
+
     if (!text) return;
 
     dmSendButton.disabled = true;
@@ -641,6 +747,10 @@ dmMessageForm?.addEventListener("submit", (event) => {
     void sendDirectMessage();
 });
 
+// --------------------------------------------------
+// CREATE SERVER MODAL
+// --------------------------------------------------
+
 function openServerModal() {
     if (!serverModal) return;
 
@@ -673,17 +783,30 @@ serverModal?.addEventListener("click", (event) => {
     }
 });
 
+// --------------------------------------------------
+// SERVER CREATION
+// --------------------------------------------------
+
 createServerForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if (!currentUser || !serverNameInput || !serverVisibilityInput) return;
+    if (!currentUser || !serverNameInput || !serverVisibilityInput) {
+        return;
+    }
 
     const name = serverNameInput.value.trim();
 
-    if (name.length < 2 || name.length > 40) return;
+    if (name.length < 2 || name.length > 40) {
+        if (serverCreateStatus) {
+            serverCreateStatus.textContent =
+                "Server names must be between 2 and 40 characters.";
+        }
+
+        return;
+    }
 
     try {
-        await addDoc(collection(db, "servers"), {
+        const serverRef = await addDoc(collection(db, "servers"), {
             name,
             nameLower: name.toLowerCase(),
             visibility: serverVisibilityInput.value,
@@ -695,8 +818,10 @@ createServerForm?.addEventListener("submit", async (event) => {
         closeServerModal();
 
         const server = {
+            id: serverRef.id,
             name,
-            visibility: serverVisibilityInput.value
+            visibility: serverVisibilityInput.value,
+            ownerUid: currentUser.uid
         };
 
         if (createdServers) {
@@ -710,19 +835,27 @@ createServerForm?.addEventListener("submit", async (event) => {
         if (serverCreateStatus) {
             serverCreateStatus.textContent =
                 error.code === "permission-denied"
-                    ? "Firebase rejected this. Publish the servers rule."
+                    ? "Firebase rejected this. Check the servers Firestore rule."
                     : "The server could not be created.";
         }
     }
 });
 
+// --------------------------------------------------
+// OPEN A CREATED SERVER
+// --------------------------------------------------
+
 function openServer(server) {
+    if (!server?.id) return;
+
     stopPublicMessages();
     stopDirectMessages();
 
     activeTextChannel = null;
     selectedMember = null;
     currentConversationId = null;
+
+    activeCreatedServerId = server.id;
 
     showLoungeSidebar();
     hideMainViews();
@@ -749,10 +882,132 @@ function openServer(server) {
         icon.classList.remove("selected");
     });
 
+    // A created server is selected instead of VIP-LOUNGE.
+    mainServerButton?.classList.remove("selected");
+    mainServerButton?.setAttribute("aria-pressed", "false");
+
     server.button?.classList.add("selected");
+    server.button?.setAttribute("aria-pressed", "true");
 
     setMobileSidebar(false);
 }
+
+// --------------------------------------------------
+// SERVER RIGHT-CLICK MENU
+// --------------------------------------------------
+
+let serverContextMenu = null;
+
+function closeServerContextMenu() {
+    serverContextMenu?.remove();
+    serverContextMenu = null;
+}
+
+function showServerContextMenu(event, server) {
+    // Only the owner of a real created server can open this menu.
+    if (
+        !server?.id ||
+        !currentUser ||
+        server.ownerUid !== currentUser.uid
+    ) {
+        return;
+    }
+
+    event.preventDefault();
+
+    closeServerContextMenu();
+
+    const menu = document.createElement("div");
+
+    menu.className = "server-context-menu";
+    menu.setAttribute("role", "menu");
+
+    const deleteButton = document.createElement("button");
+
+    deleteButton.type = "button";
+    deleteButton.className = "server-context-delete";
+    deleteButton.setAttribute("role", "menuitem");
+    deleteButton.textContent = "Delete Server";
+
+    deleteButton.addEventListener("click", () => {
+        closeServerContextMenu();
+        void deleteServer(server);
+    });
+
+    menu.appendChild(deleteButton);
+
+    menu.style.left = `${Math.max(
+        8,
+        Math.min(event.clientX, window.innerWidth - 180)
+    )}px`;
+
+    menu.style.top = `${Math.max(
+        8,
+        Math.min(event.clientY, window.innerHeight - 55)
+    )}px`;
+
+    document.body.appendChild(menu);
+
+    serverContextMenu = menu;
+
+    document.addEventListener("click", closeServerContextMenu, {
+        once: true
+    });
+}
+
+// --------------------------------------------------
+// DELETE A CREATED SERVER
+// --------------------------------------------------
+
+async function deleteServer(server) {
+    // Never allow deletion without a real server ID and matching owner.
+    if (
+        !server?.id ||
+        !currentUser ||
+        server.ownerUid !== currentUser.uid
+    ) {
+        return;
+    }
+
+    try {
+        // Delete the server document immediately. No confirmation dialog.
+        await deleteDoc(doc(db, "servers", server.id));
+
+        // Remove its icon from the sidebar.
+        server.button?.remove();
+
+        // If this was the open server, return to VIP-LOUNGE.
+        if (activeCreatedServerId === server.id) {
+            activeCreatedServerId = null;
+
+            stopPublicMessages();
+            stopDirectMessages();
+
+            showLoungeSidebar();
+            showEmptyView();
+
+            document.querySelectorAll(".server-icon").forEach((icon) => {
+                icon.classList.remove("selected");
+                icon.setAttribute("aria-pressed", "false");
+            });
+
+            mainServerButton?.classList.add("selected");
+            mainServerButton?.setAttribute("aria-pressed", "true");
+        }
+    } catch (error) {
+        console.error("Server deletion failed:", error);
+
+        alert(
+            error.code === "permission-denied"
+                ? "Firebase denied deletion. Check the server owner delete rule."
+                : "The server could not be deleted. Please try again."
+        );
+    }
+}
+
+// --------------------------------------------------
+// CREATE SERVER SIDEBAR ICONS
+// --------------------------------------------------
 
 function makeServerIcon(server) {
     const icon = document.createElement("button");
@@ -761,14 +1016,27 @@ function makeServerIcon(server) {
     icon.className = "server-icon created-server";
     icon.title = server.name;
     icon.setAttribute("aria-label", `Open ${server.name}`);
+    icon.setAttribute("aria-pressed", "false");
+
     icon.textContent = server.name.trim().charAt(0).toUpperCase();
 
     server.button = icon;
 
-    icon.addEventListener("click", () => openServer(server));
+    icon.addEventListener("click", () => {
+        openServer(server);
+    });
+
+    // Right-click opens the owner-only context menu.
+    icon.addEventListener("contextmenu", (event) => {
+        showServerContextMenu(event, server);
+    });
 
     return icon;
 }
+
+// --------------------------------------------------
+// LOAD SAVED SERVERS FROM FIRESTORE
+// --------------------------------------------------
 
 async function loadServerIcons() {
     if (!currentUser || !createdServers) return;
@@ -787,8 +1055,10 @@ async function loadServerIcons() {
             const data = entry.data();
 
             const server = {
+                id: entry.id,
                 name: data.name || "Server",
-                visibility: data.visibility || "private"
+                visibility: data.visibility || "private",
+                ownerUid: data.ownerUid || ""
             };
 
             createdServers.appendChild(makeServerIcon(server));
@@ -798,9 +1068,16 @@ async function loadServerIcons() {
     }
 }
 
+// --------------------------------------------------
+// LOGOUT
+// --------------------------------------------------
+
 async function logoutUser() {
     try {
         setMobileSidebar(false);
+
+        closeServerContextMenu();
+
         stopPublicMessages();
         stopDirectMessages();
         stopMembersListener?.();
@@ -810,6 +1087,7 @@ async function logoutUser() {
         }
 
         await signOut(auth);
+
         window.location.replace("login.html");
     } catch (error) {
         console.error("Logout failed:", error);
@@ -821,8 +1099,13 @@ async function logoutUser() {
 logoutButton?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
+
     void logoutUser();
 });
+
+// --------------------------------------------------
+// PROFILE EDITOR
+// --------------------------------------------------
 
 const profileButton = document.getElementById("profileButton");
 const profileModal = document.getElementById("profileModal");
@@ -837,7 +1120,9 @@ const profileUploadInput = document.getElementById("profileUploadInput");
 const profileCrop = document.getElementById("profileCrop");
 const cropImage = document.getElementById("cropImage");
 const cropZoom = document.getElementById("cropZoom");
-const profileChoiceButtons = [...document.querySelectorAll(".profile-choice")];
+const profileChoiceButtons = [
+    ...document.querySelectorAll(".profile-choice")
+];
 
 const AVATAR_STYLES = {
     diamond: {
@@ -875,9 +1160,11 @@ const AVATAR_STYLES = {
 let currentAvatar = "diamond";
 let uploadedPicture = "";
 let rawPicture = "";
+
 let cropScale = 1;
 let cropX = 0;
 let cropY = 0;
+
 let dragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
@@ -891,11 +1178,12 @@ function applyAvatar(key) {
 
     const style = avatarStyleFor(currentAvatar);
 
-    // A chosen picture wins over the preset colours.
+    // An uploaded picture takes priority over preset avatars.
     if (uploadedPicture) {
         if (myProfilePicture) {
             myProfilePicture.style.background = "transparent";
-            myProfilePicture.style.backgroundImage = `url(${uploadedPicture})`;
+            myProfilePicture.style.backgroundImage =
+                `url(${uploadedPicture})`;
             myProfilePicture.style.backgroundSize = "cover";
             myProfilePicture.style.backgroundPosition = "center";
             myProfilePicture.textContent = "";
@@ -903,7 +1191,8 @@ function applyAvatar(key) {
 
         if (profilePreviewImage) {
             profilePreviewImage.style.background = "transparent";
-            profilePreviewImage.style.backgroundImage = `url(${uploadedPicture})`;
+            profilePreviewImage.style.backgroundImage =
+                `url(${uploadedPicture})`;
             profilePreviewImage.style.backgroundSize = "cover";
             profilePreviewImage.style.backgroundPosition = "center";
             profilePreviewImage.textContent = "";
@@ -920,6 +1209,7 @@ function applyAvatar(key) {
         myProfilePicture.style.backgroundImage = "none";
         myProfilePicture.style.background = style.background;
         myProfilePicture.style.color = style.color;
+
         myProfilePicture.textContent =
             currentAvatar === "diamond" ? "\u2726" : style.glyph;
     }
@@ -928,10 +1218,12 @@ function applyAvatar(key) {
         profilePreviewImage.style.backgroundImage = "none";
         profilePreviewImage.style.background = style.background;
         profilePreviewImage.style.color = style.color;
+
         profilePreviewImage.style.display = "flex";
         profilePreviewImage.style.alignItems = "center";
         profilePreviewImage.style.justifyContent = "center";
         profilePreviewImage.style.fontSize = "40px";
+
         profilePreviewImage.textContent =
             currentAvatar === "diamond" ? "\u2726" : style.glyph;
     }
@@ -955,7 +1247,19 @@ async function loadProfile() {
             if (profileName) {
                 profileName.textContent = data.displayName;
             }
+
+            const currentName = document
+                .getElementById("currentUser")
+                ?.querySelector("span");
+
+            if (currentName) {
+                currentName.textContent = data.displayName;
+            }
         }
+
+        // Restore a previously saved uploaded picture.
+        uploadedPicture =
+            typeof data.picture === "string" ? data.picture : "";
 
         applyAvatar(
             typeof data.avatar === "string" ? data.avatar : "diamond"
@@ -977,6 +1281,12 @@ function openProfileModal() {
     if (profileStatus) {
         profileStatus.textContent = "";
         profileStatus.className = "";
+    }
+
+    rawPicture = "";
+
+    if (profileCrop) {
+        profileCrop.hidden = true;
     }
 
     applyAvatar(currentAvatar);
@@ -1001,6 +1311,7 @@ function closeProfileModal() {
 profileButton?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
+
     openProfileModal();
 });
 
@@ -1013,7 +1324,9 @@ profileModal?.addEventListener("click", (event) => {
     }
 });
 
-/* ---------- CROP THE CHOSEN PICTURE ---------- */
+// --------------------------------------------------
+// PROFILE IMAGE CROPPING
+// --------------------------------------------------
 
 function applyCropTransform() {
     if (!cropImage) return;
@@ -1029,8 +1342,10 @@ cropZoom?.addEventListener("input", () => {
 
 cropImage?.addEventListener("pointerdown", (event) => {
     dragging = true;
+
     dragStartX = event.clientX - cropX;
     dragStartY = event.clientY - cropY;
+
     cropImage.setPointerCapture(event.pointerId);
 });
 
@@ -1049,7 +1364,6 @@ cropImage?.addEventListener("pointermove", (event) => {
     });
 });
 
-/* Bake the crop into a small square picture. */
 function renderCroppedPicture() {
     return new Promise((resolve) => {
         if (!rawPicture) {
@@ -1061,6 +1375,8 @@ function renderCroppedPicture() {
 
         image.onload = () => {
             const SIZE = 192;
+            const FRAME = 160;
+
             const canvas = document.createElement("canvas");
 
             canvas.width = SIZE;
@@ -1073,8 +1389,6 @@ function renderCroppedPicture() {
                 return;
             }
 
-            // Match the on-screen crop frame (160px).
-            const FRAME = 160;
             const ratio = SIZE / FRAME;
 
             const baseScale = Math.max(
@@ -1087,11 +1401,8 @@ function renderCroppedPicture() {
             const drawW = image.width * scale;
             const drawH = image.height * scale;
 
-            const dx =
-                SIZE / 2 - drawW / 2 + cropX * ratio;
-
-            const dy =
-                SIZE / 2 - drawH / 2 + cropY * ratio;
+            const dx = SIZE / 2 - drawW / 2 + cropX * ratio;
+            const dy = SIZE / 2 - drawH / 2 + cropY * ratio;
 
             ctx.drawImage(image, dx, dy, drawW, drawH);
 
@@ -1108,6 +1419,10 @@ profileChoiceButtons.forEach((button) => {
         uploadedPicture = "";
         rawPicture = "";
 
+        if (profileUploadInput) {
+            profileUploadInput.value = "";
+        }
+
         if (profileCrop) {
             profileCrop.hidden = true;
         }
@@ -1116,66 +1431,74 @@ profileChoiceButtons.forEach((button) => {
     });
 });
 
-/* Choose a real picture from the device. */
-if (profileUploadInput) {
-    profileUploadInput.addEventListener("change", () => {
-        const file = profileUploadInput.files?.[0];
-        if (!file) return;
+// --------------------------------------------------
+// CHOOSE A PROFILE PICTURE
+// --------------------------------------------------
 
-        if (!/^image\//i.test(file.type)) {
-            if (profileStatus) {
-                profileStatus.textContent = "Choose an image file.";
-                profileStatus.className = "error";
-            }
+profileUploadInput?.addEventListener("change", () => {
+    const file = profileUploadInput.files?.[0];
 
-            profileUploadInput.value = "";
-            return;
+    if (!file) return;
+
+    if (!/^image\//i.test(file.type)) {
+        if (profileStatus) {
+            profileStatus.textContent = "Choose an image file.";
+            profileStatus.className = "error";
         }
 
-        if (file.size > 400 * 1024) {
-            if (profileStatus) {
-                profileStatus.textContent =
-                    "Pictures must be smaller than 400 KB.";
-                profileStatus.className = "error";
-            }
+        profileUploadInput.value = "";
+        return;
+    }
 
-            profileUploadInput.value = "";
-            return;
+    if (file.size > 400 * 1024) {
+        if (profileStatus) {
+            profileStatus.textContent =
+                "Pictures must be smaller than 400 KB.";
+
+            profileStatus.className = "error";
         }
 
-        const reader = new FileReader();
+        profileUploadInput.value = "";
+        return;
+    }
 
-        reader.onload = () => {
-            rawPicture = String(reader.result || "");
+    const reader = new FileReader();
 
-            cropScale = 1;
-            cropX = 0;
-            cropY = 0;
+    reader.onload = () => {
+        rawPicture = String(reader.result || "");
 
-            if (profileCrop) {
-                profileCrop.hidden = false;
-            }
+        cropScale = 1;
+        cropX = 0;
+        cropY = 0;
 
-            if (cropZoom) {
-                cropZoom.value = "100";
-            }
+        if (profileCrop) {
+            profileCrop.hidden = false;
+        }
 
-            if (cropImage) {
-                cropImage.src = rawPicture;
-                cropImage.style.transform =
-                    "translate(0px, 0px) scale(1)";
-            }
+        if (cropZoom) {
+            cropZoom.value = "100";
+        }
 
-            if (profileStatus) {
-                profileStatus.textContent =
-                    "Drag to position, then Save.";
-                profileStatus.className = "success";
-            }
-        };
+        if (cropImage) {
+            cropImage.src = rawPicture;
+            cropImage.style.transform =
+                "translate(0px, 0px) scale(1)";
+        }
 
-        reader.readAsDataURL(file);
-    });
-}
+        if (profileStatus) {
+            profileStatus.textContent =
+                "Drag to position, then Save.";
+
+            profileStatus.className = "success";
+        }
+    };
+
+    reader.readAsDataURL(file);
+});
+
+// --------------------------------------------------
+// SAVE PROFILE
+// --------------------------------------------------
 
 profileForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1190,6 +1513,7 @@ profileForm?.addEventListener("submit", async (event) => {
         if (profileStatus) {
             profileStatus.textContent =
                 "Display names need at least 2 characters.";
+
             profileStatus.className = "error";
         }
 
@@ -1204,10 +1528,15 @@ profileForm?.addEventListener("submit", async (event) => {
 
     try {
         if (rawPicture) {
-            uploadedPicture = await renderCroppedPicture();
+            const croppedPicture = await renderCroppedPicture();
+
+            if (!croppedPicture) {
+                throw new Error("The selected picture could not be cropped.");
+            }
+
+            uploadedPicture = croppedPicture;
         }
 
-        // Only fields this user owns are written.
         await setDoc(
             doc(db, "users", currentUser.uid),
             {
@@ -1244,7 +1573,7 @@ profileForm?.addEventListener("submit", async (event) => {
         if (profileStatus) {
             profileStatus.textContent =
                 error.code === "permission-denied"
-                    ? "Firestore rejected the profile update. Allow profile updates in your users rules."
+                    ? "Firestore rejected the profile update. Check your users rules."
                     : "Your profile could not be saved.";
 
             profileStatus.className = "error";
@@ -1256,6 +1585,19 @@ profileForm?.addEventListener("submit", async (event) => {
     }
 });
 
+// --------------------------------------------------
+// KEYBOARD SHORTCUTS AND CLEANUP
+// --------------------------------------------------
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        setMobileSidebar(false);
+        closeServerModal();
+        closeProfileModal();
+        closeServerContextMenu();
+    }
+});
+
 window.logout = logoutUser;
 window.sendMessage = sendMessage;
 
@@ -1264,6 +1606,8 @@ window.clearChat = () => {
 };
 
 window.addEventListener("pagehide", () => {
+    closeServerContextMenu();
+
     stopPublicMessages();
     stopDirectMessages();
     stopMembersListener?.();
