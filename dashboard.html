@@ -835,7 +835,113 @@
 <script type="module" src="voice.js?v=22"></script>
 
 <!-- ANIMATED DIAMOND FAVICON -->
-<script>
+<script type="module">
+import { parseGIF, decompressFrames } from
+    "https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm";
+
+(async () => {
+    try {
+        const response = await fetch("diamond-favicon.gif?v=3");
+        const buffer = await response.arrayBuffer();
+
+        const gif = parseGIF(buffer);
+        const frames = decompressFrames(gif, true);
+
+        const sourceCanvas = document.createElement("canvas");
+        sourceCanvas.width = gif.lsd.width;
+        sourceCanvas.height = gif.lsd.height;
+
+        const sourceCtx = sourceCanvas.getContext("2d");
+
+        const iconCanvas = document.createElement("canvas");
+        iconCanvas.width = 32;
+        iconCanvas.height = 32;
+
+        const iconCtx = iconCanvas.getContext("2d");
+
+        const favicon =
+            document.querySelector('link[rel="icon"]');
+
+        if (!favicon || !frames.length) return;
+
+        let index = 0;
+        let previousFrame = null;
+        let restoreCanvas = null;
+
+        function playFrame() {
+            if (previousFrame) {
+                if (previousFrame.disposalType === 2) {
+                    const d = previousFrame.dims;
+                    sourceCtx.clearRect(
+                        d.left, d.top, d.width, d.height
+                    );
+                } else if (
+                    previousFrame.disposalType === 3 &&
+                    restoreCanvas
+                ) {
+                    sourceCtx.putImageData(restoreCanvas, 0, 0);
+                }
+            }
+
+            const frame = frames[index];
+
+            restoreCanvas =
+                frame.disposalType === 3
+                    ? sourceCtx.getImageData(
+                        0, 0,
+                        sourceCanvas.width,
+                        sourceCanvas.height
+                    )
+                    : null;
+
+            const imageData = new ImageData(
+                frame.patch,
+                frame.dims.width,
+                frame.dims.height
+            );
+
+            sourceCtx.putImageData(
+                imageData,
+                frame.dims.left,
+                frame.dims.top
+            );
+
+            iconCtx.clearRect(0, 0, 32, 32);
+
+            const scale = Math.min(
+                32 / sourceCanvas.width,
+                32 / sourceCanvas.height
+            );
+
+            const width = sourceCanvas.width * scale;
+            const height = sourceCanvas.height * scale;
+
+            iconCtx.drawImage(
+                sourceCanvas,
+                (32 - width) / 2,
+                (32 - height) / 2,
+                width,
+                height
+            );
+
+            favicon.href = iconCanvas.toDataURL("image/png");
+
+            previousFrame = frame;
+            index = (index + 1) % frames.length;
+
+            setTimeout(
+                playFrame,
+                Math.max(frame.delay || 10, 30)
+            );
+        }
+
+        playFrame();
+
+    } catch (error) {
+        console.error("Diamond favicon animation failed:", error);
+    }
+})();
+</script>
 (() => {
     const gif = new Image();
     gif.src = "diamond-favicon.gif?v=2";
