@@ -331,3 +331,17 @@
     color: #e8e2d7 !important;
     text-shadow: none !important;
 }
+
+
+/* FIX: VIP-LOUNGE SERVER DIAMOND */
+#mainServerButton .rail-gem {
+    display: block !important;
+    width: 38px !important;
+    height: 38px !important;
+    object-fit: contain !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative;
+    z-index: 2;
+}
