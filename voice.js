@@ -163,7 +163,8 @@ function watchChannelCounts() {
                 element.classList.toggle("has-people", live > 0);
             },
 
-            () => {
+            (error) => {
+                console.error("Voice count listener failed:", error);
                 element.textContent = "No one in voice";
             }
         );
@@ -225,7 +226,6 @@ function renderParticipants() {
         }
 
         item.append(dot, label, badges);
-
         participantsElement.appendChild(item);
     });
 }
@@ -263,7 +263,6 @@ function attachRemoteVideo(uid, label, stream, kind = "camera") {
             `${label} — ${kind === "screen" ? "Screen" : "Camera"}`;
 
         tile.append(video, caption);
-
         videoGrid.appendChild(tile);
     }
 
@@ -340,7 +339,7 @@ function makePeer(person, callRef) {
         pc.addTrack(track, localStream);
     });
 
-    // Reserve a camera transceiver.
+    // Reserve camera transceiver.
     const cameraTrack = cameraStream?.getVideoTracks()[0];
 
     const cameraTransceiver = cameraTrack
@@ -352,7 +351,7 @@ function makePeer(person, callRef) {
             direction: "sendrecv"
         });
 
-    // Reserve a screen-sharing transceiver.
+    // Reserve screen-sharing transceiver.
     const screenTrack = screenStream?.getVideoTracks()[0];
 
     const screenTransceiver = screenTrack
@@ -437,7 +436,7 @@ function makePeer(person, callRef) {
     };
 
     /* ======================================
-       ICE CANDIDATES
+       OUTGOING ICE CANDIDATES
     ====================================== */
 
     pc.onicecandidate = async (event) => {
@@ -461,25 +460,36 @@ function makePeer(person, callRef) {
     ====================================== */
 
     pc.onconnectionstatechange = () => {
+        if (pc.connectionState === "connected") {
+            setStatus(`Voice connected to ${person.name}`);
+        }
+
         if (pc.connectionState === "failed") {
             setStatus(
                 "Voice connection failed. This network may need a TURN server."
             );
         }
 
-        if (
-            ["failed", "closed"].includes(pc.connectionState)
-        ) {
+        if (["failed", "closed"].includes(pc.connectionState)) {
             closePeer(person.uid);
         }
     };
 
-    /* ======================================
-       LISTEN FOR REMOTE CANDIDATES
-    ====================================== */
+    // IMPORTANT:
+    // Do not start the candidate listener here.
+    // The outgoing call document must exist first.
+    return peer;
+}
+
+/* ==========================================
+   LISTEN FOR REMOTE ICE CANDIDATES
+========================================== */
+
+function watchPeerCandidates(peer, person) {
+    peer.unsubCandidates?.();
 
     peer.unsubCandidates = onSnapshot(
-        collection(callRef, "candidates"),
+        collection(peer.callRef, "candidates"),
 
         (snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
@@ -494,6 +504,7 @@ function makePeer(person, callRef) {
 
                 const data = change.doc.data();
 
+                // Ignore candidates created by this user.
                 if (
                     data.uid === user?.uid ||
                     !data.candidate
@@ -505,13 +516,14 @@ function makePeer(person, callRef) {
                     data.candidate
                 );
 
-                if (!pc.remoteDescription) {
+                // Queue candidates until the remote description exists.
+                if (!peer.pc.remoteDescription) {
                     peer.waitingCandidates.push(candidate);
                     return;
                 }
 
                 try {
-                    await pc.addIceCandidate(candidate);
+                    await peer.pc.addIceCandidate(candidate);
                 } catch (error) {
                     console.warn(
                         "Could not add ICE candidate:",
@@ -522,11 +534,12 @@ function makePeer(person, callRef) {
         },
 
         (error) => {
-            console.error("Candidate listener failed:", error);
+            console.error(
+                `Candidate listener failed for ${person.name}:`,
+                error
+            );
         }
     );
-
-    return peer;
 }
 
 /* ==========================================
@@ -568,6 +581,7 @@ async function startOutgoingCall(person) {
     outgoingCalls.set(person.uid, callRef);
 
     try {
+        // Create the parent call document FIRST.
         await setDoc(callRef, {
             callerUid: user.uid,
             callerSessionId: sessionId,
@@ -580,6 +594,9 @@ async function startOutgoingCall(person) {
 
             createdAt: Date.now()
         });
+
+        // Start listening only after the call document exists.
+        watchPeerCandidates(peer, person);
 
         const offer = await peer.pc.createOffer();
 
@@ -659,6 +676,9 @@ async function answerIncomingCall(callSnapshot) {
     const peer = makePeer(caller, callSnapshot.ref);
 
     try {
+        // The incoming call document already exists.
+        watchPeerCandidates(peer, caller);
+
         await peer.pc.setRemoteDescription(
             new RTCSessionDescription(data.offer)
         );
@@ -718,9 +738,7 @@ function watchParticipants() {
 
                 if (!data.uid || !data.name) return;
 
-                if (
-                    Date.now() - heartbeatAt >= STALE_AFTER_MS
-                ) {
+                if (Date.now() - heartbeatAt >= STALE_AFTER_MS) {
                     return;
                 }
 
@@ -902,7 +920,6 @@ async function toggleCamera() {
         cameraOn = false;
 
         const oldStream = cameraStream;
-
         cameraStream = null;
 
         oldStream?.getTracks().forEach((track) => {
@@ -917,7 +934,6 @@ async function toggleCamera() {
         setStatus("Camera off");
 
         await refreshPresenceFlags();
-
         return;
     }
 
@@ -966,7 +982,6 @@ async function stopScreenShare() {
     screenOn = false;
 
     const oldStream = screenStream;
-
     screenStream = null;
 
     oldStream?.getTracks().forEach((track) => {
@@ -1409,25 +1424,21 @@ channelItems.forEach((channel) => {
 
 leaveButton?.addEventListener("click", (event) => {
     event.stopPropagation();
-
     void leaveVoice();
 });
 
 muteButton?.addEventListener("click", (event) => {
     event.stopPropagation();
-
     toggleMute();
 });
 
 cameraButton?.addEventListener("click", (event) => {
     event.stopPropagation();
-
     void toggleCamera();
 });
 
 screenButton?.addEventListener("click", (event) => {
     event.stopPropagation();
-
     void toggleScreen();
 });
 
