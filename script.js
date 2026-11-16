@@ -22,6 +22,10 @@ import {
     where
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
+// --------------------------------------------------
+// MAIN ELEMENTS
+// --------------------------------------------------
+
 const messagesElement = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const messageForm = document.getElementById("messageForm");
@@ -29,15 +33,6 @@ const sendButton = document.getElementById("sendMessageButton");
 const activeChannelName = document.getElementById("activeChannelName");
 const activeChannelDescription = document.getElementById("activeChannelDescription");
 const textChannelButtons = [...document.querySelectorAll(".text-channel")];
-
-// Prevent the workspace decoration from intercepting channel clicks.
-function disableWorkspaceGemOverlay() {
-    document.querySelectorAll(".workspace-gem").forEach((gem) => {
-        gem.style.setProperty("pointer-events", "none", "important");
-    });
-}
-
-disableWorkspaceGemOverlay();
 
 const dashboard = document.querySelector(".dashboard");
 const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
@@ -76,6 +71,19 @@ const createdServers = document.getElementById("createdServers");
 const serverNameInput = document.getElementById("serverName");
 const serverVisibilityInput = document.getElementById("serverVisibility");
 const serverCreateStatus = document.getElementById("serverCreateStatus");
+
+// Profile elements
+const profileName = document.getElementById("profileName");
+const currentUserElement = document.getElementById("currentUser");
+
+// Prevent the workspace decoration from intercepting channel clicks.
+function disableWorkspaceGemOverlay() {
+    document.querySelectorAll(".workspace-gem").forEach((gem) => {
+        gem.style.setProperty("pointer-events", "none", "important");
+    });
+}
+
+disableWorkspaceGemOverlay();
 
 const channelDescriptions = {
     general: "A little space to share what matters.",
@@ -193,7 +201,6 @@ function openTextChannel(channelName) {
     }
 
     stopDirectMessages();
-
     activeCreatedServerId = null;
 
     showLoungeSidebar();
@@ -255,9 +262,6 @@ onAuthStateChanged(auth, async (user) => {
 
     const displayName = (user.displayName || "Member").slice(0, 30);
 
-    const profileName = document.getElementById("profileName");
-    const currentUserElement = document.getElementById("currentUser");
-
     if (profileName) {
         profileName.textContent = displayName;
     }
@@ -309,7 +313,6 @@ function loadMessages(channelName) {
     if (!messagesElement || !channelName) return;
 
     stopPublicMessages();
-
     messagesElement.textContent = "Loading messages...";
 
     const messagesQuery = query(
@@ -338,7 +341,6 @@ function loadMessages(channelName) {
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
-
                 const message = document.createElement("article");
                 message.className = "message";
 
@@ -369,17 +371,11 @@ function loadMessages(channelName) {
 }
 
 async function sendMessage() {
-    if (
-        !currentUser ||
-        !input ||
-        !sendButton ||
-        !activeTextChannel
-    ) {
+    if (!currentUser || !input || !sendButton || !activeTextChannel) {
         return;
     }
 
     const text = input.value.trim();
-
     if (!text) return;
 
     sendButton.disabled = true;
@@ -425,7 +421,6 @@ function showDirectMessages() {
 
     activeTextChannel = null;
     activeCreatedServerId = null;
-
     selectedMember = null;
     currentConversationId = null;
 
@@ -672,7 +667,6 @@ function loadDirectMessages() {
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
-
                 const message = document.createElement("article");
                 message.className = "message dm-message";
 
@@ -712,7 +706,6 @@ async function sendDirectMessage() {
     }
 
     const text = dmMessageInput.value.trim();
-
     if (!text) return;
 
     dmSendButton.disabled = true;
@@ -801,7 +794,6 @@ createServerForm?.addEventListener("submit", async (event) => {
             serverCreateStatus.textContent =
                 "Server names must be between 2 and 40 characters.";
         }
-
         return;
     }
 
@@ -854,7 +846,6 @@ function openServer(server) {
     activeTextChannel = null;
     selectedMember = null;
     currentConversationId = null;
-
     activeCreatedServerId = server.id;
 
     showLoungeSidebar();
@@ -882,7 +873,6 @@ function openServer(server) {
         icon.classList.remove("selected");
     });
 
-    // A created server is selected instead of VIP-LOUNGE.
     mainServerButton?.classList.remove("selected");
     mainServerButton?.setAttribute("aria-pressed", "false");
 
@@ -904,7 +894,6 @@ function closeServerContextMenu() {
 }
 
 function showServerContextMenu(event, server) {
-    // Only the owner of a real created server can open this menu.
     if (
         !server?.id ||
         !currentUser ||
@@ -914,16 +903,13 @@ function showServerContextMenu(event, server) {
     }
 
     event.preventDefault();
-
     closeServerContextMenu();
 
     const menu = document.createElement("div");
-
     menu.className = "server-context-menu";
     menu.setAttribute("role", "menu");
 
     const deleteButton = document.createElement("button");
-
     deleteButton.type = "button";
     deleteButton.className = "server-context-delete";
     deleteButton.setAttribute("role", "menuitem");
@@ -947,7 +933,6 @@ function showServerContextMenu(event, server) {
     )}px`;
 
     document.body.appendChild(menu);
-
     serverContextMenu = menu;
 
     document.addEventListener("click", closeServerContextMenu, {
@@ -960,7 +945,6 @@ function showServerContextMenu(event, server) {
 // --------------------------------------------------
 
 async function deleteServer(server) {
-    // Never allow deletion without a real server ID and matching owner.
     if (
         !server?.id ||
         !currentUser ||
@@ -970,13 +954,10 @@ async function deleteServer(server) {
     }
 
     try {
-        // Delete the server document immediately. No confirmation dialog.
         await deleteDoc(doc(db, "servers", server.id));
 
-        // Remove its icon from the sidebar.
         server.button?.remove();
 
-        // If this was the open server, return to VIP-LOUNGE.
         if (activeCreatedServerId === server.id) {
             activeCreatedServerId = null;
 
@@ -1017,7 +998,6 @@ function makeServerIcon(server) {
     icon.title = server.name;
     icon.setAttribute("aria-label", `Open ${server.name}`);
     icon.setAttribute("aria-pressed", "false");
-
     icon.textContent = server.name.trim().charAt(0).toUpperCase();
 
     server.button = icon;
@@ -1026,7 +1006,6 @@ function makeServerIcon(server) {
         openServer(server);
     });
 
-    // Right-click opens the owner-only context menu.
     icon.addEventListener("contextmenu", (event) => {
         showServerContextMenu(event, server);
     });
@@ -1075,7 +1054,6 @@ async function loadServerIcons() {
 async function logoutUser() {
     try {
         setMobileSidebar(false);
-
         closeServerContextMenu();
 
         stopPublicMessages();
@@ -1087,7 +1065,6 @@ async function logoutUser() {
         }
 
         await signOut(auth);
-
         window.location.replace("login.html");
     } catch (error) {
         console.error("Logout failed:", error);
@@ -1095,7 +1072,6 @@ async function logoutUser() {
     }
 }
 
-// The diamond logs out. The name beside it opens the profile editor.
 logoutButton?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -1120,6 +1096,7 @@ const profileUploadInput = document.getElementById("profileUploadInput");
 const profileCrop = document.getElementById("profileCrop");
 const cropImage = document.getElementById("cropImage");
 const cropZoom = document.getElementById("cropZoom");
+
 const profileChoiceButtons = [
     ...document.querySelectorAll(".profile-choice")
 ];
@@ -1173,29 +1150,29 @@ function avatarStyleFor(key) {
     return AVATAR_STYLES[key] || AVATAR_STYLES.diamond;
 }
 
+// Apply the saved avatar or uploaded picture to the sidebar and editor.
 function applyAvatar(key) {
     currentAvatar = AVATAR_STYLES[key] ? key : "diamond";
 
     const style = avatarStyleFor(currentAvatar);
 
-    // An uploaded picture takes priority over preset avatars.
     if (uploadedPicture) {
         if (myProfilePicture) {
             myProfilePicture.style.background = "transparent";
             myProfilePicture.style.backgroundImage =
-                `url(${uploadedPicture})`;
+                `url("${uploadedPicture}")`;
             myProfilePicture.style.backgroundSize = "cover";
             myProfilePicture.style.backgroundPosition = "center";
+            myProfilePicture.style.color = "transparent";
             myProfilePicture.textContent = "";
         }
 
         if (profilePreviewImage) {
+            profilePreviewImage.src = uploadedPicture;
+            profilePreviewImage.alt = "Your profile picture";
+            profilePreviewImage.style.display = "block";
             profilePreviewImage.style.background = "transparent";
-            profilePreviewImage.style.backgroundImage =
-                `url(${uploadedPicture})`;
-            profilePreviewImage.style.backgroundSize = "cover";
-            profilePreviewImage.style.backgroundPosition = "center";
-            profilePreviewImage.textContent = "";
+            profilePreviewImage.style.objectFit = "cover";
         }
 
         profileChoiceButtons.forEach((button) => {
@@ -1209,23 +1186,16 @@ function applyAvatar(key) {
         myProfilePicture.style.backgroundImage = "none";
         myProfilePicture.style.background = style.background;
         myProfilePicture.style.color = style.color;
-
         myProfilePicture.textContent =
             currentAvatar === "diamond" ? "\u2726" : style.glyph;
     }
 
     if (profilePreviewImage) {
-        profilePreviewImage.style.backgroundImage = "none";
+        profilePreviewImage.removeAttribute("src");
+        profilePreviewImage.alt = `${currentAvatar} avatar`;
+        profilePreviewImage.style.display = "block";
         profilePreviewImage.style.background = style.background;
-        profilePreviewImage.style.color = style.color;
-
-        profilePreviewImage.style.display = "flex";
-        profilePreviewImage.style.alignItems = "center";
-        profilePreviewImage.style.justifyContent = "center";
-        profilePreviewImage.style.fontSize = "40px";
-
-        profilePreviewImage.textContent =
-            currentAvatar === "diamond" ? "\u2726" : style.glyph;
+        profilePreviewImage.style.objectFit = "contain";
     }
 
     profileChoiceButtons.forEach((button) => {
@@ -1236,6 +1206,7 @@ function applyAvatar(key) {
     });
 }
 
+// Load the profile, including the saved picture, from Firestore.
 async function loadProfile() {
     if (!currentUser) return;
 
@@ -1248,16 +1219,13 @@ async function loadProfile() {
                 profileName.textContent = data.displayName;
             }
 
-            const currentName = document
-                .getElementById("currentUser")
-                ?.querySelector("span");
+            const currentName = currentUserElement?.querySelector("span");
 
             if (currentName) {
                 currentName.textContent = data.displayName;
             }
         }
 
-        // Restore a previously saved uploaded picture.
         uploadedPicture =
             typeof data.picture === "string" ? data.picture : "";
 
@@ -1266,6 +1234,7 @@ async function loadProfile() {
         );
     } catch (error) {
         console.warn("Profile could not be read:", error);
+        uploadedPicture = "";
         applyAvatar("diamond");
     }
 }
@@ -1289,6 +1258,10 @@ function openProfileModal() {
         profileCrop.hidden = true;
     }
 
+    if (profileUploadInput) {
+        profileUploadInput.value = "";
+    }
+
     applyAvatar(currentAvatar);
 
     profileModal.hidden = false;
@@ -1305,6 +1278,12 @@ function closeProfileModal() {
 
     if (profileStatus) {
         profileStatus.textContent = "";
+    }
+
+    rawPicture = "";
+
+    if (profileCrop) {
+        profileCrop.hidden = true;
     }
 }
 
@@ -1331,6 +1310,7 @@ profileModal?.addEventListener("click", (event) => {
 function applyCropTransform() {
     if (!cropImage) return;
 
+    cropImage.style.transformOrigin = "center center";
     cropImage.style.transform =
         `translate(${cropX}px, ${cropY}px) scale(${cropScale})`;
 }
@@ -1340,6 +1320,7 @@ cropZoom?.addEventListener("input", () => {
     applyCropTransform();
 });
 
+// Drag the image to position it inside the crop frame.
 cropImage?.addEventListener("pointerdown", (event) => {
     dragging = true;
 
@@ -1364,8 +1345,9 @@ cropImage?.addEventListener("pointermove", (event) => {
     });
 });
 
+// Create the final cropped, compressed profile picture.
 function renderCroppedPicture() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         if (!rawPicture) {
             resolve("");
             return;
@@ -1378,14 +1360,13 @@ function renderCroppedPicture() {
             const FRAME = 160;
 
             const canvas = document.createElement("canvas");
-
             canvas.width = SIZE;
             canvas.height = SIZE;
 
             const ctx = canvas.getContext("2d");
 
             if (!ctx) {
-                resolve("");
+                reject(new Error("Could not create the image crop."));
                 return;
             }
 
@@ -1406,14 +1387,22 @@ function renderCroppedPicture() {
 
             ctx.drawImage(image, dx, dy, drawW, drawH);
 
-            resolve(canvas.toDataURL("image/jpeg", 0.85));
+            try {
+                resolve(canvas.toDataURL("image/jpeg", 0.82));
+            } catch (error) {
+                reject(error);
+            }
         };
 
-        image.onerror = () => resolve("");
+        image.onerror = () => {
+            reject(new Error("The selected image could not be loaded."));
+        };
+
         image.src = rawPicture;
     });
 }
 
+// Selecting a preset avatar clears the uploaded picture.
 profileChoiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
         uploadedPicture = "";
@@ -1440,7 +1429,7 @@ profileUploadInput?.addEventListener("change", () => {
 
     if (!file) return;
 
-    if (!/^image\//i.test(file.type)) {
+    if (!file.type.startsWith("image/")) {
         if (profileStatus) {
             profileStatus.textContent = "Choose an image file.";
             profileStatus.className = "error";
@@ -1450,10 +1439,10 @@ profileUploadInput?.addEventListener("change", () => {
         return;
     }
 
-    if (file.size > 400 * 1024) {
+    if (file.size > 5 * 1024 * 1024) {
         if (profileStatus) {
             profileStatus.textContent =
-                "Pictures must be smaller than 400 KB.";
+                "Please choose an image smaller than 5 MB.";
 
             profileStatus.className = "error";
         }
@@ -1481,15 +1470,23 @@ profileUploadInput?.addEventListener("change", () => {
 
         if (cropImage) {
             cropImage.src = rawPicture;
+            cropImage.style.transformOrigin = "center center";
             cropImage.style.transform =
                 "translate(0px, 0px) scale(1)";
         }
 
         if (profileStatus) {
             profileStatus.textContent =
-                "Drag to position, then Save.";
+                "Drag the image to position it. Adjust the zoom, then save.";
 
             profileStatus.className = "success";
+        }
+    };
+
+    reader.onerror = () => {
+        if (profileStatus) {
+            profileStatus.textContent = "The image could not be opened.";
+            profileStatus.className = "error";
         }
     };
 
@@ -1516,7 +1513,6 @@ profileForm?.addEventListener("submit", async (event) => {
 
             profileStatus.className = "error";
         }
-
         return;
     }
 
@@ -1537,36 +1533,43 @@ profileForm?.addEventListener("submit", async (event) => {
             uploadedPicture = croppedPicture;
         }
 
+        if (uploadedPicture.length > 400000) {
+            throw new Error(
+                "The cropped picture is too large. Please choose another image."
+            );
+        }
+
         await setDoc(
             doc(db, "users", currentUser.uid),
             {
                 uid: currentUser.uid,
                 displayName: nextName,
                 avatar: currentAvatar,
-                picture: uploadedPicture.slice(0, 400000),
-                createdAt: serverTimestamp()
+                picture: uploadedPicture,
+                updatedAt: serverTimestamp()
             },
             { merge: true }
         );
 
+        // Update the visible name and avatar immediately.
         if (profileName) {
             profileName.textContent = nextName;
         }
 
-        const currentName = document
-            .getElementById("currentUser")
-            ?.querySelector("span");
+        const currentName = currentUserElement?.querySelector("span");
 
         if (currentName) {
             currentName.textContent = nextName;
         }
 
+        applyAvatar(currentAvatar);
+
         if (profileStatus) {
-            profileStatus.textContent = "Profile saved.";
+            profileStatus.textContent = "Profile saved successfully.";
             profileStatus.className = "success";
         }
 
-        window.setTimeout(closeProfileModal, 500);
+        window.setTimeout(closeProfileModal, 700);
     } catch (error) {
         console.error("Profile save failed:", error);
 
@@ -1574,7 +1577,8 @@ profileForm?.addEventListener("submit", async (event) => {
             profileStatus.textContent =
                 error.code === "permission-denied"
                     ? "Firestore rejected the profile update. Check your users rules."
-                    : "Your profile could not be saved.";
+                    : error.message ||
+                        "Your profile could not be saved.";
 
             profileStatus.className = "error";
         }
