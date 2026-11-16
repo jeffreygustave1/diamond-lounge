@@ -2727,3 +2727,8 @@ button {
 @media (prefers-reduced-motion: reduce) {
     .profile-card::after, .profile-card::before { animation: none; }
 }
+
+   /* FIX: Prevent decorative workspace image from blocking channel clicks */
+.workspace-gem {
+    pointer-events: none;
+}
