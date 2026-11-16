@@ -378,6 +378,13 @@ function makePeer(person, callRef) {
     ====================================== */
 
     pc.ontrack = (event) => {
+        console.log("REMOTE TRACK RECEIVED:", {
+    kind: event.track.kind,
+    id: event.track.id,
+    muted: event.track.muted,
+    transceiverMid: event.transceiver.mid,
+    transceiverIndex: peer.videoTransceivers.indexOf(event.transceiver)
+});
         if (event.track.kind === "video") {
             const videoIndex =
                 peer.videoTransceivers.indexOf(event.transceiver);
