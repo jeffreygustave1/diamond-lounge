@@ -339,7 +339,7 @@
     width: 38px !important;
     height: 38px !important;
     object-fit: contain !important;
-    transform: none !important;
+    transform: scale(5) !important;
     opacity: 1 !important;
     visibility: visible !important;
     position: relative;
