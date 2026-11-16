@@ -68,11 +68,8 @@ const serverCreateStatus = document.getElementById("serverCreateStatus");
 
 const channelDescriptions = {
     general: "A little space to share what matters.",
-    gaming: "Talk games, teams, releases, and play sessions.",
-    streaming: "Share streams, clips, schedules, and creator updates.",
     announcements: "Important Diamond Lounge news and updates.",
-    memes: "Share memes and community jokes.",
-    "off-topic": "Everything that does not fit another channel."
+    streaming: "Share streams, clips, schedules, and creator updates."
 };
 
 let currentUser = null;
