@@ -829,7 +829,160 @@
 
 </div>
 
+
 <!-- APPLICATION SCRIPTS -->
+<script type="module" src="script.js?v=22"></script>
+<script type="module" src="voice.js?v=22"></script>
+
+<!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
+<script type="module">
+import { parseGIF, decompressFrames } from
+    "https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm";
+
+(async () => {
+    try {
+        const response = await fetch("diamond-favicon.gif?v=3");
+        if (!response.ok) {
+            throw new Error("Could not load diamond-favicon.gif");
+        }
+
+        const buffer = await response.arrayBuffer();
+        const gif = parseGIF(buffer);
+        const frames = decompressFrames(gif, true);
+
+        if (!frames.length) return;
+
+        const sourceCanvas = document.createElement("canvas");
+        sourceCanvas.width = gif.lsd.width;
+        sourceCanvas.height = gif.lsd.height;
+
+        const sourceCtx = sourceCanvas.getContext("2d");
+
+        const iconCanvas = document.createElement("canvas");
+        iconCanvas.width = 32;
+        iconCanvas.height = 32;
+
+        const iconCtx = iconCanvas.getContext("2d");
+
+        const favicon = document.querySelector('link[rel="icon"]');
+        if (!favicon) return;
+
+        let index = 0;
+        let previousFrame = null;
+        let restoreCanvas = null;
+
+        function playFrame() {
+            if (previousFrame) {
+                if (previousFrame.disposalType === 2) {
+                    const d = previousFrame.dims;
+                    sourceCtx.clearRect(
+                        d.left, d.top, d.width, d.height
+                    );
+                } else if (
+                    previousFrame.disposalType === 3 &&
+                    restoreCanvas
+                ) {
+                    sourceCtx.putImageData(restoreCanvas, 0, 0);
+                }
+            }
+
+            const frame = frames[index];
+
+            restoreCanvas =
+                frame.disposalType === 3
+                    ? sourceCtx.getImageData(
+                        0, 0,
+                        sourceCanvas.width,
+                        sourceCanvas.height
+                    )
+                    : null;
+
+            const imageData = new ImageData(
+                frame.patch,
+                frame.dims.width,
+                frame.dims.height
+            );
+
+            sourceCtx.putImageData(
+                imageData,
+                frame.dims.left,
+                frame.dims.top
+            );
+
+            // Find the visible diamond, ignoring transparent padding.
+            const pixels = sourceCtx.getImageData(
+                0, 0,
+                sourceCanvas.width,
+                sourceCanvas.height
+            ).data;
+
+            let minX = sourceCanvas.width;
+            let minY = sourceCanvas.height;
+            let maxX = -1;
+            let maxY = -1;
+
+            for (let y = 0; y < sourceCanvas.height; y++) {
+                for (let x = 0; x < sourceCanvas.width; x++) {
+                    const alpha =
+                        pixels[(y * sourceCanvas.width + x) * 4 + 3];
+
+                    if (alpha > 10) {
+                        minX = Math.min(minX, x);
+                        minY = Math.min(minY, y);
+                        maxX = Math.max(maxX, x);
+                        maxY = Math.max(maxY, y);
+                    }
+                }
+            }
+
+            iconCtx.clearRect(0, 0, 32, 32);
+
+            if (maxX >= minX && maxY >= minY) {
+                const cropWidth = maxX - minX + 1;
+                const cropHeight = maxY - minY + 1;
+
+                const scale = Math.min(
+                    32 / cropWidth,
+                    32 / cropHeight
+                );
+
+                const width = cropWidth * scale;
+                const height = cropHeight * scale;
+
+                iconCtx.drawImage(
+                    sourceCanvas,
+                    minX, minY, cropWidth, cropHeight,
+                    (32 - width) / 2,
+                    (32 - height) / 2,
+                    width, height
+                );
+            }
+
+            favicon.href = iconCanvas.toDataURL("image/png");
+
+            previousFrame = frame;
+            index = (index + 1) % frames.length;
+
+            setTimeout(
+                playFrame,
+                Math.max(frame.delay || 10, 30)
+            );
+        }
+
+        playFrame();
+
+    } catch (error) {
+        console.error(
+            "Diamond favicon animation failed:",
+            error
+        );
+    }
+})();
+</script>
+
+</body>
+</html>
+
 <!-- APPLICATION SCRIPTS -->
 <script type="module" src="script.js?v=22"></script>
 <script type="module" src="voice.js?v=22"></script>
