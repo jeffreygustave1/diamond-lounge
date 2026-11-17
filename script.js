@@ -22,9 +22,9 @@ import {
     where
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
-// --------------------------------------------------
-// MAIN ELEMENTS
-// --------------------------------------------------
+// ==================================================
+// DIAMOND LOUNGE — MAIN ELEMENTS
+// ==================================================
 
 const messagesElement = document.getElementById("messages");
 const input = document.getElementById("messageInput");
@@ -75,15 +75,29 @@ const serverCreateStatus = document.getElementById("serverCreateStatus");
 // Profile elements
 const profileName = document.getElementById("profileName");
 const currentUserElement = document.getElementById("currentUser");
+const profileButton = document.getElementById("profileButton");
+const profileModal = document.getElementById("profileModal");
+const closeProfileModalButton = document.getElementById("closeProfileModal");
+const cancelProfileEdit = document.getElementById("cancelProfileEdit");
+const profileForm = document.getElementById("profileForm");
+const profileDisplayName = document.getElementById("profileDisplayName");
+const profileStatus = document.getElementById("profileStatus");
+const profilePreviewImage = document.getElementById("profilePreviewImage");
+const myProfilePicture = document.getElementById("myProfilePicture");
+const profileUploadInput = document.getElementById("profileUploadInput");
+const profileCrop = document.getElementById("profileCrop");
+const cropImage = document.getElementById("cropImage");
+const cropZoom = document.getElementById("cropZoom");
+const profileChoiceButtons = [...document.querySelectorAll(".profile-choice")];
 
-// Prevent the workspace decoration from intercepting channel clicks.
-function disableWorkspaceGemOverlay() {
-    document.querySelectorAll(".workspace-gem").forEach((gem) => {
-        gem.style.setProperty("pointer-events", "none", "important");
-    });
-}
+// Prevent the decorative workspace gem from intercepting clicks.
+document.querySelectorAll(".workspace-gem").forEach((gem) => {
+    gem.style.setProperty("pointer-events", "none", "important");
+});
 
-disableWorkspaceGemOverlay();
+// ==================================================
+// APPLICATION STATE
+// ==================================================
 
 const channelDescriptions = {
     general: "A little space to share what matters.",
@@ -102,10 +116,29 @@ let stopDirectMessagesListener = null;
 let members = [];
 let selectedMember = null;
 let currentConversationId = null;
+let serverContextMenu = null;
 
-// --------------------------------------------------
+let currentAvatar = "diamond";
+let uploadedPicture = "";
+let rawPicture = "";
+let cropScale = 1;
+let cropX = 0;
+let cropY = 0;
+let dragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+// Use the same name normalization when loading and creating servers.
+function normalizeServerName(name) {
+    return String(name || "")
+        .trim()
+        .normalize("NFKC")
+        .toLocaleLowerCase("en-US");
+}
+
+// ==================================================
 // MOBILE NAVIGATION
-// --------------------------------------------------
+// ==================================================
 
 function setMobileSidebar(open) {
     if (!dashboard) return;
@@ -131,9 +164,9 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-// --------------------------------------------------
+// ==================================================
 // VIEW AND LISTENER MANAGEMENT
-// --------------------------------------------------
+// ==================================================
 
 function stopPublicMessages() {
     stopMessagesListener?.();
@@ -143,6 +176,11 @@ function stopPublicMessages() {
 function stopDirectMessages() {
     stopDirectMessagesListener?.();
     stopDirectMessagesListener = null;
+}
+
+function stopMemberListener() {
+    stopMembersListener?.();
+    stopMembersListener = null;
 }
 
 function hideMainViews() {
@@ -159,7 +197,6 @@ function showLoungeSidebar() {
 
     dmHomeButton?.classList.remove("selected");
     dmHomeButton?.setAttribute("aria-pressed", "false");
-
     mainServerButton?.classList.add("selected");
     mainServerButton?.setAttribute("aria-pressed", "true");
 
@@ -168,12 +205,10 @@ function showLoungeSidebar() {
 
 function showEmptyView() {
     stopPublicMessages();
-
     activeTextChannel = null;
     activeCreatedServerId = null;
 
     hideMainViews();
-
     if (emptyView) emptyView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
 
@@ -183,9 +218,9 @@ function showEmptyView() {
     });
 }
 
-// --------------------------------------------------
+// ==================================================
 // TEXT CHANNELS
-// --------------------------------------------------
+// ==================================================
 
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
@@ -202,12 +237,10 @@ function openTextChannel(channelName) {
 
     stopDirectMessages();
     activeCreatedServerId = null;
-
     showLoungeSidebar();
     hideMainViews();
 
     activeTextChannel = channelName;
-
     if (loungeView) loungeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = false;
 
@@ -220,13 +253,10 @@ function openTextChannel(channelName) {
             channelDescriptions[channelName] || `Welcome to #${channelName}.`;
     }
 
-    if (input) {
-        input.placeholder = `Message #${channelName}`;
-    }
+    if (input) input.placeholder = `Message #${channelName}`;
 
     textChannelButtons.forEach((button) => {
         const selected = button.dataset.channel === channelName;
-
         button.classList.toggle("selected", selected);
         button.setAttribute("aria-pressed", String(selected));
     });
@@ -241,16 +271,15 @@ textChannelButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-
         openTextChannel(button.dataset.channel);
     });
 });
 
 window.openTextChannel = openTextChannel;
 
-// --------------------------------------------------
-// AUTHENTICATION
-// --------------------------------------------------
+// ==================================================
+// AUTHENTICATION AND USER PROFILE SETUP
+// ==================================================
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -259,25 +288,18 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     currentUser = user;
-
     const displayName = (user.displayName || "Member").slice(0, 30);
 
-    if (profileName) {
-        profileName.textContent = displayName;
-    }
+    if (profileName) profileName.textContent = displayName;
 
     const currentName = currentUserElement?.querySelector("span");
-
-    if (currentName) {
-        currentName.textContent = displayName;
-    }
+    if (currentName) currentName.textContent = displayName;
 
     try {
         await ensureUserProfile();
         loadMembers();
     } catch (error) {
         console.error("Profile setup failed:", error);
-
         if (dmMemberList) {
             dmMemberList.textContent = "Member profiles could not load.";
         }
@@ -305,9 +327,9 @@ async function ensureUserProfile() {
     }
 }
 
-// --------------------------------------------------
+// ==================================================
 // PUBLIC MESSAGES
-// --------------------------------------------------
+// ==================================================
 
 function loadMessages(channelName) {
     if (!messagesElement || !channelName) return;
@@ -332,9 +354,7 @@ function loadMessages(channelName) {
             if (snapshot.empty) {
                 const empty = document.createElement("p");
                 empty.className = "channel-empty";
-                empty.textContent =
-                    `This is the beginning of #${channelName}.`;
-
+                empty.textContent = `This is the beginning of #${channelName}.`;
                 messagesElement.appendChild(empty);
                 return;
             }
@@ -351,7 +371,6 @@ function loadMessages(channelName) {
                     author,
                     document.createTextNode(data.text || "")
                 );
-
                 messagesElement.appendChild(message);
             });
 
@@ -359,7 +378,6 @@ function loadMessages(channelName) {
         },
         (error) => {
             console.error("Channel listener failed:", error);
-
             messagesElement.textContent =
                 error.code === "failed-precondition"
                     ? "This channel requires a Firestore index."
@@ -371,9 +389,7 @@ function loadMessages(channelName) {
 }
 
 async function sendMessage() {
-    if (!currentUser || !input || !sendButton || !activeTextChannel) {
-        return;
-    }
+    if (!currentUser || !input || !sendButton || !activeTextChannel) return;
 
     const text = input.value.trim();
     if (!text) return;
@@ -393,7 +409,6 @@ async function sendMessage() {
         input.focus();
     } catch (error) {
         console.error("Message send failed:", error);
-
         alert(
             error.code === "permission-denied"
                 ? "Firestore denied this message. Publish the updated rules."
@@ -409,9 +424,9 @@ messageForm?.addEventListener("submit", (event) => {
     void sendMessage();
 });
 
-// --------------------------------------------------
+// ==================================================
 // DIRECT MESSAGES
-// --------------------------------------------------
+// ==================================================
 
 function showDirectMessages() {
     if (!currentUser) return;
@@ -428,16 +443,13 @@ function showDirectMessages() {
     if (dmSidebar) dmSidebar.hidden = false;
 
     hideMainViews();
-
     if (dmHomeView) dmHomeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
 
     dmHomeButton?.classList.add("selected");
     dmHomeButton?.setAttribute("aria-pressed", "true");
-
     mainServerButton?.classList.remove("selected");
     mainServerButton?.setAttribute("aria-pressed", "false");
-
     document.body.classList.add("dm-mode");
 
     if (memberSearch) {
@@ -469,18 +481,18 @@ mainServerButton?.addEventListener("click", () => {
 
     document.querySelectorAll(".server-icon").forEach((icon) => {
         icon.classList.remove("selected");
+        icon.setAttribute("aria-pressed", "false");
     });
 
     mainServerButton?.classList.add("selected");
     mainServerButton?.setAttribute("aria-pressed", "true");
-
     setMobileSidebar(false);
 });
 
 function loadMembers() {
     if (!dmMemberList) return;
 
-    stopMembersListener?.();
+    stopMemberListener();
 
     const membersQuery = query(
         collection(db, "users"),
@@ -494,7 +506,6 @@ function loadMembers() {
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
-
                 if (
                     data.uid &&
                     data.uid !== currentUser?.uid &&
@@ -520,11 +531,7 @@ function renderMembers() {
     if (!dmMemberList) return;
 
     dmMemberList.replaceChildren();
-
-    const searchText = (memberSearch?.value || "")
-        .trim()
-        .toLowerCase();
-
+    const searchText = (memberSearch?.value || "").trim().toLowerCase();
     const filtered = members.filter((member) =>
         member.displayName.toLowerCase().includes(searchText)
     );
@@ -532,11 +539,9 @@ function renderMembers() {
     if (!filtered.length) {
         const empty = document.createElement("li");
         empty.className = "dm-empty";
-
         empty.textContent = searchText
             ? "No members match your search."
             : "No other members have joined yet.";
-
         dmMemberList.appendChild(empty);
         return;
     }
@@ -548,7 +553,6 @@ function renderMembers() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "dm-member-button";
-
         if (selectedMember?.uid === member.uid) {
             button.classList.add("active");
         }
@@ -568,7 +572,6 @@ function renderMembers() {
 
         copy.append(name, status);
         button.append(avatar, copy);
-
         button.addEventListener("click", () => {
             void openConversation(member);
         });
@@ -588,32 +591,21 @@ async function openConversation(member) {
     if (!currentUser || !member?.uid) return;
 
     stopDirectMessages();
-
     activeCreatedServerId = null;
     selectedMember = member;
 
-    currentConversationId = getConversationId(
-        currentUser.uid,
-        member.uid
-    );
-
+    currentConversationId = getConversationId(currentUser.uid, member.uid);
     const openingId = currentConversationId;
 
     hideMainViews();
-
     if (dmConversationView) dmConversationView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
-
-    if (dmContactName) {
-        dmContactName.textContent = member.displayName;
-    }
+    if (dmContactName) dmContactName.textContent = member.displayName;
 
     renderMembers();
     setMobileSidebar(false);
 
-    if (dmMessages) {
-        dmMessages.textContent = "Opening private conversation...";
-    }
+    if (dmMessages) dmMessages.textContent = "Opening private conversation...";
 
     try {
         const conversationRef = doc(db, "conversations", openingId);
@@ -631,10 +623,8 @@ async function openConversation(member) {
         }
     } catch (error) {
         console.error("Private conversation failed:", error);
-
         if (dmMessages) {
-            dmMessages.textContent =
-                "This private conversation could not be opened.";
+            dmMessages.textContent = "This private conversation could not be opened.";
         }
     }
 }
@@ -643,7 +633,6 @@ function loadDirectMessages() {
     if (!currentConversationId || !dmMessages) return;
 
     stopDirectMessages();
-
     const privateQuery = query(
         collection(db, "conversations", currentConversationId, "messages"),
         orderBy("timestamp", "asc"),
@@ -658,9 +647,7 @@ function loadDirectMessages() {
             if (snapshot.empty) {
                 const empty = document.createElement("p");
                 empty.className = "dm-empty";
-                empty.textContent =
-                    "This is the beginning of your conversation.";
-
+                empty.textContent = "This is the beginning of your conversation.";
                 dmMessages.appendChild(empty);
                 return;
             }
@@ -676,12 +663,7 @@ function loadDirectMessages() {
 
                 const author = document.createElement("strong");
                 author.textContent = `${data.username || "Member"}: `;
-
-                message.append(
-                    author,
-                    document.createTextNode(data.text || "")
-                );
-
+                message.append(author, document.createTextNode(data.text || ""));
                 dmMessages.appendChild(message);
             });
 
@@ -701,9 +683,7 @@ async function sendDirectMessage() {
         !selectedMember ||
         !dmMessageInput ||
         !dmSendButton
-    ) {
-        return;
-    }
+    ) return;
 
     const text = dmMessageInput.value.trim();
     if (!text) return;
@@ -725,7 +705,6 @@ async function sendDirectMessage() {
         dmMessageInput.focus();
     } catch (error) {
         console.error("Private message send failed:", error);
-
         if (dmStatus) {
             dmStatus.textContent = "Your message could not be sent.";
             dmStatus.classList.add("error");
@@ -740,16 +719,14 @@ dmMessageForm?.addEventListener("submit", (event) => {
     void sendDirectMessage();
 });
 
-// --------------------------------------------------
-// CREATE SERVER MODAL
-// --------------------------------------------------
+// ==================================================
+// CREATE SERVER MODAL AND SERVER CREATION
+// ==================================================
 
 function openServerModal() {
     if (!serverModal) return;
-
     serverModal.hidden = false;
     document.body.classList.add("modal-open");
-
     requestAnimationFrame(() => serverNameInput?.focus());
 }
 
@@ -758,12 +735,9 @@ function closeServerModal() {
 
     serverModal.hidden = true;
     document.body.classList.remove("modal-open");
-
     createServerForm?.reset();
 
-    if (serverCreateStatus) {
-        serverCreateStatus.textContent = "";
-    }
+    if (serverCreateStatus) serverCreateStatus.textContent = "";
 }
 
 createServerButton?.addEventListener("click", openServerModal);
@@ -771,23 +745,25 @@ closeServerModalButton?.addEventListener("click", closeServerModal);
 cancelServerCreation?.addEventListener("click", closeServerModal);
 
 serverModal?.addEventListener("click", (event) => {
-    if (event.target === serverModal) {
-        closeServerModal();
-    }
+    if (event.target === serverModal) closeServerModal();
 });
 
-// --------------------------------------------------
-// SERVER CREATION
-// --------------------------------------------------
+function hasCreatedServerName(name) {
+    const wantedName = normalizeServerName(name);
+    if (!createdServers || !wantedName) return false;
+
+    return [...createdServers.querySelectorAll(".created-server")].some(
+        (button) => normalizeServerName(button.title) === wantedName
+    );
+}
 
 createServerForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if (!currentUser || !serverNameInput || !serverVisibilityInput) {
-        return;
-    }
+    if (!currentUser || !serverNameInput || !serverVisibilityInput) return;
 
     const name = serverNameInput.value.trim();
+    const normalizedName = normalizeServerName(name);
 
     if (name.length < 2 || name.length > 40) {
         if (serverCreateStatus) {
@@ -797,10 +773,29 @@ createServerForm?.addEventListener("submit", async (event) => {
         return;
     }
 
+    if (normalizedName === "vip-lounge") {
+        if (serverCreateStatus) {
+            serverCreateStatus.textContent =
+                "VIP-LOUNGE is the default community and already exists.";
+        }
+        return;
+    }
+
+    if (hasCreatedServerName(name)) {
+        if (serverCreateStatus) {
+            serverCreateStatus.textContent =
+                "A server with that name is already shown in your sidebar.";
+        }
+        return;
+    }
+
+    const createButton = document.getElementById("confirmCreateServer");
+    if (createButton) createButton.disabled = true;
+
     try {
         const serverRef = await addDoc(collection(db, "servers"), {
             name,
-            nameLower: name.toLowerCase(),
+            nameLower: normalizedName,
             visibility: serverVisibilityInput.value,
             ownerUid: currentUser.uid,
             memberUids: [currentUser.uid],
@@ -817,25 +812,27 @@ createServerForm?.addEventListener("submit", async (event) => {
         };
 
         if (createdServers) {
-            createdServers.appendChild(makeServerIcon(server));
+            server.button = makeServerIcon(server);
+            createdServers.appendChild(server.button);
         }
 
         openServer(server);
     } catch (error) {
         console.error("Server creation failed:", error);
-
         if (serverCreateStatus) {
             serverCreateStatus.textContent =
                 error.code === "permission-denied"
                     ? "Firebase rejected this. Check the servers Firestore rule."
                     : "The server could not be created.";
         }
+    } finally {
+        if (createButton) createButton.disabled = false;
     }
 });
 
-// --------------------------------------------------
-// OPEN A CREATED SERVER
-// --------------------------------------------------
+// ==================================================
+// OPEN, SELECT, AND DELETE CREATED SERVERS
+// ==================================================
 
 function openServer(server) {
     if (!server?.id) return;
@@ -853,14 +850,8 @@ function openServer(server) {
 
     if (serverView) serverView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
-
-    if (serverViewName) {
-        serverViewName.textContent = server.name;
-    }
-
-    if (serverWelcomeName) {
-        serverWelcomeName.textContent = server.name;
-    }
+    if (serverViewName) serverViewName.textContent = server.name;
+    if (serverWelcomeName) serverWelcomeName.textContent = server.name;
 
     if (serverViewVisibility) {
         serverViewVisibility.textContent =
@@ -871,22 +862,13 @@ function openServer(server) {
 
     document.querySelectorAll(".server-icon").forEach((icon) => {
         icon.classList.remove("selected");
+        icon.setAttribute("aria-pressed", "false");
     });
-
-    mainServerButton?.classList.remove("selected");
-    mainServerButton?.setAttribute("aria-pressed", "false");
 
     server.button?.classList.add("selected");
     server.button?.setAttribute("aria-pressed", "true");
-
     setMobileSidebar(false);
 }
-
-// --------------------------------------------------
-// SERVER RIGHT-CLICK MENU
-// --------------------------------------------------
-
-let serverContextMenu = null;
 
 function closeServerContextMenu() {
     serverContextMenu?.remove();
@@ -898,9 +880,7 @@ function showServerContextMenu(event, server) {
         !server?.id ||
         !currentUser ||
         server.ownerUid !== currentUser.uid
-    ) {
-        return;
-    }
+    ) return;
 
     event.preventDefault();
     closeServerContextMenu();
@@ -921,49 +901,30 @@ function showServerContextMenu(event, server) {
     });
 
     menu.appendChild(deleteButton);
-
-    menu.style.left = `${Math.max(
-        8,
-        Math.min(event.clientX, window.innerWidth - 180)
-    )}px`;
-
-    menu.style.top = `${Math.max(
-        8,
-        Math.min(event.clientY, window.innerHeight - 55)
-    )}px`;
+    menu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - 180))}px`;
+    menu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - 55))}px`;
 
     document.body.appendChild(menu);
     serverContextMenu = menu;
 
-    document.addEventListener("click", closeServerContextMenu, {
-        once: true
-    });
+    document.addEventListener("click", closeServerContextMenu, { once: true });
 }
-
-// --------------------------------------------------
-// DELETE A CREATED SERVER
-// --------------------------------------------------
 
 async function deleteServer(server) {
     if (
         !server?.id ||
         !currentUser ||
         server.ownerUid !== currentUser.uid
-    ) {
-        return;
-    }
+    ) return;
 
     try {
         await deleteDoc(doc(db, "servers", server.id));
-
         server.button?.remove();
 
         if (activeCreatedServerId === server.id) {
             activeCreatedServerId = null;
-
             stopPublicMessages();
             stopDirectMessages();
-
             showLoungeSidebar();
             showEmptyView();
 
@@ -977,7 +938,6 @@ async function deleteServer(server) {
         }
     } catch (error) {
         console.error("Server deletion failed:", error);
-
         alert(
             error.code === "permission-denied"
                 ? "Firebase denied deletion. Check the server owner delete rule."
@@ -986,26 +946,19 @@ async function deleteServer(server) {
     }
 }
 
-// --------------------------------------------------
-// CREATE SERVER SIDEBAR ICONS
-// --------------------------------------------------
-
 function makeServerIcon(server) {
     const icon = document.createElement("button");
-
     icon.type = "button";
     icon.className = "server-icon created-server";
     icon.title = server.name;
+    icon.dataset.serverId = server.id;
     icon.setAttribute("aria-label", `Open ${server.name}`);
     icon.setAttribute("aria-pressed", "false");
     icon.textContent = server.name.trim().charAt(0).toUpperCase();
 
     server.button = icon;
 
-    icon.addEventListener("click", () => {
-        openServer(server);
-    });
-
+    icon.addEventListener("click", () => openServer(server));
     icon.addEventListener("contextmenu", (event) => {
         showServerContextMenu(event, server);
     });
@@ -1013,11 +966,8 @@ function makeServerIcon(server) {
     return icon;
 }
 
-// --------------------------------------------------
-// LOAD SAVED SERVERS FROM FIRESTORE
-// --------------------------------------------------
-
-
+// Load saved servers, but render only one icon for each normalized name.
+// This changes only the sidebar display; it does not delete Firestore records.
 async function loadServerIcons() {
     if (!currentUser || !createdServers) return;
 
@@ -1029,24 +979,42 @@ async function loadServerIcons() {
             )
         );
 
+        const savedServers = snapshot.docs
+            .map((entry) => {
+                const data = entry.data();
+                return {
+                    id: entry.id,
+                    name: typeof data.name === "string" && data.name.trim()
+                        ? data.name.trim()
+                        : "Server",
+                    visibility: data.visibility || "private",
+                    ownerUid: data.ownerUid || "",
+                    createdAt: data.createdAt || null
+                };
+            })
+            // VIP-LOUNGE already has a permanent button in dashboard.html.
+            .filter((server) => normalizeServerName(server.name) !== "vip-lounge");
+
+        // Prefer a server owned by the signed-in member, then the older record.
+        // This selects the likely original when duplicate names already exist.
+        savedServers.sort((a, b) => {
+            const aOwned = a.ownerUid === currentUser.uid ? 1 : 0;
+            const bOwned = b.ownerUid === currentUser.uid ? 1 : 0;
+            if (aOwned !== bOwned) return bOwned - aOwned;
+
+            const aTime = a.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
+            const bTime = b.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
+            return aTime - bTime;
+        });
+
         createdServers.replaceChildren();
+        const displayedNames = new Set();
 
-        snapshot.forEach((entry) => {
-            const data = entry.data();
+        savedServers.forEach((server) => {
+            const normalizedName = normalizeServerName(server.name);
+            if (!normalizedName || displayedNames.has(normalizedName)) return;
 
-            const server = {
-                id: entry.id,
-                name: data.name || "Server",
-                visibility: data.visibility || "private",
-                ownerUid: data.ownerUid || ""
-            };
-
-            // VIP-LOUNGE already has its permanent sidebar button.
-            // Do not create a second icon for it.
-            if (server.name.trim().toLowerCase() === "vip-lounge") {
-                return;
-            }
-
+            displayedNames.add(normalizedName);
             createdServers.appendChild(makeServerIcon(server));
         });
     } catch (error) {
@@ -1054,19 +1022,17 @@ async function loadServerIcons() {
     }
 }
 
-
-// --------------------------------------------------
+// ==================================================
 // LOGOUT
-// --------------------------------------------------
+// ==================================================
 
 async function logoutUser() {
     try {
         setMobileSidebar(false);
         closeServerContextMenu();
-
         stopPublicMessages();
         stopDirectMessages();
-        stopMembersListener?.();
+        stopMemberListener();
 
         if (window.leaveVoiceChat) {
             await window.leaveVoiceChat();
@@ -1083,31 +1049,12 @@ async function logoutUser() {
 logoutButton?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-
     void logoutUser();
 });
 
-// --------------------------------------------------
-// PROFILE EDITOR
-// --------------------------------------------------
-
-const profileButton = document.getElementById("profileButton");
-const profileModal = document.getElementById("profileModal");
-const closeProfileModalButton = document.getElementById("closeProfileModal");
-const cancelProfileEdit = document.getElementById("cancelProfileEdit");
-const profileForm = document.getElementById("profileForm");
-const profileDisplayName = document.getElementById("profileDisplayName");
-const profileStatus = document.getElementById("profileStatus");
-const profilePreviewImage = document.getElementById("profilePreviewImage");
-const myProfilePicture = document.getElementById("myProfilePicture");
-const profileUploadInput = document.getElementById("profileUploadInput");
-const profileCrop = document.getElementById("profileCrop");
-const cropImage = document.getElementById("cropImage");
-const cropZoom = document.getElementById("cropZoom");
-
-const profileChoiceButtons = [
-    ...document.querySelectorAll(".profile-choice")
-];
+// ==================================================
+// PROFILE AVATARS AND PROFILE EDITOR
+// ==================================================
 
 const AVATAR_STYLES = {
     diamond: {
@@ -1142,33 +1089,18 @@ const AVATAR_STYLES = {
     }
 };
 
-let currentAvatar = "diamond";
-let uploadedPicture = "";
-let rawPicture = "";
-
-let cropScale = 1;
-let cropX = 0;
-let cropY = 0;
-
-let dragging = false;
-let dragStartX = 0;
-let dragStartY = 0;
-
 function avatarStyleFor(key) {
     return AVATAR_STYLES[key] || AVATAR_STYLES.diamond;
 }
 
-// Apply the saved avatar or uploaded picture to the sidebar and editor.
 function applyAvatar(key) {
     currentAvatar = AVATAR_STYLES[key] ? key : "diamond";
-
     const style = avatarStyleFor(currentAvatar);
 
     if (uploadedPicture) {
         if (myProfilePicture) {
             myProfilePicture.style.background = "transparent";
-            myProfilePicture.style.backgroundImage =
-                `url("${uploadedPicture}")`;
+            myProfilePicture.style.backgroundImage = `url("${uploadedPicture}")`;
             myProfilePicture.style.backgroundSize = "cover";
             myProfilePicture.style.backgroundPosition = "center";
             myProfilePicture.style.color = "transparent";
@@ -1186,7 +1118,6 @@ function applyAvatar(key) {
         profileChoiceButtons.forEach((button) => {
             button.classList.remove("selected");
         });
-
         return;
     }
 
@@ -1214,7 +1145,6 @@ function applyAvatar(key) {
     });
 }
 
-// Load the profile, including the saved picture, from Firestore.
 async function loadProfile() {
     if (!currentUser) return;
 
@@ -1223,23 +1153,13 @@ async function loadProfile() {
         const data = snapshot.exists() ? snapshot.data() : {};
 
         if (typeof data.displayName === "string" && data.displayName) {
-            if (profileName) {
-                profileName.textContent = data.displayName;
-            }
-
+            if (profileName) profileName.textContent = data.displayName;
             const currentName = currentUserElement?.querySelector("span");
-
-            if (currentName) {
-                currentName.textContent = data.displayName;
-            }
+            if (currentName) currentName.textContent = data.displayName;
         }
 
-        uploadedPicture =
-            typeof data.picture === "string" ? data.picture : "";
-
-        applyAvatar(
-            typeof data.avatar === "string" ? data.avatar : "diamond"
-        );
+        uploadedPicture = typeof data.picture === "string" ? data.picture : "";
+        applyAvatar(typeof data.avatar === "string" ? data.avatar : "diamond");
     } catch (error) {
         console.warn("Profile could not be read:", error);
         uploadedPicture = "";
@@ -1251,8 +1171,7 @@ function openProfileModal() {
     if (!profileModal || !currentUser) return;
 
     if (profileDisplayName) {
-        profileDisplayName.value =
-            profileName?.textContent?.trim() || "Member";
+        profileDisplayName.value = profileName?.textContent?.trim() || "Member";
     }
 
     if (profileStatus) {
@@ -1261,20 +1180,12 @@ function openProfileModal() {
     }
 
     rawPicture = "";
-
-    if (profileCrop) {
-        profileCrop.hidden = true;
-    }
-
-    if (profileUploadInput) {
-        profileUploadInput.value = "";
-    }
+    if (profileCrop) profileCrop.hidden = true;
+    if (profileUploadInput) profileUploadInput.value = "";
 
     applyAvatar(currentAvatar);
-
     profileModal.hidden = false;
     document.body.classList.add("modal-open");
-
     requestAnimationFrame(() => profileDisplayName?.focus());
 }
 
@@ -1283,22 +1194,14 @@ function closeProfileModal() {
 
     profileModal.hidden = true;
     document.body.classList.remove("modal-open");
-
-    if (profileStatus) {
-        profileStatus.textContent = "";
-    }
-
+    if (profileStatus) profileStatus.textContent = "";
     rawPicture = "";
-
-    if (profileCrop) {
-        profileCrop.hidden = true;
-    }
+    if (profileCrop) profileCrop.hidden = true;
 }
 
 profileButton?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-
     openProfileModal();
 });
 
@@ -1306,18 +1209,15 @@ closeProfileModalButton?.addEventListener("click", closeProfileModal);
 cancelProfileEdit?.addEventListener("click", closeProfileModal);
 
 profileModal?.addEventListener("click", (event) => {
-    if (event.target === profileModal) {
-        closeProfileModal();
-    }
+    if (event.target === profileModal) closeProfileModal();
 });
 
-// --------------------------------------------------
-// PROFILE IMAGE CROPPING
-// --------------------------------------------------
+// ==================================================
+// PROFILE IMAGE CROPPING AND UPLOAD
+// ==================================================
 
 function applyCropTransform() {
     if (!cropImage) return;
-
     cropImage.style.transformOrigin = "center center";
     cropImage.style.transform =
         `translate(${cropX}px, ${cropY}px) scale(${cropScale})`;
@@ -1328,22 +1228,17 @@ cropZoom?.addEventListener("input", () => {
     applyCropTransform();
 });
 
-// Drag the image to position it inside the crop frame.
 cropImage?.addEventListener("pointerdown", (event) => {
     dragging = true;
-
     dragStartX = event.clientX - cropX;
     dragStartY = event.clientY - cropY;
-
     cropImage.setPointerCapture(event.pointerId);
 });
 
 cropImage?.addEventListener("pointermove", (event) => {
     if (!dragging) return;
-
     cropX = event.clientX - dragStartX;
     cropY = event.clientY - dragStartY;
-
     applyCropTransform();
 });
 
@@ -1353,7 +1248,6 @@ cropImage?.addEventListener("pointermove", (event) => {
     });
 });
 
-// Create the final cropped, compressed profile picture.
 function renderCroppedPicture() {
     return new Promise((resolve, reject) => {
         if (!rawPicture) {
@@ -1366,30 +1260,24 @@ function renderCroppedPicture() {
         image.onload = () => {
             const SIZE = 192;
             const FRAME = 160;
-
             const canvas = document.createElement("canvas");
             canvas.width = SIZE;
             canvas.height = SIZE;
 
             const ctx = canvas.getContext("2d");
-
             if (!ctx) {
                 reject(new Error("Could not create the image crop."));
                 return;
             }
 
             const ratio = SIZE / FRAME;
-
             const baseScale = Math.max(
                 FRAME / image.width,
                 FRAME / image.height
             );
-
             const scale = baseScale * cropScale * ratio;
-
             const drawW = image.width * scale;
             const drawH = image.height * scale;
-
             const dx = SIZE / 2 - drawW / 2 + cropX * ratio;
             const dy = SIZE / 2 - drawH / 2 + cropY * ratio;
 
@@ -1410,31 +1298,18 @@ function renderCroppedPicture() {
     });
 }
 
-// Selecting a preset avatar clears the uploaded picture.
 profileChoiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
         uploadedPicture = "";
         rawPicture = "";
-
-        if (profileUploadInput) {
-            profileUploadInput.value = "";
-        }
-
-        if (profileCrop) {
-            profileCrop.hidden = true;
-        }
-
+        if (profileUploadInput) profileUploadInput.value = "";
+        if (profileCrop) profileCrop.hidden = true;
         applyAvatar(button.dataset.avatar);
     });
 });
 
-// --------------------------------------------------
-// CHOOSE A PROFILE PICTURE
-// --------------------------------------------------
-
 profileUploadInput?.addEventListener("change", () => {
     const file = profileUploadInput.files?.[0];
-
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
@@ -1442,19 +1317,15 @@ profileUploadInput?.addEventListener("change", () => {
             profileStatus.textContent = "Choose an image file.";
             profileStatus.className = "error";
         }
-
         profileUploadInput.value = "";
         return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
         if (profileStatus) {
-            profileStatus.textContent =
-                "Please choose an image smaller than 5 MB.";
-
+            profileStatus.textContent = "Please choose an image smaller than 5 MB.";
             profileStatus.className = "error";
         }
-
         profileUploadInput.value = "";
         return;
     }
@@ -1463,30 +1334,22 @@ profileUploadInput?.addEventListener("change", () => {
 
     reader.onload = () => {
         rawPicture = String(reader.result || "");
-
         cropScale = 1;
         cropX = 0;
         cropY = 0;
 
-        if (profileCrop) {
-            profileCrop.hidden = false;
-        }
-
-        if (cropZoom) {
-            cropZoom.value = "100";
-        }
+        if (profileCrop) profileCrop.hidden = false;
+        if (cropZoom) cropZoom.value = "100";
 
         if (cropImage) {
             cropImage.src = rawPicture;
             cropImage.style.transformOrigin = "center center";
-            cropImage.style.transform =
-                "translate(0px, 0px) scale(1)";
+            cropImage.style.transform = "translate(0px, 0px) scale(1)";
         }
 
         if (profileStatus) {
             profileStatus.textContent =
                 "Drag the image to position it. Adjust the zoom, then save.";
-
             profileStatus.className = "success";
         }
     };
@@ -1501,43 +1364,33 @@ profileUploadInput?.addEventListener("change", () => {
     reader.readAsDataURL(file);
 });
 
-// --------------------------------------------------
+// ==================================================
 // SAVE PROFILE
-// --------------------------------------------------
+// ==================================================
 
 profileForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-
     if (!currentUser) return;
 
-    const nextName = (profileDisplayName?.value || "")
-        .trim()
-        .slice(0, 30);
+    const nextName = (profileDisplayName?.value || "").trim().slice(0, 30);
 
     if (nextName.length < 2) {
         if (profileStatus) {
-            profileStatus.textContent =
-                "Display names need at least 2 characters.";
-
+            profileStatus.textContent = "Display names need at least 2 characters.";
             profileStatus.className = "error";
         }
         return;
     }
 
     const saveButton = document.getElementById("saveProfileButton");
-
-    if (saveButton) {
-        saveButton.disabled = true;
-    }
+    if (saveButton) saveButton.disabled = true;
 
     try {
         if (rawPicture) {
             const croppedPicture = await renderCroppedPicture();
-
             if (!croppedPicture) {
                 throw new Error("The selected picture could not be cropped.");
             }
-
             uploadedPicture = croppedPicture;
         }
 
@@ -1559,17 +1412,9 @@ profileForm?.addEventListener("submit", async (event) => {
             { merge: true }
         );
 
-        // Update the visible name and avatar immediately.
-        if (profileName) {
-            profileName.textContent = nextName;
-        }
-
+        if (profileName) profileName.textContent = nextName;
         const currentName = currentUserElement?.querySelector("span");
-
-        if (currentName) {
-            currentName.textContent = nextName;
-        }
-
+        if (currentName) currentName.textContent = nextName;
         applyAvatar(currentAvatar);
 
         if (profileStatus) {
@@ -1580,26 +1425,21 @@ profileForm?.addEventListener("submit", async (event) => {
         window.setTimeout(closeProfileModal, 700);
     } catch (error) {
         console.error("Profile save failed:", error);
-
         if (profileStatus) {
             profileStatus.textContent =
                 error.code === "permission-denied"
                     ? "Firestore rejected the profile update. Check your users rules."
-                    : error.message ||
-                        "Your profile could not be saved.";
-
+                    : error.message || "Your profile could not be saved.";
             profileStatus.className = "error";
         }
     } finally {
-        if (saveButton) {
-            saveButton.disabled = false;
-        }
+        if (saveButton) saveButton.disabled = false;
     }
 });
 
-// --------------------------------------------------
+// ==================================================
 // KEYBOARD SHORTCUTS AND CLEANUP
-// --------------------------------------------------
+// ==================================================
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -1612,15 +1452,13 @@ document.addEventListener("keydown", (event) => {
 
 window.logout = logoutUser;
 window.sendMessage = sendMessage;
-
 window.clearChat = () => {
     alert("Shared lounge messages cannot be cleared here.");
 };
 
 window.addEventListener("pagehide", () => {
     closeServerContextMenu();
-
     stopPublicMessages();
     stopDirectMessages();
-    stopMembersListener?.();
+    stopMemberListener();
 });
