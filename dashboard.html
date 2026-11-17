@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,1144 +17,961 @@
     <link rel="stylesheet" href="branding-polish.css?v=9">
     <link rel="stylesheet" href="dm.css?v=2">
 </head>
-
-
 <body>
-<div class="dashboard">
+    <div class="dashboard">
 
-    <!-- MOBILE DRAWER + SERVER RAIL -->
-    <div class="mobile-sidebar" id="mobileSidebar">
+        <!-- MOBILE DRAWER + SERVER RAIL -->
+        <div class="mobile-sidebar" id="mobileSidebar">
 
-        <aside class="servers" aria-label="Servers and direct messages">
+            <aside class="servers" aria-label="Servers and direct messages">
 
-            <!-- DIRECT MESSAGES -->
-            <button
-                class="server-icon dm-home selected"
-                id="dmHomeButton"
-                type="button"
-                title="Direct Messages"
-                aria-label="Open Direct Messages"
-                aria-pressed="true">
-                <img src="diamond.gif" alt="Diamond Lounge Direct Messages">
-            </button>
+                <!-- DIRECT MESSAGES -->
+                <button
+                    class="server-icon dm-home selected"
+                    id="dmHomeButton"
+                    type="button"
+                    title="Direct Messages"
+                    aria-label="Open Direct Messages"
+                    aria-pressed="true">
+                    <img src="diamond.gif" alt="Diamond Lounge Direct Messages">
+                </button>
 
-            <div class="server-divider"></div>
+                <div class="server-divider"></div>
 
-            <!-- DEFAULT COMMUNITY SERVER -->
-            <button
-                class="server-icon selected"
-                id="mainServerButton"
-                type="button"
-                title="VIP-LOUNGE"
-                aria-label="Open VIP-LOUNGE"
-                aria-pressed="false">
-                <img src="diamond.gif" alt="" class="rail-gem">
-            </button>
+                <!-- DEFAULT COMMUNITY SERVER -->
+                <button
+                    class="server-icon selected"
+                    id="mainServerButton"
+                    type="button"
+                    title="VIP-LOUNGE"
+                    aria-label="Open VIP-LOUNGE"
+                    aria-pressed="false">
+                    <img src="diamond.gif" alt="" class="rail-gem">
+                </button>
 
-            <div id="createdServers" class="created-servers"></div>
+                <div id="createdServers" class="created-servers"></div>
 
-            <!-- CREATE SERVER -->
-            <button
-                class="server-icon add-server"
-                id="createServerButton"
-                type="button"
-                title="Create a server"
-                aria-label="Create a server">
-                ＋
-            </button>
+                <!-- CREATE SERVER -->
+                <button
+                    class="server-icon add-server"
+                    id="createServerButton"
+                    type="button"
+                    title="Create a server"
+                    aria-label="Create a server">
+                    ＋
+                </button>
 
-        </aside>
+            </aside>
 
-        <!-- CHANNEL / DM SIDEBAR -->
-        <aside class="channels" id="channelsSidebar">
+            <!-- CHANNEL / DM SIDEBAR -->
+            <aside class="channels" id="channelsSidebar">
 
-            <!-- MAIN COMMUNITY -->
-            <section id="loungeSidebar">
+                <!-- MAIN COMMUNITY -->
+                <section id="loungeSidebar">
 
-                <div class="workspace-heading">
-                    <span class="eyebrow">MAIN COMMUNITY</span>
+                    <div class="workspace-heading">
+                        <span class="eyebrow">MAIN COMMUNITY</span>
 
-                    <div class="workspace-title">
-                        <img src="diamond.gif" alt="" class="workspace-gem">
-                        <h1>VIP-LOUNGE</h1>
+                        <div class="workspace-title">
+                            <img src="diamond.gif" alt="" class="workspace-gem">
+                            <h1>VIP-LOUNGE</h1>
+                        </div>
+
+                        <span class="online-label"><i></i> Lounge is open</span>
                     </div>
 
-                    <span class="online-label"><i></i> Lounge is open</span>
+                    <!-- TEXT CHANNELS -->
+                    <h3 class="section-heading">TEXT CHANNELS</h3>
+
+                    <ul class="text-channels">
+                        <li>
+                            <button class="text-channel" type="button" data-channel="general">
+                                <span class="channel-symbol">#</span>
+                                <span>general</span>
+                            </button>
+                        </li>
+
+                        <li>
+                            <button class="text-channel" type="button" data-channel="announcements">
+                                <span class="channel-symbol">#</span>
+                                <span>announcements</span>
+                            </button>
+                        </li>
+
+                        <li>
+                            <button class="text-channel" type="button" data-channel="streaming">
+                                <span class="channel-symbol">#</span>
+                                <span>streaming</span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- VOICE CHANNELS -->
+                    <h3 class="section-heading voice-title">VOICE LOUNGES</h3>
+
+                    <ul class="voice-channel-list">
+
+                        <!-- GENERAL VOICE -->
+                        <li class="voice-row">
+
+                            <div class="voice-row-head">
+                                <button
+                                    class="voice-channel"
+                                    type="button"
+                                    data-voice-name="General Voice"
+                                    aria-expanded="false">
+                                    <span class="voice-channel-icon">🔊</span>
+                                    <span>General Voice</span>
+                                </button>
+
+                                <div class="voice-join-slot" hidden>
+                                    <span class="voice-count" data-voice-count="General Voice">0</span>
+
+                                    <button
+                                        class="voice-join-button glass-button"
+                                        id="joinVoiceButton"
+                                        type="button">
+                                        Join
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- SHARED VOICE CONTROLS -->
+                            <section
+                                class="voice-panel"
+                                id="voicePanel"
+                                aria-label="Voice channel controls"
+                                hidden>
+
+                                <p
+                                    class="voice-panel-status"
+                                    id="voiceStatus"
+                                    role="status"
+                                    aria-live="polite">
+                                    Select a voice lounge
+                                </p>
+
+                                <!-- LEAVE VOICE -->
+                                <div class="voice-leave-row" id="voiceLeaveRow" hidden>
+                                    <button
+                                        type="button"
+                                        class="voice-control danger"
+                                        id="leaveVoiceButton"
+                                        disabled
+                                        aria-pressed="false">
+                                        <span class="voice-control-icon">✕</span>
+                                        <span class="voice-control-label">Leave</span>
+                                    </button>
+                                </div>
+
+                                <!-- MUTE / CAMERA / SCREEN -->
+                                <div class="voice-controls" id="voiceControls" hidden>
+
+                                    <button
+                                        type="button"
+                                        class="voice-control"
+                                        id="muteToggleBtn"
+                                        disabled
+                                        aria-pressed="false">
+                                        <span class="voice-control-icon">🎙️</span>
+                                        <span class="voice-control-label">Mute</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="voice-control"
+                                        id="cameraToggleBtn"
+                                        disabled
+                                        aria-pressed="false">
+                                        <span class="voice-control-icon">📷</span>
+                                        <span class="voice-control-label">Camera</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="voice-control"
+                                        id="screenToggleBtn"
+                                        disabled
+                                        aria-pressed="false">
+                                        <span class="voice-control-icon">🖥️</span>
+                                        <span class="voice-control-label">Screen</span>
+                                    </button>
+
+                                </div>
+
+                                <!-- PARTICIPANTS -->
+                                <div class="voice-participant-info">
+                                    <span>
+                                        Participants:
+                                        <strong id="voiceParticipantCount">0</strong>
+                                    </span>
+
+                                    <ul id="voiceParticipants" class="voice-participant-list">
+                                        <li class="voice-empty">No one is here yet.</li>
+                                    </ul>
+                                </div>
+
+                                <!-- REMOTE AUDIO -->
+                                <div id="remoteAudioContainer" class="remote-audio-container"></div>
+
+                            </section>
+                        </li>
+
+                        <!-- MUSIC LOUNGE -->
+                        <li class="voice-row">
+
+                            <div class="voice-row-head">
+                                <button
+                                    class="voice-channel"
+                                    type="button"
+                                    data-voice-name="Music Lounge"
+                                    aria-expanded="false">
+                                    <span class="voice-channel-icon">♫</span>
+                                    <span>Music Lounge</span>
+                                </button>
+
+                                <div class="voice-join-slot" hidden>
+                                    <span class="voice-count" data-voice-count="Music Lounge">0</span>
+                                </div>
+                            </div>
+
+                        </li>
+
+                        <!-- AFK -->
+                        <li class="voice-row">
+                            <div class="voice-row-head">
+                                <button
+                                    class="voice-channel"
+                                    type="button"
+                                    data-voice-name="AFK"
+                                    aria-expanded="false">
+                                    <span class="voice-channel-icon">🌙</span>
+                                    <span>AFK</span>
+                                </button>
+
+                                <div class="voice-join-slot" hidden>
+                                    <span class="voice-count" data-voice-count="AFK">0</span>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </section>
+
+                <!-- DIRECT MESSAGE SIDEBAR -->
+                <section id="dmSidebar" hidden>
+
+                    <div class="dm-sidebar-heading">
+                        <span class="eyebrow">YOUR CONNECTIONS</span>
+                        <h2>Messages</h2>
+                        <p>Private conversations, just between you.</p>
+                    </div>
+
+                    <div class="dm-search-wrap">
+                        <input
+                            id="memberSearch"
+                            type="search"
+                            placeholder="Find a member..."
+                            autocomplete="off"
+                            aria-label="Search members">
+                    </div>
+
+                    <h3 class="section-heading">DIRECT MESSAGES</h3>
+
+                    <ul
+                        id="dmMemberList"
+                        class="dm-member-list"
+                        aria-live="polite">
+                        <li class="dm-empty">Loading members...</li>
+                    </ul>
+
+                </section>
+
+                <!-- PROFILE CARD -->
+                <div class="profile-card">
+
+                    <button
+                        class="profile-avatar"
+                        id="logoutButton"
+                        type="button"
+                        aria-label="Log out"
+                        title="Log out">
+                        <img src="diamond.gif" alt="">
+                    </button>
+
+                    <button
+                        class="profile-identity"
+                        id="profileButton"
+                        type="button"
+                        title="Edit your profile"
+                        aria-label="Edit your profile">
+
+                        <span class="profile-copy">
+                            <span class="profile-name" id="profileName">Member</span>
+                            <span class="profile-status">Available</span>
+                        </span>
+
+                        <span
+                            class="member-picture"
+                            id="myProfilePicture"
+                            aria-hidden="true">
+                        </span>
+
+                    </button>
+
                 </div>
 
-                <!-- TEXT CHANNELS -->
-                <h3 class="section-heading">TEXT CHANNELS</h3>
+            </aside>
 
-               <ul class="text-channels">
-    <li>
-        <button class="text-channel" type="button" data-channel="general">
-            <span class="channel-symbol">#</span>
-            <span>general</span>
+        </div>
+
+        <!-- MOBILE DRAWER BACKDROP -->
+        <button
+            class="mobile-sidebar-backdrop"
+            id="mobileSidebarBackdrop"
+            type="button"
+            aria-label="Close navigation menu"
+            tabindex="-1">
         </button>
-    </li>
 
-    <li>
-        <button class="text-channel" type="button" data-channel="announcements">
-            <span class="channel-symbol">#</span>
-            <span>announcements</span>
-        </button>
-    </li>
+        <!-- MAIN CONTENT -->
+        <main class="chat-area">
 
-    <li>
-        <button class="text-channel" type="button" data-channel="streaming">
-            <span class="channel-symbol">#</span>
-            <span>streaming</span>
-        </button>
-    </li>
-</ul>
-                <!-- VOICE CHANNELS -->
-                <h3 class="section-heading voice-title">VOICE LOUNGES</h3>
+            <!-- EMPTY / NOTHING SELECTED -->
+            <section id="emptyView" class="empty-channel-view">
 
-                <ul class="voice-channel-list">
+                <button
+                    class="mobile-menu-button empty-menu-button"
+                    type="button"
+                    aria-label="Open navigation menu"
+                    aria-controls="mobileSidebar"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
 
-                    <!-- GENERAL VOICE -->
-                    <li class="voice-row">
+                <div class="glass-stage">
+                    <div class="glass-blob glass-blob-a"></div>
+                    <div class="glass-blob glass-blob-b"></div>
+                    <div class="glass-blob glass-blob-c"></div>
 
-                        <div class="voice-row-head">
-                            <button
-                                class="voice-channel"
-                                type="button"
-                                data-voice-name="General Voice"
-                                aria-expanded="false">
-                                <span class="voice-channel-icon">🔊</span>
-                                <span>General Voice</span>
-                            </button>
-
-                            <div class="voice-join-slot" hidden>
-                                <span class="voice-count" data-voice-count="General Voice">
-                                    0
-                                </span>
-
-                                <button
-                                    class="voice-join-button glass-button"
-                                    id="joinVoiceButton"
-                                    type="button">
-                                    Join
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- SHARED VOICE CONTROLS -->
-                        <section
-                            class="voice-panel"
-                            id="voicePanel"
-                            aria-label="Voice channel controls"
-                            hidden>
-
-                            <p
-                                class="voice-panel-status"
-                                id="voiceStatus"
-                                role="status"
-                                aria-live="polite">
-                                Select a voice lounge
-                            </p>
-
-                            <!-- LEAVE VOICE -->
-                            <div class="voice-leave-row" id="voiceLeaveRow" hidden>
-                                <button
-                                    type="button"
-                                    class="voice-control danger"
-                                    id="leaveVoiceButton"
-                                    disabled
-                                    aria-pressed="false">
-                                    <span class="voice-control-icon">✕</span>
-                                    <span class="voice-control-label">Leave</span>
-                                </button>
-                            </div>
-
-                            <!-- MUTE / CAMERA / SCREEN -->
-                            <div class="voice-controls" id="voiceControls" hidden>
-
-                                <button
-                                    type="button"
-                                    class="voice-control"
-                                    id="muteToggleBtn"
-                                    disabled
-                                    aria-pressed="false">
-                                    <span class="voice-control-icon">🎙️</span>
-                                    <span class="voice-control-label">Mute</span>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    class="voice-control"
-                                    id="cameraToggleBtn"
-                                    disabled
-                                    aria-pressed="false">
-                                    <span class="voice-control-icon">📷</span>
-                                    <span class="voice-control-label">Camera</span>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    class="voice-control"
-                                    id="screenToggleBtn"
-                                    disabled
-                                    aria-pressed="false">
-                                    <span class="voice-control-icon">🖥️</span>
-                                    <span class="voice-control-label">Screen</span>
-                                </button>
-
-                            </div>
-
-                            <!-- PARTICIPANTS -->
-                            <div class="voice-participant-info">
-                                <span>
-                                    Participants:
-                                    <strong id="voiceParticipantCount">0</strong>
-                                </span>
-
-                                <ul
-                                    id="voiceParticipants"
-                                    class="voice-participant-list">
-                                    <li class="voice-empty">No one is here yet.</li>
-                                </ul>
-                            </div>
-
-                           <!-- REMOTE AUDIO -->
-<div id="remoteAudioContainer" class="remote-audio-container"></div>
-
-                        </section>
-                    </li>
-
-                    <!-- MUSIC LOUNGE -->
-                    <li class="voice-row">
-
-                        <div class="voice-row-head">
-                            <button
-                                class="voice-channel"
-                                type="button"
-                                data-voice-name="Music Lounge"
-                                aria-expanded="false">
-                                <span class="voice-channel-icon">♫</span>
-                                <span>Music Lounge</span>
-                            </button>
-
-                            <div class="voice-join-slot" hidden>
-                                <span class="voice-count" data-voice-count="Music Lounge">
-                                    0
-                                </span>
-                            </div>
-                        </div>
-
-                    </li>
-
-                    <!-- AFK -->
-                    <li class="voice-row">
-
-                        <div class="voice-row-head">
-                            <button
-                                class="voice-channel"
-                                type="button"
-                                data-voice-name="AFK"
-                                aria-expanded="false">
-                                <span class="voice-channel-icon">🌙</span>
-                                <span>AFK</span>
-                            </button>
-
-                            <div class="voice-join-slot" hidden>
-                                <span class="voice-count" data-voice-count="AFK">
-                                    0
-                                </span>
-                            </div>
-                        </div>
-
-                    </li>
-
-                </ul>
+                    <div class="liquid-glass-panel">
+                        <img src="diamond.gif" alt="" class="glass-gem">
+                        <span class="eyebrow">DIAMOND LOUNGE</span>
+                        <h2>Select a channel</h2>
+                        <p>Choose a text channel, voice lounge, or direct message.</p>
+                    </div>
+                </div>
 
             </section>
 
-            <!-- DIRECT MESSAGE SIDEBAR -->
-            <section id="dmSidebar" hidden>
+            <!-- MAIN SCREEN-SHARE VIEW -->
+            <section id="screenShareStage" class="screen-share-stage" hidden>
+                <div id="remoteScreenContainer" class="remote-screen-container"></div>
+            </section>
 
-                <div class="dm-sidebar-heading">
-                    <span class="eyebrow">YOUR CONNECTIONS</span>
-                    <h2>Messages</h2>
-                    <p>Private conversations, just between you.</p>
-                </div>
+            <!-- PUBLIC CHAT -->
+            <section id="loungeView" class="lounge-view">
 
-                <div class="dm-search-wrap">
+                <header class="chat-header">
+
+                    <div class="chat-header-main">
+
+                        <button
+                            class="mobile-menu-button"
+                            type="button"
+                            aria-label="Open navigation menu"
+                            aria-controls="mobileSidebar"
+                            aria-expanded="false">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+
+                        <div>
+                            <div class="channel-title">
+                                # <span id="activeChannelName">general</span>
+                            </div>
+
+                            <div
+                                class="sub-header"
+                                id="activeChannelDescription">
+                                A little space to share what matters.
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <span class="secure-label">✦ VIP-LOUNGE</span>
+
+                </header>
+
+                <div class="messages" id="messages" aria-live="polite"></div>
+
+                <form class="message-box glass-surface" id="messageForm">
+
                     <input
-                        id="memberSearch"
-                        type="search"
-                        placeholder="Find a member..."
-                        autocomplete="off"
-                        aria-label="Search members">
-                </div>
+                        type="text"
+                        id="messageInput"
+                        placeholder="Write something to the lounge…"
+                        maxlength="2000"
+                        autocomplete="off">
 
-                <h3 class="section-heading">DIRECT MESSAGES</h3>
+                    <button type="submit" id="sendMessageButton">Send</button>
 
-                <ul
-                    id="dmMemberList"
-                    class="dm-member-list"
+                </form>
+
+                <div
+                    id="uploadStatus"
+                    class="upload-status"
+                    role="status"
                     aria-live="polite">
-                    <li class="dm-empty">Loading members...</li>
-                </ul>
+                </div>
 
             </section>
 
-            <!-- PROFILE CARD -->
-            <div class="profile-card">
+            <!-- MEMBER-CREATED SERVER VIEW -->
+            <section id="serverView" class="server-view" hidden>
 
-                <button
-                    class="profile-avatar"
-                    id="logoutButton"
-                    type="button"
-                    aria-label="Log out"
-                    title="Log out">
-                    <img src="diamond.gif" alt="">
-                </button>
+                <header class="chat-header">
 
-                <button
-                    class="profile-identity"
-                    id="profileButton"
-                    type="button"
-                    title="Edit your profile"
-                    aria-label="Edit your profile">
+                    <div class="chat-header-main">
 
-                    <span class="profile-copy">
-                        <span class="profile-name" id="profileName">Member</span>
-                        <span class="profile-status">Available</span>
-                    </span>
+                        <button
+                            class="mobile-menu-button"
+                            type="button"
+                            aria-label="Open navigation menu"
+                            aria-controls="mobileSidebar"
+                            aria-expanded="false">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
 
-                    <span
-                        class="member-picture"
-                        id="myProfilePicture"
-                        aria-hidden="true">
-                    </span>
+                        <div>
+                            <div class="channel-title">
+                                <span id="serverViewName">Server</span>
+                            </div>
 
-                </button>
+                            <div
+                                class="sub-header"
+                                id="serverViewVisibility">
+                                Your community
+                            </div>
+                        </div>
 
+                    </div>
+
+                    <span class="secure-label">✦ YOUR SERVER</span>
+
+                </header>
+
+                <div class="server-empty">
+                    <img src="diamond.gif" alt="" class="server-empty-gem">
+                    <span class="eyebrow">SERVER CREATED</span>
+                    <h2 id="serverWelcomeName">Your server</h2>
+                    <p>You own this space. It is saved and will be here next time you sign in.</p>
+                    <p class="server-empty-note">
+                        Its own text and voice channels can be added next.
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- DIRECT MESSAGES HOME -->
+            <section id="dmHomeView" class="dm-home-view" hidden>
+
+                <header class="chat-header">
+
+                    <div class="chat-header-main">
+
+                        <button
+                            class="mobile-menu-button"
+                            type="button"
+                            aria-label="Open navigation menu"
+                            aria-controls="mobileSidebar"
+                            aria-expanded="false">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+
+                        <div>
+                            <div class="channel-title">
+                                ✦ <span>Direct Messages</span>
+                            </div>
+
+                            <div class="sub-header">
+                                Your private corner of Diamond Lounge.
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <span class="secure-label">✦ PRIVATE</span>
+
+                </header>
+
+                <div class="dm-welcome">
+                    <img src="diamond.gif" alt="" class="dm-welcome-gem">
+
+                    <span class="eyebrow">DIAMOND LOUNGE</span>
+
+                    <h2>Your conversations.<br><em>Your people.</em></h2>
+
+                    <p>
+                        Choose a member from the left to start a private conversation.
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- PRIVATE CONVERSATION -->
+            <section id="dmConversationView" class="dm-conversation-view" hidden>
+
+                <header class="chat-header dm-conversation-header">
+
+                    <div class="chat-header-main dm-contact-heading">
+
+                        <button
+                            class="mobile-menu-button"
+                            type="button"
+                            aria-label="Open navigation menu"
+                            aria-controls="mobileSidebar"
+                            aria-expanded="false">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+
+                        <div>
+                            <div class="channel-title">
+                                ✦ <span id="dmContactName">Member</span>
+                            </div>
+
+                            <div class="sub-header">Private conversation</div>
+                        </div>
+
+                    </div>
+
+                    <span class="secure-label">✦ PRIVATE</span>
+
+                </header>
+
+                <div
+                    id="dmMessages"
+                    class="messages dm-messages"
+                    aria-live="polite">
+                    <p class="dm-empty">Your conversation starts here.</p>
+                </div>
+
+                <form
+                    class="message-box dm-message-box glass-surface"
+                    id="dmMessageForm">
+
+                    <input
+                        type="text"
+                        id="dmMessageInput"
+                        placeholder="Message privately..."
+                        maxlength="2000"
+                        autocomplete="off">
+
+                    <button type="submit" id="dmSendButton">Send</button>
+
+                </form>
+
+                <div
+                    id="dmStatus"
+                    class="upload-status"
+                    role="status"
+                    aria-live="polite">
+                </div>
+
+            </section>
+
+            <!-- MAIN SCREEN SHARE VIEWER -->
+            <div id="remoteVideoGrid" class="remote-video-grid"></div>
+
+        </main>
+
+        <!-- COMMUNITY SIDEBAR -->
+        <aside class="members" id="communitySidebar">
+
+            <div class="members-section">
+                <h3 class="section-heading">COMMUNITY</h3>
+
+                <ul id="onlineMembers" class="online-list">
+                    <li id="currentUser">
+                        <i></i>
+                        <span>Member</span>
+                        <em>you</em>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="members-footer">
+                DIAMOND LOUNGE <span>✦</span>
             </div>
 
         </aside>
 
     </div>
 
-    <!-- MOBILE DRAWER BACKDROP -->
-    <button
-        class="mobile-sidebar-backdrop"
-        id="mobileSidebarBackdrop"
-        type="button"
-        aria-label="Close navigation menu"
-        tabindex="-1">
-    </button>
+    <!-- CREATE SERVER WINDOW -->
+    <div class="server-modal-backdrop" id="serverModal" hidden>
 
-    <!-- MAIN CONTENT -->
-    <main class="chat-area">
-
-        <!-- EMPTY / NOTHING SELECTED -->
-        <section id="emptyView" class="empty-channel-view">
+        <section
+            class="server-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="serverModalTitle">
 
             <button
-                class="mobile-menu-button empty-menu-button"
                 type="button"
-                aria-label="Open navigation menu"
-                aria-controls="mobileSidebar"
-                aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
+                class="server-modal-close"
+                id="closeServerModal"
+                aria-label="Close">
+                ×
             </button>
 
-            <div class="glass-stage">
-                <div class="glass-blob glass-blob-a"></div>
-                <div class="glass-blob glass-blob-b"></div>
-                <div class="glass-blob glass-blob-c"></div>
+            <div class="server-modal-icon">✦</div>
 
-                <div class="liquid-glass-panel">
-                    <img src="diamond.gif" alt="" class="glass-gem">
-                    <span class="eyebrow">DIAMOND LOUNGE</span>
-                    <h2>Select a channel</h2>
-                    <p>Choose a text channel, voice lounge, or direct message.</p>
-            </div>
-        </section>
+            <span class="eyebrow">BUILD YOUR COMMUNITY</span>
 
-        <!-- MAIN SCREEN-SHARE VIEW -->
-        <section id="screenShareStage" class="screen-share-stage" hidden>
-            <div id="remoteScreenContainer" class="remote-screen-container"></div>
-        </section>
+            <h2 id="serverModalTitle">Create a server</h2>
 
-        <!-- PUBLIC CHAT -->
-        <section id="loungeView" class="lounge-view">
+            <p class="server-modal-description">
+                Give your community a name and decide who can join.
+            </p>
 
-            <header class="chat-header">
+            <form id="createServerForm">
 
-                <div class="chat-header-main">
+                <label for="serverName">SERVER NAME</label>
+
+                <input
+                    id="serverName"
+                    name="serverName"
+                    type="text"
+                    maxlength="40"
+                    minlength="2"
+                    placeholder="My new community"
+                    autocomplete="off"
+                    required>
+
+                <label for="serverVisibility">WHO CAN JOIN?</label>
+
+                <select
+                    id="serverVisibility"
+                    name="serverVisibility"
+                    required>
+                    <option value="private">Private — Invite only</option>
+                    <option value="public">Public — Anyone can join</option>
+                </select>
+
+                <p class="server-privacy-note">
+                    You can change your server's visibility later.
+                </p>
+
+                <div class="server-modal-actions">
 
                     <button
-                        class="mobile-menu-button"
                         type="button"
-                        aria-label="Open navigation menu"
-                        aria-controls="mobileSidebar"
-                        aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        class="server-cancel-button"
+                        id="cancelServerCreation">
+                        Cancel
                     </button>
 
-                    <div>
-                        <div class="channel-title">
-                            # <span id="activeChannelName">general</span>
-                        </div>
-
-                        <div
-                            class="sub-header"
-                            id="activeChannelDescription">
-                            A little space to share what matters.
-                        </div>
-                    </div>
+                    <button
+                        type="submit"
+                        class="server-create-button"
+                        id="confirmCreateServer">
+                        Create server
+                    </button>
 
                 </div>
 
-                <span class="secure-label">✦ VIP-LOUNGE</span>
-
-            </header>
-
-            <div class="messages" id="messages" aria-live="polite"></div>
-
-            <form class="message-box glass-surface" id="messageForm">
-
-                <input
-                    type="text"
-                    id="messageInput"
-                    placeholder="Write something to the lounge…"
-                    maxlength="2000"
-                    autocomplete="off">
-
-                <button type="submit" id="sendMessageButton">Send</button>
+                <div
+                    id="serverCreateStatus"
+                    role="status"
+                    aria-live="polite">
+                </div>
 
             </form>
 
-            <div
-                id="uploadStatus"
-                class="upload-status"
-                role="status"
-                aria-live="polite">
-            </div>
-
         </section>
 
-        <!-- MEMBER-CREATED SERVER VIEW -->
-        <section id="serverView" class="server-view" hidden>
+    </div>
 
-            <header class="chat-header">
+    <!-- EDIT PROFILE WINDOW -->
+    <div class="server-modal-backdrop" id="profileModal" hidden>
 
-                <div class="chat-header-main">
+        <section
+            class="server-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="profileModalTitle">
 
-                    <button
-                        class="mobile-menu-button"
-                        type="button"
-                        aria-label="Open navigation menu"
-                        aria-controls="mobileSidebar"
-                        aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
+            <button
+                type="button"
+                class="server-modal-close"
+                id="closeProfileModal"
+                aria-label="Close">
+                ×
+            </button>
 
-                    <div>
-                        <div class="channel-title">
-                            <span id="serverViewName">Server</span>
-                        </div>
+            <div class="server-modal-icon">✦</div>
 
-                        <div
-                            class="sub-header"
-                            id="serverViewVisibility">
-                            Your community
-                        </div>
-                    </div>
+            <span class="eyebrow">YOUR PRESENCE</span>
 
-                </div>
+            <h2 id="profileModalTitle">Edit your profile</h2>
 
-                <span class="secure-label">✦ YOUR SERVER</span>
+            <p class="server-modal-description">
+                Choose the picture your community sees beside your name.
+            </p>
 
-            </header>
+            <div class="profile-modal-preview">
+                <img
+                    id="profilePreviewImage"
+                    src="diamond.gif"
+                    alt="Your current profile picture">
+            </div>
 
-            <div class="server-empty">
-                <img src="diamond.gif" alt="" class="server-empty-gem">
-                <span class="eyebrow">SERVER CREATED</span>
-                <h2 id="serverWelcomeName">Your server</h2>
-                <p>You own this space. It is saved and will be here next time you sign in.</p>
-                <p class="server-empty-note">
-                    Its own text and voice channels can be added next.
+            <label class="profile-upload glass-button" for="profileUploadInput">
+                Upload your own picture
+            </label>
+
+            <input
+                type="file"
+                id="profileUploadInput"
+                accept="image/*"
+                hidden>
+
+            <p class="profile-upload-note">
+                PNG or JPG, under 400 KB. Your picture is saved with your profile.
+            </p>
+
+            <div class="profile-crop" id="profileCrop" hidden>
+
+                <p class="profile-crop-hint">
+                    Zoom with the slider, then drag the picture to position it.
                 </p>
-            </div>
 
-        </section>
-
-        <!-- DIRECT MESSAGES HOME -->
-        <section id="dmHomeView" class="dm-home-view" hidden>
-
-            <header class="chat-header">
-
-                <div class="chat-header-main">
-
-                    <button
-                        class="mobile-menu-button"
-                        type="button"
-                        aria-label="Open navigation menu"
-                        aria-controls="mobileSidebar"
-                        aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-
-                    <div>
-                        <div class="channel-title">
-                            ✦ <span>Direct Messages</span>
-                        </div>
-
-                        <div class="sub-header">
-                            Your private corner of Diamond Lounge.
-                        </div>
-                    </div>
-
+                <div class="crop-frame">
+                    <img id="cropImage" alt="Crop preview">
                 </div>
 
-                <span class="secure-label">✦ PRIVATE</span>
-
-            </header>
-
-            <div class="dm-welcome">
-                <img src="diamond.gif" alt="" class="dm-welcome-gem">
-
-                <span class="eyebrow">DIAMOND LOUNGE</span>
-
-                <h2>Your conversations.<br><em>Your people.</em></h2>
-
-                <p>
-                    Choose a member from the left to start a private conversation.
-                </p>
-            </div>
-
-        </section>
-
-        <!-- PRIVATE CONVERSATION -->
-        <section id="dmConversationView" class="dm-conversation-view" hidden>
-
-            <header class="chat-header dm-conversation-header">
-
-                <div class="chat-header-main dm-contact-heading">
-
-                    <button
-                        class="mobile-menu-button"
-                        type="button"
-                        aria-label="Open navigation menu"
-                        aria-controls="mobileSidebar"
-                        aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-
-                    <div>
-                        <div class="channel-title">
-                            ✦ <span id="dmContactName">Member</span>
-                        </div>
-
-                        <div class="sub-header">Private conversation</div>
-                    </div>
-
-                </div>
-
-                <span class="secure-label">✦ PRIVATE</span>
-
-            </header>
-
-            <div
-                id="dmMessages"
-                class="messages dm-messages"
-                aria-live="polite">
-                <p class="dm-empty">Your conversation starts here.</p>
-            </div>
-
-            <form
-                class="message-box dm-message-box glass-surface"
-                id="dmMessageForm">
+                <label class="crop-zoom-label" for="cropZoom">Zoom</label>
 
                 <input
-                    type="text"
-                    id="dmMessageInput"
-                    placeholder="Message privately..."
-                    maxlength="2000"
-                    autocomplete="off">
+                    type="range"
+                    id="cropZoom"
+                    min="100"
+                    max="300"
+                    value="100">
 
-                <button type="submit" id="dmSendButton">Send</button>
+            </div>
+
+            <div class="profile-modal-choices">
+                <button type="button" class="profile-choice" data-avatar="diamond">Diamond</button>
+                <button type="button" class="profile-choice" data-avatar="gold">Gold</button>
+                <button type="button" class="profile-choice" data-avatar="silver">Silver</button>
+                <button type="button" class="profile-choice" data-avatar="emerald">Emerald</button>
+                <button type="button" class="profile-choice" data-avatar="ruby">Ruby</button>
+                <button type="button" class="profile-choice" data-avatar="royal">Royal</button>
+            </div>
+
+            <form id="profileForm">
+
+                <label for="profileDisplayName">DISPLAY NAME</label>
+
+                <input
+                    id="profileDisplayName"
+                    type="text"
+                    maxlength="30"
+                    placeholder="Your name"
+                    autocomplete="off"
+                    required>
+
+                <div class="server-modal-actions">
+
+                    <button
+                        type="button"
+                        class="server-cancel-button"
+                        id="cancelProfileEdit">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="server-create-button"
+                        id="saveProfileButton">
+                        Save profile
+                    </button>
+
+                </div>
+
+                <div
+                    id="profileStatus"
+                    role="status"
+                    aria-live="polite">
+                </div>
 
             </form>
 
-            <div
-                id="dmStatus"
-                class="upload-status"
-                role="status"
-                aria-live="polite">
-            </div>
-
         </section>
 
-            <!-- MAIN SCREEN SHARE VIEWER -->
-        <div id="remoteVideoGrid" class="remote-video-grid"></div>
-    </main>
-
-    <!-- COMMUNITY SIDEBAR -->
-    <aside class="members" id="communitySidebar">
-
-        <div class="members-section">
-            <h3 class="section-heading">COMMUNITY</h3>
-
-            <ul id="onlineMembers" class="online-list">
-                <li id="currentUser">
-                    <i></i>
-                    <span>Member</span>
-                    <em>you</em>
-                </li>
-            </ul>
-        </div>
-
-        <div class="members-footer">
-            DIAMOND LOUNGE <span>✦</span>
-        </div>
-
-    </aside>
-
-</div>
-
-<!-- CREATE SERVER WINDOW -->
-<div class="server-modal-backdrop" id="serverModal" hidden>
-
-    <section
-        class="server-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="serverModalTitle">
-
-        <button
-            type="button"
-            class="server-modal-close"
-            id="closeServerModal"
-            aria-label="Close">
-            ×
-        </button>
-
-        <div class="server-modal-icon">✦</div>
-
-        <span class="eyebrow">BUILD YOUR COMMUNITY</span>
-
-        <h2 id="serverModalTitle">Create a server</h2>
-
-        <p class="server-modal-description">
-            Give your community a name and decide who can join.
-        </p>
-
-        <form id="createServerForm">
-
-            <label for="serverName">SERVER NAME</label>
-
-            <input
-                id="serverName"
-                name="serverName"
-                type="text"
-                maxlength="40"
-                minlength="2"
-                placeholder="My new community"
-                autocomplete="off"
-                required>
-
-            <label for="serverVisibility">WHO CAN JOIN?</label>
-
-            <select
-                id="serverVisibility"
-                name="serverVisibility"
-                required>
-                <option value="private">Private — Invite only</option>
-                <option value="public">Public — Anyone can join</option>
-            </select>
-
-            <p class="server-privacy-note">
-                You can change your server's visibility later.
-            </p>
-
-            <div class="server-modal-actions">
-
-                <button
-                    type="button"
-                    class="server-cancel-button"
-                    id="cancelServerCreation">
-                    Cancel
-                </button>
-
-                <button
-                    type="submit"
-                    class="server-create-button"
-                    id="confirmCreateServer">
-                    Create server
-                </button>
-
-            </div>
-
-            <div
-                id="serverCreateStatus"
-                role="status"
-                aria-live="polite">
-            </div>
-
-        </form>
-
-    </section>
-
-</div>
-
-<!-- EDIT PROFILE WINDOW -->
-<div class="server-modal-backdrop" id="profileModal" hidden>
-
-    <section
-        class="server-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="profileModalTitle">
-
-        <button
-            type="button"
-            class="server-modal-close"
-            id="closeProfileModal"
-            aria-label="Close">
-            ×
-        </button>
-
-        <div class="server-modal-icon">✦</div>
-
-        <span class="eyebrow">YOUR PRESENCE</span>
-
-        <h2 id="profileModalTitle">Edit your profile</h2>
-
-        <p class="server-modal-description">
-            Choose the picture your community sees beside your name.
-        </p>
-
-        <div class="profile-modal-preview">
-            <img
-                id="profilePreviewImage"
-                src="diamond.gif"
-                alt="Your current profile picture">
-        </div>
-
-        <label class="profile-upload glass-button" for="profileUploadInput">
-            Upload your own picture
-        </label>
-
-        <input
-            type="file"
-            id="profileUploadInput"
-            accept="image/*"
-            hidden>
-
-        <p class="profile-upload-note">
-            PNG or JPG, under 400 KB. Your picture is saved with your profile.
-        </p>
-
-        <div class="profile-crop" id="profileCrop" hidden>
-
-            <p class="profile-crop-hint">
-                Zoom with the slider, then drag the picture to position it.
-            </p>
-
-            <div class="crop-frame">
-                <img id="cropImage" alt="Crop preview">
-            </div>
-
-            <label class="crop-zoom-label" for="cropZoom">Zoom</label>
-
-            <input
-                type="range"
-                id="cropZoom"
-                min="100"
-                max="300"
-                value="100">
-
-        </div>
-
-        <div class="profile-modal-choices">
-            <button type="button" class="profile-choice" data-avatar="diamond">Diamond</button>
-            <button type="button" class="profile-choice" data-avatar="gold">Gold</button>
-            <button type="button" class="profile-choice" data-avatar="silver">Silver</button>
-            <button type="button" class="profile-choice" data-avatar="emerald">Emerald</button>
-            <button type="button" class="profile-choice" data-avatar="ruby">Ruby</button>
-            <button type="button" class="profile-choice" data-avatar="royal">Royal</button>
-        </div>
-
-        <form id="profileForm">
-
-            <label for="profileDisplayName">DISPLAY NAME</label>
-
-            <input
-                id="profileDisplayName"
-                type="text"
-                maxlength="30"
-                placeholder="Your name"
-                autocomplete="off"
-                required>
-
-            <div class="server-modal-actions">
-
-                <button
-                    type="button"
-                    class="server-cancel-button"
-                    id="cancelProfileEdit">
-                    Cancel
-                </button>
-
-                <button
-                    type="submit"
-                    class="server-create-button"
-                    id="saveProfileButton">
-                    Save profile
-                </button>
-
-            </div>
-
-            <div
-                id="profileStatus"
-                role="status"
-                aria-live="polite">
-            </div>
-
-        </form>
-
-    </section>
-
-</div>
-
-
-<!-- APPLICATION SCRIPTS -->
-<script type="module" src="script.js?v=22"></script>
-<script type="module" src="voice.js?v=22"></script>
-
-<!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
-<script type="module">
-import { parseGIF, decompressFrames } from
-    "https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm";
-
-(async () => {
-    try {
-        const response = await fetch("diamond-favicon.gif?v=3");
-        if (!response.ok) {
-            throw new Error("Could not load diamond-favicon.gif");
-        }
-
-        const buffer = await response.arrayBuffer();
-        const gif = parseGIF(buffer);
-        const frames = decompressFrames(gif, true);
-
-        if (!frames.length) return;
-
-        const sourceCanvas = document.createElement("canvas");
-        sourceCanvas.width = gif.lsd.width;
-        sourceCanvas.height = gif.lsd.height;
-
-        const sourceCtx = sourceCanvas.getContext("2d");
-
-        const iconCanvas = document.createElement("canvas");
-        iconCanvas.width = 32;
-        iconCanvas.height = 32;
-
-        const iconCtx = iconCanvas.getContext("2d");
-
-        const favicon = document.querySelector('link[rel="icon"]');
-        if (!favicon) return;
-
-        let index = 0;
-        let previousFrame = null;
-        let restoreCanvas = null;
-
-        function playFrame() {
-            if (previousFrame) {
-                if (previousFrame.disposalType === 2) {
-                    const d = previousFrame.dims;
-                    sourceCtx.clearRect(
-                        d.left, d.top, d.width, d.height
-                    );
-                } else if (
-                    previousFrame.disposalType === 3 &&
-                    restoreCanvas
-                ) {
-                    sourceCtx.putImageData(restoreCanvas, 0, 0);
+    </div>
+
+    <!-- APPLICATION SCRIPTS: load each application module once -->
+    <script type="module" src="script.js?v=23"></script>
+    <script type="module" src="voice.js?v=23"></script>
+
+    <!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
+    <script type="module">
+        import { parseGIF, decompressFrames } from
+            "https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm";
+
+        (async () => {
+            try {
+                const response = await fetch("diamond-favicon.gif?v=3");
+                if (!response.ok) {
+                    throw new Error("Could not load diamond-favicon.gif");
                 }
-            }
 
-            const frame = frames[index];
+                const buffer = await response.arrayBuffer();
+                const gif = parseGIF(buffer);
+                const frames = decompressFrames(gif, true);
 
-            restoreCanvas =
-                frame.disposalType === 3
-                    ? sourceCtx.getImageData(
-                        0, 0,
-                        sourceCanvas.width,
-                        sourceCanvas.height
-                    )
-                    : null;
+                if (!frames.length) return;
 
-            const imageData = new ImageData(
-                frame.patch,
-                frame.dims.width,
-                frame.dims.height
-            );
+                const sourceCanvas = document.createElement("canvas");
+                sourceCanvas.width = gif.lsd.width;
+                sourceCanvas.height = gif.lsd.height;
 
-            sourceCtx.putImageData(
-                imageData,
-                frame.dims.left,
-                frame.dims.top
-            );
+                const sourceCtx = sourceCanvas.getContext("2d");
 
-            // Find the visible diamond, ignoring transparent padding.
-            const pixels = sourceCtx.getImageData(
-                0, 0,
-                sourceCanvas.width,
-                sourceCanvas.height
-            ).data;
+                const iconCanvas = document.createElement("canvas");
+                iconCanvas.width = 32;
+                iconCanvas.height = 32;
 
-            let minX = sourceCanvas.width;
-            let minY = sourceCanvas.height;
-            let maxX = -1;
-            let maxY = -1;
+                const iconCtx = iconCanvas.getContext("2d");
 
-            for (let y = 0; y < sourceCanvas.height; y++) {
-                for (let x = 0; x < sourceCanvas.width; x++) {
-                    const alpha =
-                        pixels[(y * sourceCanvas.width + x) * 4 + 3];
+                const favicon = document.querySelector('link[rel="icon"]');
+                if (!favicon) return;
 
-                    if (alpha > 10) {
-                        minX = Math.min(minX, x);
-                        minY = Math.min(minY, y);
-                        maxX = Math.max(maxX, x);
-                        maxY = Math.max(maxY, y);
+                let index = 0;
+                let previousFrame = null;
+                let restoreCanvas = null;
+
+                function playFrame() {
+                    if (previousFrame) {
+                        if (previousFrame.disposalType === 2) {
+                            const d = previousFrame.dims;
+                            sourceCtx.clearRect(
+                                d.left, d.top, d.width, d.height
+                            );
+                        } else if (
+                            previousFrame.disposalType === 3 &&
+                            restoreCanvas
+                        ) {
+                            sourceCtx.putImageData(restoreCanvas, 0, 0);
+                        }
                     }
-                }
-            }
 
-            iconCtx.clearRect(0, 0, 32, 32);
+                    const frame = frames[index];
 
-            if (maxX >= minX && maxY >= minY) {
-                const cropWidth = maxX - minX + 1;
-                const cropHeight = maxY - minY + 1;
+                    restoreCanvas =
+                        frame.disposalType === 3
+                            ? sourceCtx.getImageData(
+                                0, 0,
+                                sourceCanvas.width,
+                                sourceCanvas.height
+                            )
+                            : null;
 
-                const scale = Math.min(
-                    32 / cropWidth,
-                    32 / cropHeight
-                );
-
-                const width = cropWidth * scale;
-                const height = cropHeight * scale;
-
-                iconCtx.drawImage(
-                    sourceCanvas,
-                    minX, minY, cropWidth, cropHeight,
-                    (32 - width) / 2,
-                    (32 - height) / 2,
-                    width, height
-                );
-            }
-
-            favicon.href = iconCanvas.toDataURL("image/png");
-
-            previousFrame = frame;
-            index = (index + 1) % frames.length;
-
-            setTimeout(
-                playFrame,
-                Math.max(frame.delay || 10, 30)
-            );
-        }
-
-        playFrame();
-
-    } catch (error) {
-        console.error(
-            "Diamond favicon animation failed:",
-            error
-        );
-    }
-})();
-</script>
-
-</body>
-</html>
-
-<!-- APPLICATION SCRIPTS -->
-<script type="module" src="script.js?v=22"></script>
-<script type="module" src="voice.js?v=22"></script>
-
-<!-- ANIMATED DIAMOND FAVICON -->
-<script type="module">
-import { parseGIF, decompressFrames } from
-    "https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm";
-
-(async () => {
-    try {
-        const response = await fetch("diamond-favicon.gif?v=3");
-        const buffer = await response.arrayBuffer();
-
-        const gif = parseGIF(buffer);
-        const frames = decompressFrames(gif, true);
-
-        const sourceCanvas = document.createElement("canvas");
-        sourceCanvas.width = gif.lsd.width;
-        sourceCanvas.height = gif.lsd.height;
-
-        const sourceCtx = sourceCanvas.getContext("2d");
-
-        const iconCanvas = document.createElement("canvas");
-        iconCanvas.width = 32;
-        iconCanvas.height = 32;
-
-        const iconCtx = iconCanvas.getContext("2d");
-
-        const favicon =
-            document.querySelector('link[rel="icon"]');
-
-        if (!favicon || !frames.length) return;
-
-        let index = 0;
-        let previousFrame = null;
-        let restoreCanvas = null;
-
-        function playFrame() {
-            if (previousFrame) {
-                if (previousFrame.disposalType === 2) {
-                    const d = previousFrame.dims;
-                    sourceCtx.clearRect(
-                        d.left, d.top, d.width, d.height
+                    const imageData = new ImageData(
+                        frame.patch,
+                        frame.dims.width,
+                        frame.dims.height
                     );
-                } else if (
-                    previousFrame.disposalType === 3 &&
-                    restoreCanvas
-                ) {
-                    sourceCtx.putImageData(restoreCanvas, 0, 0);
-                }
-            }
 
-            const frame = frames[index];
+                    sourceCtx.putImageData(
+                        imageData,
+                        frame.dims.left,
+                        frame.dims.top
+                    );
 
-            restoreCanvas =
-                frame.disposalType === 3
-                    ? sourceCtx.getImageData(
+                    // Find the visible diamond, ignoring transparent padding.
+                    const pixels = sourceCtx.getImageData(
                         0, 0,
                         sourceCanvas.width,
                         sourceCanvas.height
-                    )
-                    : null;
+                    ).data;
 
-            const imageData = new ImageData(
-                frame.patch,
-                frame.dims.width,
-                frame.dims.height
-            );
+                    let minX = sourceCanvas.width;
+                    let minY = sourceCanvas.height;
+                    let maxX = -1;
+                    let maxY = -1;
 
-            sourceCtx.putImageData(
-                imageData,
-                frame.dims.left,
-                frame.dims.top
-            );
+                    for (let y = 0; y < sourceCanvas.height; y++) {
+                        for (let x = 0; x < sourceCanvas.width; x++) {
+                            const alpha =
+                                pixels[(y * sourceCanvas.width + x) * 4 + 3];
 
-           iconCtx.clearRect(0, 0, 32, 32);
+                            if (alpha > 10) {
+                                minX = Math.min(minX, x);
+                                minY = Math.min(minY, y);
+                                maxX = Math.max(maxX, x);
+                                maxY = Math.max(maxY, y);
+                            }
+                        }
+                    }
 
-// Find the visible diamond, ignoring transparent padding.
-const pixels = sourceCtx.getImageData(
-    0, 0,
-    sourceCanvas.width,
-    sourceCanvas.height
-).data;
+                    iconCtx.clearRect(0, 0, 32, 32);
 
-let minX = sourceCanvas.width;
-let minY = sourceCanvas.height;
-let maxX = 0;
-let maxY = 0;
+                    if (maxX >= minX && maxY >= minY) {
+                        const cropWidth = maxX - minX + 1;
+                        const cropHeight = maxY - minY + 1;
 
-for (let y = 0; y < sourceCanvas.height; y++) {
-    for (let x = 0; x < sourceCanvas.width; x++) {
-        const alpha = pixels[(y * sourceCanvas.width + x) * 4 + 3];
+                        const scale = Math.min(
+                            32 / cropWidth,
+                            32 / cropHeight
+                        );
 
-        if (alpha > 10) {
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x);
-            maxY = Math.max(maxY, y);
-        }
-    }
-}
+                        const width = cropWidth * scale;
+                        const height = cropHeight * scale;
 
-if (maxX >= minX && maxY >= minY) {
-    const cropWidth = maxX - minX + 1;
-    const cropHeight = maxY - minY + 1;
+                        iconCtx.drawImage(
+                            sourceCanvas,
+                            minX, minY, cropWidth, cropHeight,
+                            (32 - width) / 2,
+                            (32 - height) / 2,
+                            width, height
+                        );
+                    }
 
-    const scale = Math.min(
-        32 / cropWidth,
-        32 / cropHeight
-    );
+                    favicon.href = iconCanvas.toDataURL("image/png");
 
-    const width = cropWidth * scale;
-    const height = cropHeight * scale;
+                    previousFrame = frame;
+                    index = (index + 1) % frames.length;
 
-    iconCtx.drawImage(
-        sourceCanvas,
-        minX, minY, cropWidth, cropHeight,
-        (32 - width) / 2,
-        (32 - height) / 2,
-        width, height
-    );
-}
+                    setTimeout(
+                        playFrame,
+                        Math.max(frame.delay || 10, 30)
+                    );
+                }
 
-            favicon.href = iconCanvas.toDataURL("image/png");
+                playFrame();
 
-            previousFrame = frame;
-            index = (index + 1) % frames.length;
-
-            setTimeout(
-                playFrame,
-                Math.max(frame.delay || 10, 30)
-            );
-        }
-
-        playFrame();
-
-    } catch (error) {
-        console.error("Diamond favicon animation failed:", error);
-    }
-})();
-</script>
-(() => {
-    const gif = new Image();
-    gif.src = "diamond-favicon.gif?v=2";
-
-    gif.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = 32;
-        canvas.height = 32;
-
-        const ctx = canvas.getContext("2d");
-        const favicon = document.querySelector('link[rel="icon"]');
-
-        if (!favicon) return;
-
-        const updateFavicon = () => {
-            ctx.clearRect(0, 0, 32, 32);
-            ctx.drawImage(gif, 0, 0, 32, 32);
-            favicon.href = canvas.toDataURL("image/png");
-        };
-
-        updateFavicon();
-        setInterval(updateFavicon, 100);
-    };
-})();
-</script>
-
-</body>
-
+            } catch (error) {
+                console.error(
+                    "Diamond favicon animation failed:",
+                    error
+                );
+            }
+        })();
+    </script>
 </body>
 </html>
