@@ -966,7 +966,8 @@ function makeServerIcon(server) {
     return icon;
 }
 
-// Load saved servers, but render only one icon for each normalized name.
+// Load saved servers while hiding the old THEAGENTS server.
+// VIP-LOUNGE remains available through its permanent diamond button.
 // This changes only the sidebar display; it does not delete Firestore records.
 async function loadServerIcons() {
     if (!currentUser || !createdServers) return;
@@ -992,26 +993,36 @@ async function loadServerIcons() {
                     createdAt: data.createdAt || null
                 };
             })
-            // VIP-LOUNGE already has a permanent button in dashboard.html.
-            .filter((server) => normalizeServerName(server.name) !== "vip-lounge");
+            // Hide the permanent default server and the old THEAGENTS server.
+            .filter((server) => {
+                const normalizedName = normalizeServerName(server.name);
+
+                return (
+                    normalizedName !== "vip-lounge" &&
+                    normalizedName !== normalizeServerName("💎THEAGENTS🤍")
+                );
+            });
 
         // Prefer a server owned by the signed-in member, then the older record.
-        // This selects the likely original when duplicate names already exist.
         savedServers.sort((a, b) => {
             const aOwned = a.ownerUid === currentUser.uid ? 1 : 0;
             const bOwned = b.ownerUid === currentUser.uid ? 1 : 0;
+
             if (aOwned !== bOwned) return bOwned - aOwned;
 
             const aTime = a.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
             const bTime = b.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
+
             return aTime - bTime;
         });
 
         createdServers.replaceChildren();
+
         const displayedNames = new Set();
 
         savedServers.forEach((server) => {
             const normalizedName = normalizeServerName(server.name);
+
             if (!normalizedName || displayedNames.has(normalizedName)) return;
 
             displayedNames.add(normalizedName);
