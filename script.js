@@ -1017,6 +1017,7 @@ function makeServerIcon(server) {
 // LOAD SAVED SERVERS FROM FIRESTORE
 // --------------------------------------------------
 
+
 async function loadServerIcons() {
     if (!currentUser || !createdServers) return;
 
@@ -1040,12 +1041,19 @@ async function loadServerIcons() {
                 ownerUid: data.ownerUid || ""
             };
 
+            // VIP-LOUNGE already has its permanent sidebar button.
+            // Do not create a second icon for it.
+            if (server.name.trim().toLowerCase() === "vip-lounge") {
+                return;
+            }
+
             createdServers.appendChild(makeServerIcon(server));
         });
     } catch (error) {
         console.warn("Saved servers could not be listed:", error);
     }
 }
+
 
 // --------------------------------------------------
 // LOGOUT
