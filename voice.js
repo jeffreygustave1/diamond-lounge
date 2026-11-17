@@ -61,6 +61,8 @@ const countElement = document.getElementById("voiceParticipantCount");
 
 const audioContainer = document.getElementById("remoteAudioContainer");
 const videoGrid = document.getElementById("remoteVideoGrid");
+const screenShareStage = document.getElementById("screenShareStage");
+const remoteScreenContainer = document.getElementById("remoteScreenContainer");
 
 /* ==========================================
    STATE
@@ -235,7 +237,13 @@ function renderParticipants() {
 ========================================== */
 
 function attachRemoteVideo(uid, label, stream, kind = "camera") {
-    if (!videoGrid || !stream) return;
+    if (!stream) return;
+
+    const destination = kind === "screen"
+        ? remoteScreenContainer
+        : videoGrid;
+
+    if (!destination) return;
 
     const tileId = `tile-${kind}-${uid}`;
 
@@ -258,19 +266,20 @@ function attachRemoteVideo(uid, label, stream, kind = "camera") {
             kind === "screen" ? "contain" : "cover";
 
         const caption = document.createElement("figcaption");
-
         caption.textContent =
             `${label} — ${kind === "screen" ? "Screen" : "Camera"}`;
 
         tile.append(video, caption);
-        videoGrid.appendChild(tile);
+        destination.appendChild(tile);
     }
 
     const video = tile.querySelector("video");
 
     if (video && video.srcObject !== stream) {
         video.srcObject = stream;
-        video.play().catch(() => {});
+        video.play().catch((error) => {
+            console.warn("Remote video playback blocked:", error);
+        });
     }
 }
 
@@ -405,18 +414,29 @@ function makePeer(person, callRef) {
                 `tile-${kind}-${person.uid}`
             );
 
-            event.track.onunmute = () => {
-                if (tile) tile.hidden = false;
-            };
+          event.track.onunmute = () => {
+    if (tile) tile.hidden = false;
 
-            event.track.onmute = () => {
-                if (tile) tile.hidden = true;
-            };
+    if (kind === "screen" && screenShareStage) {
+        screenShareStage.hidden = false;
+    }
+};
 
-            if (!event.track.muted && tile) {
-                tile.hidden = false;
-            }
+event.track.onmute = () => {
+    if (tile) tile.hidden = true;
 
+    if (kind === "screen" && screenShareStage) {
+        screenShareStage.hidden = true;
+    }
+};
+
+if (!event.track.muted && tile) {
+    tile.hidden = false;
+
+    if (kind === "screen" && screenShareStage) {
+        screenShareStage.hidden = false;
+    }
+}
             return;
         }
 
