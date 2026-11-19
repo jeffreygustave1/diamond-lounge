@@ -7,6 +7,7 @@ import {
 
 import {
     addDoc,
+    arrayUnion,
     collection,
     deleteDoc,
     doc,
@@ -374,6 +375,7 @@ onAuthStateChanged(auth, async (user) => {
 
     await loadProfile();
     await loadServerIcons();
+    await consumeServerInviteFromUrl();
 
     // Start with no server or channel selected.
     stopCreatedServerChannels();
@@ -408,6 +410,47 @@ onAuthStateChanged(auth, async (user) => {
     document.body.classList.remove("dm-mode");
     setMobileSidebar(false);
 });
+
+async function consumeServerInviteFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const serverId = params.get("serverInvite");
+    const inviteCode = params.get("invite");
+    if (!serverId || !inviteCode || !currentUser) return;
+    try {
+        const inviteRef = doc(db, "servers", serverId, "invites", inviteCode);
+        const inviteSnapshot = await getDoc(inviteRef);
+        if (!inviteSnapshot.exists()) {
+            alert("This server invite is invalid or has expired.");
+            return;
+        }
+        const serverRef = doc(db, "servers", serverId);
+        const serverSnapshot = await getDoc(serverRef);
+        if (!serverSnapshot.exists()) {
+            alert("The invited server no longer exists.");
+            return;
+        }
+        const serverData = serverSnapshot.data();
+        const memberUids = serverData.memberUids || [];
+        if (!memberUids.includes(currentUser.uid)) {
+            await updateDoc(serverRef, { memberUids: arrayUnion(currentUser.uid) });
+        }
+        await setDoc(doc(db, "servers", serverId, "members", currentUser.uid), {
+            uid: currentUser.uid,
+            displayName: currentUser.displayName || currentUser.email?.split("@")[0] || "Member",
+            joinedAt: serverData.memberUids?.includes(currentUser.uid) ? (serverData.createdAt || serverTimestamp()) : serverTimestamp()
+        }, { merge: true });
+        const url = new URL(window.location.href);
+        ["serverInvite", "invite", "inviteChannel"].forEach(key => url.searchParams.delete(key));
+        window.history.replaceState({}, "", url.toString());
+        await loadServerIcons();
+        alert("You joined " + (serverData.name || "the server") + "!");
+    } catch (error) {
+        console.error("Invite join flow failed:", error);
+        alert(error.code === "permission-denied"
+            ? "Firebase rules currently block joining this server. We'll update the rules in the final Firebase step."
+            : "Unable to join using this invite.");
+    }
+}
 
 async function ensureUserProfile() {
     if (!currentUser) return;
