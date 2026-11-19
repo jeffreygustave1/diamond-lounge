@@ -1863,7 +1863,7 @@ async function serverSettingsDialog() {
 async function serverMembersDialog() {
     if (!activeCreatedServerId) return;
     const serverId = activeCreatedServerId;
-    const canManageMembers = await currentServerHasPermission("manageMembers");
+    const canManageMembers = await currentServerHasPermission("manageMembers") || await currentServerHasPermission("manageRoles");
     const content = serverFeatureDialog("Server Members");
     content.textContent = "Loading members...";
     try {
