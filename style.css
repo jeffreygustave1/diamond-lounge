@@ -2921,3 +2921,291 @@ button {
 .dashboard:has(.created-server.selected) .channels {
     display: none !important;
 }
+
+
+/* ==========================================
+   DIAMOND LOUNGE — RESPONSIVE FIX
+   Discord-style 3-panel desktop
+   Full-width mobile content + navigation drawer
+========================================== */
+
+/* Keep desktop three-panel layout intact */
+.dashboard {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.mobile-sidebar {
+    flex-shrink: 0;
+}
+
+.chat-area {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 0;
+}
+
+/* Smaller screens: hide members panel and use navigation drawer */
+@media (max-width: 900px) {
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        height: 100dvh;
+        min-height: 0;
+    }
+
+    .dashboard {
+        display: flex;
+        position: relative;
+        width: 100%;
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Hide the third desktop panel */
+    .members {
+        display: none !important;
+    }
+
+    /* Main content fills the entire screen */
+    .chat-area {
+        display: flex;
+        flex: 1 1 100%;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Navigation becomes a sliding drawer */
+    .mobile-sidebar {
+        position: fixed;
+        z-index: 1002;
+        top: 0;
+        bottom: 0;
+        left: 0;
+
+        display: flex;
+        width: min(310px, 88vw);
+        max-width: 88vw;
+        height: 100dvh;
+
+        overflow: hidden;
+        background: #0c0d0f;
+        box-shadow: 18px 0 45px rgba(0,0,0,.45);
+
+        transform: translateX(-110%);
+        transition: transform .28s cubic-bezier(.22,.8,.25,1);
+        will-change: transform;
+    }
+
+    .dashboard.mobile-nav-open .mobile-sidebar {
+        transform: translateX(0);
+    }
+
+    /* Narrow server rail */
+    .servers {
+        width: 58px;
+        min-width: 58px;
+        max-width: 58px;
+        flex: none;
+
+        gap: 10px;
+        padding: 14px 0;
+        padding-top: max(14px, env(safe-area-inset-top));
+
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .server-icon {
+        width: 40px;
+        height: 40px;
+        flex: none;
+        border-radius: 13px;
+    }
+
+    /* Channel panel occupies the rest of the drawer */
+    .channels {
+        width: auto;
+        min-width: 0;
+        flex: 1 1 auto;
+
+        padding: 18px 10px;
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        border-right: 0;
+    }
+
+    /* Show hamburger navigation */
+    .mobile-menu-button {
+        display: flex !important;
+        flex: none;
+    }
+
+    /* Drawer backdrop */
+    .mobile-sidebar-backdrop {
+        display: block;
+        position: fixed;
+        z-index: 1001;
+        inset: 0;
+
+        width: 100%;
+        height: 100dvh;
+
+        padding: 0;
+        border: 0;
+        background: rgba(0,0,0,.58);
+
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        transition: opacity .25s ease, visibility .25s ease;
+    }
+
+    .dashboard.mobile-nav-open .mobile-sidebar-backdrop {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    /* Keep chat headers and messages inside screen bounds */
+    .chat-header {
+        min-width: 0;
+        padding: 12px 14px;
+        gap: 10px;
+    }
+
+    .chat-header-main {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .channel-title,
+    .sub-header {
+        overflow-wrap: anywhere;
+    }
+
+    .messages,
+    .dm-messages {
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .message-box {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .message-box input[type="text"] {
+        min-width: 0;
+        width: 0;
+        flex: 1;
+    }
+
+    .empty-channel-view,
+    .server-view,
+    .lounge-view,
+    .dm-view,
+    .dm-conversation-view {
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+    }
+}
+
+/* Small phone screens */
+@media (max-width: 600px) {
+
+    .mobile-sidebar {
+        width: min(280px, 88vw);
+        max-width: 88vw;
+    }
+
+    .servers {
+        width: 54px;
+        min-width: 54px;
+        max-width: 54px;
+    }
+
+    .server-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .chat-header {
+        padding: 10px 12px;
+    }
+
+    .messages,
+    .dm-messages {
+        margin: 10px 8px 0;
+        padding: 14px 10px;
+    }
+
+    .message-box.glass-surface {
+        margin: 8px 8px 8px !important;
+    }
+
+    .empty-channel-view {
+        padding: 12px;
+    }
+
+    .liquid-glass-panel {
+        padding: 30px 18px;
+    }
+}
+
+/* Landscape phone screens */
+@media (max-width: 900px) and (max-height: 500px) {
+
+    .mobile-sidebar {
+        height: 100dvh;
+    }
+
+    .channels {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .workspace-heading {
+        padding-bottom: 12px;
+        margin-bottom: 10px;
+    }
+
+    .workspace-heading h1 {
+        font-size: 18px;
+    }
+
+    .chat-header {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .empty-channel-view {
+        padding: 10px;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .mobile-sidebar,
+    .mobile-sidebar-backdrop {
+        transition: none !important;
+    }
+}
