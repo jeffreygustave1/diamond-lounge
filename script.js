@@ -2520,7 +2520,12 @@ async function loadServerIcons() {
             }
 
             displayedNames.add(normalizedName);
-            createdServers.appendChild(makeServerIcon(server));
+            const button = makeServerIcon(server);
+            if (activeCreatedServerId === server.id) {
+                button.classList.add("selected");
+                button.setAttribute("aria-pressed", "true");
+            }
+            createdServers.appendChild(button);
         });
     } catch (error) {
         console.warn("Saved servers could not be listed:", error);
