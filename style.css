@@ -2493,3 +2493,26 @@ button {
 @media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr}.created-server-feature-modal{padding:20px 16px}}
 
 .created-server-category-heading{display:flex;align-items:center;justify-content:space-between;margin:13px 8px 4px;color:#949ba4;font-size:11px;font-weight:700;letter-spacing:.03em;list-style:none}.created-server-category-heading button{border:0;background:transparent;color:#949ba4;cursor:pointer}
+
+/* Voice channel row action icons: Discord-style, hover reveal */
+#createdServerVoiceChannels .created-server-channel-item{position:relative;display:flex;align-items:center;min-height:32px;padding:0 4px;border-radius:5px;overflow:visible}
+#createdServerVoiceChannels .created-server-channel-button{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden}
+#createdServerVoiceChannels .created-server-channel-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.created-server-voice-row-actions{display:flex;align-items:center;gap:3px;opacity:0;visibility:hidden;position:absolute;right:7px;top:50%;transform:translateY(-50%);z-index:2}
+#createdServerVoiceChannels .created-server-channel-item:hover .created-server-voice-row-actions,#createdServerVoiceChannels .created-server-channel-item.selected .created-server-voice-row-actions,#createdServerVoiceChannels .created-server-channel-item:focus-within .created-server-voice-row-actions{opacity:1;visibility:visible}
+.created-server-voice-row-actions button{width:25px;height:25px;display:grid;place-items:center;padding:3px;border:0;border-radius:4px;background:transparent;color:#b5bac1;cursor:pointer}
+.created-server-voice-row-actions button:hover{background:#41434a;color:#fff}
+.created-server-voice-row-actions svg{width:17px;height:17px;fill:currentColor}
+.created-server-voice-row-actions svg path{fill:currentColor}
+.created-server-voice-row-actions button[aria-label="Open voice channel chat"] svg path{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round}
+.created-server-voice-row-actions button[aria-label="Invite to channel"] svg path{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.created-server-voice-row-actions button[aria-label="Voice channel settings"] svg path{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#createdServerVoiceChannels .created-server-channel-item:hover .created-server-channel-button,#createdServerVoiceChannels .created-server-channel-item.selected .created-server-channel-button{padding-right:82px!important}
+.created-server-voice-chat-content{min-height:350px}
+.created-server-voice-chat-log{max-height:55dvh;min-height:200px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:8px;background:#232428;border-radius:8px}
+.created-server-voice-chat-message{display:flex;flex-direction:column;gap:3px;color:#dbdee1;overflow-wrap:anywhere}
+.created-server-voice-chat-message strong{color:#f2f3f5}
+.created-server-voice-chat-form{display:flex;gap:8px}
+.created-server-voice-chat-form input{flex:1;min-width:0}
+.created-server-voice-chat-form button{align-self:stretch}
+@media(max-width:600px){.created-server-voice-row-actions{opacity:1;visibility:visible;right:3px}#createdServerVoiceChannels .created-server-channel-item .created-server-channel-button{padding-right:82px!important}}
