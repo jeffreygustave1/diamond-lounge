@@ -1531,7 +1531,55 @@ async async function serverMembersDialog() {
         content.textContent = "Members could not be loaded. Firebase permissions may need updating.";
     }
 }
-function serverEventsDialog(){const c=serverFeatureDialog("Server Events");c.append(sfNode("p","Event scheduling is not yet connected."));}
+async function serverEventsDialog() {
+    if (!activeCreatedServerId || !currentUser) return;
+    const serverId = activeCreatedServerId;
+    const content = serverFeatureDialog("Server Events");
+    content.append(sfNode("p", "Create and view community events."));
+    const title = document.createElement("input");
+    title.placeholder = "Event name";
+    title.maxLength = 80;
+    title.required = true;
+    const date = document.createElement("input");
+    date.type = "datetime-local";
+    const details = document.createElement("textarea");
+    details.placeholder = "Event details (optional)";
+    details.maxLength = 1000;
+    details.rows = 3;
+    const create = sfNode("button", "Create event");
+    create.className = "created-server-feature-action";
+    content.append(title, date, details, create);
+    const list = document.createElement("div");
+    list.style.display = "flex";
+    list.style.flexDirection = "column";
+    list.style.gap = "8px";
+    content.append(sfNode("h3", "Upcoming / recent events"), list);
+    const eventRef = collection(db, "servers", serverId, "events");
+    const unsub = onSnapshot(query(eventRef, orderBy("createdAt", "desc"), limit(20)), snap => {
+        list.replaceChildren();
+        if (snap.empty) list.append(sfNode("p", "No events yet."));
+        snap.forEach(entry => {
+            const data = entry.data();
+            const card = document.createElement("div");
+            card.style.padding = "12px";
+            card.style.background = "#232428";
+            card.style.borderRadius = "8px";
+            card.append(sfNode("strong", data.title || "Event"), sfNode("p", data.startsAt || "Time not set"), sfNode("p", data.details || ""));
+            list.append(card);
+        });
+    }, error => { console.error("Event listener failed:", error); list.textContent = "Events unavailable. Firebase permissions may need updating."; });
+    create.onclick = async () => {
+        const eventName = title.value.trim();
+        if (!eventName) { title.focus(); return; }
+        create.disabled = true;
+        try {
+            await addDoc(eventRef, { title: eventName, startsAt: date.value || "Time not set", details: details.value.trim(), createdBy: currentUser.uid, createdAt: serverTimestamp() });
+            title.value = ""; date.value = ""; details.value = "";
+        } catch (error) { console.error("Event creation failed:", error); alert("Event creation failed. Firebase permissions may need updating."); }
+        finally { create.disabled = false; }
+    };
+    document.getElementById("serverFeatureDialog")?.querySelector(".created-server-feature-close")?.addEventListener("click", unsub, { once: true });
+}
 ==============
 
 function openServer(server) {
