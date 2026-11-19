@@ -977,6 +977,530 @@ createServerForm?.addEventListener("submit", async (event) => {
 });
 
 // ==================================================
+// CREATED SERVER CHANNELS AND MESSAGES
+// ==================================================
+
+function loadCreatedServerChannels(serverId) {
+    if (!serverId || !createdServerTextChannels || !createdServerVoiceChannels) {
+        return;
+    }
+
+    stopServerChannelsListener?.();
+    stopServerChannelsListener = null;
+
+    stopCreatedServerMessages();
+    activeCreatedServerChannelId = null;
+    createdServerChannels = [];
+
+    createdServerTextChannels.replaceChildren();
+    createdServerVoiceChannels.replaceChildren();
+
+    if (createdServerMessages) {
+        createdServerMessages.textContent = "Loading channels...";
+    }
+
+    const channelsRef = collection(db, "servers", serverId, "channels");
+
+    stopServerChannelsListener = onSnapshot(
+        query(channelsRef, orderBy("createdAt", "asc")),
+        async (snapshot) => {
+            if (activeCreatedServerId !== serverId) return;
+
+            createdServerChannels = snapshot.docs.map((entry) => ({
+                id: entry.id,
+                ...entry.data()
+            }));
+
+            if (snapshot.empty) {
+                try {
+                    await addDoc(channelsRef, {
+                        name: "general",
+                        nameLower: "general",
+                        type: "text",
+                        createdBy: currentUser.uid,
+                        createdAt: serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error("Default channel creation failed:", error);
+
+                    if (createdServerMessages) {
+                        createdServerMessages.textContent =
+                            "The default channel could not be created.";
+                    }
+                }
+
+                return;
+            }
+
+            renderCreatedServerChannels();
+
+            const selectedChannel = createdServerChannels.find(
+                (channel) =>
+                    channel.id === activeCreatedServerChannelId &&
+                    channel.type === "text"
+            );
+
+            if (selectedChannel) {
+                return;
+            }
+
+            const firstTextChannel = createdServerChannels.find(
+                (channel) => channel.type === "text"
+            );
+
+            if (firstTextChannel) {
+                openCreatedServerChannel(firstTextChannel);
+            } else {
+                stopCreatedServerMessages();
+
+                activeCreatedServerChannelId = null;
+
+                if (createdServerActiveChannel) {
+                    createdServerActiveChannel.textContent = "No text channels";
+                }
+
+                if (createdServerChannelSymbol) {
+                    createdServerChannelSymbol.textContent = "#";
+                }
+
+                if (createdServerMessages) {
+                    createdServerMessages.textContent =
+                        "This server has no text channels yet. Create one to start chatting.";
+                }
+
+                if (createdServerMessageInput) {
+                    createdServerMessageInput.disabled = true;
+                }
+
+                if (createdServerSendButton) {
+                    createdServerSendButton.disabled = true;
+                }
+            }
+        },
+        (error) => {
+            console.error("Server channels failed to load:", error);
+
+            createdServerTextChannels.textContent =
+                "Channels could not load.";
+
+            createdServerVoiceChannels.textContent =
+                "Channels could not load.";
+
+            if (createdServerMessages) {
+                createdServerMessages.textContent =
+                    error.code === "permission-denied"
+                        ? "Firebase denied channel access. Check your Firestore rules."
+                        : "Channels could not load.";
+            }
+        }
+    );
+}
+
+function renderCreatedServerChannels() {
+    if (!createdServerTextChannels || !createdServerVoiceChannels) return;
+
+    createdServerTextChannels.replaceChildren();
+    createdServerVoiceChannels.replaceChildren();
+
+    const textChannels = createdServerChannels.filter(
+        (channel) => channel.type === "text"
+    );
+
+    const voiceChannels = createdServerChannels.filter(
+        (channel) => channel.type === "voice"
+    );
+
+    function createChannelButton(channel) {
+        const item = document.createElement("li");
+        item.className = "created-server-channel-item";
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "created-server-channel-button";
+        button.dataset.channelId = channel.id;
+
+        const symbol = document.createElement("span");
+        symbol.className = "created-server-channel-icon";
+        symbol.textContent = channel.type === "voice" ? "◖" : "#";
+
+        const name = document.createElement("span");
+        name.textContent = channel.name;
+
+        button.append(symbol, name);
+
+        const selected =
+            channel.id === activeCreatedServerChannelId &&
+            channel.type === activeCreatedServerChannelType;
+
+        button.classList.toggle("selected", selected);
+        button.setAttribute("aria-pressed", String(selected));
+
+        button.addEventListener("click", () => {
+            if (channel.type === "text") {
+                openCreatedServerChannel(channel);
+            } else {
+                openCreatedServerVoiceChannel(channel);
+            }
+        });
+
+        item.appendChild(button);
+        return item;
+    }
+
+    textChannels.forEach((channel) => {
+        createdServerTextChannels.appendChild(createChannelButton(channel));
+    });
+
+    voiceChannels.forEach((channel) => {
+        createdServerVoiceChannels.appendChild(createChannelButton(channel));
+    });
+}
+
+// ==================================================
+// OPEN CREATED SERVER TEXT CHANNEL
+// ==================================================
+
+function openCreatedServerChannel(channel) {
+    if (!currentUser || !activeCreatedServerId || !channel?.id) return;
+
+    if (channel.type !== "text") return;
+
+    stopCreatedServerMessages();
+
+    activeCreatedServerChannelId = channel.id;
+    activeCreatedServerChannelType = "text";
+
+    if (createdServerActiveChannel) {
+        createdServerActiveChannel.textContent = channel.name;
+    }
+
+    if (createdServerChannelSymbol) {
+        createdServerChannelSymbol.textContent = "#";
+    }
+
+    if (createdServerMessageInput) {
+        createdServerMessageInput.disabled = false;
+        createdServerMessageInput.placeholder =
+            `Message #${channel.name}`;
+    }
+
+    if (createdServerSendButton) {
+        createdServerSendButton.disabled = false;
+    }
+
+    if (createdServerMessageStatus) {
+        createdServerMessageStatus.textContent = "";
+        createdServerMessageStatus.className = "upload-status";
+    }
+
+    renderCreatedServerChannels();
+
+    loadCreatedServerMessages(
+        activeCreatedServerId,
+        channel.id
+    );
+}
+
+// ==================================================
+// CREATED SERVER MESSAGE LISTENER
+// ==================================================
+
+function stopCreatedServerMessages() {
+    stopCreatedServerMessagesListener?.();
+    stopCreatedServerMessagesListener = null;
+}
+
+function loadCreatedServerMessages(serverId, channelId) {
+    if (!createdServerMessages || !serverId || !channelId) return;
+
+    stopCreatedServerMessages();
+
+    createdServerMessages.textContent = "Loading messages...";
+
+    const messagesRef = collection(
+        db,
+        "servers",
+        serverId,
+        "channels",
+        channelId,
+        "messages"
+    );
+
+    const messagesQuery = query(
+        messagesRef,
+        orderBy("timestamp", "asc"),
+        limit(100)
+    );
+
+    stopCreatedServerMessagesListener = onSnapshot(
+        messagesQuery,
+        (snapshot) => {
+            if (
+                activeCreatedServerId !== serverId ||
+                activeCreatedServerChannelId !== channelId
+            ) {
+                return;
+            }
+
+            createdServerMessages.replaceChildren();
+
+            if (snapshot.empty) {
+                const empty = document.createElement("p");
+                empty.className = "channel-empty";
+                empty.textContent = "This is the beginning of this channel.";
+
+                createdServerMessages.appendChild(empty);
+                return;
+            }
+
+            snapshot.forEach((entry) => {
+                const data = entry.data();
+
+                const message = document.createElement("article");
+                message.className = "message";
+
+                if (data.uid === currentUser?.uid) {
+                    message.classList.add("own-message");
+                }
+
+                const author = document.createElement("strong");
+                author.textContent = `${data.username || "Member"}: `;
+
+                message.append(
+                    author,
+                    document.createTextNode(data.text || "")
+                );
+
+                createdServerMessages.appendChild(message);
+            });
+
+            createdServerMessages.scrollTop =
+                createdServerMessages.scrollHeight;
+        },
+        (error) => {
+            console.error("Created server messages failed:", error);
+
+            createdServerMessages.textContent =
+                error.code === "permission-denied"
+                    ? "Firebase denied access to messages. Check your Firestore rules."
+                    : "Messages could not load.";
+        }
+    );
+}
+
+// ==================================================
+// SEND CREATED SERVER MESSAGE
+// ==================================================
+
+async function sendCreatedServerMessage() {
+    if (
+        !currentUser ||
+        !activeCreatedServerId ||
+        !activeCreatedServerChannelId ||
+        activeCreatedServerChannelType !== "text" ||
+        !createdServerMessageInput ||
+        !createdServerSendButton
+    ) {
+        return;
+    }
+
+    const text = createdServerMessageInput.value.trim();
+
+    if (!text) return;
+
+    const serverId = activeCreatedServerId;
+    const channelId = activeCreatedServerChannelId;
+
+    createdServerSendButton.disabled = true;
+
+    try {
+        await addDoc(
+            collection(
+                db,
+                "servers",
+                serverId,
+                "channels",
+                channelId,
+                "messages"
+            ),
+            {
+                uid: currentUser.uid,
+                username: (
+                    profileName?.textContent ||
+                    currentUser.displayName ||
+                    "Member"
+                ).slice(0, 30),
+                text: text.slice(0, 2000),
+                timestamp: serverTimestamp()
+            }
+        );
+
+        if (
+            activeCreatedServerId === serverId &&
+            activeCreatedServerChannelId === channelId
+        ) {
+            createdServerMessageInput.value = "";
+            createdServerMessageInput.focus();
+        }
+    } catch (error) {
+        console.error("Created server message failed:", error);
+
+        if (createdServerMessageStatus) {
+            createdServerMessageStatus.textContent =
+                error.code === "permission-denied"
+                    ? "Firebase denied this message. Check your Firestore rules."
+                    : "Your message could not be sent.";
+
+            createdServerMessageStatus.classList.add("error");
+        }
+    } finally {
+        if (activeCreatedServerId === serverId &&
+            activeCreatedServerChannelId === channelId) {
+            createdServerSendButton.disabled = false;
+        }
+    }
+}
+
+createdServerMessageForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void sendCreatedServerMessage();
+});
+
+// ==================================================
+// CREATED SERVER VOICE CHANNEL DISPLAY
+// ==================================================
+
+function openCreatedServerVoiceChannel(channel) {
+    if (!channel?.id || !activeCreatedServerId) return;
+
+    stopCreatedServerMessages();
+
+    activeCreatedServerChannelId = channel.id;
+    activeCreatedServerChannelType = "voice";
+
+    if (createdServerActiveChannel) {
+        createdServerActiveChannel.textContent = channel.name;
+    }
+
+    if (createdServerChannelSymbol) {
+        createdServerChannelSymbol.textContent = "◖";
+    }
+
+    if (createdServerMessageInput) {
+        createdServerMessageInput.disabled = true;
+        createdServerMessageInput.placeholder =
+            "Voice channels do not support text messages.";
+    }
+
+    if (createdServerSendButton) {
+        createdServerSendButton.disabled = true;
+    }
+
+    renderCreatedServerChannels();
+
+    if (createdServerMessages) {
+        createdServerMessages.replaceChildren();
+
+        const notice = document.createElement("div");
+        notice.className = "channel-empty";
+        notice.textContent =
+            `Voice channel "${channel.name}" selected. Voice connection integration will be added next.`;
+
+        createdServerMessages.appendChild(notice);
+    }
+}
+
+// ==================================================
+// CREATE CHANNEL
+// ==================================================
+
+addServerChannelButton?.addEventListener("click", async () => {
+    if (!currentUser || !activeCreatedServerId) return;
+
+    const serverId = activeCreatedServerId;
+
+    const nameInput = prompt(
+        "Enter the channel name:"
+    );
+
+    if (nameInput === null) return;
+
+    const name = nameInput.trim();
+
+    if (name.length < 1 || name.length > 40) {
+        alert("Channel names must be between 1 and 40 characters.");
+        return;
+    }
+
+    const typeInput = prompt(
+        "Enter channel type: text or voice",
+        "text"
+    );
+
+    if (typeInput === null) return;
+
+    const type = typeInput.trim().toLowerCase();
+
+    if (!["text", "voice"].includes(type)) {
+        alert("Channel type must be text or voice.");
+        return;
+    }
+
+    const nameLower = name.toLowerCase();
+
+    const duplicate = createdServerChannels.some(
+        (channel) =>
+            channel.type === type &&
+            String(channel.name || "").trim().toLowerCase() === nameLower
+    );
+
+    if (duplicate) {
+        alert(`A ${type} channel with that name already exists.`);
+        return;
+    }
+
+    addServerChannelButton.disabled = true;
+
+    try {
+        const channelsRef = collection(
+            db,
+            "servers",
+            serverId,
+            "channels"
+        );
+
+        const channelRef = await addDoc(channelsRef, {
+            name,
+            nameLower,
+            type,
+            createdBy: currentUser.uid,
+            createdAt: serverTimestamp()
+        });
+
+        if (
+            type === "text" &&
+            activeCreatedServerId === serverId
+        ) {
+            openCreatedServerChannel({
+                id: channelRef.id,
+                name,
+                nameLower,
+                type
+            });
+        }
+    } catch (error) {
+        console.error("Channel creation failed:", error);
+
+        alert(
+            error.code === "permission-denied"
+                ? "Firebase denied channel creation. Check your Firestore rules."
+                : "The channel could not be created."
+        );
+    } finally {
+        addServerChannelButton.disabled = false;
+    }
+});
+// ==================================================
 // OPEN, SELECT, AND DELETE CREATED SERVERS
 // ==================================================
 
