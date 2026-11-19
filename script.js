@@ -268,6 +268,8 @@ function stopCreatedServerChannels() {
     activeCreatedServerChannelId = null;
     activeCreatedServerChannelType = "text";
     createdServerChannels = [];
+    activeCreatedServerOwnerUid = null;
+    currentServerCanManageChannels = false;
 }
 
 function hideMainViews() {
@@ -307,6 +309,8 @@ function showEmptyView() {
 
     activeTextChannel = null;
     activeCreatedServerId = null;
+    activeCreatedServerOwnerUid = null;
+    currentServerCanManageChannels = false;
 
     hideMainViews();
 
