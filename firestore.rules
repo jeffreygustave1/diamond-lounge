@@ -20,7 +20,19 @@ service cloud.firestore {
         && request.resource.data.displayName.size() <= 30
         && request.resource.data.createdAt == request.time;
 
-      allow update, delete: if false;
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.uid == userId
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 2
+        && request.resource.data.displayName.size() <= 30
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName', 'avatar', 'picture', 'updatedAt'
+        ])
+        && (!('avatar' in request.resource.data) || request.resource.data.avatar is string)
+        && (!('picture' in request.resource.data) || request.resource.data.picture is string)
+        && (!('updatedAt' in request.resource.data) || request.resource.data.updatedAt == request.time);
+      allow delete: if false;
     }
 
     match /messages/{messageId} {
