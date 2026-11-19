@@ -1198,146 +1198,81 @@ function renderCreatedServerChannels() {
     createdServerTextChannels.replaceChildren();
     createdServerVoiceChannels.replaceChildren();
 
-    const textChannels = createdServerChannels.filter(
-        (channel) => channel.type === "text"
-    );
-
-    const voiceChannels = createdServerChannels.filter(
-        (channel) => channel.type === "voice"
-    );
+    const textChannels = createdServerChannels.filter(channel => channel.type === "text");
+    const voiceChannels = createdServerChannels.filter(channel => channel.type === "voice");
 
     function createChannelButton(channel) {
-    const item = document.createElement("li");
-    item.className = "created-server-channel-item";
+        const item = document.createElement("li");
+        item.className = "created-server-channel-item";
 
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "created-server-channel-button";
-    button.dataset.channelId = channel.id;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "created-server-channel-button";
+        button.dataset.channelId = channel.id;
 
-    const symbol = document.createElement("span");
-    symbol.className = "created-server-channel-icon";
-    symbol.textContent = channel.type === "voice" ? "◖" : "#";
+        const symbol = document.createElement("span");
+        symbol.className = "created-server-channel-icon";
+        symbol.textContent = channel.type === "voice" ? "◖" : "#";
 
-    const name = document.createElement("span");
-    name.textContent = channel.name;
+        const name = document.createElement("span");
+        name.textContent = channel.name;
+        button.append(symbol, name);
 
-    button.append(symbol, name);
+        const selected = channel.id === activeCreatedServerChannelId &&
+            channel.type === activeCreatedServerChannelType;
+        button.classList.toggle("selected", selected);
+        button.setAttribute("aria-pressed", String(selected));
 
-    const selected =
-        channel.id === activeCreatedServerChannelId &&
-        channel.type === activeCreatedServerChannelType;
-
-    button.classList.toggle("selected", selected);
-    button.setAttribute("aria-pressed", String(selected));
-
-    button.addEventListener("click", () => {
-        if (channel.type === "text") {
-            openCreatedServerChannel(channel);
-        } else {
-            openCreatedServerVoiceChannel(channel);
-        }
-    });
-
-    item.appendChild(button);
-
-    // CHANNEL DELETE BUTTON — SERVER OWNER ONLY
-    if (activeCreatedServerOwnerUid === currentUser?.uid) {
-        const deleteButton = document.createElement("button");
-
-        deleteButton.type = "button";
-        deleteButton.className = "created-server-channel-delete";
-        deleteButton.textContent = "×";
-        deleteButton.title = "Delete channel";
-        deleteButton.setAttribute("aria-label", `Delete ${channel.name}`);
-
-        deleteButton.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            void deleteCreatedServerChannel(channel);
+        button.addEventListener("click", () => {
+            if (channel.type === "text") openCreatedServerChannel(channel);
+            else openCreatedServerVoiceChannel(channel);
         });
+        item.appendChild(button);
 
-        item.appendChild(deleteButton);
+        if (activeCreatedServerOwnerUid === currentUser?.uid) {
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "created-server-channel-delete";
+            deleteButton.textContent = "×";
+            deleteButton.title = "Delete channel";
+            deleteButton.setAttribute("aria-label", `Delete ${channel.name}`);
+            deleteButton.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+                void deleteCreatedServerChannel(channel);
+            });
+            item.appendChild(deleteButton);
+        }
+        return item;
     }
 
-    return item;
+    textChannels.forEach(channel => createdServerTextChannels.appendChild(createChannelButton(channel)));
+    voiceChannels.forEach(channel => createdServerVoiceChannels.appendChild(createChannelButton(channel)));
 }
 
-// ==================================================
-
 // DELETE CREATED SERVER CHANNEL
-
-// ==================================================
-
 async function deleteCreatedServerChannel(channel) {
+    if (!currentUser || !activeCreatedServerId ||
+        activeCreatedServerOwnerUid !== currentUser.uid || !channel?.id) return;
 
-    if (
-
-        !currentUser ||
-
-        !activeCreatedServerId ||
-
-        activeCreatedServerOwnerUid !== currentUser.uid ||
-
-        !channel?.id
-
-    ) {
-
-        return;
-
-    }
-
-    const confirmed = confirm(
-
-        `Delete the ${channel.type} channel "${channel.name}"?`
-
-    );
-
-    if (!confirmed) return;
-
+    if (!confirm(`Delete the ${channel.type} channel "${channel.name}"?`)) return;
     const serverId = activeCreatedServerId;
 
     try {
-
-        await deleteDoc(
-
-            doc(db, "servers", serverId, "channels", channel.id)
-
-        );
-
+        await deleteDoc(doc(db, "servers", serverId, "channels", channel.id));
         if (activeCreatedServerChannelId === channel.id) {
-
             stopCreatedServerMessages();
-
             activeCreatedServerChannelId = null;
-
-            if (createdServerMessages) {
-
-                createdServerMessages.textContent =
-
-                    "Channel deleted.";
-
-            }
-
+            if (createdServerMessages) createdServerMessages.textContent = "Channel deleted.";
         }
-
     } catch (error) {
-
         console.error("Channel deletion failed:", error);
-
-        alert(
-
-            error.code === "permission-denied"
-
-                ? "Firebase denied channel deletion."
-
-                : "The channel could not be deleted."
-
-        );
-
+        alert(error.code === "permission-denied"
+            ? "Firebase denied channel deletion."
+            : "The channel could not be deleted.");
     }
-
 }
+
 // ==================================================
 // OPEN CREATED SERVER TEXT CHANNEL
 // ==================================================
