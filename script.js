@@ -1929,7 +1929,7 @@ async function serverMembersDialog() {
                     roleWrap.style.flexWrap = "wrap";
                     roleWrap.style.gap = "8px";
                     roleWrap.style.marginTop = "10px";
-                    const selectedRoleIds = new Set(memberData.roleIds || (memberSnapshot.exists() ? [] : ["member"]));
+                    const selectedRoleIds = new Set(Array.isArray(memberData.roleIds) ? memberData.roleIds : ["member"]);
                     const checks = [];
                     roles.forEach(role => {
                         const label = document.createElement("label");
