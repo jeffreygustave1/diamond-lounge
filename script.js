@@ -126,6 +126,8 @@ let activeCreatedServerChannelId = null;
 let activeCreatedServerChannelType = "text";
 let createdServerChannels = [];
 let createdServerVoicePresenceStop = null;
+let pendingInviteServer = null;
+let pendingInviteChannelId = null;
 
 const createdServerTextChannels = document.getElementById("createdServerTextChannels");
 const createdServerVoiceChannels = document.getElementById("createdServerVoiceChannels");
@@ -456,6 +458,12 @@ onAuthStateChanged(auth, async (user) => {
 
     document.body.classList.remove("dm-mode");
     setMobileSidebar(false);
+
+    if (pendingInviteServer) {
+        const invitedServer = pendingInviteServer;
+        pendingInviteServer = null;
+        openServer(invitedServer);
+    }
 });
 
 async function consumeServerInviteFromUrl() {
@@ -498,6 +506,13 @@ async function consumeServerInviteFromUrl() {
         ["serverInvite", "invite", "inviteChannel"].forEach(key => url.searchParams.delete(key));
         window.history.replaceState({}, "", url.toString());
         await loadServerIcons();
+        pendingInviteServer = {
+            id: serverId,
+            name: serverData.name || "Server",
+            visibility: serverData.visibility || "private",
+            ownerUid: serverData.ownerUid || ""
+        };
+        pendingInviteChannelId = inviteSnapshot.data().channelId || params.get("inviteChannel") || null;
         alert("You joined " + (serverData.name || "the server") + "!");
     } catch (error) {
         console.error("Invite join flow failed:", error);
@@ -1224,6 +1239,16 @@ function loadCreatedServerChannels(serverId) {
             }
 
             renderCreatedServerChannels();
+
+            if (pendingInviteChannelId) {
+                const invitedChannel = createdServerChannels.find(channel => channel.id === pendingInviteChannelId);
+                pendingInviteChannelId = null;
+                if (invitedChannel) {
+                    if (invitedChannel.type === "voice") openCreatedServerVoiceChannel(invitedChannel);
+                    else if (invitedChannel.type === "text") openCreatedServerChannel(invitedChannel);
+                    return;
+                }
+            }
 
             const selectedChannel = createdServerChannels.find(
     (channel) =>
