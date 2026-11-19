@@ -1177,11 +1177,6 @@ function loadCreatedServerChannels(serverId) {
 );
 
 if (selectedChannel) {
-    renderCreatedServerChannels();
-    return;
-}
-
-            if (selectedChannel) {
                 return;
             }
 
