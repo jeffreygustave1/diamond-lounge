@@ -1,4 +1,3 @@
-
 import { auth, db } from "./firebase.js";
 
 import {
@@ -90,7 +89,7 @@ const cropImage = document.getElementById("cropImage");
 const cropZoom = document.getElementById("cropZoom");
 const profileChoiceButtons = [...document.querySelectorAll(".profile-choice")];
 
-// Prevent the decorative workspace gem from intercepting clicks.
+// Prevent decorative workspace gems from intercepting clicks.
 document.querySelectorAll(".workspace-gem").forEach((gem) => {
     gem.style.setProperty("pointer-events", "none", "important");
 });
@@ -128,7 +127,6 @@ let dragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
 
-// Use the same name normalization when loading and creating servers.
 function normalizeServerName(name) {
     return String(name || "")
         .trim()
@@ -191,24 +189,38 @@ function hideMainViews() {
     if (dmConversationView) dmConversationView.hidden = true;
 }
 
+function clearServerSelections() {
+    document.querySelectorAll(".server-icon").forEach((icon) => {
+        icon.classList.remove("selected");
+        icon.setAttribute("aria-pressed", "false");
+    });
+}
+
 function showLoungeSidebar() {
     if (dmSidebar) dmSidebar.hidden = true;
     if (loungeSidebar) loungeSidebar.hidden = false;
 
-    dmHomeButton?.classList.remove("selected");
-    dmHomeButton?.setAttribute("aria-pressed", "false");
-    mainServerButton?.classList.add("selected");
-    mainServerButton?.setAttribute("aria-pressed", "true");
+    if (dmHomeButton) {
+        dmHomeButton.classList.remove("selected");
+        dmHomeButton.setAttribute("aria-pressed", "false");
+    }
+
+    if (mainServerButton) {
+        mainServerButton.classList.add("selected");
+        mainServerButton.setAttribute("aria-pressed", "true");
+    }
 
     document.body.classList.remove("dm-mode");
 }
 
 function showEmptyView() {
     stopPublicMessages();
+
     activeTextChannel = null;
     activeCreatedServerId = null;
 
     hideMainViews();
+
     if (emptyView) emptyView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
 
@@ -236,13 +248,15 @@ function openTextChannel(channelName) {
     }
 
     stopDirectMessages();
+
     activeCreatedServerId = null;
     showLoungeSidebar();
     hideMainViews();
 
-    activeTextChannel = channelName;
     if (loungeView) loungeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = false;
+
+    activeTextChannel = channelName;
 
     if (activeChannelName) {
         activeChannelName.textContent = channelName;
@@ -253,13 +267,18 @@ function openTextChannel(channelName) {
             channelDescriptions[channelName] || `Welcome to #${channelName}.`;
     }
 
-    if (input) input.placeholder = `Message #${channelName}`;
+    if (input) {
+        input.placeholder = `Message #${channelName}`;
+    }
 
     textChannelButtons.forEach((button) => {
         const selected = button.dataset.channel === channelName;
+
         button.classList.toggle("selected", selected);
         button.setAttribute("aria-pressed", String(selected));
     });
+
+    clearServerSelections();
 
     loadMessages(channelName);
     setMobileSidebar(false);
@@ -288,18 +307,25 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     currentUser = user;
+
     const displayName = (user.displayName || "Member").slice(0, 30);
 
-    if (profileName) profileName.textContent = displayName;
+    if (profileName) {
+        profileName.textContent = displayName;
+    }
 
     const currentName = currentUserElement?.querySelector("span");
-    if (currentName) currentName.textContent = displayName;
+
+    if (currentName) {
+        currentName.textContent = displayName;
+    }
 
     try {
         await ensureUserProfile();
         loadMembers();
     } catch (error) {
         console.error("Profile setup failed:", error);
+
         if (dmMemberList) {
             dmMemberList.textContent = "Member profiles could not load.";
         }
@@ -308,8 +334,37 @@ onAuthStateChanged(auth, async (user) => {
     await loadProfile();
     await loadServerIcons();
 
-    showLoungeSidebar();
-    showEmptyView();
+    // Start with no server or channel selected.
+    stopPublicMessages();
+    stopDirectMessages();
+
+    activeTextChannel = null;
+    activeCreatedServerId = null;
+    selectedMember = null;
+    currentConversationId = null;
+
+    if (loungeSidebar) loungeSidebar.hidden = true;
+    if (dmSidebar) dmSidebar.hidden = true;
+    if (communitySidebar) communitySidebar.hidden = true;
+
+    hideMainViews();
+
+    if (emptyView) emptyView.hidden = false;
+
+    clearServerSelections();
+
+    if (mainServerButton) {
+        mainServerButton.classList.remove("selected");
+        mainServerButton.setAttribute("aria-pressed", "false");
+    }
+
+    if (dmHomeButton) {
+        dmHomeButton.classList.remove("selected");
+        dmHomeButton.setAttribute("aria-pressed", "false");
+    }
+
+    document.body.classList.remove("dm-mode");
+    setMobileSidebar(false);
 });
 
 async function ensureUserProfile() {
@@ -361,6 +416,7 @@ function loadMessages(channelName) {
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
+
                 const message = document.createElement("article");
                 message.className = "message";
 
@@ -371,6 +427,7 @@ function loadMessages(channelName) {
                     author,
                     document.createTextNode(data.text || "")
                 );
+
                 messagesElement.appendChild(message);
             });
 
@@ -378,6 +435,7 @@ function loadMessages(channelName) {
         },
         (error) => {
             console.error("Channel listener failed:", error);
+
             messagesElement.textContent =
                 error.code === "failed-precondition"
                     ? "This channel requires a Firestore index."
@@ -409,6 +467,7 @@ async function sendMessage() {
         input.focus();
     } catch (error) {
         console.error("Message send failed:", error);
+
         alert(
             error.code === "permission-denied"
                 ? "Firestore denied this message. Publish the updated rules."
@@ -443,13 +502,22 @@ function showDirectMessages() {
     if (dmSidebar) dmSidebar.hidden = false;
 
     hideMainViews();
+
     if (dmHomeView) dmHomeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
 
-    dmHomeButton?.classList.add("selected");
-    dmHomeButton?.setAttribute("aria-pressed", "true");
-    mainServerButton?.classList.remove("selected");
-    mainServerButton?.setAttribute("aria-pressed", "false");
+    if (dmHomeButton) {
+        dmHomeButton.classList.add("selected");
+        dmHomeButton.setAttribute("aria-pressed", "true");
+    }
+
+    if (mainServerButton) {
+        mainServerButton.classList.remove("selected");
+        mainServerButton.setAttribute("aria-pressed", "false");
+    }
+
+    clearServerSelections();
+
     document.body.classList.add("dm-mode");
 
     if (memberSearch) {
@@ -476,16 +544,22 @@ dmHomeButton?.addEventListener("click", (event) => {
 });
 
 mainServerButton?.addEventListener("click", () => {
+    stopDirectMessages();
+
+    activeTextChannel = null;
+    activeCreatedServerId = null;
+    selectedMember = null;
+    currentConversationId = null;
+
     showLoungeSidebar();
     showEmptyView();
+    clearServerSelections();
 
-    document.querySelectorAll(".server-icon").forEach((icon) => {
-        icon.classList.remove("selected");
-        icon.setAttribute("aria-pressed", "false");
-    });
+    if (mainServerButton) {
+        mainServerButton.classList.add("selected");
+        mainServerButton.setAttribute("aria-pressed", "true");
+    }
 
-    mainServerButton?.classList.add("selected");
-    mainServerButton?.setAttribute("aria-pressed", "true");
     setMobileSidebar(false);
 });
 
@@ -506,6 +580,7 @@ function loadMembers() {
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
+
                 if (
                     data.uid &&
                     data.uid !== currentUser?.uid &&
@@ -531,7 +606,9 @@ function renderMembers() {
     if (!dmMemberList) return;
 
     dmMemberList.replaceChildren();
+
     const searchText = (memberSearch?.value || "").trim().toLowerCase();
+
     const filtered = members.filter((member) =>
         member.displayName.toLowerCase().includes(searchText)
     );
@@ -542,6 +619,7 @@ function renderMembers() {
         empty.textContent = searchText
             ? "No members match your search."
             : "No other members have joined yet.";
+
         dmMemberList.appendChild(empty);
         return;
     }
@@ -553,6 +631,7 @@ function renderMembers() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "dm-member-button";
+
         if (selectedMember?.uid === member.uid) {
             button.classList.add("active");
         }
@@ -572,6 +651,7 @@ function renderMembers() {
 
         copy.append(name, status);
         button.append(avatar, copy);
+
         button.addEventListener("click", () => {
             void openConversation(member);
         });
@@ -591,13 +671,19 @@ async function openConversation(member) {
     if (!currentUser || !member?.uid) return;
 
     stopDirectMessages();
+
     activeCreatedServerId = null;
     selectedMember = member;
 
-    currentConversationId = getConversationId(currentUser.uid, member.uid);
+    currentConversationId = getConversationId(
+        currentUser.uid,
+        member.uid
+    );
+
     const openingId = currentConversationId;
 
     hideMainViews();
+
     if (dmConversationView) dmConversationView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
     if (dmContactName) dmContactName.textContent = member.displayName;
@@ -605,7 +691,9 @@ async function openConversation(member) {
     renderMembers();
     setMobileSidebar(false);
 
-    if (dmMessages) dmMessages.textContent = "Opening private conversation...";
+    if (dmMessages) {
+        dmMessages.textContent = "Opening private conversation...";
+    }
 
     try {
         const conversationRef = doc(db, "conversations", openingId);
@@ -623,8 +711,10 @@ async function openConversation(member) {
         }
     } catch (error) {
         console.error("Private conversation failed:", error);
+
         if (dmMessages) {
-            dmMessages.textContent = "This private conversation could not be opened.";
+            dmMessages.textContent =
+                "This private conversation could not be opened.";
         }
     }
 }
@@ -633,6 +723,7 @@ function loadDirectMessages() {
     if (!currentConversationId || !dmMessages) return;
 
     stopDirectMessages();
+
     const privateQuery = query(
         collection(db, "conversations", currentConversationId, "messages"),
         orderBy("timestamp", "asc"),
@@ -648,12 +739,14 @@ function loadDirectMessages() {
                 const empty = document.createElement("p");
                 empty.className = "dm-empty";
                 empty.textContent = "This is the beginning of your conversation.";
+
                 dmMessages.appendChild(empty);
                 return;
             }
 
             snapshot.forEach((entry) => {
                 const data = entry.data();
+
                 const message = document.createElement("article");
                 message.className = "message dm-message";
 
@@ -663,7 +756,12 @@ function loadDirectMessages() {
 
                 const author = document.createElement("strong");
                 author.textContent = `${data.username || "Member"}: `;
-                message.append(author, document.createTextNode(data.text || ""));
+
+                message.append(
+                    author,
+                    document.createTextNode(data.text || "")
+                );
+
                 dmMessages.appendChild(message);
             });
 
@@ -705,6 +803,7 @@ async function sendDirectMessage() {
         dmMessageInput.focus();
     } catch (error) {
         console.error("Private message send failed:", error);
+
         if (dmStatus) {
             dmStatus.textContent = "Your message could not be sent.";
             dmStatus.classList.add("error");
@@ -725,8 +824,10 @@ dmMessageForm?.addEventListener("submit", (event) => {
 
 function openServerModal() {
     if (!serverModal) return;
+
     serverModal.hidden = false;
     document.body.classList.add("modal-open");
+
     requestAnimationFrame(() => serverNameInput?.focus());
 }
 
@@ -735,9 +836,12 @@ function closeServerModal() {
 
     serverModal.hidden = true;
     document.body.classList.remove("modal-open");
+
     createServerForm?.reset();
 
-    if (serverCreateStatus) serverCreateStatus.textContent = "";
+    if (serverCreateStatus) {
+        serverCreateStatus.textContent = "";
+    }
 }
 
 createServerButton?.addEventListener("click", openServerModal);
@@ -745,11 +849,14 @@ closeServerModalButton?.addEventListener("click", closeServerModal);
 cancelServerCreation?.addEventListener("click", closeServerModal);
 
 serverModal?.addEventListener("click", (event) => {
-    if (event.target === serverModal) closeServerModal();
+    if (event.target === serverModal) {
+        closeServerModal();
+    }
 });
 
 function hasCreatedServerName(name) {
     const wantedName = normalizeServerName(name);
+
     if (!createdServers || !wantedName) return false;
 
     return [...createdServers.querySelectorAll(".created-server")].some(
@@ -790,7 +897,10 @@ createServerForm?.addEventListener("submit", async (event) => {
     }
 
     const createButton = document.getElementById("confirmCreateServer");
-    if (createButton) createButton.disabled = true;
+
+    if (createButton) {
+        createButton.disabled = true;
+    }
 
     try {
         const serverRef = await addDoc(collection(db, "servers"), {
@@ -819,6 +929,7 @@ createServerForm?.addEventListener("submit", async (event) => {
         openServer(server);
     } catch (error) {
         console.error("Server creation failed:", error);
+
         if (serverCreateStatus) {
             serverCreateStatus.textContent =
                 error.code === "permission-denied"
@@ -826,7 +937,9 @@ createServerForm?.addEventListener("submit", async (event) => {
                     : "The server could not be created.";
         }
     } finally {
-        if (createButton) createButton.disabled = false;
+        if (createButton) {
+            createButton.disabled = false;
+        }
     }
 });
 
@@ -845,11 +958,14 @@ function openServer(server) {
     currentConversationId = null;
     activeCreatedServerId = server.id;
 
-    showLoungeSidebar();
+    // Hide the VIP-LOUNGE and DM sidebars.
+    if (loungeSidebar) loungeSidebar.hidden = true;
+    if (dmSidebar) dmSidebar.hidden = true;
+    if (communitySidebar) communitySidebar.hidden = true;
+
     hideMainViews();
 
     if (serverView) serverView.hidden = false;
-    if (communitySidebar) communitySidebar.hidden = true;
     if (serverViewName) serverViewName.textContent = server.name;
     if (serverWelcomeName) serverWelcomeName.textContent = server.name;
 
@@ -860,13 +976,23 @@ function openServer(server) {
                 : "Private server — invite only";
     }
 
-    document.querySelectorAll(".server-icon").forEach((icon) => {
-        icon.classList.remove("selected");
-        icon.setAttribute("aria-pressed", "false");
-    });
+    document.body.classList.remove("dm-mode");
+
+    if (mainServerButton) {
+        mainServerButton.classList.remove("selected");
+        mainServerButton.setAttribute("aria-pressed", "false");
+    }
+
+    if (dmHomeButton) {
+        dmHomeButton.classList.remove("selected");
+        dmHomeButton.setAttribute("aria-pressed", "false");
+    }
+
+    clearServerSelections();
 
     server.button?.classList.add("selected");
     server.button?.setAttribute("aria-pressed", "true");
+
     setMobileSidebar(false);
 }
 
@@ -901,13 +1027,23 @@ function showServerContextMenu(event, server) {
     });
 
     menu.appendChild(deleteButton);
-    menu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - 180))}px`;
-    menu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - 55))}px`;
+
+    menu.style.left = `${Math.max(
+        8,
+        Math.min(event.clientX, window.innerWidth - 180)
+    )}px`;
+
+    menu.style.top = `${Math.max(
+        8,
+        Math.min(event.clientY, window.innerHeight - 55)
+    )}px`;
 
     document.body.appendChild(menu);
     serverContextMenu = menu;
 
-    document.addEventListener("click", closeServerContextMenu, { once: true });
+    document.addEventListener("click", closeServerContextMenu, {
+        once: true
+    });
 }
 
 async function deleteServer(server) {
@@ -923,21 +1059,22 @@ async function deleteServer(server) {
 
         if (activeCreatedServerId === server.id) {
             activeCreatedServerId = null;
+
             stopPublicMessages();
             stopDirectMessages();
+
             showLoungeSidebar();
             showEmptyView();
+            clearServerSelections();
 
-            document.querySelectorAll(".server-icon").forEach((icon) => {
-                icon.classList.remove("selected");
-                icon.setAttribute("aria-pressed", "false");
-            });
-
-            mainServerButton?.classList.add("selected");
-            mainServerButton?.setAttribute("aria-pressed", "true");
+            if (mainServerButton) {
+                mainServerButton.classList.add("selected");
+                mainServerButton.setAttribute("aria-pressed", "true");
+            }
         }
     } catch (error) {
         console.error("Server deletion failed:", error);
+
         alert(
             error.code === "permission-denied"
                 ? "Firebase denied deletion. Check the server owner delete rule."
@@ -948,6 +1085,7 @@ async function deleteServer(server) {
 
 function makeServerIcon(server) {
     const icon = document.createElement("button");
+
     icon.type = "button";
     icon.className = "server-icon created-server";
     icon.title = server.name;
@@ -958,7 +1096,10 @@ function makeServerIcon(server) {
 
     server.button = icon;
 
-    icon.addEventListener("click", () => openServer(server));
+    icon.addEventListener("click", () => {
+        openServer(server);
+    });
+
     icon.addEventListener("contextmenu", (event) => {
         showServerContextMenu(event, server);
     });
@@ -967,8 +1108,6 @@ function makeServerIcon(server) {
 }
 
 // Load saved servers while hiding the old THEAGENTS server.
-// VIP-LOUNGE remains available through its permanent diamond button.
-// This changes only the sidebar display; it does not delete Firestore records.
 async function loadServerIcons() {
     if (!currentUser || !createdServers) return;
 
@@ -983,17 +1122,18 @@ async function loadServerIcons() {
         const savedServers = snapshot.docs
             .map((entry) => {
                 const data = entry.data();
+
                 return {
                     id: entry.id,
-                    name: typeof data.name === "string" && data.name.trim()
-                        ? data.name.trim()
-                        : "Server",
+                    name:
+                        typeof data.name === "string" && data.name.trim()
+                            ? data.name.trim()
+                            : "Server",
                     visibility: data.visibility || "private",
                     ownerUid: data.ownerUid || "",
                     createdAt: data.createdAt || null
                 };
             })
-            // Hide the permanent default server and the old THEAGENTS server.
             .filter((server) => {
                 const normalizedName = normalizeServerName(server.name);
 
@@ -1003,15 +1143,19 @@ async function loadServerIcons() {
                 );
             });
 
-        // Prefer a server owned by the signed-in member, then the older record.
         savedServers.sort((a, b) => {
             const aOwned = a.ownerUid === currentUser.uid ? 1 : 0;
             const bOwned = b.ownerUid === currentUser.uid ? 1 : 0;
 
-            if (aOwned !== bOwned) return bOwned - aOwned;
+            if (aOwned !== bOwned) {
+                return bOwned - aOwned;
+            }
 
-            const aTime = a.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
-            const bTime = b.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
+            const aTime =
+                a.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
+
+            const bTime =
+                b.createdAt?.toMillis?.() ?? Number.MAX_SAFE_INTEGER;
 
             return aTime - bTime;
         });
@@ -1023,7 +1167,9 @@ async function loadServerIcons() {
         savedServers.forEach((server) => {
             const normalizedName = normalizeServerName(server.name);
 
-            if (!normalizedName || displayedNames.has(normalizedName)) return;
+            if (!normalizedName || displayedNames.has(normalizedName)) {
+                return;
+            }
 
             displayedNames.add(normalizedName);
             createdServers.appendChild(makeServerIcon(server));
@@ -1041,6 +1187,7 @@ async function logoutUser() {
     try {
         setMobileSidebar(false);
         closeServerContextMenu();
+
         stopPublicMessages();
         stopDirectMessages();
         stopMemberListener();
@@ -1111,7 +1258,8 @@ function applyAvatar(key) {
     if (uploadedPicture) {
         if (myProfilePicture) {
             myProfilePicture.style.background = "transparent";
-            myProfilePicture.style.backgroundImage = `url("${uploadedPicture}")`;
+            myProfilePicture.style.backgroundImage =
+                `url("${uploadedPicture}")`;
             myProfilePicture.style.backgroundSize = "cover";
             myProfilePicture.style.backgroundPosition = "center";
             myProfilePicture.style.color = "transparent";
@@ -1129,6 +1277,7 @@ function applyAvatar(key) {
         profileChoiceButtons.forEach((button) => {
             button.classList.remove("selected");
         });
+
         return;
     }
 
@@ -1164,15 +1313,26 @@ async function loadProfile() {
         const data = snapshot.exists() ? snapshot.data() : {};
 
         if (typeof data.displayName === "string" && data.displayName) {
-            if (profileName) profileName.textContent = data.displayName;
+            if (profileName) {
+                profileName.textContent = data.displayName;
+            }
+
             const currentName = currentUserElement?.querySelector("span");
-            if (currentName) currentName.textContent = data.displayName;
+
+            if (currentName) {
+                currentName.textContent = data.displayName;
+            }
         }
 
-        uploadedPicture = typeof data.picture === "string" ? data.picture : "";
-        applyAvatar(typeof data.avatar === "string" ? data.avatar : "diamond");
+        uploadedPicture =
+            typeof data.picture === "string" ? data.picture : "";
+
+        applyAvatar(
+            typeof data.avatar === "string" ? data.avatar : "diamond"
+        );
     } catch (error) {
         console.warn("Profile could not be read:", error);
+
         uploadedPicture = "";
         applyAvatar("diamond");
     }
@@ -1182,7 +1342,8 @@ function openProfileModal() {
     if (!profileModal || !currentUser) return;
 
     if (profileDisplayName) {
-        profileDisplayName.value = profileName?.textContent?.trim() || "Member";
+        profileDisplayName.value =
+            profileName?.textContent?.trim() || "Member";
     }
 
     if (profileStatus) {
@@ -1191,12 +1352,20 @@ function openProfileModal() {
     }
 
     rawPicture = "";
-    if (profileCrop) profileCrop.hidden = true;
-    if (profileUploadInput) profileUploadInput.value = "";
+
+    if (profileCrop) {
+        profileCrop.hidden = true;
+    }
+
+    if (profileUploadInput) {
+        profileUploadInput.value = "";
+    }
 
     applyAvatar(currentAvatar);
+
     profileModal.hidden = false;
     document.body.classList.add("modal-open");
+
     requestAnimationFrame(() => profileDisplayName?.focus());
 }
 
@@ -1205,9 +1374,16 @@ function closeProfileModal() {
 
     profileModal.hidden = true;
     document.body.classList.remove("modal-open");
-    if (profileStatus) profileStatus.textContent = "";
+
+    if (profileStatus) {
+        profileStatus.textContent = "";
+    }
+
     rawPicture = "";
-    if (profileCrop) profileCrop.hidden = true;
+
+    if (profileCrop) {
+        profileCrop.hidden = true;
+    }
 }
 
 profileButton?.addEventListener("click", (event) => {
@@ -1220,7 +1396,9 @@ closeProfileModalButton?.addEventListener("click", closeProfileModal);
 cancelProfileEdit?.addEventListener("click", closeProfileModal);
 
 profileModal?.addEventListener("click", (event) => {
-    if (event.target === profileModal) closeProfileModal();
+    if (event.target === profileModal) {
+        closeProfileModal();
+    }
 });
 
 // ==================================================
@@ -1229,6 +1407,7 @@ profileModal?.addEventListener("click", (event) => {
 
 function applyCropTransform() {
     if (!cropImage) return;
+
     cropImage.style.transformOrigin = "center center";
     cropImage.style.transform =
         `translate(${cropX}px, ${cropY}px) scale(${cropScale})`;
@@ -1241,15 +1420,19 @@ cropZoom?.addEventListener("input", () => {
 
 cropImage?.addEventListener("pointerdown", (event) => {
     dragging = true;
+
     dragStartX = event.clientX - cropX;
     dragStartY = event.clientY - cropY;
+
     cropImage.setPointerCapture(event.pointerId);
 });
 
 cropImage?.addEventListener("pointermove", (event) => {
     if (!dragging) return;
+
     cropX = event.clientX - dragStartX;
     cropY = event.clientY - dragStartY;
+
     applyCropTransform();
 });
 
@@ -1271,24 +1454,29 @@ function renderCroppedPicture() {
         image.onload = () => {
             const SIZE = 192;
             const FRAME = 160;
+
             const canvas = document.createElement("canvas");
             canvas.width = SIZE;
             canvas.height = SIZE;
 
             const ctx = canvas.getContext("2d");
+
             if (!ctx) {
                 reject(new Error("Could not create the image crop."));
                 return;
             }
 
             const ratio = SIZE / FRAME;
+
             const baseScale = Math.max(
                 FRAME / image.width,
                 FRAME / image.height
             );
+
             const scale = baseScale * cropScale * ratio;
             const drawW = image.width * scale;
             const drawH = image.height * scale;
+
             const dx = SIZE / 2 - drawW / 2 + cropX * ratio;
             const dy = SIZE / 2 - drawH / 2 + cropY * ratio;
 
@@ -1313,14 +1501,22 @@ profileChoiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
         uploadedPicture = "";
         rawPicture = "";
-        if (profileUploadInput) profileUploadInput.value = "";
-        if (profileCrop) profileCrop.hidden = true;
+
+        if (profileUploadInput) {
+            profileUploadInput.value = "";
+        }
+
+        if (profileCrop) {
+            profileCrop.hidden = true;
+        }
+
         applyAvatar(button.dataset.avatar);
     });
 });
 
 profileUploadInput?.addEventListener("change", () => {
     const file = profileUploadInput.files?.[0];
+
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
@@ -1328,15 +1524,18 @@ profileUploadInput?.addEventListener("change", () => {
             profileStatus.textContent = "Choose an image file.";
             profileStatus.className = "error";
         }
+
         profileUploadInput.value = "";
         return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
         if (profileStatus) {
-            profileStatus.textContent = "Please choose an image smaller than 5 MB.";
+            profileStatus.textContent =
+                "Please choose an image smaller than 5 MB.";
             profileStatus.className = "error";
         }
+
         profileUploadInput.value = "";
         return;
     }
@@ -1345,12 +1544,18 @@ profileUploadInput?.addEventListener("change", () => {
 
     reader.onload = () => {
         rawPicture = String(reader.result || "");
+
         cropScale = 1;
         cropX = 0;
         cropY = 0;
 
-        if (profileCrop) profileCrop.hidden = false;
-        if (cropZoom) cropZoom.value = "100";
+        if (profileCrop) {
+            profileCrop.hidden = false;
+        }
+
+        if (cropZoom) {
+            cropZoom.value = "100";
+        }
 
         if (cropImage) {
             cropImage.src = rawPicture;
@@ -1381,27 +1586,35 @@ profileUploadInput?.addEventListener("change", () => {
 
 profileForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
+
     if (!currentUser) return;
 
     const nextName = (profileDisplayName?.value || "").trim().slice(0, 30);
 
     if (nextName.length < 2) {
         if (profileStatus) {
-            profileStatus.textContent = "Display names need at least 2 characters.";
+            profileStatus.textContent =
+                "Display names need at least 2 characters.";
             profileStatus.className = "error";
         }
+
         return;
     }
 
     const saveButton = document.getElementById("saveProfileButton");
-    if (saveButton) saveButton.disabled = true;
+
+    if (saveButton) {
+        saveButton.disabled = true;
+    }
 
     try {
         if (rawPicture) {
             const croppedPicture = await renderCroppedPicture();
+
             if (!croppedPicture) {
                 throw new Error("The selected picture could not be cropped.");
             }
+
             uploadedPicture = croppedPicture;
         }
 
@@ -1423,9 +1636,16 @@ profileForm?.addEventListener("submit", async (event) => {
             { merge: true }
         );
 
-        if (profileName) profileName.textContent = nextName;
+        if (profileName) {
+            profileName.textContent = nextName;
+        }
+
         const currentName = currentUserElement?.querySelector("span");
-        if (currentName) currentName.textContent = nextName;
+
+        if (currentName) {
+            currentName.textContent = nextName;
+        }
+
         applyAvatar(currentAvatar);
 
         if (profileStatus) {
@@ -1436,15 +1656,19 @@ profileForm?.addEventListener("submit", async (event) => {
         window.setTimeout(closeProfileModal, 700);
     } catch (error) {
         console.error("Profile save failed:", error);
+
         if (profileStatus) {
             profileStatus.textContent =
                 error.code === "permission-denied"
                     ? "Firestore rejected the profile update. Check your users rules."
                     : error.message || "Your profile could not be saved.";
+
             profileStatus.className = "error";
         }
     } finally {
-        if (saveButton) saveButton.disabled = false;
+        if (saveButton) {
+            saveButton.disabled = false;
+        }
     }
 });
 
@@ -1463,120 +1687,15 @@ document.addEventListener("keydown", (event) => {
 
 window.logout = logoutUser;
 window.sendMessage = sendMessage;
+
 window.clearChat = () => {
     alert("Shared lounge messages cannot be cleared here.");
 };
 
 window.addEventListener("pagehide", () => {
     closeServerContextMenu();
+
     stopPublicMessages();
     stopDirectMessages();
     stopMemberListener();
 });
-
-/* ==========================================
-   DIAMOND LOUNGE — MOBILE NAVIGATION FIX
-   MOBILE ONLY
-========================================== */
-
-@media (max-width: 600px) {
-
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        overflow: hidden;
-    }
-
-    .dashboard {
-        width: 100%;
-        height: 100dvh;
-        min-width: 0;
-        overflow: hidden;
-    }
-
-    /* Mobile sidebar */
-    .mobile-sidebar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        bottom: 0 !important;
-        width: 100vw !important;
-        max-width: 100vw !important;
-        height: 100dvh !important;
-        display: flex !important;
-        flex-direction: row !important;
-        transform: translateX(0) !important;
-        visibility: visible !important;
-        z-index: 1002 !important;
-        overflow: hidden !important;
-    }
-
-    /* Server rail */
-    .mobile-sidebar .servers {
-        width: 54px !important;
-        min-width: 54px !important;
-        max-width: 54px !important;
-        flex: 0 0 54px !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-    }
-
-    /* Channel sidebar */
-    .mobile-sidebar .channels {
-        width: auto !important;
-        min-width: 0 !important;
-        flex: 1 1 auto !important;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-    }
-
-    /* Do not display VIP channels on created servers */
-    .dashboard:has(.created-server.selected) #loungeSidebar {
-        display: none !important;
-    }
-
-    /* Respect hidden views */
-    [hidden] {
-        display: none !important;
-    }
-
-    /* Main views */
-    #emptyView,
-    #serverView,
-    #loungeView,
-    #dmHomeView,
-    #dmConversationView {
-        min-width: 0 !important;
-        max-width: 100% !important;
-        overflow-x: hidden !important;
-    }
-
-    /* Messages */
-    .messages,
-    .dm-messages {
-        min-width: 0 !important;
-        max-width: 100% !important;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        overflow-wrap: anywhere !important;
-    }
-
-    /* Inputs */
-    input,
-    textarea,
-    .message-box,
-    .dm-message-box {
-        max-width: 100% !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Media */
-    img,
-    video,
-    iframe {
-        max-width: 100%;
-    }
-}
