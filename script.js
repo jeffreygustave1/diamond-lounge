@@ -1490,8 +1490,48 @@ async function serverInviteDialog(channel=null){if(!currentUser||!activeCreatedS
 async function serverVoiceChannelSettings(channel){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog("Voice Channel Settings");const label=sfNode("label","Channel name");const input=document.createElement("input");input.value=channel.name||"";input.maxLength=40;c.append(label,input);const save=sfNode("button","Save");save.className="created-server-feature-action";c.append(save);save.onclick=async()=>{try{await updateDoc(doc(db,"servers",activeCreatedServerId,"channels",channel.id),{name:input.value.trim(),nameLower:normalizeServerName(input.value)});channel.name=input.value.trim();renderCreatedServerChannels();if(activeCreatedServerChannelId===channel.id&&createdServerActiveChannel)createdServerActiveChannel.textContent=channel.name;save.textContent="Saved";}catch(e){alert("Channel update failed. Check Firebase rules.");}};if(activeCreatedServerOwnerUid===currentUser.uid){const del=sfNode("button","Delete channel");del.className="created-server-feature-action";del.style.background="#ed4245";c.append(del);del.onclick=()=>{if(confirm("Delete this voice channel?"))void deleteCreatedServerChannel(channel);};}}
 async function openCreatedServerVoiceChat(channel){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog(channel.name+" — Chat");c.className="created-server-feature-content created-server-voice-chat-content";const log=document.createElement("div");log.className="created-server-voice-chat-log";c.append(log);const form=document.createElement("form");form.className="created-server-voice-chat-form";const input=document.createElement("input");input.placeholder="Message #"+channel.name;input.maxLength=2000;input.required=true;const send=sfNode("button","Send");send.className="created-server-feature-action";form.append(input,send);c.append(form);const ref=collection(db,"servers",activeCreatedServerId,"channels",channel.id,"messages");const unsub=onSnapshot(query(ref,orderBy("timestamp","asc")),snap=>{log.replaceChildren();snap.forEach(d=>{const data=d.data(),row=document.createElement("div");row.className="created-server-voice-chat-message";const name=sfNode("strong",data.displayName||data.username||"Member");const body=sfNode("span",data.text||"");row.append(name,body);log.append(row);});log.scrollTop=log.scrollHeight;},e=>{console.error(e);log.textContent="Chat could not be loaded. Firebase rules may need updating.";});form.onsubmit=async e=>{e.preventDefault();const text=input.value.trim();if(!text)return;send.disabled=true;try{await addDoc(ref,{uid:currentUser.uid,displayName:currentUser.displayName||currentUser.email?.split("@")[0]||"Member",text,timestamp:serverTimestamp()});input.value="";}catch(e){console.error(e);alert("Message failed to send. Firebase rules may need updating.");}finally{send.disabled=false;}};const modal=document.getElementById("serverFeatureDialog");modal?.querySelector(".created-server-feature-close")?.addEventListener("click",unsub,{once:true});modal?.addEventListener("DOMNodeRemoved",unsub,{once:true});}
 async function serverSettingsDialog(){if(!activeCreatedServerId||!currentUser)return;const snap=await getDoc(doc(db,"servers",activeCreatedServerId));if(!snap.exists())return;const d=snap.data(),c=serverFeatureDialog("Server Settings"),input=document.createElement("input");input.value=d.name||"";input.maxLength=40;const vis=document.createElement("select");["private","public"].forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;vis.append(o);});vis.value=d.visibility||"private";c.append(sfNode("label","Server name"),input,sfNode("label","Visibility"),vis);const save=sfNode("button","Save changes");save.className="created-server-feature-action";c.append(save);save.onclick=async()=>{if(activeCreatedServerOwnerUid!==currentUser.uid){alert("Only the owner can change settings.");return;}try{await updateDoc(doc(db,"servers",activeCreatedServerId),{name:input.value.trim(),nameLower:normalizeServerName(input.value),visibility:vis.value});if(serverViewName)serverViewName.textContent=input.value.trim();const mn=document.getElementById("createdServerMenuName");if(mn)mn.textContent=input.value.trim();save.textContent="Saved";}catch(e){alert("Settings save failed. Check Firestore rules.");}};}
-async function serverMembersDialog(){const c=serverFeatureDialog("Server Members");try{const snap=await getDocs(collection(db,"servers",activeCreatedServerId,"members"));snap.forEach(d=>c.append(sfNode("div",d.data().displayName||d.data().name||d.id)));}catch(e){c.append(sfNode("p","Members unavailable."));}}
-async function serverEventsDialog(){const c=serverFeatureDialog("Server Events");c.append(sfNode("p","Event scheduling is not yet connected."));}
+async async function serverMembersDialog() {
+    if (!activeCreatedServerId) return;
+    const content = serverFeatureDialog("Server Members");
+    content.textContent = "Loading members...";
+    try {
+        const serverSnapshot = await getDoc(doc(db, "servers", activeCreatedServerId));
+        if (!serverSnapshot.exists()) {
+            content.textContent = "This server no longer exists.";
+            return;
+        }
+        const memberUids = serverSnapshot.data().memberUids || [];
+        content.replaceChildren();
+        if (!memberUids.length) {
+            content.append(sfNode("p", "No members found."));
+            return;
+        }
+        const list = document.createElement("div");
+        list.style.display = "flex";
+        list.style.flexDirection = "column";
+        list.style.gap = "10px";
+        for (const uid of memberUids) {
+            try {
+                const userSnapshot = await getDoc(doc(db, "users", uid));
+                const userData = userSnapshot.exists() ? userSnapshot.data() : {};
+                const row = sfNode("div", userData.displayName || userData.name || (uid === activeCreatedServerOwnerUid ? "Server Owner" : "Member"));
+                row.style.padding = "10px 12px";
+                row.style.borderRadius = "8px";
+                row.style.background = "#232428";
+                if (uid === activeCreatedServerOwnerUid) row.textContent += " · Owner";
+                list.append(row);
+            } catch (memberError) {
+                console.warn("Member profile unavailable:", memberError);
+                list.append(sfNode("div", uid === activeCreatedServerOwnerUid ? "Server Owner" : "Member"));
+            }
+        }
+        content.append(list);
+    } catch (error) {
+        console.error("Server member list failed:", error);
+        content.textContent = "Members could not be loaded. Firebase permissions may need updating.";
+    }
+}
+function serverEventsDialog(){const c=serverFeatureDialog("Server Events");c.append(sfNode("p","Event scheduling is not yet connected."));}
 ==============
 
 function openServer(server) {
