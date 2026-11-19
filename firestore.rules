@@ -112,7 +112,7 @@ service cloud.firestore {
 
       match /roles/{roleId} {
         allow read: if isServerMember();
-        allow create, update, delete: if isServerOwner();
+        allow create, update, delete: if isServerOwner() || hasServerPermission('manageRoles');
       }
 
       match /members/{memberUid} {
@@ -131,7 +131,7 @@ service cloud.firestore {
               && request.resource.data.permissions.hasOnly(['viewChannels', 'sendMessages', 'connectVoice', 'speak']))
           );
         allow update: if (
-          isServerOwner()
+          (isServerOwner() || hasServerPermission('manageMembers') || hasServerPermission('manageRoles'))
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roleIds', 'permissions'])
           && request.resource.data.roleIds is list
           && request.resource.data.roleIds.size() <= 20
