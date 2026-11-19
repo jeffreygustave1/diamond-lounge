@@ -112,6 +112,28 @@ let stopMessagesListener = null;
 let stopMembersListener = null;
 let stopDirectMessagesListener = null;
 
+// ==================================================
+// CREATED SERVER CHANNEL STATE
+// ==================================================
+
+let stopServerChannelsListener = null;
+let stopCreatedServerMessagesListener = null;
+
+let activeCreatedServerChannelId = null;
+let activeCreatedServerChannelType = "text";
+let createdServerChannels = [];
+
+const createdServerTextChannels = document.getElementById("createdServerTextChannels");
+const createdServerVoiceChannels = document.getElementById("createdServerVoiceChannels");
+const addServerChannelButton = document.getElementById("addServerChannelButton");
+const createdServerActiveChannel = document.getElementById("createdServerActiveChannel");
+const createdServerChannelSymbol = document.getElementById("createdServerChannelSymbol");
+const createdServerMessages = document.getElementById("createdServerMessages");
+const createdServerMessageForm = document.getElementById("createdServerMessageForm");
+const createdServerMessageInput = document.getElementById("createdServerMessageInput");
+const createdServerSendButton = document.getElementById("createdServerSendButton");
+const createdServerMessageStatus = document.getElementById("createdServerMessageStatus");
+
 let members = [];
 let selectedMember = null;
 let currentConversationId = null;
