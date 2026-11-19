@@ -2916,3 +2916,8 @@ button {
         transform: translateX(0) !important;
     }
 }   
+
+   /* HIDE VIP CHANNELS WHEN A CREATED SERVER IS SELECTED */
+.dashboard:has(.created-server.selected) .channels {
+    display: none !important;
+}
