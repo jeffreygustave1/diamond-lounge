@@ -1487,50 +1487,7 @@ createdServerMessageForm?.addEventListener("submit", (event) => {
 // CREATED SERVER VOICE CHANNEL DISPLAY
 // ==================================================
 
-function openCreatedServerVoiceChannel(channel) {
-    if (!channel?.id || !activeCreatedServerId) return;
-
-    stopCreatedServerMessages();
-
-    activeCreatedServerChannelId = channel.id;
-    activeCreatedServerChannelType = "voice";
-
-    if (createdServerActiveChannel) {
-        createdServerActiveChannel.textContent = channel.name;
-    }
-
-    if (createdServerChannelSymbol) {
-        createdServerChannelSymbol.textContent = "◖";
-    }
-
-    if (createdServerMessageInput) {
-        createdServerMessageInput.disabled = true;
-        createdServerMessageInput.placeholder =
-            "Voice channels do not support text messages.";
-    }
-
-    if (createdServerSendButton) {
-        createdServerSendButton.disabled = true;
-    }
-
-    renderCreatedServerChannels();
-
-    if (createdServerMessages) {
-        createdServerMessages.replaceChildren();
-
-        const notice = document.createElement("div");
-        notice.className = "channel-empty";
-        notice.textContent =
-            `Voice channel "${channel.name}" selected. Voice connection integration will be added next.`;
-
-        createdServerMessages.appendChild(notice);
-    }
-}
-
-// ==================================================
-// CREATE CHANNEL (TYPE-SPECIFIC SHORTCUTS)
-// ==================================================
-
+function openCreatedServerVoiceChannel(channel){if(!channel?.id||!activeCreatedServerId)return;stopCreatedServerMessages();activeCreatedServerChannelId=channel.id;activeCreatedServerChannelType="voice";if(createdServerActiveChannel)createdServerActiveChannel.textContent=channel.name;if(createdServerChannelSymbol)createdServerChannelSymbol.textContent="◖";if(createdServerMessageInput){createdServerMessageInput.disabled=true;createdServerMessageInput.placeholder="Voice channels do not support text messages.";}if(createdServerSendButton)createdServerSendButton.disabled=true;renderCreatedServerChannels();if(createdServerMessages){createdServerMessages.replaceChildren();const h=document.createElement("h2");h.className="created-server-voice-title";h.textContent=channel.name;createdServerMessages.append(h);const stage=document.createElement("div");stage.className="created-server-voice-stage";createdServerMessages.append(stage);const ah=document.createElement("h3");ah.className="created-server-audience-heading";ah.textContent="AUDIENCE";createdServerMessages.append(ah);const aud=document.createElement("div");aud.className="created-server-audience";createdServerMessages.append(aud);const ctl=document.createElement("div");ctl.className="created-server-voice-controls";const join=document.createElement("button");join.className="created-server-voice-join";join.textContent="Join Voice";join.onclick=()=>window.diamondJoinCreatedVoiceRoom?.(channel.name,"cs-"+activeCreatedServerId+"-"+channel.id);const leave=document.createElement("button");leave.className="created-server-voice-leave";leave.textContent="Leave";leave.onclick=()=>window.diamondLeaveVoice?.();ctl.append(join,leave);createdServerMessages.append(ctl);const note=document.createElement("p");note.className="created-server-voice-status";note.textContent="Connect your microphone to join. Members will appear here.";createdServerMessages.append(note);createdServerVoicePresenceStop?.();createdServerVoicePresenceStop=window.diamondWatchCreatedVoiceRoom?.("cs-"+activeCreatedServerId+"-"+channel.id,stage,aud)||null;}}
 async function createCreatedServerChannel(typeOverride = null) {
     if (!currentUser || !activeCreatedServerId) return;
     const serverId = activeCreatedServerId;
@@ -1547,7 +1504,7 @@ async function createCreatedServerChannel(typeOverride = null) {
         if (typeInput === null) return;
         type = typeInput.trim().toLowerCase();
     }
-    if (!["text", "voice"].includes(type)) {
+    if (!["text", "voice", "category"].includes(type)) {
         alert("Channel type must be text or voice.");
         return;
     }
