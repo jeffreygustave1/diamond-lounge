@@ -138,6 +138,8 @@ let members = [];
 let selectedMember = null;
 let currentConversationId = null;
 let serverContextMenu = null;
+let serverLongPressTimer = null;
+let suppressServerClick = false;
 
 let currentAvatar = "diamond";
 let uploadedPicture = "";
