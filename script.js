@@ -1929,7 +1929,7 @@ async function serverMembersDialog() {
                     roleWrap.style.flexWrap = "wrap";
                     roleWrap.style.gap = "8px";
                     roleWrap.style.marginTop = "10px";
-                    const selectedRoleIds = new Set(memberData.roleIds || []);
+                    const selectedRoleIds = new Set(memberData.roleIds || (memberSnapshot.exists() ? [] : ["member"]));
                     const checks = [];
                     roles.forEach(role => {
                         const label = document.createElement("label");
@@ -1958,10 +1958,18 @@ async function serverMembersDialog() {
                                 (Array.isArray(item.role.permissions) ? item.role.permissions : [])
                                     .forEach(permission => permissions.add(permission));
                             });
-                            await updateDoc(doc(db, "servers", serverId, "members", uid), {
-                                roleIds,
-                                permissions: [...permissions]
-                            });
+                            const memberRef = doc(db, "servers", serverId, "members", uid);
+                            const roleUpdate = { roleIds, permissions: [...permissions] };
+                            if (memberSnapshot.exists()) {
+                                await updateDoc(memberRef, roleUpdate);
+                            } else {
+                                await setDoc(memberRef, {
+                                    uid,
+                                    displayName: userData.displayName || userData.name || "Member",
+                                    ...roleUpdate,
+                                    joinedAt: serverTimestamp()
+                                });
+                            }
                             status.textContent = "Saved";
                         } catch (error) {
                             console.error("Member role assignment failed:", error);
