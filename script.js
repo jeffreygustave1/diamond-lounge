@@ -1889,7 +1889,6 @@ async function serverEventsDialog() {
     };
     document.getElementById("serverFeatureDialog")?.querySelector(".created-server-feature-close")?.addEventListener("click", unsub, { once: true });
 }
-==============
 
 function openServer(server) {
     if (!server?.id) return;
