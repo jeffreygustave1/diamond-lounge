@@ -1115,10 +1115,15 @@ function loadCreatedServerChannels(serverId) {
             renderCreatedServerChannels();
 
             const selectedChannel = createdServerChannels.find(
-                (channel) =>
-                    channel.id === activeCreatedServerChannelId &&
-                    channel.type === "text"
-            );
+    (channel) =>
+        channel.id === activeCreatedServerChannelId &&
+        channel.type === activeCreatedServerChannelType
+);
+
+if (selectedChannel) {
+    renderCreatedServerChannels();
+    return;
+}
 
             if (selectedChannel) {
                 return;
