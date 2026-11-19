@@ -11,7 +11,7 @@
     <link rel="icon" type="image/gif" href="diamond-favicon.gif?v=1">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="style.css?v=23">
+    <link rel="stylesheet" href="style.css?v=24">
     <link rel="stylesheet" href="luxury.css?v=9">
     <link rel="stylesheet" href="branding-polish.css?v=9">
     <link rel="stylesheet" href="dm.css?v=2">
@@ -469,124 +469,48 @@
 
                 
 <div class="created-server-workspace" id="createdServerWorkspace">
-
-    <!-- SERVER CHANNELS -->
     <aside class="created-server-channel-panel">
-
+        <details class="created-server-dropdown">
+            <summary id="createdServerMenuTrigger"><span id="createdServerMenuName">Server menu</span><span class="server-menu-chevron">⌄</span></summary>
+            <div class="created-server-menu">
+                <button type="button" data-server-menu-action="invite">Invite People</button>
+                <button type="button" data-server-menu-action="settings">Server Settings</button>
+                <button type="button" data-server-menu-action="channel">Create Channel</button>
+                <button type="button" data-server-menu-action="category">Create Category</button>
+                <button type="button" data-server-menu-action="event">Create Event</button>
+            </div>
+        </details>
+        <button type="button" class="created-server-event-row" data-server-menu-action="event"><span>▣</span> Events</button>
+        <button type="button" class="created-server-event-row" data-server-menu-action="members"><span>♙</span> Members</button>
         <div class="created-server-channel-heading">
-            <h3>CHANNELS</h3>
-
-            <button
-                type="button"
-                id="addServerChannelButton"
-                title="Create a channel"
-                aria-label="Create a channel">
-                +
-            </button>
+            <h3>TEXT CHANNELS</h3>
+            <button type="button" id="addServerTextChannelButton" title="Create text channel" aria-label="Create text channel">+</button>
         </div>
-
         <div class="created-server-channel-section">
-            <h4>TEXT CHANNELS</h4>
             <ul id="createdServerTextChannels"></ul>
         </div>
-
+        <div class="created-server-channel-heading">
+            <h3>VOICE CHANNELS</h3>
+            <button type="button" id="addServerVoiceChannelButton" title="Create voice channel" aria-label="Create voice channel">+</button>
+        </div>
         <div class="created-server-channel-section">
-            <h4>VOICE CHANNELS</h4>
             <ul id="createdServerVoiceChannels"></ul>
         </div>
-
+        <button type="button" id="addServerChannelButton" class="created-server-add-channel" title="Create channel" aria-label="Create channel">＋ Create Channel</button>
     </aside>
-
-    <!-- SERVER CHAT -->
     <section class="created-server-chat">
-
         <header class="created-server-chat-header">
-            <div>
-                <span class="created-server-channel-symbol" id="createdServerChannelSymbol">#</span>
-                <span id="createdServerActiveChannel">general</span>
-            </div>
+            <div><span class="created-server-channel-symbol" id="createdServerChannelSymbol">#</span><span id="createdServerActiveChannel">general</span></div>
+            <button type="button" class="created-server-header-members" data-server-menu-action="members" title="View members">♙ Members</button>
         </header>
-
-        <div
-            id="createdServerMessages"
-            class="created-server-messages"
-            aria-live="polite">
-        </div>
-
+        <div id="createdServerMessages" class="created-server-messages" aria-live="polite"></div>
         <form id="createdServerMessageForm" class="message-box glass-surface">
-
-            <input
-                type="text"
-                id="createdServerMessageInput"
-                placeholder="Message this channel..."
-                maxlength="2000"
-                autocomplete="off">
-
-            <button type="submit" id="createdServerSendButton">
-                Send
-            </button>
-
+            <input type="text" id="createdServerMessageInput" placeholder="Message this channel..." maxlength="2000" autocomplete="off">
+            <button type="submit" id="createdServerSendButton">Send</button>
         </form>
-
-        <div
-            id="createdServerMessageStatus"
-            class="upload-status"
-            role="status"
-            aria-live="polite">
-        </div>
-
+        <div id="createdServerMessageStatus" class="upload-status" role="status" aria-live="polite"></div>
     </section>
-
-</div>
-</escape>
-
-            </section>
-
-            <!-- DIRECT MESSAGES HOME -->
-            <section id="dmHomeView" class="dm-home-view" hidden>
-
-                <header class="chat-header">
-
-                    <div class="chat-header-main">
-
-                        <button
-                            class="mobile-menu-button"
-                            type="button"
-                            aria-label="Open navigation menu"
-                            aria-controls="mobileSidebar"
-                            aria-expanded="false">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
-
-                        <div>
-                            <div class="channel-title">
-                                ✦ <span>Direct Messages</span>
-                            </div>
-
-                            <div class="sub-header">
-                                Your private corner of Diamond Lounge.
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <span class="secure-label">✦ PRIVATE</span>
-
-                </header>
-
-                <div class="dm-welcome">
-                    <img src="diamond.gif" alt="" class="dm-welcome-gem">
-
-                    <span class="eyebrow">DIAMOND LOUNGE</span>
-
-                    <h2>Your conversations.<br><em>Your people.</em></h2>
-
-                    <p>
-                        Choose a member from the left to start a private conversation.
-                    </p>
-                </div>
+</div></div>
 
             </section>
 
@@ -887,7 +811,7 @@
     </div>
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
-    <script type="module" src="script.js?v=24"></script>
+    <script type="module" src="script.js?v=25"></script>
     <script type="module" src="voice.js?v=24"></script>
 
     <!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
