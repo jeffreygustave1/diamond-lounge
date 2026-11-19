@@ -1473,3 +1473,110 @@ window.addEventListener("pagehide", () => {
     stopDirectMessages();
     stopMemberListener();
 });
+
+/* ==========================================
+   DIAMOND LOUNGE — MOBILE NAVIGATION FIX
+   MOBILE ONLY
+========================================== */
+
+@media (max-width: 600px) {
+
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .dashboard {
+        width: 100%;
+        height: 100dvh;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    /* Mobile sidebar */
+    .mobile-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100dvh !important;
+        display: flex !important;
+        flex-direction: row !important;
+        transform: translateX(0) !important;
+        visibility: visible !important;
+        z-index: 1002 !important;
+        overflow: hidden !important;
+    }
+
+    /* Server rail */
+    .mobile-sidebar .servers {
+        width: 54px !important;
+        min-width: 54px !important;
+        max-width: 54px !important;
+        flex: 0 0 54px !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Channel sidebar */
+    .mobile-sidebar .channels {
+        width: auto !important;
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    /* Do not display VIP channels on created servers */
+    .dashboard:has(.created-server.selected) #loungeSidebar {
+        display: none !important;
+    }
+
+    /* Respect hidden views */
+    [hidden] {
+        display: none !important;
+    }
+
+    /* Main views */
+    #emptyView,
+    #serverView,
+    #loungeView,
+    #dmHomeView,
+    #dmConversationView {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Messages */
+    .messages,
+    .dm-messages {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* Inputs */
+    input,
+    textarea,
+    .message-box,
+    .dm-message-box {
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Media */
+    img,
+    video,
+    iframe {
+        max-width: 100%;
+    }
+}
