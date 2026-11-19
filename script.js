@@ -1401,7 +1401,7 @@ function renderCreatedServerChannels() {
         const label = document.createElement("span");
         label.textContent = category.name.toUpperCase();
         heading.append(label);
-        if (isOwner) {
+        if (canManageChannels) {
             const remove = document.createElement("button");
             remove.type = "button";
             remove.className = "created-server-channel-delete";
