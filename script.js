@@ -1611,6 +1611,7 @@ function openServer(server) {
     selectedMember = null;
     currentConversationId = null;
     activeCreatedServerId = server.id;
+activeCreatedServerOwnerUid = server.ownerUid || null;
 activeCreatedServerChannelId = null;
 activeCreatedServerChannelType = "text";
 
