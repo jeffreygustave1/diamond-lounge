@@ -1639,3 +1639,7 @@ function playVoicePresenceSound(type) {
         console.warn("Voice presence sound failed:", error);
     }
 }
+/* CREATED-SERVER VOICE BRIDGE */
+window.diamondJoinCreatedVoiceRoom=async(label,customRoomId)=>{if(localStream)await leaveVoice();selectedChannel=label;roomId=customRoomId;setStatus("Connecting to "+label+"...");watchParticipants();await joinVoice();};
+window.diamondLeaveVoice=()=>leaveVoice();
+window.diamondWatchCreatedVoiceRoom=(customRoomId,stage,audience)=>{const unsub=onSnapshot(collection(db,"voiceRooms",customRoomId,"participants"),snap=>{const live=snap.docs.map(d=>d.data()).filter(p=>Date.now()-Number(p.heartbeatAt||0)<STALE_AFTER_MS);stage.replaceChildren();audience.replaceChildren();if(!live.length){stage.textContent="No one connected yet.";return;}live.forEach(p=>{const tile=document.createElement("div");tile.className="created-server-voice-tile";const avatar=document.createElement("div");avatar.className="created-server-voice-avatar";avatar.textContent=(p.name||"Member").trim().slice(0,1).toUpperCase();const nm=document.createElement("div");nm.className="created-server-voice-name";nm.textContent=p.name||"Member";tile.append(avatar,nm);if(p.cameraOn||p.screenOn){const badge=document.createElement("span");badge.textContent=p.cameraOn?"📷":"🖥️";tile.append(badge);}stage.append(tile);const person=document.createElement("div");person.className="created-server-audience-member";person.textContent=p.name||"Member";audience.append(person);});});return()=>unsub();};
