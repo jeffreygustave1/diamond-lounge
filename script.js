@@ -107,6 +107,7 @@ const channelDescriptions = {
 let currentUser = null;
 let activeTextChannel = null;
 let activeCreatedServerId = null;
+let activeCreatedServerOwnerUid = null;
 
 let stopMessagesListener = null;
 let stopMembersListener = null;
