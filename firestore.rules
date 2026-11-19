@@ -84,6 +84,7 @@ service cloud.firestore {
       allow delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
       function isServerMember() { return request.auth != null && request.auth.uid in get(/databases/$(database)/documents/servers/$(serverId)).data.memberUids; }
       function isServerOwner() { return request.auth != null && get(/databases/$(database)/documents/servers/$(serverId)).data.ownerUid == request.auth.uid; }
+      match /roles/{roleId} { allow read: if isServerMember(); allow create, update, delete: if isServerOwner(); }
       match /members/{memberUid} { allow read: if isServerMember(); allow create, update: if request.auth != null && request.auth.uid == memberUid && isServerMember() && request.resource.data.uid == memberUid; allow delete: if request.auth != null && request.auth.uid == memberUid; }
       match /channels/{channelId} { allow read: if isServerMember(); allow create: if isServerMember() && request.resource.data.createdBy == request.auth.uid && request.resource.data.type in ['text','voice','category']; allow update, delete: if isServerOwner();
         match /messages/{messageId} { allow read: if isServerMember(); allow create: if isServerMember() && request.resource.data.uid == request.auth.uid && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 2000; allow update, delete: if false; }
