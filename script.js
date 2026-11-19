@@ -17,7 +17,7 @@ import {
     orderBy,
     query,
     serverTimestamp,
-    setDoc,
+    setDoc,\n    updateDoc,
     where
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
@@ -1582,22 +1582,13 @@ async function createCreatedServerChannel(typeOverride = null) {
 
 addServerChannelButton?.addEventListener("click", () => void createCreatedServerChannel());
 document.getElementById("addServerTextChannelButton")?.addEventListener("click", () => void createCreatedServerChannel("text"));
-document.getElementById("addServerVoiceChannelButton")?.addEventListener("click", () => void createCreatedServerChannel("voice"));
-
-document.querySelectorAll("[data-server-menu-action]").forEach(button => {
-    button.addEventListener("click", () => {
-        const action = button.dataset.serverMenuAction;
-        if (action === "channel") return void createCreatedServerChannel();
-        if (action === "invite") alert("Invite People will be implemented next, with shareable invite links.");
-        if (action === "settings") alert("Server Settings is the next feature being built.");
-        if (action === "category") alert("Channel categories are coming next.");
-        if (action === "event") alert("Server events are coming next.");
-        if (action === "members") alert("Server member list is coming next.");
-    });
-});
-// ==================================================
-// OPEN, SELECT, AND DELETE CREATED SERVERS
-// ==================================================
+document.getElementById("addServerVoiceChannelButton")?.addEventListener("click", () => void createCreatedServerChandocument.querySelectorAll("[data-server-menu-action]").forEach(button=>button.addEventListener("click",()=>{const a=button.dataset.serverMenuAction;if(a==="channel")void createCreatedServerChannel();if(a==="invite")void serverInviteDialog();if(a==="settings")void serverSettingsDialog();if(a==="members")void serverMembersDialog();if(a==="category")void createCreatedServerChannel("category");if(a==="event")void serverEventsDialog();}));
+function serverFeatureDialog(title){let o=document.getElementById("serverFeatureDialog");if(!o){o=document.createElement("div");o.id="serverFeatureDialog";o.className="created-server-feature-backdrop";o.innerHTML='<section class="created-server-feature-modal"><button type="button" class="created-server-feature-close">×</button><h2></h2><div class="created-server-feature-content"></div></section>';document.body.append(o);o.querySelector("button").onclick=()=>o.remove();o.onclick=e=>{if(e.target===o)o.remove();};}o.querySelector("h2").textContent=title;const c=o.querySelector(".created-server-feature-content");c.replaceChildren();return c;}function sfNode(tag,t){const n=document.createElement(tag);n.textContent=t;return n;}
+async function serverInviteDialog(){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog("Invite Friends");c.append(sfNode("p","Create a shareable invite link."));const b=sfNode("button","Create invite link");b.className="created-server-feature-action";c.append(b);const area=document.createElement("div");c.append(area);b.onclick=async()=>{try{b.disabled=true;const code=(crypto.randomUUID?.()||Date.now()+"-"+Math.random()).replace(/-/g,"").slice(0,20);await setDoc(doc(db,"servers",activeCreatedServerId,"invites",code),{code,createdBy:currentUser.uid,createdAt:serverTimestamp()});const url=new URL(location.href);url.searchParams.set("serverInvite",activeCreatedServerId);url.searchParams.set("invite",code);area.replaceChildren();const input=document.createElement("input");input.readOnly=true;input.value=url.href;const cp=sfNode("button","Copy");cp.className="created-server-feature-action";cp.onclick=async()=>{try{await navigator.clipboard.writeText(input.value);cp.textContent="Copied";}catch{input.select();document.execCommand("copy");}};area.append(input,cp);}catch(e){console.error(e);alert("Invite creation failed. Firebase permissions may need updating.");}finally{b.disabled=false;}};}
+async function serverSettingsDialog(){if(!activeCreatedServerId||!currentUser)return;const snap=await getDoc(doc(db,"servers",activeCreatedServerId));if(!snap.exists())return;const d=snap.data(),c=serverFeatureDialog("Server Settings"),input=document.createElement("input");input.value=d.name||"";input.maxLength=40;const vis=document.createElement("select");["private","public"].forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;vis.append(o);});vis.value=d.visibility||"private";c.append(sfNode("label","Server name"),input,sfNode("label","Visibility"),vis);const save=sfNode("button","Save changes");save.className="created-server-feature-action";c.append(save);save.onclick=async()=>{if(activeCreatedServerOwnerUid!==currentUser.uid){alert("Only the owner can change settings.");return;}try{await updateDoc(doc(db,"servers",activeCreatedServerId),{name:input.value.trim(),nameLower:normalizeServerName(input.value),visibility:vis.value});if(serverViewName)serverViewName.textContent=input.value.trim();const mn=document.getElementById("createdServerMenuName");if(mn)mn.textContent=input.value.trim();save.textContent="Saved";}catch(e){alert("Settings save failed. Check Firestore rules.");}};}
+async function serverMembersDialog(){const c=serverFeatureDialog("Server Members");try{const snap=await getDocs(collection(db,"servers",activeCreatedServerId,"members"));snap.forEach(d=>c.append(sfNode("div",d.data().displayName||d.data().name||d.id)));}catch(e){c.append(sfNode("p","Members unavailable."));}}
+async function serverEventsDialog(){const c=serverFeatureDialog("Server Events");c.append(sfNode("p","Event scheduling is not yet connected."));}
+==============
 
 function openServer(server) {
     if (!server?.id) return;
