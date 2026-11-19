@@ -1493,13 +1493,13 @@ async function createCreatedServerChannel(typeOverride = null) {
         type = typeInput.trim().toLowerCase();
     }
     if (!["text", "voice", "category"].includes(type)) {
-        alert("Channel type must be text or voice.");
+        alert("Channel type must be text, voice, or category.");
         return;
     }
     const nameLower = name.toLowerCase();
     if (createdServerChannels.some(channel => channel.type === type &&
         String(channel.name || "").trim().toLowerCase() === nameLower)) {
-        alert(`A ${type} channel with that name already exists.`);
+        alert(`A ${type} with that name already exists.`);
         return;
     }
     const buttons = [addServerChannelButton,
