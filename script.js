@@ -167,8 +167,6 @@ function normalizeServerName(name) {
 const SERVER_PERMISSION_OPTIONS = [
     ["manageChannels", "Manage channels"],
     ["manageEvents", "Manage events"],
-    ["manageMembers", "Manage members"],
-    ["manageRoles", "Manage roles"],
     ["manageInvites", "Manage invites"],
     ["manageMessages", "Manage messages"]
 ];
@@ -1888,7 +1886,7 @@ async function serverSettingsDialog() {
 async function serverMembersDialog() {
     if (!activeCreatedServerId) return;
     const serverId = activeCreatedServerId;
-    const canManageMembers = await currentServerHasPermission("manageMembers") || await currentServerHasPermission("manageRoles");
+    const canManageMembers = activeCreatedServerOwnerUid === currentUser?.uid;
     const content = serverFeatureDialog("Server Members");
     content.textContent = "Loading members...";
     try {
@@ -1999,8 +1997,8 @@ async function serverMembersDialog() {
 
 async function serverRolesDialog() {
     if (!activeCreatedServerId || !currentUser) return;
-    if (!(await currentServerHasPermission("manageRoles"))) {
-        alert("You need the Manage Roles permission to manage roles.");
+    if (activeCreatedServerOwnerUid !== currentUser.uid) {
+        alert("Only the server owner can manage roles.");
         return;
     }
 
