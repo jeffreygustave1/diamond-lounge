@@ -1528,94 +1528,72 @@ function openCreatedServerVoiceChannel(channel) {
 }
 
 // ==================================================
-// CREATE CHANNEL
+// CREATE CHANNEL (TYPE-SPECIFIC SHORTCUTS)
 // ==================================================
 
-addServerChannelButton?.addEventListener("click", async () => {
+async function createCreatedServerChannel(typeOverride = null) {
     if (!currentUser || !activeCreatedServerId) return;
-
     const serverId = activeCreatedServerId;
-
-    const nameInput = prompt(
-        "Enter the channel name:"
-    );
-
+    const nameInput = prompt("Enter the channel name:");
     if (nameInput === null) return;
-
     const name = nameInput.trim();
-
     if (name.length < 1 || name.length > 40) {
         alert("Channel names must be between 1 and 40 characters.");
         return;
     }
-
-    const typeInput = prompt(
-        "Enter channel type: text or voice",
-        "text"
-    );
-
-    if (typeInput === null) return;
-
-    const type = typeInput.trim().toLowerCase();
-
+    let type = typeOverride;
+    if (!type) {
+        const typeInput = prompt("Enter channel type: text or voice", "text");
+        if (typeInput === null) return;
+        type = typeInput.trim().toLowerCase();
+    }
     if (!["text", "voice"].includes(type)) {
         alert("Channel type must be text or voice.");
         return;
     }
-
     const nameLower = name.toLowerCase();
-
-    const duplicate = createdServerChannels.some(
-        (channel) =>
-            channel.type === type &&
-            String(channel.name || "").trim().toLowerCase() === nameLower
-    );
-
-    if (duplicate) {
+    if (createdServerChannels.some(channel => channel.type === type &&
+        String(channel.name || "").trim().toLowerCase() === nameLower)) {
         alert(`A ${type} channel with that name already exists.`);
         return;
     }
-
-    addServerChannelButton.disabled = true;
-
+    const buttons = [addServerChannelButton,
+        document.getElementById("addServerTextChannelButton"),
+        document.getElementById("addServerVoiceChannelButton")].filter(Boolean);
+    buttons.forEach(button => button.disabled = true);
     try {
-        const channelsRef = collection(
-            db,
-            "servers",
-            serverId,
-            "channels"
-        );
-
+        const channelsRef = collection(db, "servers", serverId, "channels");
         const channelRef = await addDoc(channelsRef, {
-            name,
-            nameLower,
-            type,
-            createdBy: currentUser.uid,
+            name, nameLower, type, createdBy: currentUser.uid,
             createdAt: serverTimestamp()
         });
-
-        if (
-            type === "text" &&
-            activeCreatedServerId === serverId
-        ) {
-            openCreatedServerChannel({
-                id: channelRef.id,
-                name,
-                nameLower,
-                type
-            });
+        if (activeCreatedServerId === serverId && type === "text") {
+            openCreatedServerChannel({ id: channelRef.id, name, nameLower, type });
         }
     } catch (error) {
         console.error("Channel creation failed:", error);
-
-        alert(
-            error.code === "permission-denied"
-                ? "Firebase denied channel creation. Check your Firestore rules."
-                : "The channel could not be created."
-        );
+        alert(error.code === "permission-denied"
+            ? "Firebase denied channel creation. Check your Firestore rules."
+            : "The channel could not be created.");
     } finally {
-        addServerChannelButton.disabled = false;
+        buttons.forEach(button => button.disabled = false);
     }
+}
+
+addServerChannelButton?.addEventListener("click", () => void createCreatedServerChannel());
+document.getElementById("addServerTextChannelButton")?.addEventListener("click", () => void createCreatedServerChannel("text"));
+document.getElementById("addServerVoiceChannelButton")?.addEventListener("click", () => void createCreatedServerChannel("voice"));
+
+document.querySelectorAll("[data-server-menu-action]").forEach(button => {
+    button.addEventListener("click", () => {
+        const action = button.dataset.serverMenuAction;
+        if (action === "channel") return void createCreatedServerChannel();
+        if (action === "invite") alert("Invite People will be implemented next, with shareable invite links.");
+        if (action === "settings") alert("Server Settings is the next feature being built.");
+        if (action === "category") alert("Channel categories are coming next.");
+        if (action === "event") alert("Server events are coming next.");
+        if (action === "members") alert("Server member list is coming next.");
+    });
 });
 // ==================================================
 // OPEN, SELECT, AND DELETE CREATED SERVERS
