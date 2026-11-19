@@ -936,14 +936,94 @@ createServerForm?.addEventListener("submit", async (event) => {
     }
 
     try {
-        const serverRef = await addDoc(collection(db, "servers"), {
-            name,
-            nameLower: normalizedName,
-            visibility: serverVisibilityInput.value,
-            ownerUid: currentUser.uid,
-            memberUids: [currentUser.uid],
-            createdAt: serverTimestamp()
-        });
+        
+    
+    const serverRef = await addDoc(collection(db, "servers"), {
+    name,
+    nameLower: normalizedName,
+    visibility: serverVisibilityInput.value,
+    ownerUid: currentUser.uid,
+    memberUids: [currentUser.uid],
+    createdAt: serverTimestamp()
+});
+
+// ================================================
+// INITIALIZE SERVER ROLES
+// ================================================
+
+const serverId = serverRef.id;
+
+const serverRolesRef = collection(db, "servers", serverId, "roles");
+
+await Promise.all([
+    setDoc(doc(serverRolesRef, "owner"), {
+        name: "Owner",
+        nameLower: "owner",
+        permissions: ["*"],
+        position: 100,
+        managed: true,
+        createdAt: serverTimestamp()
+    }),
+
+    setDoc(doc(serverRolesRef, "admin"), {
+        name: "Admin",
+        nameLower: "admin",
+        permissions: [
+            "manageServer",
+            "manageChannels",
+            "manageRoles",
+            "manageMembers",
+            "manageMessages",
+            "kickMembers",
+            "banMembers",
+            "manageInvites",
+            "manageVoice"
+        ],
+        position: 80,
+        managed: false,
+        createdAt: serverTimestamp()
+    }),
+
+    setDoc(doc(serverRolesRef, "moderator"), {
+        name: "Moderator",
+        nameLower: "moderator",
+        permissions: [
+            "manageMessages",
+            "kickMembers",
+            "manageVoice"
+        ],
+        position: 50,
+        managed: false,
+        createdAt: serverTimestamp()
+    }),
+
+    setDoc(doc(serverRolesRef, "member"), {
+        name: "Member",
+        nameLower: "member",
+        permissions: [
+            "viewChannels",
+            "sendMessages",
+            "connectVoice",
+            "speak"
+        ],
+        position: 10,
+        managed: false,
+        createdAt: serverTimestamp()
+    })
+]);
+
+// ================================================
+// INITIALIZE SERVER OWNER MEMBERSHIP
+// ================================================
+
+await setDoc(
+    doc(db, "servers", serverId, "members", currentUser.uid),
+    {
+        uid: currentUser.uid,
+        roleIds: ["owner"],
+        joinedAt: serverTimestamp()
+    }
+);
 
         closeServerModal();
 
