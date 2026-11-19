@@ -1757,17 +1757,57 @@ function makeServerIcon(server) {
 
     server.button = icon;
 
-    icon.addEventListener("click", () => {
+    icon.addEventListener("click", (event) => {
+        if (suppressServerClick) {
+            event.preventDefault();
+            event.stopPropagation();
+            suppressServerClick = false;
+            return;
+        }
+
         openServer(server);
     });
 
+    // COMPUTER RIGHT-CLICK
     icon.addEventListener("contextmenu", (event) => {
         showServerContextMenu(event, server);
     });
 
+    // MOBILE LONG-PRESS
+    icon.addEventListener("pointerdown", (event) => {
+        if (event.pointerType !== "touch") return;
+
+        clearTimeout(serverLongPressTimer);
+        suppressServerClick = false;
+
+        serverLongPressTimer = setTimeout(() => {
+            suppressServerClick = true;
+
+            showServerContextMenu(
+                {
+                    preventDefault() {},
+                    clientX: event.clientX,
+                    clientY: event.clientY
+                },
+                server
+            );
+        }, 650);
+    });
+
+    icon.addEventListener("pointerup", () => {
+        clearTimeout(serverLongPressTimer);
+    });
+
+    icon.addEventListener("pointercancel", () => {
+        clearTimeout(serverLongPressTimer);
+    });
+
+    icon.addEventListener("pointerleave", () => {
+        clearTimeout(serverLongPressTimer);
+    });
+
     return icon;
 }
-
 // Load saved servers while hiding the old THEAGENTS server.
 async function loadServerIcons() {
     if (!currentUser || !createdServers) return;
