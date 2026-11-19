@@ -1256,6 +1256,81 @@ function renderCreatedServerChannels() {
 }
 
 // ==================================================
+
+// DELETE CREATED SERVER CHANNEL
+
+// ==================================================
+
+async function deleteCreatedServerChannel(channel) {
+
+    if (
+
+        !currentUser ||
+
+        !activeCreatedServerId ||
+
+        activeCreatedServerOwnerUid !== currentUser.uid ||
+
+        !channel?.id
+
+    ) {
+
+        return;
+
+    }
+
+    const confirmed = confirm(
+
+        `Delete the ${channel.type} channel "${channel.name}"?`
+
+    );
+
+    if (!confirmed) return;
+
+    const serverId = activeCreatedServerId;
+
+    try {
+
+        await deleteDoc(
+
+            doc(db, "servers", serverId, "channels", channel.id)
+
+        );
+
+        if (activeCreatedServerChannelId === channel.id) {
+
+            stopCreatedServerMessages();
+
+            activeCreatedServerChannelId = null;
+
+            if (createdServerMessages) {
+
+                createdServerMessages.textContent =
+
+                    "Channel deleted.";
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error("Channel deletion failed:", error);
+
+        alert(
+
+            error.code === "permission-denied"
+
+                ? "Firebase denied channel deletion."
+
+                : "The channel could not be deleted."
+
+        );
+
+    }
+
+}
+// ==================================================
 // OPEN CREATED SERVER TEXT CHANNEL
 // ==================================================
 
