@@ -1,0 +1,16 @@
+name: Deploy Firebase Rules
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --global firebase-tools
+      - name: Deploy Firestore and Storage rules
+        run: firebase deploy --only firestore:rules,storage --project diamond-lounge-7caf6 --token "${{ secrets.FIREBASE_TOKEN }}"
