@@ -3233,3 +3233,166 @@ button {
     }
 
 }
+
+/* ==========================================
+   DIAMOND LOUNGE — MOBILE WIDTH FIX
+========================================== */
+
+@media screen and (max-width: 600px) {
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .dashboard {
+        width: 100%;
+        max-width: 100vw;
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Keep the server rail compact */
+    .servers {
+        width: 64px !important;
+        min-width: 64px !important;
+        padding: 12px 0 !important;
+        gap: 12px !important;
+    }
+
+    .server-icon {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    /* Channel sidebar becomes a mobile drawer */
+    .channels {
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 64px !important;
+
+        width: min(240px, calc(100vw - 80px)) !important;
+        min-width: 0 !important;
+        max-width: calc(100vw - 80px) !important;
+
+        z-index: 1000 !important;
+
+        transform: translateX(-110%);
+        visibility: hidden;
+        transition:
+            transform .22s ease,
+            visibility .22s ease;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    .dashboard.mobile-nav-open .channels {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    /* No members column on phones */
+    .members,
+    #communitySidebar {
+        display: none !important;
+        width: 0 !important;
+        min-width: 0 !important;
+    }
+
+    /* Chat takes the full available phone width */
+    .chat-area {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        flex: 1 1 0% !important;
+
+        overflow: hidden !important;
+    }
+
+    .chat-header {
+        min-width: 0 !important;
+        padding: 12px 14px !important;
+    }
+
+    .chat-header-main {
+        min-width: 0 !important;
+        overflow: hidden;
+    }
+
+    .chat-header-main > div {
+        min-width: 0;
+    }
+
+    .channel-title,
+    .sub-header {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Keep messages inside the phone */
+    .messages,
+    .dm-messages {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        padding: 14px 10px !important;
+        overflow-x: hidden !important;
+    }
+
+    .message {
+        max-width: 100% !important;
+        overflow-wrap: anywhere;
+    }
+
+    /* Compact message composer */
+    .message-box {
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 8px !important;
+        gap: 6px !important;
+    }
+
+    .message-box input {
+        min-width: 0 !important;
+        width: 0 !important;
+        flex: 1 1 0% !important;
+    }
+
+    .message-box button {
+        padding: 9px 12px !important;
+    }
+
+    /* Remove unwanted horizontal overflow */
+    #loungeView,
+    #serverView,
+    #dmHomeView,
+    #dmConversationView,
+    #emptyView {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    /* Mobile navigation backdrop */
+    .mobile-sidebar-backdrop {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 999 !important;
+        background: rgba(0, 0, 0, .55) !important;
+    }
+
+    .dashboard.mobile-nav-open .mobile-sidebar-backdrop {
+        display: block !important;
+    }
+
+    /* Prevent desktop-sized content from stretching the screen */
+    * {
+        max-width: 100%;
+    }
+
+}
