@@ -467,15 +467,84 @@
 
                 </header>
 
-                <div class="server-empty">
-                    <img src="diamond.gif" alt="" class="server-empty-gem">
-                    <span class="eyebrow">SERVER CREATED</span>
-                    <h2 id="serverWelcomeName">Your server</h2>
-                    <p>You own this space. It is saved and will be here next time you sign in.</p>
-                    <p class="server-empty-note">
-                        Its own text and voice channels can be added next.
-                    </p>
-                </div>
+                
+<div class="created-server-workspace" id="createdServerWorkspace">
+
+    <!-- SERVER CHANNELS -->
+    <aside class="created-server-channel-panel">
+
+        <div class="created-server-channel-heading">
+            <h3>CHANNELS</h3>
+
+            <button
+                type="button"
+                id="addServerChannelButton"
+                title="Create a channel"
+                aria-label="Create a channel">
+                +
+            </button>
+        </div>
+
+        <div class="created-server-channel-section">
+            <h4>TEXT CHANNELS</h4>
+            <ul id="createdServerTextChannels"></ul>
+        </div>
+
+        <div class="created-server-channel-section">
+            <h4>VOICE CHANNELS</h4>
+            <ul id="createdServerVoiceChannels"></ul>
+        </div>
+
+    </aside>
+
+    <!-- SERVER CHAT -->
+    <section class="created-server-chat">
+
+        <header class="created-server-chat-header">
+            <div>
+                <span class="created-server-channel-symbol" id="createdServerChannelSymbol">#</span>
+                <span id="createdServerActiveChannel">general</span>
+            </div>
+        </header>
+
+        <div
+            id="createdServerMessages"
+            class="created-server-messages"
+            aria-live="polite">
+        </div>
+
+        <form id="createdServerMessageForm" class="message-box glass-surface">
+
+            <input
+                type="text"
+                id="createdServerMessageInput"
+                placeholder="Message this channel..."
+                maxlength="2000"
+                autocomplete="off">
+
+            <button type="submit" id="createdServerSendButton">
+                Send
+            </button>
+
+        </form>
+
+        <div
+            id="createdServerMessageStatus"
+            class="upload-status"
+            role="status"
+            aria-live="polite">
+        </div>
+
+    </section>
+
+</div>
+</escape>
+
+Save `dashboard.html`.
+
+<text color="warning" weight="medium">Don't modify `script.js` yet.</text>
+
+Once you've replaced it and saved, tell me **Done**. Then I'll give you the JavaScript that connects channel creation, channel switching, and server-specific messaging to Firestore.
 
             </section>
 
