@@ -1197,49 +1197,60 @@ function renderCreatedServerChannels() {
     );
 
     function createChannelButton(channel) {
-        const item = document.createElement("li");
-        item.className = "created-server-channel-item";
+    const item = document.createElement("li");
+    item.className = "created-server-channel-item";
 
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "created-server-channel-button";
-        button.dataset.channelId = channel.id;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "created-server-channel-button";
+    button.dataset.channelId = channel.id;
 
-        const symbol = document.createElement("span");
-        symbol.className = "created-server-channel-icon";
-        symbol.textContent = channel.type === "voice" ? "◖" : "#";
+    const symbol = document.createElement("span");
+    symbol.className = "created-server-channel-icon";
+    symbol.textContent = channel.type === "voice" ? "◖" : "#";
 
-        const name = document.createElement("span");
-        name.textContent = channel.name;
+    const name = document.createElement("span");
+    name.textContent = channel.name;
 
-        button.append(symbol, name);
+    button.append(symbol, name);
 
-        const selected =
-            channel.id === activeCreatedServerChannelId &&
-            channel.type === activeCreatedServerChannelType;
+    const selected =
+        channel.id === activeCreatedServerChannelId &&
+        channel.type === activeCreatedServerChannelType;
 
-        button.classList.toggle("selected", selected);
-        button.setAttribute("aria-pressed", String(selected));
+    button.classList.toggle("selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
 
-        button.addEventListener("click", () => {
-            if (channel.type === "text") {
-                openCreatedServerChannel(channel);
-            } else {
-                openCreatedServerVoiceChannel(channel);
-            }
+    button.addEventListener("click", () => {
+        if (channel.type === "text") {
+            openCreatedServerChannel(channel);
+        } else {
+            openCreatedServerVoiceChannel(channel);
+        }
+    });
+
+    item.appendChild(button);
+
+    // CHANNEL DELETE BUTTON — SERVER OWNER ONLY
+    if (activeCreatedServerOwnerUid === currentUser?.uid) {
+        const deleteButton = document.createElement("button");
+
+        deleteButton.type = "button";
+        deleteButton.className = "created-server-channel-delete";
+        deleteButton.textContent = "×";
+        deleteButton.title = "Delete channel";
+        deleteButton.setAttribute("aria-label", `Delete ${channel.name}`);
+
+        deleteButton.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void deleteCreatedServerChannel(channel);
         });
 
-        item.appendChild(button);
-        return item;
+        item.appendChild(deleteButton);
     }
 
-    textChannels.forEach((channel) => {
-        createdServerTextChannels.appendChild(createChannelButton(channel));
-    });
-
-    voiceChannels.forEach((channel) => {
-        createdServerVoiceChannels.appendChild(createChannelButton(channel));
-    });
+    return item;
 }
 
 // ==================================================
