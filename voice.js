@@ -1,4 +1,3 @@
-
 import { auth, db } from "./firebase.js";
 
 import {
@@ -92,6 +91,13 @@ const peers = new Map();
 const outgoingCalls = new Map();
 const incomingCalls = new Map();
 const stopCounts = new Map();
+
+/* ==========================================
+   JOIN / LEAVE SOUND TRACKING
+========================================== */
+
+let previousVoiceMembers = new Set();
+let voiceSnapshotInitialized = false;
 
 /* ==========================================
    GENERAL HELPERS
@@ -388,12 +394,13 @@ function makePeer(person, callRef) {
 
     pc.ontrack = (event) => {
         console.log("REMOTE TRACK RECEIVED:", {
-    kind: event.track.kind,
-    id: event.track.id,
-    muted: event.track.muted,
-    transceiverMid: event.transceiver.mid,
-    transceiverIndex: peer.videoTransceivers.indexOf(event.transceiver)
-});
+            kind: event.track.kind,
+            id: event.track.id,
+            muted: event.track.muted,
+            transceiverMid: event.transceiver.mid,
+            transceiverIndex: peer.videoTransceivers.indexOf(event.transceiver)
+        });
+
         if (event.track.kind === "video") {
             const videoIndex =
                 peer.videoTransceivers.indexOf(event.transceiver);
@@ -414,29 +421,30 @@ function makePeer(person, callRef) {
                 `tile-${kind}-${person.uid}`
             );
 
-          event.track.onunmute = () => {
-    if (tile) tile.hidden = false;
+            event.track.onunmute = () => {
+                if (tile) tile.hidden = false;
 
-    if (kind === "screen" && screenShareStage) {
-        screenShareStage.hidden = false;
-    }
-};
+                if (kind === "screen" && screenShareStage) {
+                    screenShareStage.hidden = false;
+                }
+            };
 
-event.track.onmute = () => {
-    if (tile) tile.hidden = true;
+            event.track.onmute = () => {
+                if (tile) tile.hidden = true;
 
-    if (kind === "screen" && screenShareStage) {
-        screenShareStage.hidden = true;
-    }
-};
+                if (kind === "screen" && screenShareStage) {
+                    screenShareStage.hidden = true;
+                }
+            };
 
-if (!event.track.muted && tile) {
-    tile.hidden = false;
+            if (!event.track.muted && tile) {
+                tile.hidden = false;
 
-    if (kind === "screen" && screenShareStage) {
-        screenShareStage.hidden = false;
-    }
-}
+                if (kind === "screen" && screenShareStage) {
+                    screenShareStage.hidden = false;
+                }
+            }
+
             return;
         }
 
@@ -738,6 +746,7 @@ function processIncomingCalls() {
 
 /* ==========================================
    WATCH VOICE PARTICIPANTS
+   JOIN / LEAVE SOUND DETECTION
 ========================================== */
 
 function watchParticipants() {
@@ -747,6 +756,10 @@ function watchParticipants() {
     stopParticipants = null;
 
     participants.clear();
+
+    // Reset sound detection when changing voice rooms.
+    previousVoiceMembers.clear();
+    voiceSnapshotInitialized = false;
 
     renderParticipants();
 
@@ -779,6 +792,36 @@ function watchParticipants() {
                     screenOn: Boolean(data.screenOn)
                 });
             });
+
+            const currentVoiceMembers = new Set(fresh.keys());
+
+            // Ignore the first snapshot to prevent false sounds.
+            if (voiceSnapshotInitialized) {
+
+                // Detect new members.
+                currentVoiceMembers.forEach((uid) => {
+                    if (
+                        !previousVoiceMembers.has(uid) &&
+                        uid !== user?.uid
+                    ) {
+                        playVoicePresenceSound("join");
+                    }
+                });
+
+                // Detect members who left.
+                previousVoiceMembers.forEach((uid) => {
+                    if (
+                        !currentVoiceMembers.has(uid) &&
+                        uid !== user?.uid
+                    ) {
+                        playVoicePresenceSound("leave");
+                    }
+                });
+            }
+
+            // Store the current room membership.
+            previousVoiceMembers = currentVoiceMembers;
+            voiceSnapshotInitialized = true;
 
             participants.clear();
 
@@ -1281,8 +1324,12 @@ async function leaveVoice(knownUid = user?.uid) {
     incomingCalls.clear();
     participants.clear();
 
+    previousVoiceMembers.clear();
+    voiceSnapshotInitialized = false;
+
     videoGrid?.replaceChildren();
     audioContainer?.replaceChildren();
+    remoteScreenContainer?.replaceChildren();
 
     muted = false;
     cameraOn = false;
