@@ -168,10 +168,7 @@ const SERVER_PERMISSION_OPTIONS = [
     ["manageMembers", "Manage members"],
     ["manageRoles", "Manage roles"],
     ["manageInvites", "Manage invites"],
-    ["manageVoice", "Manage voice"],
-    ["manageMessages", "Manage messages"],
-    ["kickMembers", "Remove members"],
-    ["banMembers", "Ban members"]
+    ["manageMessages", "Manage messages"]
 ];
 
 async function currentServerHasPermission(permission) {
@@ -1866,7 +1863,7 @@ async function serverSettingsDialog() {
 async function serverMembersDialog() {
     if (!activeCreatedServerId) return;
     const serverId = activeCreatedServerId;
-    const isOwner = activeCreatedServerOwnerUid === currentUser?.uid;
+    const canManageMembers = await currentServerHasPermission("manageMembers");
     const content = serverFeatureDialog("Server Members");
     content.textContent = "Loading members...";
     try {
@@ -1909,7 +1906,7 @@ async function serverMembersDialog() {
                 if (uid === activeCreatedServerOwnerUid) heading.textContent += " · Owner";
                 row.append(heading);
 
-                if (isOwner && uid !== activeCreatedServerOwnerUid && memberSnapshot.exists()) {
+                if (canManageMembers && uid !== activeCreatedServerOwnerUid && memberSnapshot.exists()) {
                     const roleWrap = document.createElement("div");
                     roleWrap.style.display = "flex";
                     roleWrap.style.flexWrap = "wrap";
@@ -1977,8 +1974,8 @@ async function serverMembersDialog() {
 
 async function serverRolesDialog() {
     if (!activeCreatedServerId || !currentUser) return;
-    if (activeCreatedServerOwnerUid !== currentUser.uid) {
-        alert("Only the server owner can manage roles.");
+    if (!(await currentServerHasPermission("manageRoles"))) {
+        alert("You need the Manage Roles permission to manage roles.");
         return;
     }
 
