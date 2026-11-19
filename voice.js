@@ -1537,3 +1537,58 @@ window.addEventListener("pagehide", () => {
 
     closeAllPeers();
 });
+
+// ==================================================
+// DIAMOND LOUNGE — VOICE JOIN / LEAVE SOUND ENGINE
+// ==================================================
+
+let voiceSoundAudioContext = null;
+
+function playVoicePresenceSound(type) {
+    try {
+        const AudioContextClass =
+            window.AudioContext || window.webkitAudioContext;
+
+        if (!AudioContextClass) return;
+
+        voiceSoundAudioContext ??= new AudioContextClass();
+
+        if (voiceSoundAudioContext.state === "suspended") {
+            voiceSoundAudioContext.resume();
+        }
+
+        const ctx = voiceSoundAudioContext;
+        const now = ctx.currentTime;
+
+        const notes = type === "join"
+            ? [660, 880]
+            : [880, 660];
+
+        notes.forEach((frequency, index) => {
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            oscillator.type = "sine";
+            oscillator.frequency.value = frequency;
+
+            gain.gain.setValueAtTime(0, now + index * 0.12);
+            gain.gain.linearRampToValueAtTime(
+                0.12,
+                now + index * 0.12 + 0.025
+            );
+            gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                now + index * 0.12 + 0.18
+            );
+
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+
+            oscillator.start(now + index * 0.12);
+            oscillator.stop(now + index * 0.12 + 0.2);
+        });
+
+    } catch (error) {
+        console.warn("Voice presence sound failed:", error);
+    }
+}
