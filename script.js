@@ -1514,6 +1514,10 @@ function openServer(server) {
     selectedMember = null;
     currentConversationId = null;
     activeCreatedServerId = server.id;
+activeCreatedServerChannelId = null;
+activeCreatedServerChannelType = "text";
+
+loadCreatedServerChannels(server.id);
 
     // Hide the VIP-LOUNGE and DM sidebars.
     if (loungeSidebar) loungeSidebar.hidden = true;
