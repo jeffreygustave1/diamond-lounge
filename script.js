@@ -272,6 +272,9 @@ function showEmptyView() {
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
 
+    // Release created-server channel listeners when returning to VIP-LOUNGE.
+    stopCreatedServerChannels();
+
     if (
         activeTextChannel === channelName &&
         loungeView &&
@@ -371,6 +374,7 @@ onAuthStateChanged(auth, async (user) => {
     await loadServerIcons();
 
     // Start with no server or channel selected.
+    stopCreatedServerChannels();
     stopPublicMessages();
     stopDirectMessages();
 
@@ -526,6 +530,9 @@ messageForm?.addEventListener("submit", (event) => {
 function showDirectMessages() {
     if (!currentUser) return;
 
+    // Prevent server listeners from lingering while viewing DMs.
+    stopCreatedServerChannels();
+
     stopPublicMessages();
     stopDirectMessages();
 
@@ -580,6 +587,7 @@ dmHomeButton?.addEventListener("click", (event) => {
 });
 
 mainServerButton?.addEventListener("click", () => {
+    stopCreatedServerChannels();
     stopDirectMessages();
 
     activeTextChannel = null;
