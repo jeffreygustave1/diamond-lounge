@@ -251,7 +251,8 @@ function openTextChannel(channelName) {
 
     activeCreatedServerId = null;
     showLoungeSidebar();
-    hideMainViews();
+showEmptyView();
+setMobileSidebar(true);
 
     if (loungeView) loungeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = false;
