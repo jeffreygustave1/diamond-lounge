@@ -1194,64 +1194,7 @@ if (selectedChannel) {
     );
 }
 
-function renderCreatedServerChannels() {
-    if (!createdServerTextChannels || !createdServerVoiceChannels) return;
-
-    createdServerTextChannels.replaceChildren();
-    createdServerVoiceChannels.replaceChildren();
-
-    const textChannels = createdServerChannels.filter(channel => channel.type === "text");
-    const voiceChannels = createdServerChannels.filter(channel => channel.type === "voice");
-
-    function createChannelButton(channel) {
-        const item = document.createElement("li");
-        item.className = "created-server-channel-item";
-
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "created-server-channel-button";
-        button.dataset.channelId = channel.id;
-
-        const symbol = document.createElement("span");
-        symbol.className = "created-server-channel-icon";
-        symbol.textContent = channel.type === "voice" ? "◖" : "#";
-
-        const name = document.createElement("span");
-        name.textContent = channel.name;
-        button.append(symbol, name);
-
-        const selected = channel.id === activeCreatedServerChannelId &&
-            channel.type === activeCreatedServerChannelType;
-        button.classList.toggle("selected", selected);
-        button.setAttribute("aria-pressed", String(selected));
-
-        button.addEventListener("click", () => {
-            if (channel.type === "text") openCreatedServerChannel(channel);
-            else openCreatedServerVoiceChannel(channel);
-        });
-        item.appendChild(button);
-
-        if (activeCreatedServerOwnerUid === currentUser?.uid) {
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.className = "created-server-channel-delete";
-            deleteButton.textContent = "×";
-            deleteButton.title = "Delete channel";
-            deleteButton.setAttribute("aria-label", `Delete ${channel.name}`);
-            deleteButton.addEventListener("click", event => {
-                event.preventDefault();
-                event.stopPropagation();
-                void deleteCreatedServerChannel(channel);
-            });
-            item.appendChild(deleteButton);
-        }
-        return item;
-    }
-
-    textChannels.forEach(channel => createdServerTextChannels.appendChild(createChannelButton(channel)));
-    voiceChannels.forEach(channel => createdServerVoiceChannels.appendChild(createChannelButton(channel)));
-}
-
+function renderCreatedServerChannels(){if(!createdServerTextChannels||!createdServerVoiceChannels)return;createdServerTextChannels.replaceChildren();createdServerVoiceChannels.replaceChildren();const categories=createdServerChannels.filter(c=>c.type==="category"),texts=createdServerChannels.filter(c=>c.type==="text"),voices=createdServerChannels.filter(c=>c.type==="voice");categories.forEach(cat=>{const li=document.createElement("li");li.className="created-server-category-heading";const span=document.createElement("span");span.textContent=cat.name.toUpperCase();li.append(span);if(activeCreatedServerOwnerUid===currentUser?.uid){const del=document.createElement("button");del.textContent="×";del.className="created-server-channel-delete";del.onclick=()=>void deleteCreatedServerChannel(cat);li.append(del);}createdServerTextChannels.append(li);});function make(c){const li=document.createElement("li");li.className="created-server-channel-item";const b=document.createElement("button");b.type="button";b.className="created-server-channel-button";const ico=document.createElement("span");ico.className="created-server-channel-icon";ico.textContent=c.type==="voice"?"◖":"#";const n=document.createElement("span");n.textContent=c.name;b.append(ico,n);const sel=c.id===activeCreatedServerChannelId&&c.type===activeCreatedServerChannelType;b.classList.toggle("selected",sel);b.onclick=()=>c.type==="text"?openCreatedServerChannel(c):openCreatedServerVoiceChannel(c);li.append(b);if(activeCreatedServerOwnerUid===currentUser?.uid){const d=document.createElement("button");d.type="button";d.className="created-server-channel-delete";d.textContent="×";d.onclick=e=>{e.stopPropagation();void deleteCreatedServerChannel(c);};li.append(d);}return li;}texts.forEach(c=>createdServerTextChannels.append(make(c)));voices.forEach(c=>createdServerVoiceChannels.append(make(c)));}
 // DELETE CREATED SERVER CHANNEL
 async function deleteCreatedServerChannel(channel) {
     if (!currentUser || !activeCreatedServerId ||
