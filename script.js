@@ -111,7 +111,6 @@ let activeCreatedServerId = null;
 let stopMessagesListener = null;
 let stopMembersListener = null;
 let stopDirectMessagesListener = null;
-
 // ==================================================
 // CREATED SERVER CHANNEL STATE
 // ==================================================
