@@ -122,7 +122,7 @@ let stopCreatedServerMessagesListener = null;
 
 let activeCreatedServerChannelId = null;
 let activeCreatedServerChannelType = "text";
-let createdServerChannels = [];
+let createdServerChannels = [];\nlet createdServerVoicePresenceStop = null;
 
 const createdServerTextChannels = document.getElementById("createdServerTextChannels");
 const createdServerVoiceChannels = document.getElementById("createdServerVoiceChannels");
