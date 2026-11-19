@@ -2275,3 +2275,48 @@ button {
         animation: none !important;
     }
 }
+
+/* ==========================================
+   DIAMOND LOUNGE — CHANNEL DELETE CONTROLS
+========================================== */
+
+.created-server-channel-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.created-server-channel-button {
+    flex: 1;
+    min-width: 0;
+}
+
+.created-server-channel-delete {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #c7a96b;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.created-server-channel-delete:hover {
+    background: rgba(199, 169, 107, 0.16);
+    color: #ff7777;
+}
+
+@media (max-width: 768px) {
+    .created-server-channel-delete {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        background: rgba(199, 169, 107, 0.08);
+    }
+}
