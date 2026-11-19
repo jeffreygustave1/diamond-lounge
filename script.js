@@ -2279,8 +2279,11 @@ loadCreatedServerChannels(server.id);
 
     clearServerSelections();
 
-    server.button?.classList.add("selected");
-    server.button?.setAttribute("aria-pressed", "true");
+    const serverButton = server.button ||
+        [...(createdServers?.querySelectorAll(".created-server") || [])]
+            .find(button => button.dataset.serverId === server.id);
+    serverButton?.classList.add("selected");
+    serverButton?.setAttribute("aria-pressed", "true");
 
     setMobileSidebar(false);
 }
