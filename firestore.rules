@@ -106,8 +106,12 @@ service cloud.firestore {
         let memberPath = /databases/$(database)/documents/servers/$(serverId)/members/$(request.auth.uid);
         return isServerMember()
           && exists(memberPath)
-          && get(memberPath).data.permissions is list
-          && get(memberPath).data.permissions.hasAny(['*', permission]);
+          && (
+            (get(memberPath).data.permissions is list
+              && get(memberPath).data.permissions.hasAny(['*', permission]))
+            || (!('permissions' in get(memberPath).data)
+              && permission in ['viewChannels', 'sendMessages', 'connectVoice', 'speak'])
+          );
       }
 
       match /roles/{roleId} {
