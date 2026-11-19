@@ -2525,3 +2525,6 @@ button {
 .created-server-channel-item[data-channel-type=voice] .created-server-channel-icon{color:#c7a96b;}
 .created-server-voice-chat-log{max-height:45vh;overflow:auto;}
 @media(max-width:600px){.created-server-voice-tile{min-height:145px}.created-server-voice-avatar{width:76px;height:76px}.created-server-voice-stage{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}}
+
+.created-server-voice-avatar{overflow:hidden;position:relative;}
+.created-server-voice-avatar-image{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
