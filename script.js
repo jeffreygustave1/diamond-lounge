@@ -1917,6 +1917,8 @@ loadCreatedServerChannels(server.id);
     if (serverView) serverView.hidden = false;
     if (serverViewName) serverViewName.textContent = server.name;
     if (serverWelcomeName) serverWelcomeName.textContent = server.name;
+    const menuName = document.getElementById("createdServerMenuName");
+    if (menuName) menuName.textContent = server.name;
 
     if (serverViewVisibility) {
         serverViewVisibility.textContent =
