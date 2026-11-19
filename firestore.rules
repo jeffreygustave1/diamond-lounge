@@ -118,21 +118,27 @@ service cloud.firestore {
       match /members/{memberUid} {
         allow read: if isServerMember();
         allow create: if request.auth != null
-          && request.auth.uid == memberUid
-          && isServerMember()
           && request.resource.data.keys().hasOnly(['uid', 'displayName', 'roleIds', 'permissions', 'joinedAt'])
           && request.resource.data.uid == memberUid
           && request.resource.data.roleIds is list
           && (
-            (isServerOwner()
-              && request.resource.data.roleIds.size() == 1
-              && request.resource.data.roleIds[0] == 'owner')
-            ||
-            (!isServerOwner()
+            (
+              request.auth.uid == memberUid
+              && isServerMember()
+              && !isServerOwner()
               && request.resource.data.roleIds.size() == 1
               && request.resource.data.roleIds[0] == 'member'
               && request.resource.data.permissions is list
-              && request.resource.data.permissions.hasOnly(['viewChannels', 'sendMessages', 'connectVoice', 'speak']))
+              && request.resource.data.permissions.hasOnly(['viewChannels', 'sendMessages', 'connectVoice', 'speak'])
+            )
+            ||
+            (
+              isServerOwner()
+              && memberUid in get(/databases/$(database)/documents/servers/$(serverId)).data.memberUids
+              && request.resource.data.roleIds.size() <= 20
+              && request.resource.data.permissions is list
+              && request.resource.data.permissions.size() <= 40
+            )
           );
         allow update: if (
           isServerOwner()
