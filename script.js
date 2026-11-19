@@ -17,7 +17,8 @@ import {
     orderBy,
     query,
     serverTimestamp,
-    setDoc,\n    updateDoc,
+    setDoc,
+    updateDoc,
     where
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
