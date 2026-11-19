@@ -162,6 +162,55 @@ function normalizeServerName(name) {
         .toLocaleLowerCase("en-US");
 }
 
+const SERVER_PERMISSION_OPTIONS = [
+    ["manageChannels", "Manage channels"],
+    ["manageEvents", "Manage events"],
+    ["manageMembers", "Manage members"],
+    ["manageRoles", "Manage roles"],
+    ["manageInvites", "Manage invites"],
+    ["manageVoice", "Manage voice"],
+    ["manageMessages", "Manage messages"],
+    ["kickMembers", "Remove members"],
+    ["banMembers", "Ban members"]
+];
+
+async function currentServerHasPermission(permission) {
+    if (!currentUser || !activeCreatedServerId) return false;
+    if (activeCreatedServerOwnerUid === currentUser.uid) return true;
+    try {
+        const membership = await getDoc(doc(
+            db, "servers", activeCreatedServerId, "members", currentUser.uid
+        ));
+        if (!membership.exists()) return false;
+        const permissions = membership.data().permissions;
+        return Array.isArray(permissions) &&
+            (permissions.includes("*") || permissions.includes(permission));
+    } catch (error) {
+        console.warn("Server permission check failed:", error);
+        return false;
+    }
+}
+
+async function refreshServerMemberPermissions(serverId) {
+    const serverSnapshot = await getDoc(doc(db, "servers", serverId));
+    if (!serverSnapshot.exists()) return;
+    const roleSnapshot = await getDocs(collection(db, "servers", serverId, "roles"));
+    const roles = new Map(roleSnapshot.docs.map(entry => [
+        entry.id, Array.isArray(entry.data().permissions) ? entry.data().permissions : []
+    ]));
+    const memberUids = serverSnapshot.data().memberUids || [];
+    await Promise.all(memberUids.map(async uid => {
+        const memberRef = doc(db, "servers", serverId, "members", uid);
+        const memberSnapshot = await getDoc(memberRef);
+        if (!memberSnapshot.exists()) return;
+        const roleIds = memberSnapshot.data().roleIds || [];
+        const effective = new Set();
+        roleIds.forEach(roleId => (roles.get(roleId) || []).forEach(permission => effective.add(permission)));
+        if (uid === serverSnapshot.data().ownerUid) effective.add("*");
+        await updateDoc(memberRef, { permissions: [...effective] });
+    }));
+}
+
 // ==================================================
 // MOBILE NAVIGATION
 // ==================================================
@@ -435,11 +484,19 @@ async function consumeServerInviteFromUrl() {
         if (!memberUids.includes(currentUser.uid)) {
             await updateDoc(serverRef, { memberUids: arrayUnion(currentUser.uid) });
         }
-        await setDoc(doc(db, "servers", serverId, "members", currentUser.uid), {
-            uid: currentUser.uid,
-            displayName: currentUser.displayName || currentUser.email?.split("@")[0] || "Member",
-            joinedAt: serverData.memberUids?.includes(currentUser.uid) ? (serverData.createdAt || serverTimestamp()) : serverTimestamp()
-        }, { merge: true });
+
+        const memberRef = doc(db, "servers", serverId, "members", currentUser.uid);
+        const memberSnapshot = await getDoc(memberRef);
+        if (!memberSnapshot.exists()) {
+            await setDoc(memberRef, {
+                uid: currentUser.uid,
+                displayName: currentUser.displayName || currentUser.email?.split("@")[0] || "Member",
+                roleIds: ["member"],
+                permissions: ["viewChannels", "sendMessages", "connectVoice", "speak"],
+                joinedAt: serverTimestamp()
+            });
+        }
+
         const url = new URL(window.location.href);
         ["serverInvite", "invite", "inviteChannel"].forEach(key => url.searchParams.delete(key));
         window.history.replaceState({}, "", url.toString());
@@ -448,7 +505,7 @@ async function consumeServerInviteFromUrl() {
     } catch (error) {
         console.error("Invite join flow failed:", error);
         alert(error.code === "permission-denied"
-            ? "Firebase rules currently block joining this server. We'll update the rules in the final Firebase step."
+            ? "Firebase rules currently block joining this server. Publish the latest Firestore rules."
             : "Unable to join using this invite.");
     }
 }
@@ -1359,8 +1416,11 @@ function renderCreatedServerChannels() {
 }
 // DELETE CREATED SERVER CHANNEL
 async function deleteCreatedServerChannel(channel) {
-    if (!currentUser || !activeCreatedServerId ||
-        activeCreatedServerOwnerUid !== currentUser.uid || !channel?.id) return;
+    if (!currentUser || !activeCreatedServerId || !channel?.id ||
+        !(await currentServerHasPermission("manageChannels"))) {
+        alert("You need the Manage Channels role permission to delete channels.");
+        return;
+    }
 
     if (!confirm(`Delete the ${channel.type} channel "${channel.name}"?`)) return;
     const serverId = activeCreatedServerId;
@@ -1597,6 +1657,10 @@ createdServerMessageForm?.addEventListener("submit", (event) => {
 function openCreatedServerVoiceChannel(channel){if(!channel?.id||!activeCreatedServerId)return;stopCreatedServerMessages();activeCreatedServerChannelId=channel.id;activeCreatedServerChannelType="voice";if(createdServerActiveChannel)createdServerActiveChannel.textContent=channel.name;if(createdServerChannelSymbol)createdServerChannelSymbol.textContent="◖";if(createdServerMessageInput){createdServerMessageInput.disabled=true;createdServerMessageInput.placeholder="Voice channels do not support text messages.";}if(createdServerSendButton)createdServerSendButton.disabled=true;renderCreatedServerChannels();if(createdServerMessages){createdServerMessages.replaceChildren();const h=document.createElement("h2");h.className="created-server-voice-title";h.textContent=channel.name;createdServerMessages.append(h);const stage=document.createElement("div");stage.className="created-server-voice-stage";createdServerMessages.append(stage);const ah=document.createElement("h3");ah.className="created-server-audience-heading";ah.textContent="AUDIENCE";createdServerMessages.append(ah);const aud=document.createElement("div");aud.className="created-server-audience";createdServerMessages.append(aud);const ctl=document.createElement("div");ctl.className="created-server-voice-controls";const join=document.createElement("button");join.className="created-server-voice-join";join.textContent="Join Voice";join.onclick=()=>window.diamondJoinCreatedVoiceRoom?.(channel.name,"cs-"+activeCreatedServerId+"-"+channel.id);const leave=document.createElement("button");leave.className="created-server-voice-leave";leave.textContent="Leave";leave.onclick=()=>window.diamondLeaveVoice?.();ctl.append(join,leave);createdServerMessages.append(ctl);const note=document.createElement("p");note.className="created-server-voice-status";note.textContent="Connect your microphone to join. Members will appear here.";createdServerMessages.append(note);createdServerVoicePresenceStop?.();createdServerVoicePresenceStop=window.diamondWatchCreatedVoiceRoom?.("cs-"+activeCreatedServerId+"-"+channel.id,stage,aud)||null;}}
 async function createCreatedServerChannel(typeOverride = null) {
     if (!currentUser || !activeCreatedServerId) return;
+    if (!(await currentServerHasPermission("manageChannels"))) {
+        alert("You need the Manage Channels role permission to create channels.");
+        return;
+    }
     const serverId = activeCreatedServerId;
     const nameInput = prompt(typeOverride === "category" ? "Enter the category name:" : "Enter the channel name:");
     if (nameInput === null) return;
@@ -1674,7 +1738,7 @@ addServerChannelButton?.addEventListener("click", () => void createCreatedServer
 document.getElementById("addServerTextChannelButton")?.addEventListener("click", () => void createCreatedServerChannel("text"));
 document.getElementById("addServerVoiceChannelButton")?.addEventListener("click", () => void createCreatedServerChannel("voice"));
 
-document.querySelectorAll("[data-server-menu-action]").forEach(button => button.addEventListener("click", () => { const a=button.dataset.serverMenuAction; if(a==="channel")void createCreatedServerChannel(); if(a==="invite")void serverInviteDialog(); if(a==="settings")void serverSettingsDialog(); if(a==="members")void serverMembersDialog(); if(a==="category")void createCreatedServerChannel("category"); if(a==="event")void serverEventsDialog(); }));
+document.querySelectorAll("[data-server-menu-action]").forEach(button => button.addEventListener("click", () => { const a=button.dataset.serverMenuAction; if(a==="channel")void createCreatedServerChannel(); if(a==="invite")void serverInviteDialog(); if(a==="settings")void serverSettingsDialog(); if(a==="members")void serverMembersDialog(); if(a==="roles")void serverRolesDialog(); if(a==="category")void createCreatedServerChannel("category"); if(a==="event")void serverEventsDialog(); }));
 function serverFeatureDialog(title){let o=document.getElementById("serverFeatureDialog");if(!o){o=document.createElement("div");o.id="serverFeatureDialog";o.className="created-server-feature-backdrop";o.innerHTML='<section class="created-server-feature-modal"><button type="button" class="created-server-feature-close">×</button><h2></h2><div class="created-server-feature-content"></div></section>';document.body.append(o);o.querySelector("button").onclick=()=>o.remove();o.onclick=e=>{if(e.target===o)o.remove();};}o.querySelector("h2").textContent=title;const c=o.querySelector(".created-server-feature-content");c.replaceChildren();return c;}function sfNode(tag,t){const n=document.createElement(tag);n.textContent=t;return n;}
 async function serverInviteDialog(channel=null){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog("Invite Friends"),p=sfNode("p",channel?"Create a link to invite someone directly to this voice channel.":"Create a shareable invite link.");c.append(p);const b=sfNode("button","Create invite link");b.className="created-server-feature-action";c.append(b);const area=document.createElement("div");c.append(area);b.onclick=async()=>{try{b.disabled=true;const code=(crypto.randomUUID?.()||Date.now()+"-"+Math.random()).replace(/-/g,"").slice(0,20);await setDoc(doc(db,"servers",activeCreatedServerId,"invites",code),{code,createdBy:currentUser.uid,createdAt:serverTimestamp(),channelId:channel?.id||null});const url=new URL(location.href);url.searchParams.set("serverInvite",activeCreatedServerId);url.searchParams.set("invite",code);if(channel)url.searchParams.set("inviteChannel",channel.id);area.replaceChildren();const input=document.createElement("input");input.readOnly=true;input.value=url.href;const cp=sfNode("button","Copy");cp.className="created-server-feature-action";cp.onclick=async()=>{try{await navigator.clipboard.writeText(input.value);cp.textContent="Copied";}catch{input.select();document.execCommand("copy");}};area.append(input,cp);}catch(e){console.error(e);alert("Invite link creation failed. Firebase permissions may need updating.");}finally{b.disabled=false;}};}
 async function serverVoiceChannelSettings(channel){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog("Voice Channel Settings");const label=sfNode("label","Channel name");const input=document.createElement("input");input.value=channel.name||"";input.maxLength=40;c.append(label,input);const save=sfNode("button","Save");save.className="created-server-feature-action";c.append(save);save.onclick=async()=>{try{await updateDoc(doc(db,"servers",activeCreatedServerId,"channels",channel.id),{name:input.value.trim(),nameLower:normalizeServerName(input.value)});channel.name=input.value.trim();renderCreatedServerChannels();if(activeCreatedServerChannelId===channel.id&&createdServerActiveChannel)createdServerActiveChannel.textContent=channel.name;save.textContent="Saved";}catch(e){alert("Channel update failed. Check Firebase rules.");}};if(activeCreatedServerOwnerUid===currentUser.uid){const del=sfNode("button","Delete channel");del.className="created-server-feature-action";del.style.background="#ed4245";c.append(del);del.onclick=()=>{if(confirm("Delete this voice channel?"))void deleteCreatedServerChannel(channel);};}}
@@ -1801,33 +1865,103 @@ async function serverSettingsDialog() {
 
 async function serverMembersDialog() {
     if (!activeCreatedServerId) return;
+    const serverId = activeCreatedServerId;
+    const isOwner = activeCreatedServerOwnerUid === currentUser?.uid;
     const content = serverFeatureDialog("Server Members");
     content.textContent = "Loading members...";
     try {
-        const serverSnapshot = await getDoc(doc(db, "servers", activeCreatedServerId));
+        const serverSnapshot = await getDoc(doc(db, "servers", serverId));
         if (!serverSnapshot.exists()) {
             content.textContent = "This server no longer exists.";
             return;
         }
         const memberUids = serverSnapshot.data().memberUids || [];
+        const roleSnapshot = await getDocs(collection(db, "servers", serverId, "roles"));
+        const roles = roleSnapshot.docs
+            .map(entry => ({ id: entry.id, ...entry.data() }))
+            .filter(role => role.id !== "owner");
         content.replaceChildren();
         if (!memberUids.length) {
             content.append(sfNode("p", "No members found."));
             return;
         }
+
         const list = document.createElement("div");
         list.style.display = "flex";
         list.style.flexDirection = "column";
         list.style.gap = "10px";
+
         for (const uid of memberUids) {
             try {
-                const userSnapshot = await getDoc(doc(db, "users", uid));
+                const [userSnapshot, memberSnapshot] = await Promise.all([
+                    getDoc(doc(db, "users", uid)),
+                    getDoc(doc(db, "servers", serverId, "members", uid))
+                ]);
                 const userData = userSnapshot.exists() ? userSnapshot.data() : {};
-                const row = sfNode("div", userData.displayName || userData.name || (uid === activeCreatedServerOwnerUid ? "Server Owner" : "Member"));
-                row.style.padding = "10px 12px";
-                row.style.borderRadius = "8px";
+                const memberData = memberSnapshot.exists() ? memberSnapshot.data() : {};
+                const row = document.createElement("section");
+                row.style.padding = "12px";
+                row.style.borderRadius = "9px";
                 row.style.background = "#232428";
-                if (uid === activeCreatedServerOwnerUid) row.textContent += " · Owner";
+                const heading = sfNode("strong",
+                    userData.displayName || userData.name ||
+                    (uid === activeCreatedServerOwnerUid ? "Server Owner" : "Member"));
+                if (uid === activeCreatedServerOwnerUid) heading.textContent += " · Owner";
+                row.append(heading);
+
+                if (isOwner && uid !== activeCreatedServerOwnerUid && memberSnapshot.exists()) {
+                    const roleWrap = document.createElement("div");
+                    roleWrap.style.display = "flex";
+                    roleWrap.style.flexWrap = "wrap";
+                    roleWrap.style.gap = "8px";
+                    roleWrap.style.marginTop = "10px";
+                    const selectedRoleIds = new Set(memberData.roleIds || []);
+                    const checks = [];
+                    roles.forEach(role => {
+                        const label = document.createElement("label");
+                        label.style.display = "inline-flex";
+                        label.style.alignItems = "center";
+                        label.style.gap = "5px";
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.checked = selectedRoleIds.has(role.id);
+                        checkbox.style.width = "auto";
+                        label.append(checkbox, document.createTextNode(role.name || role.id));
+                        roleWrap.append(label);
+                        checks.push({ role, checkbox });
+                    });
+                    const save = sfNode("button", "Save roles");
+                    save.className = "created-server-feature-action";
+                    save.style.marginTop = "10px";
+                    const status = sfNode("span", "");
+                    status.style.marginLeft = "10px";
+                    save.onclick = async () => {
+                        save.disabled = true;
+                        try {
+                            const roleIds = checks.filter(item => item.checkbox.checked).map(item => item.role.id);
+                            const permissions = new Set();
+                            checks.filter(item => item.checkbox.checked).forEach(item => {
+                                (Array.isArray(item.role.permissions) ? item.role.permissions : [])
+                                    .forEach(permission => permissions.add(permission));
+                            });
+                            await updateDoc(doc(db, "servers", serverId, "members", uid), {
+                                roleIds,
+                                permissions: [...permissions]
+                            });
+                            status.textContent = "Saved";
+                        } catch (error) {
+                            console.error("Member role assignment failed:", error);
+                            status.textContent = "Could not save. Publish updated rules.";
+                        } finally {
+                            save.disabled = false;
+                        }
+                    };
+                    row.append(roleWrap, save, status);
+                } else if (uid !== activeCreatedServerOwnerUid) {
+                    const assigned = (memberData.roleIds || [])
+                        .map(id => roles.find(role => role.id === id)?.name || id);
+                    row.append(sfNode("p", assigned.length ? assigned.join(", ") : "Member"));
+                }
                 list.append(row);
             } catch (memberError) {
                 console.warn("Member profile unavailable:", memberError);
@@ -1840,6 +1974,185 @@ async function serverMembersDialog() {
         content.textContent = "Members could not be loaded. Firebase permissions may need updating.";
     }
 }
+
+async function serverRolesDialog() {
+    if (!activeCreatedServerId || !currentUser) return;
+    if (activeCreatedServerOwnerUid !== currentUser.uid) {
+        alert("Only the server owner can manage roles.");
+        return;
+    }
+
+    const serverId = activeCreatedServerId;
+    const content = serverFeatureDialog("Server Roles & Permissions");
+    content.append(sfNode("p", "Create roles, choose their permissions, then assign them from Server Members."));
+
+    const nameInput = document.createElement("input");
+    nameInput.placeholder = "Role name";
+    nameInput.maxLength = 30;
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.value = "#c7a96b";
+    const permissionsBox = document.createElement("div");
+    permissionsBox.style.display = "grid";
+    permissionsBox.style.gridTemplateColumns = "repeat(auto-fit,minmax(170px,1fr))";
+    permissionsBox.style.gap = "8px";
+    const permissionChecks = new Map();
+    SERVER_PERMISSION_OPTIONS.forEach(([value, labelText]) => {
+        const label = document.createElement("label");
+        label.style.display = "flex";
+        label.style.alignItems = "center";
+        label.style.gap = "7px";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = value;
+        checkbox.style.width = "auto";
+        label.append(checkbox, document.createTextNode(labelText));
+        permissionsBox.append(label);
+        permissionChecks.set(value, checkbox);
+    });
+
+    const save = sfNode("button", "Create role");
+    save.className = "created-server-feature-action";
+    const cancel = sfNode("button", "Cancel edit");
+    cancel.className = "created-server-feature-action";
+    cancel.hidden = true;
+    const status = sfNode("span", "");
+    let editingRoleId = null;
+
+    const resetForm = () => {
+        editingRoleId = null;
+        nameInput.value = "";
+        colorInput.value = "#c7a96b";
+        permissionChecks.forEach(checkbox => checkbox.checked = false);
+        save.textContent = "Create role";
+        cancel.hidden = true;
+    };
+    cancel.onclick = resetForm;
+    save.onclick = async () => {
+        const name = nameInput.value.trim();
+        if (name.length < 2 || name.length > 30) {
+            alert("Role names must be between 2 and 30 characters.");
+            return;
+        }
+        const permissions = [...permissionChecks.entries()]
+            .filter(([, checkbox]) => checkbox.checked)
+            .map(([value]) => value);
+        save.disabled = true;
+        try {
+            const roleData = {
+                name,
+                nameLower: name.toLowerCase(),
+                color: colorInput.value,
+                permissions,
+                managed: false,
+                updatedAt: serverTimestamp()
+            };
+            if (editingRoleId) {
+                await updateDoc(doc(db, "servers", serverId, "roles", editingRoleId), roleData);
+                status.textContent = "Role updated.";
+            } else {
+                await addDoc(collection(db, "servers", serverId, "roles"), {
+                    ...roleData, createdBy: currentUser.uid, createdAt: serverTimestamp()
+                });
+                status.textContent = "Role created.";
+            }
+            await refreshServerMemberPermissions(serverId);
+            resetForm();
+            await renderRoles();
+        } catch (error) {
+            console.error("Role save failed:", error);
+            status.textContent = error.code === "permission-denied"
+                ? "Firebase denied this change. Publish updated rules."
+                : "Role could not be saved.";
+        } finally {
+            save.disabled = false;
+        }
+    };
+
+    content.append(sfNode("label", "Role name"), nameInput,
+        sfNode("label", "Role color"), colorInput,
+        sfNode("h3", "Permissions"), permissionsBox, save, cancel, status);
+    const list = document.createElement("div");
+    list.style.display = "flex";
+    list.style.flexDirection = "column";
+    list.style.gap = "8px";
+    content.append(sfNode("h3", "Existing roles"), list);
+
+    async function renderRoles() {
+        const snapshot = await getDocs(collection(db, "servers", serverId, "roles"));
+        list.replaceChildren();
+        const entries = snapshot.docs
+            .map(entry => ({ id: entry.id, ...entry.data() }))
+            .sort((a, b) => (b.position || 0) - (a.position || 0));
+        entries.forEach(role => {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            row.style.flexWrap = "wrap";
+            row.style.gap = "8px";
+            row.style.padding = "10px";
+            row.style.background = "#232428";
+            row.style.borderRadius = "8px";
+            const dot = document.createElement("span");
+            dot.style.width = "10px";
+            dot.style.height = "10px";
+            dot.style.borderRadius = "50%";
+            dot.style.background = role.color || "#c7a96b";
+            const label = sfNode("strong", role.name || role.id);
+            row.append(dot, label, sfNode("span", (role.permissions || []).join(", ") || "No extra permissions"));
+            if (role.id !== "owner" && !role.managed) {
+                const edit = sfNode("button", "Edit");
+                edit.className = "created-server-feature-action";
+                edit.onclick = () => {
+                    editingRoleId = role.id;
+                    nameInput.value = role.name || "";
+                    colorInput.value = role.color || "#c7a96b";
+                    permissionChecks.forEach((checkbox, permission) => {
+                        checkbox.checked = (role.permissions || []).includes(permission);
+                    });
+                    save.textContent = "Save role";
+                    cancel.hidden = false;
+                    nameInput.focus();
+                };
+                const remove = sfNode("button", "Delete");
+                remove.className = "created-server-feature-action";
+                remove.style.background = "#7c3438";
+                remove.onclick = async () => {
+                    if (!confirm(`Delete the ${role.name || "selected"} role?`)) return;
+                    remove.disabled = true;
+                    try {
+                        const serverSnapshot = await getDoc(doc(db, "servers", serverId));
+                        const uids = serverSnapshot.data()?.memberUids || [];
+                        await Promise.all(uids.map(async uid => {
+                            const memberRef = doc(db, "servers", serverId, "members", uid);
+                            const memberSnapshot = await getDoc(memberRef);
+                            if (!memberSnapshot.exists()) return;
+                            const memberData = memberSnapshot.data();
+                            const roleIds = (memberData.roleIds || []).filter(id => id !== role.id);
+                            await updateDoc(memberRef, { roleIds });
+                        }));
+                        await deleteDoc(doc(db, "servers", serverId, "roles", role.id));
+                        await refreshServerMemberPermissions(serverId);
+                        if (editingRoleId === role.id) resetForm();
+                        await renderRoles();
+                    } catch (error) {
+                        console.error("Role delete failed:", error);
+                        alert("Role could not be deleted. Check the latest Firebase rules.");
+                    } finally {
+                        remove.disabled = false;
+                    }
+                };
+                row.append(edit, remove);
+            } else {
+                row.append(sfNode("span", "Built-in owner role"));
+            }
+            list.append(row);
+        });
+    }
+
+    await renderRoles();
+}
+
 async function serverEventsDialog() {
     if (!activeCreatedServerId || !currentUser) return;
     const serverId = activeCreatedServerId;
@@ -1878,6 +2191,10 @@ async function serverEventsDialog() {
         });
     }, error => { console.error("Event listener failed:", error); list.textContent = "Events unavailable. Firebase permissions may need updating."; });
     create.onclick = async () => {
+        if (!(await currentServerHasPermission("manageEvents"))) {
+            alert("You need the Manage Events role permission to create events.");
+            return;
+        }
         const eventName = title.value.trim();
         if (!eventName) { title.focus(); return; }
         create.disabled = true;
