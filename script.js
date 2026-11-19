@@ -202,6 +202,17 @@ function stopMemberListener() {
     stopMembersListener?.();
     stopMembersListener = null;
 }
+function stopCreatedServerChannels() {
+    stopServerChannelsListener?.();
+    stopServerChannelsListener = null;
+
+    stopCreatedServerMessagesListener?.();
+    stopCreatedServerMessagesListener = null;
+
+    activeCreatedServerChannelId = null;
+    activeCreatedServerChannelType = "text";
+    createdServerChannels = [];
+}
 
 function hideMainViews() {
     if (emptyView) emptyView.hidden = true;
