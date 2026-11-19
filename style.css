@@ -3218,3 +3218,18 @@ button {
     }
 }
 
+/* MOBILE: HIDE THE RIGHT PANEL UNTIL CONTENT IS SELECTED */
+@media (max-width: 900px) {
+
+    #emptyView,
+    #dmHomeView {
+        display: none !important;
+    }
+
+    #loungeView[hidden],
+    #dmConversationView[hidden],
+    #serverView[hidden] {
+        display: none !important;
+    }
+
+}
