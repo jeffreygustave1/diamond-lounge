@@ -265,6 +265,9 @@ function stopCreatedServerChannels() {
     stopCreatedServerMessagesListener?.();
     stopCreatedServerMessagesListener = null;
 
+    createdServerVoicePresenceStop?.();
+    createdServerVoicePresenceStop = null;
+
     activeCreatedServerChannelId = null;
     activeCreatedServerChannelType = "text";
     createdServerChannels = [];
@@ -1472,6 +1475,8 @@ function openCreatedServerChannel(channel) {
 
     if (channel.type !== "text") return;
 
+    createdServerVoicePresenceStop?.();
+    createdServerVoicePresenceStop = null;
     stopCreatedServerMessages();
 
     activeCreatedServerChannelId = channel.id;
