@@ -3209,3 +3209,12 @@ button {
         transition: none !important;
     }
 }
+
+
+/* Hide the second sidebar when VIP-LOUNGE/default screen is active */
+@media (max-width: 900px) {
+    .dashboard:not(.mobile-nav-open) .channels {
+        /* Do not hide channels based on drawer state */
+    }
+}
+
