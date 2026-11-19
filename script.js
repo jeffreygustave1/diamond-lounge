@@ -201,11 +201,14 @@ async function refreshServerMemberPermissions(serverId) {
         const memberRef = doc(db, "servers", serverId, "members", uid);
         const memberSnapshot = await getDoc(memberRef);
         if (!memberSnapshot.exists()) return;
-        const roleIds = memberSnapshot.data().roleIds || [];
+        const storedRoleIds = memberSnapshot.data().roleIds;
+        const roleIds = Array.isArray(storedRoleIds)
+            ? storedRoleIds
+            : (uid === serverSnapshot.data().ownerUid ? ["owner"] : ["member"]);
         const effective = new Set();
         roleIds.forEach(roleId => (roles.get(roleId) || []).forEach(permission => effective.add(permission)));
         if (uid === serverSnapshot.data().ownerUid) effective.add("*");
-        await updateDoc(memberRef, { permissions: [...effective] });
+        await updateDoc(memberRef, { roleIds, permissions: [...effective] });
     }));
 }
 
