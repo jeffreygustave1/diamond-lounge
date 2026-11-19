@@ -1093,15 +1093,10 @@ await Promise.all([
         name: "Admin",
         nameLower: "admin",
         permissions: [
-            "manageServer",
             "manageChannels",
-            "manageRoles",
-            "manageMembers",
+            "manageEvents",
             "manageMessages",
-            "kickMembers",
-            "banMembers",
-            "manageInvites",
-            "manageVoice"
+            "manageInvites"
         ],
         position: 80,
         managed: false,
@@ -1112,9 +1107,7 @@ await Promise.all([
         name: "Moderator",
         nameLower: "moderator",
         permissions: [
-            "manageMessages",
-            "kickMembers",
-            "manageVoice"
+            "manageMessages"
         ],
         position: 50,
         managed: false,
@@ -1145,6 +1138,7 @@ await setDoc(
     {
         uid: currentUser.uid,
         roleIds: ["owner"],
+        permissions: ["*"],
         joinedAt: serverTimestamp()
     }
 );
