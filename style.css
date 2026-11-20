@@ -3313,3 +3313,25 @@ button {
     height: 100%;
     object-fit: cover;
 }
+
+
+
+/* Keep the account dock attached to the one visible channel sidebar. */
+.created-server-channel-panel > .profile-card {
+    width: auto;
+    min-height: 58px;
+    flex: 0 0 auto;
+    margin: auto 8px 8px;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    background: #232428;
+    box-shadow: none;
+}
+.created-server-channel-panel > .profile-card::before,
+.created-server-channel-panel > .profile-card::after {
+    display: none !important;
+}
+.created-server-channel-panel.has-voice-connection > .profile-card {
+    display: none !important;
+}
