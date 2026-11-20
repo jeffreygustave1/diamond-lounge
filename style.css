@@ -3673,3 +3673,10 @@ button {
 .dl-watch-theater-mode .dl-watch-grid{grid-template-columns:minmax(0,1fr) 290px}
 .dl-watch-chat-glass[hidden]{display:none!important}
 @media(max-width:900px){.dl-watch-theater-mode .dl-watch-grid{grid-template-columns:1fr}}
+
+/* Tighter single-member voice stage: keep the profile tile from swallowing the call view. */
+.created-server-voice-stage{align-content:center;justify-items:center}
+.created-server-voice-tile:only-child{width:min(100%,340px)!important;min-height:190px!important;max-height:240px!important}
+.created-server-voice-tile:only-child .created-server-voice-avatar{width:52px;height:52px;font-size:20px}
+.created-server-voice-tile:only-child .created-server-voice-tile-footer{padding:7px 10px}
+@media(max-width:700px){.created-server-voice-tile:only-child{width:min(100%,300px)!important;min-height:175px!important;max-height:215px!important}.created-server-voice-tile:only-child .created-server-voice-avatar{width:46px;height:46px}}
