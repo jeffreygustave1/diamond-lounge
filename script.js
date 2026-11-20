@@ -374,8 +374,8 @@ function openTextChannel(channelName) {
 
     activeCreatedServerId = null;
     showLoungeSidebar();
-showEmptyView();
-setMobileSidebar(true);
+    hideMainViews();
+    setMobileSidebar(true);
 
     if (loungeView) loungeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = false;
@@ -472,6 +472,8 @@ onAuthStateChanged(auth, async (user) => {
     selectedMember = null;
     currentConversationId = null;
 
+    const channelsSidebar = document.getElementById("channelsSidebar");
+    if (channelsSidebar) channelsSidebar.hidden = true;
     if (loungeSidebar) loungeSidebar.hidden = true;
     if (dmSidebar) dmSidebar.hidden = true;
     if (communitySidebar) communitySidebar.hidden = true;
@@ -2093,6 +2095,41 @@ function openPrimaryVoiceCall(channelName, roomId) {
 
 window.diamondOpenPrimaryVoiceCall = openPrimaryVoiceCall;
 window.diamondClosePrimaryVoiceCall = closePrimaryVoiceCallView;
+
+function syncDiscordScreenShareLayout() {
+    const screenStage = document.getElementById("screenShareStage");
+    const screenContainer = document.getElementById("remoteScreenContainer");
+    const active = Boolean(
+        screenStage &&
+        !screenStage.hidden &&
+        screenContainer?.querySelector(".remote-video-screen:not([hidden])")
+    );
+    document.querySelectorAll(".created-server-voice-call").forEach(call => {
+        call.classList.toggle("is-screen-sharing", active);
+    });
+}
+
+const discordScreenShareObserver = new MutationObserver(syncDiscordScreenShareLayout);
+const screenStageForLayout = document.getElementById("screenShareStage");
+const screenContainerForLayout = document.getElementById("remoteScreenContainer");
+if (screenStageForLayout) {
+    discordScreenShareObserver.observe(screenStageForLayout, {
+        attributes: true,
+        attributeFilter: ["hidden"],
+        childList: true,
+        subtree: true
+    });
+}
+if (screenContainerForLayout) {
+    discordScreenShareObserver.observe(screenContainerForLayout, {
+        attributes: true,
+        attributeFilter: ["hidden"],
+        childList: true,
+        subtree: true
+    });
+}
+window.addEventListener("diamond-screen-share-layout", syncDiscordScreenShareLayout);
+
 
 document.addEventListener("click", event => {
     const button = event.target.closest("[data-voice-action]");
