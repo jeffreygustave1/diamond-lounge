@@ -1,95 +1,48 @@
-/* Diamond Lounge Watch — voice-dock activity */
-(function(){
-const buttons=[...document.querySelectorAll("[data-watch-launch]")];
-if(!buttons.length)return;
-const overlay=document.createElement("div");
-overlay.className="dl-watch-overlay";
-overlay.hidden=true;
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+import { doc, collection, setDoc, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+/* Diamond Lounge Watch: voice-room scoped synchronized YouTube playback and realtime chat */
+(() => {
+const buttons=[...document.querySelectorAll("[data-watch-launch]")]; if(!buttons.length)return;
+const overlay=document.createElement("div");overlay.className="dl-watch-overlay";overlay.hidden=true;
 overlay.innerHTML=`
 <div class="dl-watch-shell" role="dialog" aria-modal="true" aria-label="Watch activities">
-  <div class="dl-watch-top">
-    <div class="dl-watch-brand"><img src="diamond.gif" alt=""><span>DIAMOND LOUNGE · WATCH</span></div>
-    <div class="dl-watch-top-actions"><span class="dl-watch-live-label">VOICE ACTIVITY</span><button class="dl-watch-close" aria-label="Close Watch">×</button></div>
-  </div>
-  <div class="dl-watch-grid">
-    <div class="dl-watch-main">
-      <div class="dl-watch-player" id="dlWatchPlayer">
-        <div class="dl-watch-empty"><span>◆</span><strong>YOUR WATCH LOUNGE</strong><small>Choose a video to get started</small></div>
-        <div class="dl-watch-chat-glass" id="dlWatchChat"><div class="chat-label">LOUNGE CHAT</div><p><b>Diamond Lounge</b> <span class="chat-muted">Welcome to Watch.</span></p><p class="chat-muted">Chat overlay preview — live synchronized Watch chat is not connected yet.</p></div>
-      </div>
-      <div class="dl-watch-video-meta"><div><h2 class="dl-watch-title">Watch together</h2><p class="dl-watch-caption" id="dlWatchStatus">Your voice channel is connected. Load a YouTube video to begin.</p></div><button class="dl-watch-theater" id="dlWatchTheater" type="button">Theater mode</button></div>
-    </div>
-    <aside class="dl-watch-side">
-      <h3>WATCH CONTROLS</h3>
-      <label class="dl-watch-field-label" for="dlWatchUrl">VIDEO LINK</label>
-      <input class="dl-watch-url" id="dlWatchUrl" type="url" placeholder="Paste a YouTube link…">
-      <button class="dl-watch-load" id="dlWatchLoad">▶ Load video</button>
-      <div class="dl-watch-option-group">
-        <button type="button" id="dlWatchBrowse">⌕ <span><b>Browse YouTube</b><small>Find something to watch</small></span><i>↗</i></button>
-        <button type="button" id="dlWatchInvite">♧ <span><b>Invite to Watch</b><small>Copy the video link</small></span><i>⧉</i></button>
-        <button type="button" id="dlWatchChatToggle" aria-pressed="true">▤ <span><b>Show chat overlay</b><small>Toggle the glass chat panel</small></span><i>◉</i></button>
-        <button type="button" id="dlWatchReload">↻ <span><b>Reload video</b><small>Restart the current player</small></span><i>↻</i></button>
-        <button type="button" id="dlWatchClear">⌫ <span><b>Clear player</b><small>Remove the current video</small></span><i>×</i></button>
-      </div>
-      <p class="dl-watch-note">Video playback is embedded from YouTube. Synchronized playback and live Watch chat are planned separately.</p>
-    </aside>
-  </div>
-</div>`;
+ <div class="dl-watch-top"><div class="dl-watch-brand"><img src="diamond.gif" alt=""><span>DIAMOND LOUNGE · WATCH</span></div><div class="dl-watch-top-actions"><span class="dl-watch-live-label">VOICE ACTIVITY · SYNCED</span><button class="dl-watch-close" aria-label="Close Watch">×</button></div></div>
+ <div class="dl-watch-grid"><div class="dl-watch-main">
+  <div class="dl-watch-player" id="dlWatchPlayer"><div class="dl-watch-empty"><span>◆</span><strong>YOUR WATCH LOUNGE</strong><small>Choose a video to get started</small></div><div class="dl-watch-chat-glass" id="dlWatchChat"><div class="chat-label">LIVE WATCH CHAT</div><div class="dl-watch-chat-messages" id="dlWatchChatMessages"></div><form id="dlWatchChatForm" class="dl-watch-chat-form"><input id="dlWatchChatInput" maxlength="500" placeholder="Message the Watch lounge…" autocomplete="off"><button type="submit">Send</button></form></div></div>
+  <div class="dl-watch-video-meta"><div><h2 class="dl-watch-title">Watch together</h2><p class="dl-watch-caption" id="dlWatchStatus">Connect to a voice channel to use Watch.</p></div><button class="dl-watch-theater" id="dlWatchTheater" type="button">Theater mode</button></div>
+ </div><aside class="dl-watch-side"><h3>WATCH CONTROLS</h3><label class="dl-watch-field-label" for="dlWatchUrl">VIDEO LINK</label><input class="dl-watch-url" id="dlWatchUrl" type="url" placeholder="Paste a YouTube link…"><button class="dl-watch-load" id="dlWatchLoad">▶ Load video for everyone</button>
+ <div class="dl-watch-option-group"><button type="button" id="dlWatchBrowse">⌕ <span><b>Browse YouTube</b><small>Find something to watch</small></span><i>↗</i></button><button type="button" id="dlWatchInvite">♧ <span><b>Invite to Watch</b><small>Copy current video link</small></span><i>⧉</i></button><button type="button" id="dlWatchChatToggle" aria-pressed="true">▤ <span><b>Show chat overlay</b><small>Toggle the glass chat panel</small></span><i>◉</i></button><button type="button" id="dlWatchReload">↻ <span><b>Reload video</b><small>Restart for everyone</small></span><i>↻</i></button><button type="button" id="dlWatchClear">⌫ <span><b>Clear player</b><small>Clear shared playback</small></span><i>×</i></button></div><p class="dl-watch-note">Playback state is shared within the connected voice channel. Chat is live.</p></aside></div></div>`;
 document.body.append(overlay);
-const $=id=>overlay.querySelector("#"+id);
-const close=overlay.querySelector(".dl-watch-close"),input=$("dlWatchUrl"),player=$("dlWatchPlayer"),status=$("dlWatchStatus");
-let currentId=null,currentUrl="";
-function show(){overlay.hidden=false;close.focus();}
-function hide(){overlay.hidden=true;}
-function parseVideo(raw){
- try{
-  const u=new URL(raw);
-  if(u.hostname==="youtu.be")return u.pathname.slice(1);
-  if(u.hostname==="youtube.com"||u.hostname.endsWith(".youtube.com"))return u.searchParams.get("v")||u.pathname.split("/").filter(Boolean).pop();
- }catch{}
- return null;
-}
-function clearPlayer(){
- player.querySelector("iframe")?.remove();
- currentId=null;currentUrl="";
- const empty=document.createElement("div");empty.className="dl-watch-empty";
- empty.innerHTML="<span>◆</span><strong>YOUR WATCH LOUNGE</strong><small>Choose a video to get started</small>";
- player.prepend(empty);status.textContent="Your voice channel is connected. Load a YouTube video to begin.";
-}
-function loadVideo(){
- const id=parseVideo(input.value.trim());
- if(!id||!/^[A-Za-z0-9_-]{6,}$/.test(id)){input.setCustomValidity("Please enter a valid YouTube link.");input.reportValidity();return;}
- input.setCustomValidity("");player.querySelector("iframe")?.remove();player.querySelector(".dl-watch-empty")?.remove();
- const iframe=document.createElement("iframe");
- iframe.src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&rel=0";
- iframe.title="YouTube video";iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";iframe.allowFullscreen=true;
- player.prepend(iframe);currentId=id;currentUrl="https://www.youtube.com/watch?v="+id;
- status.textContent="Video loaded. Share its link with people in your voice channel.";
-}
-buttons.forEach(button=>button.addEventListener("click",show));
-close.addEventListener("click",hide);
-overlay.addEventListener("click",e=>{if(e.target===overlay)hide();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)hide();});
-$("dlWatchLoad").addEventListener("click",loadVideo);
-input.addEventListener("keydown",e=>{if(e.key==="Enter")loadVideo();});
+const $=id=>overlay.querySelector("#"+id), close=$(".dl-watch-close"),input=$("dlWatchUrl"),player=$("dlWatchPlayer"),status=$("dlWatchStatus"),messages=$("dlWatchChatMessages");
+let user=null,voice={connected:false,roomId:null,selectedChannel:null},currentId=null,currentUrl="",yt=null,apiReady=false,applyingRemote=false,remoteStateUnsub=null,remoteChatUnsub=null,chatRoom=null,sharedStateRef=null,lastStateSignature="",syncTimer=null;
+function show(){overlay.hidden=false;close.focus();}function hide(){overlay.hidden=true;}
+function parseVideo(raw){try{const u=new URL(raw);if(u.hostname==="youtu.be")return u.pathname.slice(1);if(u.hostname==="youtube.com"||u.hostname.endsWith(".youtube.com"))return u.searchParams.get("v")||u.pathname.split("/").filter(Boolean).pop();}catch{}return null;}
+function roomBase(){return voice.roomId&&user?doc(db,"voiceRooms",voice.roomId,"watch","state"):null;}
+function chatBase(){return voice.roomId&&user?collection(db,"voiceRooms",voice.roomId,"watch","messages"):null;}
+function setStatus(s){status.textContent=s;}
+function emptyPlayer(){player.querySelector("#dlWatchPlayer iframe")?.remove();player.querySelector("iframe")?.remove();player.querySelector(".dl-watch-empty")?.remove();const e=document.createElement("div");e.className="dl-watch-empty";e.innerHTML="<span>◆</span><strong>YOUR WATCH LOUNGE</strong><small>Choose a video to get started</small>";player.prepend(e);}
+function loadLocal(id,autoplay=true,startAt=0){currentId=id;currentUrl="https://www.youtube.com/watch?v="+id;input.value=currentUrl;player.querySelector(".dl-watch-empty")?.remove();if(!apiReady){ensureApi();setStatus("Preparing synchronized video player…");return;}buildPlayer(id,autoplay,startAt);}
+function buildPlayer(id,autoplay,startAt){player.querySelector("iframe")?.remove();const host=document.createElement("div");host.id="dlWatchYT";player.prepend(host);yt=new YT.Player(host,{height:"100%",width:"100%",videoId:id,playerVars:{autoplay:autoplay?1:0,controls:1,rel:0,playsinline:1,start:Math.floor(startAt)},events:{onReady:e=>{if(startAt>0)e.target.seekTo(startAt,true);setStatus("Video synced for this voice channel.");},onStateChange:handlePlayerState}});}
+function ensureApi(){if(window.YT?.Player){apiReady=true;if(currentId)buildPlayer(currentId,true,0);return;}if(window.dlWatchApiLoading)return;window.dlWatchApiLoading=true;window.onYouTubeIframeAPIReady=()=>{apiReady=true;if(currentId)buildPlayer(currentId,true,0);};const s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";document.head.append(s);}
+function playerTime(){try{return yt?.getCurrentTime?.()||0;}catch{return 0;}}
+async function publishState(state){if(!sharedStateRef||!user)return;const data={videoId:currentId,action:state,position:playerTime(),updatedAt:Date.now(),updatedBy:user.uid};lastStateSignature=JSON.stringify(data);try{await setDoc(sharedStateRef,data);}catch(e){console.error("Watch sync write failed",e);setStatus("Could not sync playback. Check Firestore Watch rules.");}}
+function handlePlayerState(e){if(applyingRemote)return;if(e.data===YT.PlayerState.PLAYING)publishState("play");else if(e.data===YT.PlayerState.PAUSED)publishState("pause");else if(e.data===YT.PlayerState.ENDED)publishState("pause");}
+function applyRemoteState(data){if(!data||!data.videoId)return;const id=data.videoId;if(id!==currentId){applyingRemote=true;loadLocal(id,data.action==="play",data.position||0);setTimeout(()=>applyingRemote=false,1200);return;}if(!yt?.getPlayerState)return;applyingRemote=true;const target=Number(data.position||0);try{if(data.action==="play"){if(Math.abs(playerTime()-target)>3)yt.seekTo(target,true);yt.playVideo();}else{yt.pauseVideo();if(Math.abs(playerTime()-target)>3)yt.seekTo(target,true);}}catch{}setTimeout(()=>applyingRemote=false,900);}
+function detachRoom(){remoteStateUnsub?.();remoteChatUnsub?.();remoteStateUnsub=remoteChatUnsub=null;sharedStateRef=null;chatRoom=null;messages.replaceChildren();clearInterval(syncTimer);syncTimer=null;}
+function attachRoom(){detachRoom();if(!voice.connected||!voice.roomId||!user){setStatus("Connect to a voice channel to use Watch.");return;}sharedStateRef=roomBase();chatRoom=chatBase();remoteStateUnsub=onSnapshot(sharedStateRef,s=>{if(s.exists()){const data=s.data();if(data.updatedBy===user.uid&&JSON.stringify(data)===lastStateSignature)return;applyRemoteState(data);}},e=>console.warn("Watch state listener",e));remoteChatUnsub=onSnapshot(query(chatRoom,orderBy("createdAt","asc"),limit(60)),s=>renderChat(s.docs.map(d=>d.data())),e=>console.warn("Watch chat listener",e));setStatus("Connected to "+(voice.selectedChannel||"voice")+" — shared Watch ready.");syncTimer=setInterval(()=>{if(yt?.getPlayerState?.()===YT.PlayerState.PLAYING&&!applyingRemote)publishState("play");},5000);}
+function renderChat(items){messages.replaceChildren();items.forEach(m=>{const line=document.createElement("p");line.className="dl-watch-chat-line";const name=document.createElement("b");name.textContent=m.name||"Member";const txt=document.createElement("span");txt.textContent=" "+(m.text||"");line.append(name,txt);messages.append(line);});messages.scrollTop=messages.scrollHeight;}
+$("dlWatchChatForm").addEventListener("submit",async e=>{e.preventDefault();const box=$("dlWatchChatInput"),text=box.value.trim();if(!text||!chatRoom||!user)return;box.value="";try{await addDoc(chatRoom,{uid:user.uid,name:user.displayName||user.email||"Member",text,createdAt:serverTimestamp()});}catch(err){setStatus("Chat message could not be sent.");console.error(err);}});
+$("dlWatchLoad").addEventListener("click",async()=>{const id=parseVideo(input.value.trim());if(!id||!/^[A-Za-z0-9_-]{6,}$/.test(id)){input.setCustomValidity("Please enter a valid YouTube link.");input.reportValidity();return;}input.setCustomValidity("");if(!voice.connected||!sharedStateRef){setStatus("Join a voice channel first.");return;}loadLocal(id,true,0);await publishState("play");});
+input.addEventListener("keydown",e=>{if(e.key==="Enter")$("dlWatchLoad").click();});
 $("dlWatchBrowse").addEventListener("click",()=>window.open("https://www.youtube.com/","_blank","noopener,noreferrer"));
-$("dlWatchInvite").addEventListener("click",async()=>{
- if(!currentUrl){status.textContent="Load a video first, then you can copy its link.";return;}
- try{await navigator.clipboard.writeText(currentUrl);status.textContent="Video link copied. Share it with your voice channel.";}
- catch{input.value=currentUrl;input.focus();input.select();status.textContent="Select and copy the video link above.";}
-});
-$("dlWatchChatToggle").addEventListener("click",e=>{
- const chat=$("dlWatchChat"),visible=chat.hidden;
- chat.hidden=!visible;e.currentTarget.setAttribute("aria-pressed",String(visible));
- e.currentTarget.querySelector("b").textContent=visible?"Hide chat overlay":"Show chat overlay";
-});
-$("dlWatchTheater").addEventListener("click",()=>{
- const active=overlay.classList.toggle("dl-watch-theater-mode");
- $("dlWatchTheater").textContent=active?"Exit theater mode":"Theater mode";
-});
-$("dlWatchReload").addEventListener("click",()=>{
- if(!currentId){status.textContent="Load a video first.";return;}
- const id=currentId;input.value=currentUrl;loadVideo();
-});
-$("dlWatchClear").addEventListener("click",clearPlayer);
+$("dlWatchInvite").addEventListener("click",async()=>{if(!currentUrl){setStatus("Load a video first.");return;}try{await navigator.clipboard.writeText(currentUrl);setStatus("Video link copied.");}catch{input.value=currentUrl;input.select();setStatus("Copy the link from the input.");}});
+$("dlWatchChatToggle").addEventListener("click",e=>{const chat=$("dlWatchChat"),visible=chat.hidden;chat.hidden=!visible;e.currentTarget.setAttribute("aria-pressed",String(visible));e.currentTarget.querySelector("b").textContent=visible?"Hide chat overlay":"Show chat overlay";});
+$("dlWatchTheater").addEventListener("click",()=>{const active=overlay.classList.toggle("dl-watch-theater-mode");$("dlWatchTheater").textContent=active?"Exit theater mode":"Theater mode";});
+$("dlWatchReload").addEventListener("click",()=>{if(!currentId){setStatus("Load a video first.");return;}loadLocal(currentId,true,playerTime());publishState("play");});
+$("dlWatchClear").addEventListener("click",async()=>{currentId=null;currentUrl="";yt=null;emptyPlayer();if(sharedStateRef)try{await setDoc(sharedStateRef,{videoId:null,action:"clear",position:0,updatedAt:Date.now(),updatedBy:user.uid});}catch(e){console.error(e);}setStatus("Shared player cleared.");});
+close.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide();});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)hide();});buttons.forEach(b=>b.addEventListener("click",show));
+window.addEventListener("diamond-voice-state",e=>{voice=e.detail||{};attachRoom();});
+onAuthStateChanged(auth,u=>{user=u;if(voice.connected)attachRoom();});
 })();
