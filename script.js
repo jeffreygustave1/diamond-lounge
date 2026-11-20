@@ -480,28 +480,42 @@ async function consumeServerInviteFromUrl() {
     const serverId = params.get("serverInvite");
     const inviteCode = params.get("invite");
     if (!serverId || !inviteCode || !currentUser) return;
+
+    const inviteRef = doc(db, "servers", serverId, "invites", inviteCode);
+    const serverRef = doc(db, "servers", serverId);
+    const joinRequestRef = doc(db, "servers", serverId, "joinRequests", currentUser.uid);
     try {
-        const inviteRef = doc(db, "servers", serverId, "invites", inviteCode);
-        const inviteSnapshot = await getDoc(inviteRef);
+        const [inviteSnapshot, serverSnapshot] = await Promise.all([
+            getDoc(inviteRef),
+            getDoc(serverRef)
+        ]);
         if (!inviteSnapshot.exists()) {
             alert("This server invite is invalid or has expired.");
             return;
         }
-        const serverRef = doc(db, "servers", serverId);
-        const serverSnapshot = await getDoc(serverRef);
         if (!serverSnapshot.exists()) {
             alert("The invited server no longer exists.");
             return;
         }
+
         const serverData = serverSnapshot.data();
         const memberUids = serverData.memberUids || [];
         if (!memberUids.includes(currentUser.uid)) {
-            await updateDoc(serverRef, { memberUids: arrayUnion(currentUser.uid) });
+            // Firestore rules validate this request against the invite document.
+            await setDoc(joinRequestRef, {
+                uid: currentUser.uid,
+                inviteCode,
+                createdAt: serverTimestamp()
+            });
+            await updateDoc(serverRef, {
+                memberUids: arrayUnion(currentUser.uid)
+            });
+            await deleteDoc(joinRequestRef);
         }
 
         const memberRef = doc(db, "servers", serverId, "members", currentUser.uid);
         const memberSnapshot = await getDoc(memberRef);
-        if (!memberSnapshot.exists()) {
+        if (!memberSnapshot.exists() && currentUser.uid !== serverData.ownerUid) {
             await setDoc(memberRef, {
                 uid: currentUser.uid,
                 displayName: currentUser.displayName || currentUser.email?.split("@")[0] || "Member",
@@ -525,8 +539,9 @@ async function consumeServerInviteFromUrl() {
         alert("You joined " + (serverData.name || "the server") + "!");
     } catch (error) {
         console.error("Invite join flow failed:", error);
+        try { await deleteDoc(joinRequestRef); } catch {}
         alert(error.code === "permission-denied"
-            ? "Firebase rules currently block joining this server. Publish the latest Firestore rules."
+            ? "Firebase blocked this join. Publish the latest Firestore rules and try the invite again."
             : "Unable to join using this invite.");
     }
 }
