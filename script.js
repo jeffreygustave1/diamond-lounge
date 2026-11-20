@@ -1,9 +1,10 @@
-import { auth, db } from "./firebase.js";
+import { auth, db, storage } from "./firebase.js";
 
 import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
 
 import {
     addDoc,
@@ -165,6 +166,8 @@ let suppressServerClick = false;
 
 let currentAvatar = "diamond";
 let uploadedPicture = "";
+let silverGifEntitled = false;
+let pendingGifFile = null;
 let currentProfileBadges = [];
 let rawPicture = "";
 let cropScale = 1;
@@ -3359,6 +3362,9 @@ function applyAvatar(key) {
 
 async function loadProfile() {
     if (!currentUser) return;
+    try { const ent = await getDoc(doc(db, "premiumEntitlements", currentUser.uid)); silverGifEntitled = ent.exists() && ent.data().silverGifPack === true; } catch (_) { silverGifEntitled = false; }
+    const uploadLabel = document.querySelector('label[for="profileUploadInput"]');
+    if (uploadLabel) uploadLabel.textContent = silverGifEntitled ? "Upload your own picture or Silver GIF" : "Upload your own picture";
 
     try {
         const snapshot = await getDoc(doc(db, "users", currentUser.uid));
@@ -3585,69 +3591,15 @@ profileChoiceButtons.forEach((button) => {
 });
 
 profileUploadInput?.addEventListener("change", () => {
-    const file = profileUploadInput.files?.[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-        if (profileStatus) {
-            profileStatus.textContent = "Choose an image file.";
-            profileStatus.className = "error";
-        }
-
-        profileUploadInput.value = "";
-        return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-        if (profileStatus) {
-            profileStatus.textContent =
-                "Please choose an image smaller than 5 MB.";
-            profileStatus.className = "error";
-        }
-
-        profileUploadInput.value = "";
-        return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-        rawPicture = String(reader.result || "");
-
-        cropScale = 1;
-        cropX = 0;
-        cropY = 0;
-
-        if (profileCrop) {
-            profileCrop.hidden = false;
-        }
-
-        if (cropZoom) {
-            cropZoom.value = "100";
-        }
-
-        if (cropImage) {
-            cropImage.src = rawPicture;
-            cropImage.style.transformOrigin = "center center";
-            cropImage.style.transform = "translate(0px, 0px) scale(1)";
-        }
-
-        if (profileStatus) {
-            profileStatus.textContent =
-                "Drag the image to position it. Adjust the zoom, then save.";
-            profileStatus.className = "success";
-        }
-    };
-
-    reader.onerror = () => {
-        if (profileStatus) {
-            profileStatus.textContent = "The image could not be opened.";
-            profileStatus.className = "error";
-        }
-    };
-
-    reader.readAsDataURL(file);
+    const file = profileUploadInput.files?.[0]; if (!file) return;
+    const gif = file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif");
+    if (!file.type.startsWith("image/")) { if (profileStatus) { profileStatus.textContent = "Choose an image file."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
+    if (gif && !silverGifEntitled) { if (profileStatus) { profileStatus.textContent = "GIF profile pictures require the Silver GIF Pack. Purchase it, then refresh."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
+    if (file.size > 5*1024*1024) { if (profileStatus) { profileStatus.textContent = "Please choose an image smaller than 5 MB."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
+    if (gif) { pendingGifFile=file; rawPicture=""; uploadedPicture=""; if(profileCrop)profileCrop.hidden=true; if(profilePreviewImage){profilePreviewImage.src=URL.createObjectURL(file);profilePreviewImage.style.display="block";} if(profileStatus){profileStatus.textContent="Silver GIF selected. Save your profile to upload it.";profileStatus.className="success";} return; }
+    pendingGifFile=null; const reader=new FileReader();
+    reader.onload=()=>{rawPicture=String(reader.result||"");cropScale=1;cropX=0;cropY=0;if(profileCrop)profileCrop.hidden=false;if(cropZoom)cropZoom.value="100";if(cropImage){cropImage.src=rawPicture;cropImage.style.transformOrigin="center center";cropImage.style.transform="translate(0px, 0px) scale(1)";}if(profileStatus){profileStatus.textContent="Drag the image to position it. Adjust zoom, then save.";profileStatus.className="success";}};
+    reader.onerror=()=>{if(profileStatus){profileStatus.textContent="The image could not be opened.";profileStatus.className="error";}};reader.readAsDataURL(file);
 });
 
 // ==================================================
@@ -3684,7 +3636,12 @@ profileForm?.addEventListener("submit", async (event) => {
     }
 
     try {
-        if (rawPicture) {
+        if (pendingGifFile) {
+            if (!silverGifEntitled) throw new Error("Silver GIF Pack entitlement required.");
+            const gifRef = storageRef(storage, "premium-gifs/" + currentUser.uid + "/profile.gif");
+            await uploadBytes(gifRef, pendingGifFile, { contentType: "image/gif" });
+            uploadedPicture = await getDownloadURL(gifRef);
+        } else if (rawPicture) {
             const croppedPicture = await renderCroppedPicture();
 
             if (!croppedPicture) {
@@ -3707,6 +3664,7 @@ profileForm?.addEventListener("submit", async (event) => {
                 displayName: nextName,
                 avatar: currentAvatar,
                 picture: uploadedPicture,
+                pictureType: pendingGifFile ? "gif" : "image",
                 badges: nextBadges,
                 updatedAt: serverTimestamp()
             },
@@ -3724,6 +3682,7 @@ profileForm?.addEventListener("submit", async (event) => {
         }
 
         currentProfileBadges = nextBadges;
+        pendingGifFile = null; rawPicture = "";
         syncCreatedServerVoiceUser();
         void window.diamondVoiceControls?.refreshProfile?.();
         applyAvatar(currentAvatar);
