@@ -1949,9 +1949,19 @@ function openPrimaryVoiceCall(channelName, roomId) {
     primaryVoiceChannelName = channelName;
     primaryVoiceRoomId = roomId;
 
+    stopDirectMessages();
+    activeCreatedServerId = null;
+    activeCreatedServerOwnerUid = null;
+    currentServerCanManageChannels = false;
+    showLoungeSidebar();
+    hideMainViews();
     if (loungeView) loungeView.hidden = false;
     if (serverView) serverView.hidden = true;
     if (communitySidebar) communitySidebar.hidden = false;
+    clearServerSelections();
+    mainServerButton?.classList.add("selected");
+    mainServerButton?.setAttribute("aria-pressed", "true");
+    setMobileSidebar(false);
     const messages = document.getElementById("messages");
     const messageForm = document.getElementById("messageForm");
     const uploadStatus = document.getElementById("uploadStatus");
@@ -3548,6 +3558,7 @@ profileForm?.addEventListener("submit", async (event) => {
 
         currentProfileBadges = nextBadges;
         syncCreatedServerVoiceUser();
+        void window.diamondVoiceControls?.refreshProfile?.();
         applyAvatar(currentAvatar);
 
         if (profileStatus) {
