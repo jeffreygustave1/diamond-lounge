@@ -52,7 +52,28 @@ const STALE_AFTER_MS = 35000;
 const ICE_SERVERS = [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" }
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun.relay.metered.ca:80" },
+    {
+        urls: "turn:global.relay.metered.ca:80",
+        username: "aa74c4572f5063c393acfe40",
+        credential: "NzdXtF8nNR6Nl6Uf"
+    },
+    {
+        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+        username: "aa74c4572f5063c393acfe40",
+        credential: "NzdXtF8nNR6Nl6Uf"
+    },
+    {
+        urls: "turn:global.relay.metered.ca:443",
+        username: "aa74c4572f5063c393acfe40",
+        credential: "NzdXtF8nNR6Nl6Uf"
+    },
+    {
+        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+        username: "aa74c4572f5063c393acfe40",
+        credential: "NzdXtF8nNR6Nl6Uf"
+    }
 ];
 
 /* ==========================================
