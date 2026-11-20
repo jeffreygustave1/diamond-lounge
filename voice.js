@@ -495,6 +495,8 @@ function makePeer(person, callRef) {
             peer.audio.autoplay = true;
             peer.audio.playsInline = true;
             peer.audio.dataset.peer = person.uid;
+            peer.audio.muted = deafened;
+            peer.audio.volume = outputVolume;
 
             audioContainer?.appendChild(peer.audio);
         }
@@ -959,39 +961,25 @@ function watchIncomingCalls() {
 
 async function refreshPresenceFlags() {
     if (!roomId || !user || !localStream) return;
-
     try {
         await setDoc(
-            doc(
-                db,
-                "voiceRooms",
-                roomId,
-                "participants",
-                user.uid
-            ),
-
+            doc(db, "voiceRooms", roomId, "participants", user.uid),
             {
                 uid: user.uid,
-
-                name: (
-                    user.displayName || "Member"
-                ).slice(0, 80),
-
+                name: String(activeVoiceProfile.displayName || user.displayName || "Member").slice(0, 80),
                 sessionId,
                 heartbeatAt: Date.now(),
-
                 cameraOn,
-                screenOn
+                screenOn,
+                muted,
+                deafened,
+                raisedHand,
+                badges: Array.isArray(activeVoiceProfile.badges) ? activeVoiceProfile.badges.slice(0, 4) : []
             },
-
             { merge: true }
         );
-
     } catch (error) {
-        console.warn(
-            "Presence flags could not be updated:",
-            error
-        );
+        console.warn("Presence flags could not be updated:", error);
     }
 }
 
