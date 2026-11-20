@@ -3649,3 +3649,27 @@ button {
 .created-server-voice-tile:only-child{grid-column:auto!important;width:min(100%,460px)!important;min-height:260px!important;max-height:360px;margin:0 auto!important}
 .created-server-voice-tile:only-child .created-server-voice-avatar{width:64px;height:64px;font-size:24px;border-width:2px}
 @media(max-width:700px){.created-server-voice-tile:only-child{width:min(100%,360px)!important;min-height:220px!important}.created-server-voice-tile:only-child .created-server-voice-avatar{width:56px;height:56px}}
+
+
+/* Expanded Watch activity controls */
+.dl-watch-top-actions{display:flex;align-items:center;gap:14px}
+.dl-watch-live-label{color:#8fb495;font-size:9px;letter-spacing:1.5px;font-weight:800}
+.dl-watch-field-label{display:block;margin-top:14px;color:#c7a96b;font-size:9px;font-weight:800;letter-spacing:1.5px}
+.dl-watch-video-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dl-watch-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#c7a96b;text-align:center;letter-spacing:1.5px}
+.dl-watch-empty>span{font-size:36px;opacity:.7}.dl-watch-empty strong{font-size:12px}.dl-watch-empty small{color:#8c8e96;font-size:11px;letter-spacing:.3px}
+.dl-watch-side{display:flex;flex-direction:column;gap:7px}
+.dl-watch-side .dl-watch-url{margin-top:0}
+.dl-watch-option-group{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.dl-watch-option-group button{display:flex;align-items:center;gap:11px;width:100%;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035);color:#d8d5ce;text-align:left;cursor:pointer}
+.dl-watch-option-group button:hover{border-color:rgba(199,169,107,.35);background:rgba(199,169,107,.08)}
+.dl-watch-option-group button>span{display:flex;flex:1;flex-direction:column;gap:3px}
+.dl-watch-option-group button b{font-size:11px;font-weight:650}
+.dl-watch-option-group button small{color:#92939b;font-size:9px}
+.dl-watch-option-group button i{color:#c7a96b;font-style:normal}
+.dl-watch-note{margin-top:auto!important;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);font-size:10px!important;color:#858791!important}
+.dl-watch-theater{flex:none;padding:8px 11px;border:1px solid rgba(199,169,107,.28);border-radius:9px;background:rgba(199,169,107,.08);color:#e1cfaa;font-size:10px;cursor:pointer}
+.dl-watch-theater-mode .dl-watch-shell{width:min(1800px,100%);height:98vh}
+.dl-watch-theater-mode .dl-watch-grid{grid-template-columns:minmax(0,1fr) 290px}
+.dl-watch-chat-glass[hidden]{display:none!important}
+@media(max-width:900px){.dl-watch-theater-mode .dl-watch-grid{grid-template-columns:1fr}}
