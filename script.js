@@ -308,6 +308,7 @@ function clearServerSelections() {
 }
 
 function showLoungeSidebar() {
+    placeProfileCardInVisibleSidebar(false);
     const channelsSidebar = document.getElementById("channelsSidebar");
     if (channelsSidebar) channelsSidebar.hidden = false;
     if (dmSidebar) dmSidebar.hidden = true;
@@ -693,6 +694,7 @@ messageForm?.addEventListener("submit", (event) => {
 
 function showDirectMessages() {
     if (!currentUser) return;
+    placeProfileCardInVisibleSidebar(false);
     const channelsSidebar = document.getElementById("channelsSidebar");
     if (channelsSidebar) channelsSidebar.hidden = false;
 
@@ -1785,6 +1787,16 @@ function restoreCreatedServerVoiceMedia() {
     createdServerRemoteMediaLayer = null;
 }
 
+function placeProfileCardInVisibleSidebar(serverViewActive = false) {
+    const card = document.querySelector(".profile-card");
+    const globalSidebar = document.getElementById("channelsSidebar");
+    const serverPanel = document.querySelector(".created-server-channel-panel");
+    const destination = serverViewActive ? serverPanel : globalSidebar;
+    if (card && destination && card.parentElement !== destination) {
+        destination.append(card);
+    }
+}
+
 function syncCreatedServerVoiceUser() {
     const panels = [
         ["createdServerVoiceUserAvatar", "createdServerVoiceUserName", "createdServerVoiceUserSubline", "createdServerVoiceUserBadges"],
@@ -1860,6 +1872,8 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
         : "";
 
     document.getElementById("channelsSidebar")?.classList.toggle("has-voice-connection", showMainPanel);
+    document.querySelector(".created-server-channel-panel")
+        ?.classList.toggle("has-voice-connection", showCreatedPanel);
 
     document.querySelectorAll('[data-voice-action="mute"]').forEach(button => {
         button.setAttribute("aria-pressed", String(Boolean(state.muted)));
@@ -2816,6 +2830,7 @@ function openServer(server) {
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
     const channelsSidebar = document.getElementById("channelsSidebar");
     if (channelsSidebar) channelsSidebar.hidden = true;
+    placeProfileCardInVisibleSidebar(true);
     restoreCreatedServerVoiceMedia();
 
     stopPublicMessages();
