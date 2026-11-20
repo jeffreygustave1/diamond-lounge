@@ -1743,40 +1743,170 @@ function playVoicePresenceSound(type) {
 /* CREATED-SERVER VOICE BRIDGE */
 window.diamondJoinCreatedVoiceRoom=async(label,customRoomId)=>{if(localStream)await leaveVoice();selectedChannel=label;roomId=customRoomId;setStatus("Connecting to "+label+"...");watchParticipants();await joinVoice();};
 window.diamondLeaveVoice=()=>leaveVoice();
-window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience) => {
+window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = {}) => {
     const profileCache = new Map();
+    const tileCache = new Map();
+    const tileRoots = new Map();
+    const cardColors = ["#26343f", "#17191d", "#dfc5ad", "#4b74b6", "#3a3544", "#315044"];
+
     const avatarPresets = {
-        diamond: {
-            background: "linear-gradient(145deg,#2b2924,#141416)",
-            color: "#e1c98f",
-            glyph: "✦"
-        },
-        gold: {
-            background: "linear-gradient(145deg,#c7a96b,#8b7040)",
-            color: "#1a1610",
-            glyph: "G"
-        },
-        silver: {
-            background: "linear-gradient(145deg,#c9ccd2,#8d9198)",
-            color: "#191a1d",
-            glyph: "S"
-        },
-        emerald: {
-            background: "linear-gradient(145deg,#4f8a63,#2c5740)",
-            color: "#eef7f0",
-            glyph: "E"
-        },
-        ruby: {
-            background: "linear-gradient(145deg,#a5535a,#6f2f36)",
-            color: "#fbeeee",
-            glyph: "R"
-        },
-        royal: {
-            background: "linear-gradient(145deg,#5a5fa5,#33376f)",
-            color: "#eeeffb",
-            glyph: "V"
-        }
+        diamond: { background: "linear-gradient(145deg,#2b2924,#141416)", color: "#e1c98f", glyph: "✦", tile: "#26343f" },
+        gold: { background: "linear-gradient(145deg,#c7a96b,#8b7040)", color: "#1a1610", glyph: "G", tile: "#dfc5ad" },
+        silver: { background: "linear-gradient(145deg,#c9ccd2,#8d9198)", color: "#191a1d", glyph: "S", tile: "#30343b" },
+        emerald: { background: "linear-gradient(145deg,#4f8a63,#2c5740)", color: "#eef7f0", glyph: "E", tile: "#315044" },
+        ruby: { background: "linear-gradient(145deg,#a5535a,#6f2f36)", color: "#fbeeee", glyph: "R", tile: "#55373e" },
+        royal: { background: "linear-gradient(145deg,#5a5fa5,#33376f)", color: "#eeeffb", glyph: "V", tile: "#4b74b6" }
     };
+
+    window.diamondVoiceTileRoots = tileRoots;
+
+    function makeTile(member) {
+        const tile = document.createElement("article");
+        tile.className = "created-server-voice-tile";
+        tile.dataset.uid = member.uid;
+
+        const avatar = document.createElement("div");
+        avatar.className = "created-server-voice-avatar";
+        avatar.textContent = String(member.name || "Member").trim().slice(0, 1).toUpperCase();
+
+        const footer = document.createElement("div");
+        footer.className = "created-server-voice-tile-footer";
+
+        const identity = document.createElement("div");
+        identity.className = "created-server-voice-identity";
+
+        const name = document.createElement("span");
+        name.className = "created-server-voice-name-pill";
+        name.textContent = member.name || "Member";
+
+        const badges = document.createElement("div");
+        badges.className = "created-server-voice-badges";
+
+        identity.append(name, badges);
+
+        const indicators = document.createElement("div");
+        indicators.className = "created-server-voice-indicators";
+
+        footer.append(identity, indicators);
+        tile.append(avatar, footer);
+
+        if (member.uid === user?.uid) tile.classList.add("is-self");
+        tileCache.set(member.uid, { tile, avatar, name, badges, indicators });
+        tileRoots.set(member.uid, tile);
+        return tile;
+    }
+
+    function renderProfile(member, profile) {
+        const parts = tileCache.get(member.uid);
+        if (!parts || !parts.tile.isConnected) return;
+
+        const name = profile.displayName || member.name || "Member";
+        parts.name.textContent = name;
+
+        const preset = avatarPresets[profile.avatar] || avatarPresets.diamond;
+        const picture = typeof profile.picture === "string" ? profile.picture : "";
+
+        parts.tile.style.setProperty("--voice-card-background", preset.tile);
+        parts.avatar.replaceChildren();
+
+        if (picture) {
+            const image = document.createElement("img");
+            image.src = picture;
+            image.alt = name + " avatar";
+            image.className = "created-server-voice-avatar-image";
+            parts.avatar.append(image);
+        } else {
+            parts.avatar.textContent = preset.glyph;
+            parts.avatar.style.background = preset.background;
+            parts.avatar.style.color = preset.color;
+        }
+
+        parts.badges.replaceChildren();
+        const labels = Array.isArray(profile.badges)
+            ? profile.badges
+            : (Array.isArray(member.badges) ? member.badges : []);
+        labels.slice(0, 4).forEach(label => {
+            const badge = document.createElement("span");
+            badge.className = "created-server-voice-badge";
+            badge.textContent = String(label).trim().slice(0, 24);
+            if (badge.textContent) parts.badges.append(badge);
+        });
+
+        if (context.serverId && member.uid) {
+            const rolePromise = getDoc(doc(db, "servers", context.serverId, "members", member.uid))
+                .then(snapshot => snapshot.exists() ? snapshot.data() : {})
+                .catch(() => ({}));
+            rolePromise.then(memberRecord => {
+                if (!parts.tile.isConnected) return;
+                const roleIds = Array.isArray(memberRecord.roleIds) ? memberRecord.roleIds : [];
+                const roleLabel = roleIds.includes("owner") ? "Owner" : roleIds.includes("admin") ? "Admin" : "";
+                if (roleLabel && !parts.badges.querySelector('[data-server-role="true"]')) {
+                    const roleBadge = document.createElement("span");
+                    roleBadge.className = "created-server-voice-badge is-role";
+                    roleBadge.dataset.serverRole = "true";
+                    roleBadge.textContent = roleLabel;
+                    parts.badges.prepend(roleBadge);
+                }
+            });
+        }
+    }
+
+    function updateTile(member) {
+        let parts = tileCache.get(member.uid);
+        if (!parts) {
+            makeTile(member);
+            parts = tileCache.get(member.uid);
+        }
+
+        parts.name.textContent = member.name || "Member";
+        parts.tile.classList.toggle("is-self", member.uid === user?.uid);
+        parts.tile.classList.toggle("is-muted", Boolean(member.muted));
+        parts.tile.classList.toggle("has-raised-hand", Boolean(member.raisedHand));
+
+        parts.indicators.replaceChildren();
+        if (member.muted) {
+            const icon = document.createElement("span");
+            icon.className = "created-server-voice-indicator is-muted";
+            icon.textContent = "⊘";
+            icon.title = "Muted";
+            parts.indicators.append(icon);
+        }
+        if (member.cameraOn) {
+            const icon = document.createElement("span");
+            icon.className = "created-server-voice-indicator";
+            icon.textContent = "▣";
+            icon.title = "Camera on";
+            parts.indicators.append(icon);
+        }
+        if (member.screenOn) {
+            const icon = document.createElement("span");
+            icon.className = "created-server-voice-indicator";
+            icon.textContent = "▤";
+            icon.title = "Sharing screen";
+            parts.indicators.append(icon);
+        }
+        if (member.raisedHand) {
+            const hand = document.createElement("span");
+            hand.className = "created-server-voice-hand";
+            hand.textContent = "✋";
+            hand.title = "Raised hand";
+            parts.indicators.append(hand);
+        }
+
+        stage.append(parts.tile);
+
+        let promise = profileCache.get(member.uid);
+        if (!promise) {
+            promise = getDoc(doc(db, "users", member.uid))
+                .then(snapshot => snapshot.exists() ? snapshot.data() : {})
+                .catch(error => {
+                    console.warn("Voice profile unavailable:", error);
+                    return {};
+                });
+            profileCache.set(member.uid, promise);
+        }
+        promise.then(profile => renderProfile(member, profile));
+    }
 
     const unsubscribe = onSnapshot(
         collection(db, "voiceRooms", customRoomId, "participants"),
@@ -1784,83 +1914,50 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience) => {
             const liveMembers = snapshot.docs
                 .map(entry => entry.data())
                 .filter(member =>
+                    member.uid &&
                     Date.now() - Number(member.heartbeatAt || 0) < STALE_AFTER_MS
                 );
 
-            stage.replaceChildren();
-            audience.replaceChildren();
+            const activeIds = new Set(liveMembers.map(member => member.uid));
+            [...tileCache.keys()].forEach(uid => {
+                if (!activeIds.has(uid)) {
+                    tileCache.get(uid)?.tile.remove();
+                    tileCache.delete(uid);
+                    tileRoots.delete(uid);
+                }
+            });
 
+            if (audience) audience.replaceChildren();
             if (!liveMembers.length) {
-                stage.textContent = "No one connected yet.";
+                stage.replaceChildren();
+                const empty = document.createElement("div");
+                empty.className = "created-server-voice-empty";
+                empty.textContent = "Waiting for people to join…";
+                stage.append(empty);
                 return;
             }
 
-            liveMembers.forEach(member => {
-                const displayName = member.name || "Member";
-                const tile = document.createElement("div");
-                tile.className = "created-server-voice-tile";
-
-                const avatar = document.createElement("div");
-                avatar.className = "created-server-voice-avatar";
-                avatar.textContent = displayName.trim().slice(0, 1).toUpperCase();
-
-                const name = document.createElement("div");
-                name.className = "created-server-voice-name";
-                name.textContent = displayName;
-                tile.append(avatar, name);
-
-                if (member.cameraOn || member.screenOn) {
-                    const mediaBadge = document.createElement("span");
-                    mediaBadge.textContent = member.cameraOn ? "📷" : "🖥️";
-                    tile.append(mediaBadge);
-                }
-
-                stage.append(tile);
-
-                const audienceMember = document.createElement("div");
-                audienceMember.className = "created-server-audience-member";
-                audienceMember.textContent = displayName;
-                audience.append(audienceMember);
-
-                if (!member.uid) return;
-
-                let profilePromise = profileCache.get(member.uid);
-                if (!profilePromise) {
-                    profilePromise = getDoc(doc(db, "users", member.uid))
-                        .then(profile => profile.exists() ? profile.data() : {})
-                        .catch(error => {
-                            console.warn("Voice avatar profile unavailable:", error);
-                            return {};
-                        });
-                    profileCache.set(member.uid, profilePromise);
-                }
-
-                profilePromise.then(profile => {
-                    if (!avatar.isConnected) return;
-
-                    if (typeof profile.picture === "string" && profile.picture) {
-                        avatar.replaceChildren();
-                        const image = document.createElement("img");
-                        image.src = profile.picture;
-                        image.alt = displayName + " avatar";
-                        image.className = "created-server-voice-avatar-image";
-                        avatar.append(image);
-                        return;
-                    }
-
-                    const preset = avatarPresets[profile.avatar] || avatarPresets.diamond;
-                    avatar.textContent = preset.glyph;
-                    avatar.style.background = preset.background;
-                    avatar.style.color = preset.color;
-                });
-            });
+            liveMembers.forEach(member => updateTile(member));
+            if (audience) audience.hidden = true;
         },
         error => {
             console.error("Created-server voice presence failed:", error);
-            stage.textContent = "Voice members could not be loaded.";
-            audience.replaceChildren();
+            stage.replaceChildren();
+            const message = document.createElement("div");
+            message.className = "created-server-voice-empty";
+            message.textContent = "Voice members could not be loaded.";
+            stage.append(message);
+            if (audience) audience.replaceChildren();
         }
     );
 
-    return () => unsubscribe();
+    return () => {
+        unsubscribe();
+        tileCache.forEach(parts => parts.tile.remove());
+        tileCache.clear();
+        tileRoots.clear();
+        if (window.diamondVoiceTileRoots === tileRoots) {
+            window.diamondVoiceTileRoots = new Map();
+        }
+    };
 };
