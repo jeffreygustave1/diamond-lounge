@@ -16,7 +16,7 @@
         <a class="auth-brand" href="index.html"><img src="diamond.gif" alt="" class="auth-brand-gem"> DIAMOND LOUNGE</a>
         <h1>Welcome back</h1>
         <p class="login-subtitle">Your lounge is waiting.</p>
-        <form id="loginForm" class="login-form">
+        <form id="loginForm" class="login-form" method="post" action="login.html">
             <label for="loginEmail">Email address (username sign-in not enabled yet)</label>
             <input type="text" id="loginEmail" name="email" placeholder="Email address" autocomplete="username" required>
             <label for="loginPassword">Password</label>
@@ -39,7 +39,8 @@ import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/fi
         const form = document.getElementById("loginForm");
         const button = document.getElementById("loginButton");
         const errorMessage = document.getElementById("errorMessage");
-        const googleButton = document.getElementById("googleButton");\nconst guestButton=document.getElementById("guestButton");
+        const googleButton = document.getElementById("googleButton");
+const guestButton=document.getElementById("guestButton");
 const phoneButton = document.getElementById("phoneButton");
 const phoneCodeArea = document.getElementById("phoneCodeArea");
 const requestedRedirect = new URLSearchParams(window.location.search).get("redirect");
@@ -88,7 +89,8 @@ const requestedRedirect = new URLSearchParams(window.location.search).get("redir
         };
 
         async function ensureProfile(user) { const profileRef=doc(db,"users",user.uid); const existing=await getDoc(profileRef); if(!existing.exists()){ await setDoc(profileRef,{uid:user.uid,displayName:user.displayName || user.phoneNumber || "Member",createdAt:serverTimestamp()}); } }
-guestButton.addEventListener("click",async()=>{guestButton.disabled=true;guestButton.textContent="Entering as Guest…";try{await signInAnonymously(auth);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||e.message;guestButton.disabled=false;guestButton.textContent="Browse as Guest";}});\ngoogleButton.addEventListener("click", async()=>{try{const result=await signInWithPopup(auth,new GoogleAuthProvider());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||e.message;}});
+guestButton.addEventListener("click",async()=>{guestButton.disabled=true;guestButton.textContent="Entering as Guest…";try{await signInAnonymously(auth);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||e.message;guestButton.disabled=false;guestButton.textContent="Browse as Guest";}});
+googleButton.addEventListener("click", async()=>{try{const result=await signInWithPopup(auth,new GoogleAuthProvider());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||e.message;}});
 let confirmationResult=null;
 phoneButton.addEventListener("click",async()=>{try{const phone=document.getElementById("phoneNumber").value.trim();if(!phone){errorMessage.textContent="Enter your phone number including country code.";return;}if(!window.phoneRecaptcha)window.phoneRecaptcha=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});confirmationResult=await signInWithPhoneNumber(auth,phone,window.phoneRecaptcha);phoneCodeArea.hidden=false;phoneButton.disabled=true;phoneButton.textContent="Code sent";errorMessage.textContent="Verification SMS sent. Enter the code below.";}catch(e){errorMessage.textContent=errors[e.code]||e.message;phoneButton.disabled=false;if(window.phoneRecaptcha){window.phoneRecaptcha.clear();window.phoneRecaptcha=null;}}});
 document.getElementById("verifyPhoneButton").addEventListener("click",async()=>{try{const result=await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||"Verification failed.";phoneButton.disabled=false;phoneButton.textContent="Send verification code"; }});
