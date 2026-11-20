@@ -1842,7 +1842,7 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
     const mainRoom = document.getElementById("mainVoiceConnectionRoom");
 
     const isCreatedRoom = Boolean(state.roomId && state.roomId.startsWith("cs-"));
-    const connectedOrJoining = Boolean(state.connected || state.joining);
+    const connectedOrJoining = Boolean(state.connected);
     const isViewingJoinedServer = Boolean(activeCreatedServerId && serverView && !serverView.hidden);
     const showCreatedPanel = isViewingJoinedServer && connectedOrJoining;
     // When the server workspace is open, its sidebar owns the dock. Otherwise use the global sidebar.
