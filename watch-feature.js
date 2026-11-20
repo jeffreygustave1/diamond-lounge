@@ -16,9 +16,18 @@ overlay.innerHTML=`
  <div class="dl-watch-option-group"><button type="button" id="dlWatchBrowse">⌕ <span><b>Browse YouTube</b><small>Find something to watch</small></span><i>↗</i></button><button type="button" id="dlWatchInvite">♧ <span><b>Invite to Watch</b><small>Copy current video link</small></span><i>⧉</i></button><button type="button" id="dlWatchChatToggle" aria-pressed="true">▤ <span><b>Show chat overlay</b><small>Toggle the glass chat panel</small></span><i>◉</i></button><button type="button" id="dlWatchReload">↻ <span><b>Reload video</b><small>Restart for everyone</small></span><i>↻</i></button><button type="button" id="dlWatchClear">⌫ <span><b>Clear player</b><small>Clear shared playback</small></span><i>×</i></button></div><p class="dl-watch-note">Playback state is shared within the connected voice channel. Chat is live.</p></aside></div></div>`;
 document.body.append(overlay);
 const $=selector=>overlay.querySelector(selector.startsWith("#")||selector.startsWith(".")?selector:"#"+selector), close=$(".dl-watch-close"),input=$("dlWatchUrl"),player=$("dlWatchPlayer"),status=$("dlWatchStatus"),messages=$("dlWatchChatMessages");
-const watchTile=document.createElement("article");watchTile.className="dl-watch-voice-tile";watchTile.innerHTML=`<div class="dl-watch-voice-title"><span>▶</span><strong>YouTube Watch</strong><small>Shared voice activity</small></div>`;watchTile.append(player);const voiceStage=document.getElementById("remoteVideoGrid");
+const watchTile=document.createElement("article");watchTile.className="dl-watch-voice-tile";watchTile.innerHTML=`<div class="dl-watch-voice-title"><span>▶</span><strong>YouTube Watch</strong><small>Shared voice activity</small></div>`;watchTile.append(player);let voiceStage=window.diamondActiveVoiceStage||document.querySelector(".created-server-voice-stage");
 let user=null,voice={connected:false,roomId:null,selectedChannel:null},currentId=null,currentUrl="",yt=null,apiReady=false,applyingRemote=false,remoteStateUnsub=null,remoteChatUnsub=null,chatRoom=null,sharedStateRef=null,lastStateSignature="",syncTimer=null;
-function show(){overlay.hidden=false;close.focus();}function hide(){overlay.hidden=true;}function mountWatchTile(){if(voiceStage&&voice.connected&&!watchTile.isConnected)voiceStage.append(watchTile);}function removeWatchTile(){watchTile.remove();}
+function show(){overlay.hidden=false;close.focus();}function hide(){overlay.hidden=true;}
+function mountWatchTile(){
+ const activeStage=window.diamondActiveVoiceStage||document.querySelector(".created-server-voice-stage")||voiceStage;
+ if(activeStage&&voice.connected){
+  voiceStage=activeStage;
+  if(watchTile.parentElement!==activeStage)activeStage.prepend(watchTile);
+ }
+}
+function removeWatchTile(){watchTile.remove();}
+window.addEventListener("diamond-voice-stage",e=>{voiceStage=e.detail?.stage||null;if(voice.connected&&currentId)mountWatchTile();});
 function parseVideo(raw){try{const u=new URL(raw);if(u.hostname==="youtu.be")return u.pathname.slice(1);if(u.hostname==="youtube.com"||u.hostname.endsWith(".youtube.com"))return u.searchParams.get("v")||u.pathname.split("/").filter(Boolean).pop();}catch{}return null;}
 function roomBase(){return voice.roomId&&user?doc(db,"voiceRooms",voice.roomId,"watch","state"):null;}
 function chatBase(){return voice.roomId&&user?collection(db,"voiceRooms",voice.roomId,"watch","messages"):null;}
