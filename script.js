@@ -266,6 +266,10 @@ function stopMemberListener() {
     stopMembersListener = null;
 }
 function stopCreatedServerChannels() {
+    restoreCreatedServerVoiceMedia();
+    activeCreatedServerVoiceChannel = null;
+    const connectionPanel = document.getElementById("createdServerVoiceConnectionPanel");
+    if (connectionPanel) connectionPanel.hidden = true;
     stopServerChannelsListener?.();
     stopServerChannelsListener = null;
 
@@ -1747,6 +1751,7 @@ function syncCreatedServerVoiceUser() {
     const avatar = document.getElementById("createdServerVoiceUserAvatar");
     const name = document.getElementById("createdServerVoiceUserName");
     const subline = document.getElementById("createdServerVoiceUserSubline");
+    const badges = document.getElementById("createdServerVoiceUserBadges");
     if (name) name.textContent =
         profileName?.textContent?.trim() ||
         currentUser?.displayName ||
@@ -1754,6 +1759,14 @@ function syncCreatedServerVoiceUser() {
         "Member";
     if (subline) subline.textContent =
         serverViewName?.textContent?.trim() || "Diamond Lounge";
+    if (badges) {
+        badges.replaceChildren();
+        currentProfileBadges.slice(0, 2).forEach(label => {
+            const chip = document.createElement("span");
+            chip.textContent = label;
+            badges.append(chip);
+        });
+    }
     if (avatar) {
         avatar.replaceChildren();
         if (uploadedPicture) {
@@ -2610,6 +2623,7 @@ async function serverEventsDialog() {
 
 function openServer(server) {
     if (!server?.id) return;
+    restoreCreatedServerVoiceMedia();
 
     stopPublicMessages();
     stopDirectMessages();
