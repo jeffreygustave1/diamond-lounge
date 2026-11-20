@@ -3593,3 +3593,31 @@ button {
 #profileModal .server-modal-actions button:hover{transform:translateY(-1px)}
 #profileModal #profileStatus{grid-column:1/-1;font-size:12px;color:#d8c49a}
 @media(max-width:600px){#profileModal{padding:12px}#profileModal>section.server-modal{padding:28px 18px 22px;border-radius:18px}#profileModal h2{font-size:25px}#profileModal #profileForm{grid-template-columns:1fr}#profileModal .profile-badges-note,#profileModal .server-modal-actions,#profileModal #profileStatus{grid-column:1}#profileModal .profile-modal-choices{gap:7px}#profileModal .profile-choice{padding:10px 5px}}
+
+/* Diamond Lounge glass featured watch */
+.dl-watch-launch{font-size:19px!important;color:#d9c38f!important}
+.dl-watch-launch span{display:block;filter:drop-shadow(0 0 8px rgba(207,177,119,.3))}
+.dl-watch-overlay{position:fixed;inset:0;z-index:12000;background:rgba(7,8,11,.82);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px)}
+.dl-watch-overlay[hidden]{display:none}
+.dl-watch-shell{width:min(1500px,100%);height:min(94vh,980px);overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:26px;background:linear-gradient(135deg,rgba(31,32,38,.94),rgba(12,13,17,.94));box-shadow:0 30px 100px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.08);padding:clamp(12px,2vw,26px)}
+.dl-watch-top{display:flex;align-items:center;justify-content:space-between;padding:5px 5px 20px}
+.dl-watch-brand{display:flex;align-items:center;gap:12px;color:#f2e6cb;letter-spacing:2px;font-size:12px;font-weight:800}
+.dl-watch-brand img{width:30px;height:30px;object-fit:contain}
+.dl-watch-close{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:white;font-size:22px;cursor:pointer}
+.dl-watch-grid{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(260px,.85fr);gap:20px}
+.dl-watch-main{min-width:0}
+.dl-watch-player{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:20px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(130deg,#1c1d23,#090a0c);box-shadow:0 18px 50px rgba(0,0,0,.4)}
+.dl-watch-player iframe{width:100%;height:100%;border:0}
+.dl-watch-chat-glass{position:absolute;right:14px;bottom:14px;width:min(300px,42%);max-height:48%;overflow:auto;padding:14px;border:1px solid rgba(255,255,255,.2);border-radius:16px;background:rgba(16,17,22,.4);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);box-shadow:0 10px 35px rgba(0,0,0,.25);color:#f3f3f5;font-size:12px;line-height:1.5}
+.dl-watch-chat-glass .chat-label{font-size:9px;letter-spacing:1.7px;font-weight:800;color:#ddc58f;margin-bottom:7px}
+.dl-watch-chat-glass p{margin:4px 0;color:rgba(255,255,255,.83)}
+.dl-watch-chat-glass .chat-muted{color:rgba(255,255,255,.56)}
+.dl-watch-title{font-size:clamp(18px,2vw,24px);margin:20px 0 8px;color:#f1eee8}
+.dl-watch-caption{font-size:13px;color:#9c9da4;line-height:1.6}
+.dl-watch-side{border:1px solid rgba(255,255,255,.12);border-radius:20px;background:rgba(255,255,255,.045);backdrop-filter:blur(20px);padding:18px;min-height:300px}
+.dl-watch-side h3{margin:0 0 12px;color:#e6d2a7;font-size:13px;letter-spacing:1.5px}
+.dl-watch-side p{color:#b4b4ba;font-size:13px;line-height:1.6}
+.dl-watch-url{width:100%;box-sizing:border-box;margin-top:14px;padding:12px;border-radius:11px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);color:white}
+.dl-watch-load{width:100%;margin-top:9px;padding:12px;border:1px solid rgba(220,196,146,.35);border-radius:11px;background:linear-gradient(120deg,#b99c64,#e4d2a7);color:#191919;font-weight:800;cursor:pointer}
+@media(max-width:900px){.dl-watch-grid{grid-template-columns:1fr}.dl-watch-side{min-height:auto}.dl-watch-chat-glass{width:min(260px,48%);font-size:11px}}
+@media(max-width:600px){.dl-watch-overlay{padding:5px}.dl-watch-shell{height:96vh;border-radius:18px;padding:12px}.dl-watch-player{border-radius:13px}.dl-watch-chat-glass{right:8px;bottom:8px;padding:8px;width:48%;max-height:40%;font-size:10px}.dl-watch-grid{gap:12px}}
