@@ -1,16 +1,33 @@
-// Diamond Support — AI-powered chat (Cloudflare Worker backend).
-// After deploying the Worker, replace the URL below with your Worker endpoint.
+// Diamond Support — context-aware troubleshooting assistant.
+// This client provides product knowledge and troubleshooting guidance.
+// Actual server diagnostics require backend integrations and must not be claimed unless implemented.
 const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
+const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support, the helpful technical support assistant for DIAMOND LOUNGE, a Discord-like community web app.
+
+Your job is to troubleshoot issues step by step, not just give generic replies.
+Website features include user accounts and profiles/avatar uploads, text channels and messages, direct messages, server creation/membership/roles/channels, voice chat, camera/video, screen sharing, voice-room watch activities, and premium cosmetics/entitlements.
+
+Guidelines:
+- Be conversational, calm, concise, and practical. Give one or two steps at a time, not giant lists.
+- Ask clarifying questions only when needed. Identify what the user is experiencing, what they expected, and any error text.
+- For troubleshooting, first isolate the problem: browser/device, reproduce steps, what works vs fails, and whether the issue affects one user or several.
+- Offer concrete checks for browser permissions, refresh/relogin, browser compatibility, network, file type/size, and appropriate settings only when relevant.
+- Explain likely causes in plain language and label guesses as possibilities.
+- You cannot directly inspect the user's browser, database, server logs, Firestore, Cloudflare, account, or device unless a tool/integration explicitly provides that access. Never pretend you checked these or fixed something.
+- Do not ask for passwords, authentication tokens, secret keys, payment details, or private information.
+- If a likely site-side bug or backend/configuration issue is found, explain evidence and collect a concise report (feature, steps, expected vs actual, error, device/browser) for escalation to the DIAMOND LOUNGE developer.
+- Current known limitation: Firebase Storage is not enabled on a paid billing plan; do not recommend upgrades or spending money. Use only free/no-cost troubleshooting alternatives unless user says otherwise.
+- Keep answers focused on DIAMOND LOUNGE and don't invent features or access.`;
 const view=document.getElementById("supportBotView"),openBtn=document.getElementById("supportBotOpen"),chat=document.getElementById("supportBotChat"),choices=document.getElementById("supportBotChoices"),reset=document.getElementById("supportBotReset"),form=document.getElementById("supportBotForm"),input=document.getElementById("supportBotInput"),sendButton=document.getElementById("supportBotSend");
 const topics=["Account or login","Profile or avatar","Messages and DMs","Voice or microphone","Camera or video","Screen sharing","Servers or channels","Website bugs"];
 let history=[],busy=false;
 function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
 function topicButtons(){choices.replaceChildren();topics.forEach(topic=>{const b=document.createElement("button");b.type="button";b.textContent=topic;b.addEventListener("click",()=>send(topic));choices.appendChild(b);});}
-async function send(message){const value=(message||"").trim();if(!value||busy)return;bubble(value,"user");history.push({role:"user",content:value});input.value="";busy=true;if(sendButton)sendButton.disabled=true;input.disabled=true;choices.replaceChildren();bubble("Diamond is thinking…","bot");const thinking=chat.lastElementChild;
-try{if(DIAMOND_AI_ENDPOINT.includes("YOUR-WORKER-NAME"))throw new Error("AI backend setup is not complete yet. Deploy the Worker and add its endpoint in supportbot.js.");const response=await fetch(DIAMOND_AI_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});const data=await response.json();if(!response.ok)throw new Error(data.error||"AI request failed.");thinking?.remove();const answer=String(data.reply||"I didn't receive a response. Please try again.");history.push({role:"assistant",content:answer});bubble(answer,"bot");}
-catch(error){thinking?.remove();bubble("Diamond Support’s AI is temporarily unavailable while we prepare it for launch. Live AI replies aren’t enabled yet—please check back soon. 💎","bot");}
+async function send(message){const value=(message||"").trim();if(!value||busy)return;bubble(value,"user");history.push({role:"user",content:value});input.value="";busy=true;if(sendButton)sendButton.disabled=true;input.disabled=true;choices.replaceChildren();bubble("Diamond is investigating…","bot");const thinking=chat.lastElementChild;
+try{if(DIAMOND_AI_ENDPOINT.includes("YOUR-WORKER-NAME"))throw new Error("Support backend endpoint is not configured.");const response=await fetch(DIAMOND_AI_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[{role:"system",content:DIAMOND_SUPPORT_SYSTEM},...history]})});let data={};try{data=await response.json();}catch{}if(!response.ok)throw new Error("Support service returned HTTP "+response.status+(data.error?": "+String(data.error).slice(0,240):""));thinking?.remove();const answer=String(data.reply||"The support service returned an empty reply. Please try again.");history.push({role:"assistant",content:answer});bubble(answer,"bot");}
+catch(error){thinking?.remove();bubble("I couldn't reach the support service just now. "+(error?.message||"Request failed.")+" Your issue hasn't been diagnosed yet. Please try sending your message again in a moment. If it continues, tell the developer that Diamond Support's endpoint is failing.","bot");}
 finally{busy=false;input.disabled=false;if(sendButton)sendButton.disabled=false;topicButtons();input.focus();}}
-function start(){chat.replaceChildren();history=[];bubble("Hi! I'm Diamond Support 💎 — now ready for natural conversations. Ask me about Diamond Lounge, or tap a topic to get started. What can I help with?","bot");topicButtons();input.value="";}
+function start(){chat.replaceChildren();history=[];bubble("Hi! I'm Diamond Support 💎. Tell me what isn't working and I'll help troubleshoot it step by step. What happened?","bot");topicButtons();input.value="";}
 form?.addEventListener("submit",e=>{e.preventDefault();send(input.value);});
 function openSupportConversation(){const area=document.querySelector(".chat-area");if(!area||!view)return;area.querySelectorAll(":scope > section").forEach(section=>{section.hidden=true;});view.hidden=false;const channelsSidebar=document.getElementById("channelsSidebar");if(channelsSidebar)channelsSidebar.hidden=false;const dmSidebar=document.getElementById("dmSidebar");if(dmSidebar)dmSidebar.hidden=false;const loungeSidebar=document.getElementById("loungeSidebar");if(loungeSidebar)loungeSidebar.hidden=true;const dmHomeButton=document.getElementById("dmHomeButton");if(dmHomeButton){dmHomeButton.classList.add("selected");dmHomeButton.setAttribute("aria-pressed","true");}const mainServerButton=document.getElementById("mainServerButton");if(mainServerButton){mainServerButton.classList.remove("selected");mainServerButton.setAttribute("aria-pressed","false");}document.body.classList.add("dm-mode");start();input.focus();}
 function closeSupportConversation(){if(!view)return;view.hidden=true;const home=document.getElementById("dmHomeView");if(home)home.hidden=false;}
