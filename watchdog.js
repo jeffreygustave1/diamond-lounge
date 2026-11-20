@@ -97,7 +97,7 @@
     const empty = document.createElement("div"); empty.textContent = "No browser errors recorded this session."; empty.style.cssText = "padding:12px;opacity:.7";
     list.appendChild(empty);
     panel.append(header,list);
-    badge.addEventListener("click",()=>{panel.style.display=panel.style.display==="none"?"block":"none";});
+    badge.addEventListener("click",()=>{panel.style.display=panel.style.display==="none"?"block":"none";syncBotVisibility();});
     close.addEventListener("click",()=>panel.style.display="none");
     clear.addEventListener("click",()=>{entries.length=0;render();list.innerHTML='<div style="padding:12px;opacity:.7">No browser errors recorded this session.</div>';count.textContent="0";});
     document.body.append(badge,panel);
@@ -108,6 +108,16 @@
       const active = !!botView && !botView.hidden;
       badge.style.display = active ? "flex" : "none";
       if (!active) panel.style.display = "none";
+      if (active) {
+        const quickChoices = botView.querySelector("#supportBotChoices");
+        if (quickChoices) {
+          const rect = quickChoices.getBoundingClientRect();
+          badge.style.bottom = "auto";
+          badge.style.top = Math.max(8, rect.top - badge.offsetHeight - 8) + "px";
+          panel.style.bottom = "auto";
+          panel.style.top = Math.max(8, rect.top - badge.offsetHeight - 50) + "px";
+        }
+      }
     }
     if (botView) {
       syncBotVisibility();
