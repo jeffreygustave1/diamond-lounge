@@ -1973,7 +1973,29 @@ window.diamondWatchCreatedVoiceSidebarRoom = (customRoomId, strip) => {
 };
 
 /* CREATED-SERVER VOICE BRIDGE */
-window.diamondJoinCreatedVoiceRoom=async(label,customRoomId,serverName="")=>{if(localStream)await leaveVoice();selectedChannel=label;roomId=customRoomId;activeVoiceServerName=serverName||"";setStatus("Connecting to "+label+"...");watchParticipants();await joinVoice();};
+window.diamondJoinCreatedVoiceRoom = async (label, customRoomId, serverName = "") => {
+    if (!customRoomId || !label) return;
+
+    // Reopening the currently connected voice channel should not drop/rejoin.
+    if (localStream && roomId === customRoomId) {
+        selectedChannel = label;
+        activeVoiceServerName = serverName || "";
+        setStatus("Connected to " + label);
+        watchParticipants();
+        return;
+    }
+
+    // Moving between voice channels is seamless: leave the old room, then
+    // immediately start connecting to the newly selected room.
+    if (localStream) await leaveVoice();
+
+    selectedChannel = label;
+    roomId = customRoomId;
+    activeVoiceServerName = serverName || "";
+    setStatus("Connecting to " + label + "...");
+    watchParticipants();
+    await joinVoice();
+};
 window.diamondLeaveVoice=()=>leaveVoice();
 window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = {}) => {
     const profileCache = new Map();
