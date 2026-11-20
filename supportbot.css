@@ -36,3 +36,20 @@ body.dm-mode #supportBotView > #supportBotChat { order:1!important; flex:1 1 0!i
 body.dm-mode #supportBotView > #supportBotChoices { order:2!important; flex:0 0 auto!important; }
 body.dm-mode #supportBotView > #supportBotForm { order:3!important; flex:0 0 auto!important; }
 body.dm-mode #supportBotView > .support-bot-footer { order:4!important; flex:0 0 auto!important; }
+
+
+/* DIAMOND SUPPORT PROFILE — USE THE LOUNGE ANIMATED GEM */
+body.dm-mode #supportBotView .support-bot-avatar {
+    display: block !important;
+    width: 38px !important;
+    height: 38px !important;
+    flex: 0 0 38px !important;
+    object-fit: contain !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: transparent !important;
+    filter: drop-shadow(0 0 7px rgba(0, 145, 255, .38));
+    pointer-events: none !important;
+}
