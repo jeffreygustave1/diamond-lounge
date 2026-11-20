@@ -1830,8 +1830,14 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
 
         const preset = avatarPresets[profile.avatar] || avatarPresets.diamond;
         const picture = typeof profile.picture === "string" ? profile.picture : "";
+        const uidText = String(member.uid || name);
+        const uidHash = [...uidText].reduce((value, character) => value + character.charCodeAt(0), 0);
+        const fallbackTone = cardColors[uidHash % cardColors.length];
 
-        parts.tile.style.setProperty("--voice-card-background", preset.tile);
+        parts.tile.style.setProperty(
+            "--voice-card-background",
+            profile.avatar && profile.avatar !== "diamond" ? preset.tile : fallbackTone
+        );
         parts.avatar.replaceChildren();
 
         if (picture) {
