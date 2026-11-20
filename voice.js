@@ -1656,6 +1656,7 @@ window.diamondVoiceControls = {
         selectedChannel,
         roomId,
         status: statusElement?.textContent || "",
+        serverName: activeVoiceServerName,
         outputVolume
     }),
     toggleMute,
@@ -1907,6 +1908,11 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
         }
 
         stage.append(parts.tile);
+        const earlyCamera = document.getElementById("tile-camera-" + member.uid);
+        if (earlyCamera && earlyCamera.parentElement !== parts.tile) {
+            parts.tile.append(earlyCamera);
+            parts.tile.classList.add("has-camera");
+        }
         if (member.uid === user?.uid && cameraOn && cameraStream) {
             syncLocalVoiceCameraPreview();
         }
