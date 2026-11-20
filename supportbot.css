@@ -51,7 +51,7 @@ body.dm-mode #supportBotView .support-bot-avatar {
     background: transparent !important;
     color: transparent !important;
     filter: drop-shadow(0 0 7px rgba(0, 145, 255, .38));
-    transform: scale(1.65) !important;
+    transform: scale(4.95) !important;
     transform-origin: center center !important;
     pointer-events: none !important;
 }
