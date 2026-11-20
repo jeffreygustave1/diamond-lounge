@@ -4,3 +4,31 @@
 
 /* Private calls: compact Discord-inspired dock with controls in a right rail */
 .dm-call-backdrop{position:fixed;inset:0;z-index:1100;display:flex;justify-content:flex-end;align-items:stretch;background:rgba(0,0,0,.16);padding:12px;pointer-events:none}.dm-call-panel{pointer-events:auto;width:min(460px,calc(100vw - 24px));height:100%;max-height:100%;padding:18px;border:1px solid rgba(199,169,107,.4);border-radius:16px;background:rgba(23,24,28,.97);color:#eee;box-shadow:0 16px 50px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:12px}.dm-call-panel h2{margin:0;font-size:18px}.dm-call-panel #dmCallStatus{margin:0;color:#aaa}.dm-call-videos{display:flex;flex-direction:column;gap:10px;min-height:0;flex:1}.dm-call-videos video{width:100%;height:50%;min-height:120px;background:#080809;border-radius:12px;object-fit:contain}.dm-call-controls{display:flex;flex-direction:column;gap:8px;margin-top:auto}.dm-call-controls button{width:100%;min-height:44px;border:1px solid rgba(199,169,107,.25);border-radius:10px;padding:10px 12px;background:#22232a;color:#eee;cursor:pointer;text-align:left}.dm-call-controls button:last-child{border-color:#a44;background:#512323;text-align:center}.dm-call-backdrop[hidden]{display:none!important}@media(max-width:600px){.dm-call-backdrop{padding:8px}.dm-call-panel{width:min(420px,calc(100vw - 16px));padding:14px}.dm-call-videos video{height:45%;}}
+
+/* PRIVATE CALL: persistent side control dock, not a modal overlay */
+.dm-call-backdrop{
+  position:fixed!important;inset:12px 12px 12px auto!important;
+  z-index:11000!important;width:min(350px,calc(100vw - 24px))!important;
+  display:block!important;padding:0!important;background:transparent!important;
+  backdrop-filter:none!important;pointer-events:none!important;
+}
+.dm-call-backdrop[hidden]{display:none!important}
+.dm-call-panel{
+  width:100%!important;height:100%!important;max-height:none!important;
+  box-sizing:border-box!important;overflow:auto!important;
+  padding:16px!important;gap:12px!important;pointer-events:auto!important;
+  border:1px solid rgba(199,169,107,.34)!important;
+  background:rgba(18,19,23,.97)!important;
+  box-shadow:0 18px 55px rgba(0,0,0,.48)!important;
+}
+.dm-call-panel h2{font-size:16px!important;letter-spacing:.4px}
+.dm-call-videos{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;flex:0 0 auto!important}
+.dm-call-videos video{width:100%!important;height:auto!important;min-height:112px!important;max-height:150px!important;object-fit:cover!important}
+.dm-call-controls{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:auto!important}
+.dm-call-controls button{min-height:42px!important;text-align:center!important}
+.dm-call-controls #dmCallHangup{grid-column:1/-1!important}
+@media(max-width:600px){
+ .dm-call-backdrop{inset:auto 8px 8px auto!important;width:min(320px,calc(100vw - 16px))!important;height:min(72vh,560px)!important}
+ .dm-call-panel{padding:12px!important}
+ .dm-call-videos video{min-height:90px!important}
+}
