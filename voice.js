@@ -631,12 +631,12 @@ function makePeer(person, callRef) {
                 `tile-${kind}-${person.uid}`
             );
             const remoteVideo = tile?.querySelector("video");
+            // attachRemoteVideo assigns srcObject and initiates playback once.
+            // Avoid a second srcObject load which interrupts play() with AbortError.
             if (remoteVideo) {
-                remoteVideo.srcObject = stream;
                 remoteVideo.autoplay = true;
                 remoteVideo.playsInline = true;
                 remoteVideo.muted = true;
-                remoteVideo.play().catch(error => console.warn("Remote video autoplay retry failed:", error));
             }
             if (tile) tile.hidden = event.track.muted;
 
