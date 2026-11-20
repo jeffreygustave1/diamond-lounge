@@ -94,6 +94,7 @@ let activeVoiceServerName = "";
 
 const participants = new Map();
 const peers = new Map();
+const activeRemoteScreenUids = new Set();
 const outgoingCalls = new Map();
 const incomingCalls = new Map();
 const stopCounts = new Map();
@@ -376,6 +377,49 @@ function attachRemoteVideo(uid, label, stream, kind = "camera") {
     }
 }
 
+function refreshScreenShareStageVisibility() {
+    const active = Boolean(screenOn || activeRemoteScreenUids.size);
+    if (screenShareStage) screenShareStage.hidden = !active;
+    window.dispatchEvent(new CustomEvent("diamond-screen-share-layout", {
+        detail: { active, local: screenOn, remoteCount: activeRemoteScreenUids.size }
+    }));
+}
+
+function syncLocalScreenPreview() {
+    if (!remoteScreenContainer) return;
+    let tile = document.getElementById("local-screen-share-preview");
+
+    if (!screenOn || !screenStream) {
+        tile?.remove();
+        refreshScreenShareStageVisibility();
+        return;
+    }
+
+    if (!tile) {
+        tile = document.createElement("figure");
+        tile.id = "local-screen-share-preview";
+        tile.className = "remote-video-tile remote-video-screen created-server-local-screen";
+
+        const video = document.createElement("video");
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true;
+        video.style.objectFit = "contain";
+
+        const caption = document.createElement("figcaption");
+        caption.textContent = "Your screen";
+        tile.append(video, caption);
+        remoteScreenContainer.append(tile);
+    }
+
+    const video = tile.querySelector("video");
+    if (video && video.srcObject !== screenStream) {
+        video.srcObject = screenStream;
+        video.play().catch(error => console.warn("Local screen preview playback failed:", error));
+    }
+    refreshScreenShareStageVisibility();
+}
+
 function syncLocalVoiceCameraPreview() {
     const callTile = user?.uid ? window.diamondVoiceTileRoots?.get(user.uid) : null;
     if (!callTile) return;
@@ -429,6 +473,8 @@ function closePeer(uid) {
     cameraTile?.remove();
     cameraRoot?.classList.remove("has-camera");
     document.getElementById("tile-screen-" + uid)?.remove();
+    activeRemoteScreenUids.delete(uid);
+    refreshScreenShareStageVisibility();
 
     if (outgoingCalls.get(uid) === peer.callRef) {
         outgoingCalls.delete(uid);
@@ -540,9 +586,9 @@ function makePeer(person, callRef) {
             event.track.onunmute = () => {
                 if (tile) tile.hidden = false;
                 if (kind === "camera") tile?.parentElement?.classList.add("has-camera");
-
-                if (kind === "screen" && screenShareStage) {
-                    screenShareStage.hidden = false;
+                if (kind === "screen") {
+                    activeRemoteScreenUids.add(person.uid);
+                    refreshScreenShareStageVisibility();
                 }
             };
 
@@ -551,18 +597,25 @@ function makePeer(person, callRef) {
                 if (kind === "camera" && !tile?.parentElement?.querySelector("#local-voice-camera-preview")) {
                     tile?.parentElement?.classList.remove("has-camera");
                 }
+                if (kind === "screen") {
+                    activeRemoteScreenUids.delete(person.uid);
+                    refreshScreenShareStageVisibility();
+                }
+            };
 
-                if (kind === "screen" && screenShareStage) {
-                    screenShareStage.hidden = true;
+            event.track.onended = () => {
+                if (kind === "screen") {
+                    activeRemoteScreenUids.delete(person.uid);
+                    refreshScreenShareStageVisibility();
                 }
             };
 
             if (!event.track.muted && tile) {
                 tile.hidden = false;
                 if (kind === "camera") tile.parentElement?.classList.add("has-camera");
-
-                if (kind === "screen" && screenShareStage) {
-                    screenShareStage.hidden = false;
+                if (kind === "screen") {
+                    activeRemoteScreenUids.add(person.uid);
+                    refreshScreenShareStageVisibility();
                 }
             }
 
@@ -1170,6 +1223,7 @@ async function stopScreenShare() {
     });
 
     await replaceVideoTrack("screen", null);
+    syncLocalScreenPreview();
 
     setPressed(screenButton, false);
     setButtonLabel(screenButton, "Screen");
@@ -1209,6 +1263,7 @@ async function toggleScreen() {
         }
 
         screenOn = true;
+        syncLocalScreenPreview();
 
         track.onended = () => {
             if (screenOn) {
@@ -1234,6 +1289,7 @@ async function toggleScreen() {
 
         screenStream = null;
         screenOn = false;
+        syncLocalScreenPreview();
 
         setPressed(screenButton, false);
         setButtonLabel(screenButton, "Screen");
@@ -1294,6 +1350,8 @@ async function joinVoice() {
         deafened = false;
         raisedHand = false;
         activeVoiceProfile = {};
+        activeRemoteScreenUids.clear();
+        syncLocalScreenPreview();
         try {
             const profileSnapshot = await getDoc(doc(db, "users", user.uid));
             activeVoiceProfile = profileSnapshot.exists() ? profileSnapshot.data() : {};
@@ -1461,7 +1519,9 @@ async function leaveVoice(knownUid = user?.uid) {
     raisedHand = false;
     activeVoiceProfile = {};
     activeVoiceServerName = "";
+    activeRemoteScreenUids.clear();
     syncLocalVoiceCameraPreview();
+    syncLocalScreenPreview();
 
     [
         muteButton,
