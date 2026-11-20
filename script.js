@@ -1809,12 +1809,12 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
     document.querySelectorAll('[data-voice-action="mute"]').forEach(button => {
         button.setAttribute("aria-pressed", String(Boolean(state.muted)));
         button.title = state.muted ? "Unmute microphone" : "Mute microphone";
-        button.textContent = state.muted ? "⊘" : "♩";
+        button.textContent = state.muted ? "⊘⌄" : "♩⌄";
     });
     document.querySelectorAll('[data-voice-action="deafen"]').forEach(button => {
         button.setAttribute("aria-pressed", String(Boolean(state.deafened)));
         button.title = state.deafened ? "Turn audio on" : "Deafen";
-        button.textContent = state.deafened ? "◉" : "◖";
+        button.textContent = state.deafened ? "◉⌄" : "◖⌄";
     });
     document.querySelectorAll('[data-voice-action="camera"]').forEach(button => {
         button.setAttribute("aria-pressed", String(Boolean(state.cameraOn)));
