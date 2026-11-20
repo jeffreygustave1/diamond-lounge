@@ -264,10 +264,11 @@ service cloud.firestore {
         allow get: if request.auth != null;
         allow list: if false;
         allow create: if isServerMember()
+          && request.auth != null
           && request.resource.data.keys().hasAll(['code', 'createdBy', 'createdAt', 'channelId'])
           && request.resource.data.keys().hasOnly(['code', 'createdBy', 'createdAt', 'channelId'])
-          && request.resource.data.code == inviteCode
           && request.resource.data.code is string
+          && request.resource.data.code == inviteCode
           && request.resource.data.code.size() >= 10
           && request.resource.data.code.size() <= 40
           && request.resource.data.createdBy == request.auth.uid
