@@ -1750,6 +1750,7 @@ window.diamondJoinCreatedVoiceRoom=async(label,customRoomId)=>{if(localStream)aw
 window.diamondLeaveVoice=()=>leaveVoice();
 window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = {}) => {
     const profileCache = new Map();
+    const roleCache = new Map();
     const tileCache = new Map();
     const tileRoots = new Map();
     const cardColors = ["#26343f", "#17191d", "#dfc5ad", "#4b74b6", "#3a3544", "#315044"];
@@ -1838,9 +1839,13 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
         });
 
         if (context.serverId && member.uid) {
-            const rolePromise = getDoc(doc(db, "servers", context.serverId, "members", member.uid))
-                .then(snapshot => snapshot.exists() ? snapshot.data() : {})
-                .catch(() => ({}));
+            let rolePromise = roleCache.get(member.uid);
+            if (!rolePromise) {
+                rolePromise = getDoc(doc(db, "servers", context.serverId, "members", member.uid))
+                    .then(snapshot => snapshot.exists() ? snapshot.data() : {})
+                    .catch(() => ({}));
+                roleCache.set(member.uid, rolePromise);
+            }
             rolePromise.then(memberRecord => {
                 if (!parts.tile.isConnected) return;
                 const roleIds = Array.isArray(memberRecord.roleIds) ? memberRecord.roleIds : [];
@@ -1899,6 +1904,9 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
         }
 
         stage.append(parts.tile);
+        if (member.uid === user?.uid && cameraOn && cameraStream) {
+            syncLocalVoiceCameraPreview();
+        }
 
         let promise = profileCache.get(member.uid);
         if (!promise) {
