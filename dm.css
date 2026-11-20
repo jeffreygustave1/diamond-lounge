@@ -463,3 +463,14 @@ body.dm-mode #dmConversationView > .dm-message-box { order:2 !important; }
 body.dm-mode #dmConversationView > .dm-call-toolbar,
 body.dm-mode #dmConversationView > #dmStatus { order:3 !important; }
 body.dm-mode #communitySidebar { display:none !important; }
+
+/* Private-message member entries mirror the VIP-Lounge text channel rows. */
+body.dm-mode #dmSidebar .dm-channel-list-heading{padding:5px 10px 12px;border:0;}
+body.dm-mode #dmSidebar .dm-search-wrap{margin:8px 0 12px;}
+body.dm-mode #dmSidebar .dm-member-list{list-style:none;padding:0;margin:0;}
+body.dm-mode #dmSidebar .dm-member-list li{padding:0;margin:0;}
+body.dm-mode #dmSidebar .dm-channel-entry{display:flex!important;width:100%;align-items:center;gap:8px;padding:9px 10px!important;margin:2px 0!important;text-align:left;border-radius:8px!important;}
+body.dm-mode #dmSidebar .dm-channel-entry .channel-symbol{flex:none;opacity:.8;}
+body.dm-mode #dmSidebar .dm-channel-entry .dm-channel-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+body.dm-mode #dmSidebar .dm-channel-entry.selected{background:rgba(199,169,107,.09)!important;border-color:rgba(199,169,107,.16)!important;}
+body.dm-mode #dmSidebar .dm-channel-entry:hover{background:rgba(199,169,107,.09)!important;}
