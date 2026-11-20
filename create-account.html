@@ -43,7 +43,7 @@
             updateProfile, GoogleAuthProvider, signInWithPopup
         } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
         import {
-            doc,
+            doc, getDoc,
             setDoc,
             serverTimestamp
         } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
@@ -83,7 +83,10 @@
             "auth/network-request-failed": "Network error. Check your connection and try again.",
             "auth/operation-not-allowed": "Enable Email/Password sign-in in Firebase Authentication.",
             "auth/unauthorized-domain": "Add jeffreygustave1.github.io under Firebase Authentication → Settings → Authorized domains.",
-            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console.",\n            "auth/popup-blocked": "The Google sign-in popup was blocked. Allow popups for Diamond Lounge and try again.",\n            "auth/popup-closed-by-user": "Google sign-in was closed before completion.",\n            "auth/account-exists-with-different-credential": "An account already exists with this email using another sign-in method. Sign in using that method, then link Google from your profile."
+            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console.",
+            "auth/popup-blocked": "The Google sign-in popup was blocked. Allow popups for Diamond Lounge and try again.",
+            "auth/popup-closed-by-user": "Google sign-in was closed before completion.",
+            "auth/account-exists-with-different-credential": "An account already exists with this email using another sign-in method. Sign in using that method, then link Google from your profile."
         };
 
         document.getElementById("googleSignupButton").addEventListener("click", async () => {
