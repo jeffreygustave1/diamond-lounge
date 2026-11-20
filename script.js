@@ -131,6 +131,9 @@ let createdServerVoicePresenceStop = null;
 let pendingInviteServer = null;
 let pendingInviteChannelId = null;
 let activeCreatedServerVoiceChannel = null;
+let primaryVoiceChannelName = null;
+let primaryVoiceRoomId = null;
+let primaryVoicePresenceStop = null;
 let createdServerRemoteMediaLayer = null;
 let remoteVideoGridHomeParent = null;
 let remoteScreenStageHomeParent = null;
@@ -1750,42 +1753,48 @@ function restoreCreatedServerVoiceMedia() {
 }
 
 function syncCreatedServerVoiceUser() {
-    const avatar = document.getElementById("createdServerVoiceUserAvatar");
-    const name = document.getElementById("createdServerVoiceUserName");
-    const subline = document.getElementById("createdServerVoiceUserSubline");
-    const badges = document.getElementById("createdServerVoiceUserBadges");
-    if (name) name.textContent =
-        profileName?.textContent?.trim() ||
-        currentUser?.displayName ||
-        currentUser?.email?.split("@")[0] ||
-        "Member";
-    if (subline) subline.textContent =
-        window.diamondVoiceControls?.getState?.().serverName ||
-        serverViewName?.textContent?.trim() || "Diamond Lounge";
-    if (badges) {
-        badges.replaceChildren();
-        currentProfileBadges.slice(0, 2).forEach(label => {
-            const chip = document.createElement("span");
-            chip.textContent = label;
-            badges.append(chip);
-        });
-    }
-    if (avatar) {
-        avatar.replaceChildren();
-        if (uploadedPicture) {
-            const image = document.createElement("img");
-            image.src = uploadedPicture;
-            image.alt = "";
-            avatar.append(image);
-            avatar.classList.add("has-picture");
-        } else {
-            avatar.classList.remove("has-picture");
-            const preset = AVATAR_STYLES[currentAvatar] || AVATAR_STYLES.diamond;
-            avatar.style.background = preset.background;
-            avatar.style.color = preset.color;
-            avatar.textContent = currentAvatar === "diamond" ? "✦" : preset.glyph;
+    const panels = [
+        ["createdServerVoiceUserAvatar", "createdServerVoiceUserName", "createdServerVoiceUserSubline", "createdServerVoiceUserBadges"],
+        ["mainVoiceUserAvatar", "mainVoiceUserName", "mainVoiceUserSubline", "mainVoiceUserBadges"]
+    ];
+    panels.forEach(([avatarId, nameId, sublineId, badgesId]) => {
+        const avatar = document.getElementById(avatarId);
+        const name = document.getElementById(nameId);
+        const subline = document.getElementById(sublineId);
+        const badges = document.getElementById(badgesId);
+        if (name) name.textContent =
+            profileName?.textContent?.trim() ||
+            currentUser?.displayName ||
+            currentUser?.email?.split("@")[0] ||
+            "Member";
+        if (subline) subline.textContent =
+            window.diamondVoiceControls?.getState?.().serverName ||
+            serverViewName?.textContent?.trim() || "VIP-LOUNGE";
+        if (badges) {
+            badges.replaceChildren();
+            currentProfileBadges.slice(0, 2).forEach(label => {
+                const chip = document.createElement("span");
+                chip.textContent = label;
+                badges.append(chip);
+            });
         }
-    }
+        if (avatar) {
+            avatar.replaceChildren();
+            if (uploadedPicture) {
+                const image = document.createElement("img");
+                image.src = uploadedPicture;
+                image.alt = "";
+                avatar.append(image);
+                avatar.classList.add("has-picture");
+            } else {
+                avatar.classList.remove("has-picture");
+                const preset = AVATAR_STYLES[currentAvatar] || AVATAR_STYLES.diamond;
+                avatar.style.background = preset.background;
+                avatar.style.color = preset.color;
+                avatar.textContent = currentAvatar === "diamond" ? "✦" : preset.glyph;
+            }
+        }
+    });
 }
 
 function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getState?.() || {}) {
