@@ -3227,3 +3227,89 @@ button {
         padding: 12px 14px;
     }
 }
+
+
+
+/* Small live member portraits beneath voice-channel names. */
+.voice-row-member-avatars {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-height: 20px;
+    margin: 1px 0 6px 31px;
+    padding: 0;
+}
+.voice-row-member-avatar {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin-left: -4px;
+    overflow: hidden;
+    border: 2px solid #2b2d31;
+    border-radius: 50%;
+    background: #3b3d44;
+    color: #f2f3f5;
+    font-size: 9px;
+    font-weight: 700;
+}
+.voice-row-member-avatar:first-child {
+    margin-left: 0;
+}
+.voice-row-member-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.voice-row-member-extra {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 20px;
+    margin-left: 2px;
+    border-radius: 10px;
+    background: #3b3d44;
+    color: #dbdee1;
+    font-size: 9px;
+    font-weight: 700;
+}
+.voice-row.has-voice-members .voice-row-head {
+    min-height: 30px;
+}
+.created-server-channel-item[data-channel-type="voice"] {
+    flex-wrap: wrap;
+}
+.created-server-channel-item[data-channel-type="voice"] .created-server-voice-sidebar-members {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    min-height: 18px;
+    margin: -1px 0 5px 29px;
+}
+.created-server-voice-sidebar-member {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    margin-left: -4px;
+    overflow: hidden;
+    border: 2px solid #2b2d31;
+    border-radius: 50%;
+    background: #3b3d44;
+    color: #f2f3f5;
+    text-align: center;
+    font-size: 8px;
+    line-height: 14px;
+    font-weight: 700;
+}
+.created-server-voice-sidebar-member:first-child {
+    margin-left: 0;
+}
+.created-server-voice-sidebar-member img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
