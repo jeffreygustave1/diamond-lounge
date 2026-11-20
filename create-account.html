@@ -83,13 +83,13 @@
             "auth/network-request-failed": "Network error. Check your connection and try again.",
             "auth/operation-not-allowed": "Enable Email/Password sign-in in Firebase Authentication.",
             "auth/unauthorized-domain": "Add jeffreygustave1.github.io under Firebase Authentication → Settings → Authorized domains.",
-            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console."
+            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console.",\n            "auth/popup-blocked": "The Google sign-in popup was blocked. Allow popups for Diamond Lounge and try again.",\n            "auth/popup-closed-by-user": "Google sign-in was closed before completion.",\n            "auth/account-exists-with-different-credential": "An account already exists with this email using another sign-in method. Sign in using that method, then link Google from your profile."
         };
 
         document.getElementById("googleSignupButton").addEventListener("click", async () => {
           try {
             const result = await signInWithPopup(auth, new GoogleAuthProvider());
-            await setDoc(doc(db, "users", result.user.uid), {uid:result.user.uid,displayName:result.user.displayName || "Member",createdAt:serverTimestamp()}, {merge:true});
+            const profileRef=doc(db,"users",result.user.uid); const existing=await getDoc(profileRef); if(!existing.exists()){await setDoc(profileRef,{uid:result.user.uid,displayName:result.user.displayName || "Member",createdAt:serverTimestamp()});}
             window.location.assign(postAuthDestination());
           } catch(e) { errorMessage.textContent = errors[e.code] || e.message; }
         });
