@@ -52,14 +52,14 @@
     const gem = document.createElement("img");
     gem.src = "diamond.gif";
     gem.alt = "";
-    gem.style.cssText = "width:168px;height:168px;object-fit:contain;flex-shrink:0;transform:none";
+    gem.style.cssText = "width:30px;height:75px;object-fit:cover;object-position:center;flex-shrink:0;transform:none";
     const label = document.createElement("span");
     label.textContent = "DIAMOND WATCHDOG";
     label.style.cssText = "letter-spacing:.4px;margin-left:0px";
     badge.append(gem,label);
     count = document.createElement("span");
     count.textContent = "0";
-    count.style.cssText = "opacity:.75;font-size:10px";
+    count.style.cssText = "opacity:.75;font-size:10px;margin-left:8px";
     badge.appendChild(count);
 
     // Keep diagnostics passive and place them tightly centered inside the Support header.
