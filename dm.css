@@ -384,56 +384,42 @@
 }
 
 
-/* FIX: Keep the selected private conversation in the third workspace column,
-   filling the chat area beside the DM list (never stacking at the bottom). */
+/* DM workspace: normal-flow main pane, never overlay or stacked. */
 body.dm-mode .chat-area {
-    display: flex !important;
-    flex: 1 1 0 !important;
-    width: auto !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+    display: flex;
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    flex-direction: column;
+    overflow: hidden;
 }
-body.dm-mode #dmConversationView {
-    position: relative !important;
-    inset: auto !important;
-    display: flex !important;
-    flex: 1 1 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    flex-direction: column !important;
-    align-self: stretch !important;
-    margin: 0 !important;
-    overflow: hidden !important;
+body.dm-mode #dmConversationView:not([hidden]) {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    flex-direction: column;
+    align-self: stretch;
+    margin: 0;
+    overflow: hidden;
+    inset: auto;
+    transform: none;
+    float: none;
+    order: 0;
+    z-index: auto;
 }
 body.dm-mode #dmConversationView[hidden] { display: none !important; }
 body.dm-mode #dmConversationView .dm-messages {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
 }
 body.dm-mode #dmConversationView .dm-message-box,
 body.dm-mode #dmConversationView .dm-call-toolbar,
-body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto !important; }
-
-/* DM workspace safety: the conversation is a single normal-flow column.
-   No duplicate/overlay positioning; hidden sibling views remain hidden. */
-body.dm-mode .chat-area > #dmConversationView:not([hidden]) {
-    position: relative !important;
-    float: none !important;
-    order: 0 !important;
-    transform: none !important;
-    inset: auto !important;
-    z-index: auto !important;
-}
-body.dm-mode .chat-area > #dmHomeView,
-body.dm-mode .chat-area > #loungeView,
-body.dm-mode .chat-area > #serverView,
-body.dm-mode .chat-area > #emptyView {
-    display: none !important;
-}
+body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto; }
