@@ -1685,79 +1685,47 @@ function setOutputVolume(value) {
 }
 
 /* ==========================================
-   VOICE CHANNEL SELECTION
-   AUTO JOIN
+   VOICE CHANNEL SELECTION — DELEGATED CLICK HANDLER
 ========================================== */
 
-channelItems.forEach((channel) => {
-    channel.addEventListener("click", async (event) => {
-        if (event.target.closest("#voicePanel")) {
-            return;
-        }
+document.addEventListener("click", async (event) => {
+    const channel = event.target instanceof Element ? event.target.closest(".voice-channel[data-voice-name]") : null;
+    if (!channel || event.target.closest("#voicePanel")) return;
+    if (!channelItems.includes(channel)) return;
 
-        const nextName =
-            channel.dataset.voiceName ||
-            channel.textContent.trim();
+    event.preventDefault();
+    const nextName = channel.dataset.voiceName || channel.textContent.trim();
+    const nextRoom = makeRoomId(nextName);
 
-        const nextRoom = makeRoomId(nextName);
-
-        // Already connected: reopen the call screen without reconnecting.
-        if (localStream && nextRoom === roomId) {
-            activeVoiceServerName = "VIP-LOUNGE";
-            window.diamondOpenPrimaryVoiceCall?.(nextName, nextRoom);
-            watchParticipants();
-            return;
-        }
-
-        // Leave the previous channel first.
-        if (localStream && nextRoom !== roomId) {
-            await leaveVoice();
-        }
-
-        // Update active channel.
-        channelItems.forEach((item) => {
-            const active = item === channel;
-
-            item.classList.toggle("active", active);
-
-            item.setAttribute(
-                "aria-expanded",
-                String(active)
-            );
-        });
-
-        // Hide old Join buttons.
-        joinSlots.forEach((slot) => {
-            slot.hidden = true;
-        });
-
-        selectedChannel = nextName;
-        roomId = nextRoom;
+    if (joining) return;
+    if (localStream && nextRoom === roomId) {
         activeVoiceServerName = "VIP-LOUNGE";
         window.diamondOpenPrimaryVoiceCall?.(nextName, nextRoom);
-
-        // Keep the old inline control panel out of the Discord-style voice layout. 
-        const ownRow = channel.closest(".voice-row");
-
-        if (
-            panel &&
-            ownRow &&
-            panel.parentElement !== ownRow
-        ) {
-            ownRow.appendChild(panel);
-        }
-
-        if (panel) {
-            panel.hidden = true;
-        }
-
-        // Watch the selected room.
         watchParticipants();
+        return;
+    }
 
-        // Automatically connect.
-        await joinVoice();
+    if (localStream && nextRoom !== roomId) await leaveVoice();
+
+    channelItems.forEach(item => {
+        const active = item === channel;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-expanded", String(active));
     });
-});
+    joinSlots.forEach(slot => { slot.hidden = true; });
+
+    selectedChannel = nextName;
+    roomId = nextRoom;
+    activeVoiceServerName = "VIP-LOUNGE";
+    window.diamondOpenPrimaryVoiceCall?.(nextName, nextRoom);
+
+    const ownRow = channel.closest(".voice-row");
+    if (panel && ownRow && panel.parentElement !== ownRow) ownRow.appendChild(panel);
+    if (panel) panel.hidden = true;
+
+    watchParticipants();
+    await joinVoice();
+}, true);
 
 /* ==========================================
    VOICE BUTTON EVENTS
