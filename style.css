@@ -3680,3 +3680,13 @@ button {
 .created-server-voice-tile:only-child .created-server-voice-avatar{width:52px;height:52px;font-size:20px}
 .created-server-voice-tile:only-child .created-server-voice-tile-footer{padding:7px 10px}
 @media(max-width:700px){.created-server-voice-tile:only-child{width:min(100%,300px)!important;min-height:175px!important;max-height:215px!important}.created-server-voice-tile:only-child .created-server-voice-avatar{width:46px;height:46px}}
+
+
+/* Realtime Watch chat styling */
+.dl-watch-chat-messages{display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:auto;scrollbar-width:thin}
+.dl-watch-chat-line{margin:0!important;overflow-wrap:anywhere;font-size:11px}
+.dl-watch-chat-line b{color:#e4c990}
+.dl-watch-chat-form{display:flex;gap:6px;margin-top:9px}
+.dl-watch-chat-form input{min-width:0;flex:1;padding:8px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(0,0,0,.35);color:#fff;font-size:11px}
+.dl-watch-chat-form button{padding:8px 10px;border:1px solid rgba(199,169,107,.4);border-radius:8px;background:rgba(199,169,107,.18);color:#e8d6b1;font-size:11px;cursor:pointer}
+.dl-watch-chat-glass[hidden]{display:none!important}
