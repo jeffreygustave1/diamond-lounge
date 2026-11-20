@@ -1835,10 +1835,11 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
     const mainRoom = document.getElementById("mainVoiceConnectionRoom");
 
     const isCreatedRoom = Boolean(state.roomId && state.roomId.startsWith("cs-"));
-    const isPrimaryRoom = Boolean(state.roomId && !isCreatedRoom);
     const connectedOrJoining = Boolean(state.connected || state.joining);
-    const showCreatedPanel = isCreatedRoom && connectedOrJoining;
-    const showMainPanel = isPrimaryRoom && connectedOrJoining;
+    const isViewingJoinedServer = Boolean(activeCreatedServerId && serverView && !serverView.hidden);
+    const showCreatedPanel = isCreatedRoom && connectedOrJoining && isViewingJoinedServer;
+    // Keep a global connection dock visible when the user navigates away from the active voice server.
+    const showMainPanel = connectedOrJoining && !showCreatedPanel;
 
     if (createdPanel) createdPanel.hidden = !showCreatedPanel;
     if (createdState) createdState.textContent = state.joining && !state.connected ? "Connecting..." : "Voice Connected";
