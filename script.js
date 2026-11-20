@@ -205,7 +205,7 @@ async function refreshServerMemberPermissions(serverId) {
         const roleIds = Array.isArray(storedRoleIds)
             ? storedRoleIds
             : (uid === serverSnapshot.data().ownerUid ? ["owner"] : ["member"]);
-        const effective = new Set();
+        const effective = new Set(["viewChannels", "sendMessages", "connectVoice", "speak"]);
         roleIds.forEach(roleId => (roles.get(roleId) || []).forEach(permission => effective.add(permission)));
         if (uid === serverSnapshot.data().ownerUid) effective.add("*");
         await updateDoc(memberRef, { roleIds, permissions: [...effective] });
@@ -1119,6 +1119,10 @@ await Promise.all([
         name: "Admin",
         nameLower: "admin",
         permissions: [
+            "viewChannels",
+            "sendMessages",
+            "connectVoice",
+            "speak",
             "manageChannels",
             "manageEvents",
             "manageMessages",
@@ -1133,6 +1137,10 @@ await Promise.all([
         name: "Moderator",
         nameLower: "moderator",
         permissions: [
+            "viewChannels",
+            "sendMessages",
+            "connectVoice",
+            "speak",
             "manageMessages"
         ],
         position: 50,
@@ -1988,7 +1996,7 @@ async function serverMembersDialog() {
                         save.disabled = true;
                         try {
                             const roleIds = checks.filter(item => item.checkbox.checked).map(item => item.role.id);
-                            const permissions = new Set();
+                            const permissions = new Set(["viewChannels", "sendMessages", "connectVoice", "speak"]);
                             checks.filter(item => item.checkbox.checked).forEach(item => {
                                 (Array.isArray(item.role.permissions) ? item.role.permissions : [])
                                     .forEach(permission => permissions.add(permission));
