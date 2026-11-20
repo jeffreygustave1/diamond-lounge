@@ -438,5 +438,55 @@ service cloud.firestore {
           && resource.data.uid == request.auth.uid;
       }
     }
+
+    // Private DM calling: each call is visible only to its two participants.
+    match /dmCalls/{callId} {
+      function isParticipant() {
+        return request.auth != null
+          && request.auth.uid in resource.data.participants;
+      }
+      allow read: if isParticipant();
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['callerUid','calleeUid','callerName','participants','callType','status','createdAt'])
+        && request.resource.data.callerUid == request.auth.uid
+        && request.resource.data.calleeUid is string
+        && request.resource.data.calleeUid != request.auth.uid
+        && request.resource.data.participants is list
+        && request.resource.data.participants.size() == 2
+        && request.resource.data.participants.hasAll([request.auth.uid,request.resource.data.calleeUid])
+        && request.resource.data.callType in ['audio','video']
+        && request.resource.data.status == 'ringing'
+        && request.resource.data.createdAt == request.time;
+      allow update: if isParticipant() && (
+        (request.auth.uid == resource.data.callerUid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['offer'])
+          && request.resource.data.offer is map
+          && request.resource.data.offer.type == 'offer'
+          && request.resource.data.offer.sdp is string)
+        || (request.auth.uid == resource.data.calleeUid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answer','status'])
+          && request.resource.data.answer is map
+          && request.resource.data.answer.type == 'answer'
+          && request.resource.data.answer.sdp is string
+          && request.resource.data.status == 'accepted')
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && request.resource.data.status in ['ended','declined'])
+      );
+      allow delete: if false;
+      match /{candidateCollection}/{candidateId} {
+        function parentCall() {
+          return get(/databases/$(database)/documents/dmCalls/$(callId)).data;
+        }
+        function participant() {
+          return request.auth != null && request.auth.uid in parentCall().participants;
+        }
+        allow read: if participant() && candidateCollection in ['callerCandidates','calleeCandidates'];
+        allow create: if participant()
+          && candidateCollection in ['callerCandidates','calleeCandidates']
+          && request.resource.data.keys().hasOnly(['candidate'])
+          && request.resource.data.candidate is map;
+        allow update, delete: if false;
+      }
+    }
   }
 }
