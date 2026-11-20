@@ -3696,3 +3696,13 @@ button {
 #createdServerVoiceStage.created-server-voice-stage { justify-items:stretch!important; align-content:center!important; grid-template-columns:minmax(0,1fr)!important; }
 #loungeVoiceStage .created-server-voice-tile:only-child,
 #createdServerVoiceStage .created-server-voice-tile:only-child { width:min(100%,480px)!important; height:240px!important; min-height:240px!important; max-height:240px!important; justify-self:center!important; align-self:center!important; box-sizing:border-box!important; }
+
+/* DIAMOND LOUNGE premium customization storefront */
+.dl-customization-store{margin:24px 0 18px;padding:18px;border:1px solid rgba(199,169,107,.22);border-radius:16px;background:linear-gradient(145deg,rgba(23,25,30,.96),rgba(12,13,16,.96));}
+.dl-store-heading h3{margin:5px 0 8px;font-size:20px;color:#f2e7ce}.dl-store-heading p,.dl-store-item p{color:#a5a5ad;font-size:12px;line-height:1.5}
+.dl-store-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.dl-store-item{display:flex;flex-direction:column;gap:10px;padding:13px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:rgba(255,255,255,.025);min-width:0}
+.dl-store-art{height:84px;border-radius:10px;display:grid;place-items:center;font-weight:800;letter-spacing:2px;font-size:20px;color:#f4e4c1;background:linear-gradient(135deg,#252b36,#111319);border:1px solid rgba(199,169,107,.22)}
+.gif-art{background:linear-gradient(135deg,#243c4a,#161b29,#544332);color:#c9e8ff}.aura-art{background:radial-gradient(circle,#425a73,#171921 65%);font-size:32px}.frame-art{background:linear-gradient(135deg,#c7a96b,#27231b);font-size:32px;color:#161310}.name-art{background:linear-gradient(110deg,#30313a,#16171c);color:#c7a96b;font-size:13px}.badge-art{background:linear-gradient(135deg,#3e4c43,#161b19);font-size:32px}.banner-art{background:linear-gradient(135deg,#3a3149,#171820);font-size:28px}
+.dl-store-lock{color:#c7a96b;font-size:9px;letter-spacing:1.5px;font-weight:800}.dl-store-item h4{margin:3px 0;font-size:14px;color:#e7e6e1}.dl-store-item p{margin:0}.dl-store-buy{margin-top:auto;width:100%;padding:9px 12px;border:1px solid rgba(199,169,107,.35);border-radius:9px;background:rgba(199,169,107,.08);color:#e2cfaa;font-size:11px;font-weight:700;cursor:pointer}.dl-store-buy:hover{background:rgba(199,169,107,.15)}.dl-store-payment-note{margin-top:14px;padding:11px;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#b4b4bc;font-size:11px;line-height:1.5}
+@media(max-width:560px){.dl-store-grid{grid-template-columns:1fr}.dl-customization-store{padding:13px}}
