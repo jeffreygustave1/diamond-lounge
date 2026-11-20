@@ -83,7 +83,7 @@ googleButton.addEventListener("click", async()=>{try{const result=await signInWi
 let confirmationResult=null;
 phoneButton.addEventListener("click",async()=>{try{const phone=document.getElementById("phoneNumber").value.trim();if(!phone){errorMessage.textContent="Enter your phone number including country code.";return;}if(!window.phoneRecaptcha)window.phoneRecaptcha=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});confirmationResult=await signInWithPhoneNumber(auth,phone,window.phoneRecaptcha);phoneCodeArea.hidden=false;phoneButton.disabled=true;phoneButton.textContent="Code sent";}catch(e){errorMessage.textContent=errors[e.code]||e.message;phoneButton.disabled=false;if(window.phoneRecaptcha){window.phoneRecaptcha.clear();window.phoneRecaptcha=null;}}});
 document.getElementById("verifyPhoneButton").addEventListener("click",async()=>{try{const result=await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||"Verification failed."; }});
-form.addEventListener("submit", async (event) =>
+form.addEventListener("submit", async (event) => {
             event.preventDefault();
             if (!form.reportValidity()) return;
             errorMessage.textContent = "";
