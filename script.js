@@ -53,6 +53,12 @@ const serverWelcomeName = document.getElementById("serverWelcomeName");
 const loungeView = document.getElementById("loungeView");
 const dmHomeView = document.getElementById("dmHomeView");
 const dmConversationView = document.getElementById("dmConversationView");
+
+// Keep private conversations inside the main chat column, not as a BODY sibling.
+const dmMainChatArea = document.querySelector(".chat-area");
+if (dmConversationView && dmMainChatArea && dmConversationView.parentElement !== dmMainChatArea) {
+    dmMainChatArea.appendChild(dmConversationView);
+}
 const communitySidebar = document.getElementById("communitySidebar");
 
 const memberSearch = document.getElementById("memberSearch");
