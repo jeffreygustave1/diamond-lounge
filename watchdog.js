@@ -77,14 +77,14 @@
     const gem = document.createElement("img");
     gem.src = "diamond.gif";
     gem.alt = "";
-    gem.style.cssText = "width:22px;height:22px;object-fit:contain;flex-shrink:0";
+    gem.style.cssText = "width:132px;height:132px;object-fit:contain;flex-shrink:0";
     const label = document.createElement("span");
     label.textContent = "DIAMOND WATCHDOG";
     badge.append(gem,label);
     count = document.createElement("span");
     count.textContent = "0";
     badge.appendChild(count);
-    badge.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483000;border:1px solid #4a78aa;border-radius:12px;background:#101923;color:#dcecff;display:flex;align-items:center;gap:8px;padding:10px 14px;font:13px system-ui;box-shadow:0 4px 18px #0006;cursor:pointer";
+    badge.style.cssText = "z-index:2147483000;border:1px solid #4a78aa;border-radius:12px;background:#101923;color:#dcecff;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;font:13px system-ui;box-shadow:0 4px 18px #0006;cursor:pointer;width:max-content;max-width:100%;margin:10px auto 14px";
     panel = document.createElement("div");
     panel.style.cssText = "display:none;position:fixed;right:12px;bottom:54px;width:min(420px,calc(100vw - 24px));max-height:min(60vh,520px);z-index:2147483000;background:#101318;color:#eee;border:1px solid #44566b;border-radius:14px;box-shadow:0 8px 30px #0009;font:13px system-ui;overflow:hidden";
     const header = document.createElement("div");
@@ -97,7 +97,7 @@
     const empty = document.createElement("div"); empty.textContent = "No browser errors recorded this session."; empty.style.cssText = "padding:12px;opacity:.7";
     list.appendChild(empty);
     panel.append(header,list);
-    badge.addEventListener("click",()=>{panel.style.display=panel.style.display==="none"?"block":"none";syncBotVisibility();});
+    badge.addEventListener("click",()=>{panel.style.display=panel.style.display==="none"?"block":"none"; if(panel.style.display==="block"){panel.style.position="fixed";panel.style.top="50%";panel.style.left="50%";panel.style.right="auto";panel.style.bottom="auto";panel.style.transform="translate(-50%,-50%)";} });
     close.addEventListener("click",()=>panel.style.display="none");
     clear.addEventListener("click",()=>{entries.length=0;render();list.innerHTML='<div style="padding:12px;opacity:.7">No browser errors recorded this session.</div>';count.textContent="0";});
     document.body.append(badge,panel);
@@ -108,15 +108,9 @@
       const active = !!botView && !botView.hidden;
       badge.style.display = active ? "flex" : "none";
       if (!active) panel.style.display = "none";
-      if (active) {
-        const quickChoices = botView.querySelector("#supportBotChoices");
-        if (quickChoices) {
-          const rect = quickChoices.getBoundingClientRect();
-          badge.style.bottom = "auto";
-          badge.style.top = Math.max(8, rect.top - badge.offsetHeight - 8) + "px";
-          panel.style.bottom = "auto";
-          panel.style.top = Math.max(8, rect.top - badge.offsetHeight - 50) + "px";
-        }
+      if (active && badge.parentElement !== botView) {
+        const chatElement = botView.querySelector("#supportBotChat");
+        if (chatElement) botView.insertBefore(badge, chatElement);
       }
     }
     if (botView) {
