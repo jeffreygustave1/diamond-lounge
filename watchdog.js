@@ -10,7 +10,7 @@
     const entry = { time: new Date().toISOString(), type, message: String(message || "Unknown error").slice(0, 1200), details };
     entries.push(entry);
     if (entries.length > MAX) entries.shift();
-    render();
+    renderCountOnly();
   }
   function safeDetails(value) {
     try { return typeof value === "string" ? value.slice(0, 500) : String(value); }
