@@ -3342,3 +3342,194 @@ button {
     flex-direction: column;
     min-height: 0;
 }
+
+
+
+/* =========================================================
+   CHANNEL WORKSPACE / DISCORD SCREEN-SHARE PRESENTATION
+   ========================================================= */
+
+/* The channel sidebar is not an empty placeholder when no server is selected. */
+.channels[hidden] {
+    display: none !important;
+}
+
+/* The active text channel uses the full main chat region.
+   The empty welcome panel is not stacked above the active channel. */
+#emptyView[hidden],
+#loungeView[hidden],
+#serverView[hidden],
+#dmHomeView[hidden],
+#dmConversationView[hidden] {
+    display: none !important;
+}
+#loungeView {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+#loungeView .chat-header {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 64px;
+    margin: 0;
+    border-radius: 0;
+}
+#loungeView .messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+}
+#loungeView .message-box {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    margin: 10px 16px 14px;
+}
+#loungeView .upload-status {
+    flex: 0 0 auto;
+}
+
+/* Screen share fills the voice room. The member grid becomes Discord's
+   compact floating participant column on the right. */
+.created-server-voice-remote-media #screenShareStage {
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    z-index: 8;
+    background: #050506;
+}
+.created-server-voice-remote-media #remoteScreenContainer {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    background: #050506;
+}
+.created-server-voice-remote-media #remoteScreenContainer .remote-video-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: #050506;
+}
+.created-server-voice-remote-media #remoteScreenContainer .remote-video-screen video {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    background: #050506;
+}
+.created-server-voice-remote-media #remoteScreenContainer .remote-video-screen figcaption {
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    width: max-content;
+    max-width: 60%;
+    padding: 6px 9px;
+    border-radius: 6px;
+    background: rgba(13,15,19,.78);
+    color: #fff;
+    font-size: 11px;
+}
+.created-server-voice-call.is-screen-sharing .created-server-voice-stage {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    bottom: 96px;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: min(230px,24%);
+    min-height: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: transparent;
+    pointer-events: none;
+}
+.created-server-voice-call.is-screen-sharing .created-server-voice-tile {
+    display: grid;
+    flex: 0 0 132px;
+    width: 100%;
+    min-height: 132px;
+    max-height: 132px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    background: var(--voice-card-background,#26343f);
+    box-shadow: 0 5px 18px rgba(0,0,0,.32);
+}
+.created-server-voice-call.is-screen-sharing .created-server-voice-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 19px;
+}
+.created-server-voice-call.is-screen-sharing .created-server-voice-tile-footer {
+    right: 6px;
+    bottom: 6px;
+    left: 6px;
+}
+.created-server-voice-call.is-screen-sharing .created-server-voice-name-pill {
+    max-width: 100%;
+    padding: 3px 6px;
+    font-size: 10px;
+}
+.created-server-voice-call.is-screen-sharing .created-server-voice-badge {
+    max-width: 105px;
+    padding: 3px 5px;
+    font-size: 9px;
+}
+.created-server-voice-call.is-screen-sharing .created-server-voice-toolbar {
+    z-index: 12;
+}
+.created-server-local-screen {
+    position: relative !important;
+}
+@media (max-width: 700px) {
+    .created-server-voice-call.is-screen-sharing .created-server-voice-stage {
+        top: auto;
+        right: 8px;
+        bottom: 82px;
+        left: 8px;
+        flex-direction: row;
+        width: auto;
+        height: 104px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    .created-server-voice-call.is-screen-sharing .created-server-voice-tile {
+        flex: 0 0 142px;
+        width: 142px;
+        min-height: 96px;
+        max-height: 96px;
+    }
+    .created-server-voice-call.is-screen-sharing .created-server-voice-avatar {
+        width: 38px;
+        height: 38px;
+    }
+    .created-server-voice-call.is-screen-sharing .created-server-voice-toolbar {
+        padding-top: 8px;
+    }
+}
