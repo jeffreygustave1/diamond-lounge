@@ -17,31 +17,6 @@ import {
     where
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
-// Early audio diagnostic exposed before the rest of voice UI initializes.
-window.diamondTestVoicePresenceSound = async (type = "join") => {
-    try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) { console.error("[Diamond Lounge] Web Audio unavailable"); return; }
-        window.__diamondVoiceTestContext ||= new AudioContextClass();
-        const ctx = window.__diamondVoiceTestContext;
-        if (ctx.state !== "running") await ctx.resume();
-        const notes = type === "leave" ? [760, 520] : [520, 760];
-        notes.forEach((frequency, i) => {
-            const at = ctx.currentTime + i * 0.11;
-            const oscillator = ctx.createOscillator();
-            const gain = ctx.createGain();
-            oscillator.frequency.value = frequency;
-            oscillator.type = "sine";
-            gain.gain.setValueAtTime(0.001, at);
-            gain.gain.linearRampToValueAtTime(0.2, at + 0.012);
-            gain.gain.exponentialRampToValueAtTime(0.001, at + 0.15);
-            oscillator.connect(gain); gain.connect(ctx.destination);
-            oscillator.start(at); oscillator.stop(at + 0.16);
-        });
-        console.log("[Diamond Lounge] Test chirp triggered");
-    } catch (error) { console.error("[Diamond Lounge] Audio test failed:", error); }
-};
-
 /* ==========================================
    SETTINGS
 ========================================== */
