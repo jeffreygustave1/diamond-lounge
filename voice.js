@@ -267,49 +267,64 @@ function renderParticipants() {
 
 function attachRemoteVideo(uid, label, stream, kind = "camera") {
     if (!stream) return;
-
-    const destination = kind === "screen"
-        ? remoteScreenContainer
-        : videoGrid;
-
+    const callTile = kind === "camera" ? window.diamondVoiceTileRoots?.get(uid) : null;
+    const destination = callTile || (kind === "screen" ? remoteScreenContainer : videoGrid);
     if (!destination) return;
 
-    const tileId = `tile-${kind}-${uid}`;
-
+    const tileId = "tile-" + kind + "-" + uid;
     let tile = document.getElementById(tileId);
-
     if (!tile) {
         tile = document.createElement("figure");
-
         tile.id = tileId;
-        tile.className = `remote-video-tile remote-video-${kind}`;
+        tile.className = callTile
+            ? "remote-video-tile remote-video-camera created-server-embedded-video"
+            : "remote-video-tile remote-video-" + kind;
         tile.hidden = true;
 
         const video = document.createElement("video");
-
         video.autoplay = true;
         video.playsInline = true;
         video.muted = true;
-
-        video.style.objectFit =
-            kind === "screen" ? "contain" : "cover";
+        video.style.objectFit = kind === "screen" ? "contain" : "cover";
 
         const caption = document.createElement("figcaption");
-        caption.textContent =
-            `${label} — ${kind === "screen" ? "Screen" : "Camera"}`;
-
+        caption.textContent = label + " — " + (kind === "screen" ? "Screen" : "Camera");
         tile.append(video, caption);
         destination.appendChild(tile);
+        if (callTile) callTile.classList.add("has-camera");
     }
 
     const video = tile.querySelector("video");
-
     if (video && video.srcObject !== stream) {
         video.srcObject = stream;
-        video.play().catch((error) => {
-            console.warn("Remote video playback blocked:", error);
-        });
+        video.play().catch(error => console.warn("Remote video playback blocked:", error));
     }
+}
+
+function syncLocalVoiceCameraPreview() {
+    const callTile = user?.uid ? window.diamondVoiceTileRoots?.get(user.uid) : null;
+    if (!callTile) return;
+
+    const existing = callTile.querySelector("#local-voice-camera-preview");
+    if (existing) existing.remove();
+
+    if (!cameraOn || !cameraStream) {
+        if (!callTile.querySelector(".created-server-embedded-video")) {
+            callTile.classList.remove("has-camera");
+        }
+        return;
+    }
+
+    const video = document.createElement("video");
+    video.id = "local-voice-camera-preview";
+    video.className = "created-server-local-camera";
+    video.autoplay = true;
+    video.playsInline = true;
+    video.muted = true;
+    video.srcObject = cameraStream;
+    callTile.append(video);
+    callTile.classList.add("has-camera");
+    video.play().catch(() => {});
 }
 
 /* ==========================================
@@ -334,8 +349,11 @@ function closePeer(uid) {
 
     peer.audio?.remove();
 
-    document.getElementById(`tile-camera-${uid}`)?.remove();
-    document.getElementById(`tile-screen-${uid}`)?.remove();
+    const cameraTile = document.getElementById("tile-camera-" + uid);
+    const cameraRoot = cameraTile?.parentElement;
+    cameraTile?.remove();
+    cameraRoot?.classList.remove("has-camera");
+    document.getElementById("tile-screen-" + uid)?.remove();
 
     if (outgoingCalls.get(uid) === peer.callRef) {
         outgoingCalls.delete(uid);
