@@ -1492,13 +1492,16 @@ function renderCreatedServerChannels() {
         container.append(heading);
     }
 
-    function renderChannelList(container, type, channels) {
+    function renderChannelList(container, type, channels, showCategoryHeadings = false) {
         const uncategorized = channels.filter(c => !c.parentCategoryId ||
             !categories.some(cat => cat.id === c.parentCategoryId));
         uncategorized.forEach(channel => container.append(makeChannelRow(channel)));
 
         categories.forEach(category => {
-            appendCategoryHeading(container, category);
+            // Each category heading is rendered once, in the text-channel section.
+            // Voice channels still stay grouped/indented, without duplicating every
+            // category heading a second time in the voice section.
+            if (showCategoryHeadings) appendCategoryHeading(container, category);
             channels
                 .filter(channel => channel.parentCategoryId === category.id)
                 .forEach(channel => {
@@ -1509,8 +1512,8 @@ function renderCreatedServerChannels() {
         });
     }
 
-    renderChannelList(createdServerTextChannels, "text", texts);
-    renderChannelList(createdServerVoiceChannels, "voice", voices);
+    renderChannelList(createdServerTextChannels, "text", texts, true);
+    renderChannelList(createdServerVoiceChannels, "voice", voices, false);
 
     if (activeCreatedServerId) {
         voices.forEach(channel => {
@@ -1903,7 +1906,7 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
     });
 
     document.querySelectorAll(".created-server-voice-join").forEach(button => {
-        button.hidden = Boolean(state.connected);
+        button.hidden = Boolean(state.connected || state.joining);
         button.disabled = Boolean(state.joining);
         button.textContent = state.joining ? "Connecting..." : "Join Voice";
     });
@@ -2270,7 +2273,9 @@ function openCreatedServerVoiceChannel(channel) {
         join.classList.remove("created-server-voice-tool");
         join.className = "created-server-voice-join";
         join.textContent = "Join Voice";
-        join.hidden = Boolean(window.diamondVoiceControls?.getState?.().connected);
+        // Channel selection auto-connects. Keep retry available only if the
+        // browser denies access or the automatic connection otherwise fails.
+        join.hidden = true;
         const controls = document.createElement("div");
         controls.className = "created-server-voice-toolbar-group";
         controls.append(
@@ -2298,10 +2303,17 @@ function openCreatedServerVoiceChannel(channel) {
         document.getElementById("createdServerVoiceStage"),
         document.querySelector(".created-server-audience"),
         { serverId: activeCreatedServerId, channelId: channel.id }
-    ) || null;
+) || null;
 
     syncCreatedServerVoiceUser();
     updateCreatedServerVoiceUI();
+
+    // Selecting the voice-channel row immediately joins the room.
+    void window.diamondJoinCreatedVoiceRoom?.(
+        channel.name,
+        "cs-" + activeCreatedServerId + "-" + channel.id,
+        serverViewName?.textContent?.trim() || "Diamond Lounge"
+    );
 }
 
 async function createCreatedServerChannel(typeOverride = null) {
