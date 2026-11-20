@@ -896,10 +896,11 @@
     <!-- DIAMOND SUPPORT BOT WINDOW -->
     <div id="supportBotModal" class="support-bot-backdrop" hidden>
       <section class="support-bot-panel" role="dialog" aria-modal="true" aria-labelledby="supportBotTitle">
-        <header class="support-bot-header"><div><span class="support-bot-eyebrow">DIAMOND LOUNGE</span><h2 id="supportBotTitle">✦ Diamond Support</h2></div><button type="button" id="supportBotClose" aria-label="Close support">×</button></header>
-        <div id="supportBotChat" class="support-bot-chat" aria-live="polite"></div>
+        <header class="support-bot-header"><div class="support-bot-brand"><span class="support-bot-eyebrow">DIAMOND LOUNGE · SUPPORT</span><h2 id="supportBotTitle"><span class="support-bot-avatar">◇</span> Diamond Support <span class="support-bot-online"><i></i> Online</span></h2></div><button type="button" id="supportBotClose" aria-label="Close support">×</button></header>
+        <div id="supportBotChat" class="support-bot-chat" aria-live="polite" aria-label="Support conversation"></div>
         <div id="supportBotChoices" class="support-bot-choices"></div>
-        <footer class="support-bot-footer"><span>Automated guidance · Never share passwords or verification codes.</span><button type="button" id="supportBotReset">Restart</button></footer>
+        <form id="supportBotForm" class="support-bot-input-row"><input id="supportBotInput" type="text" maxlength="1000" autocomplete="off" placeholder="Message Diamond Support..." aria-label="Message Diamond Support"><button type="submit" id="supportBotSend" aria-label="Send message">➤</button></form>
+        <footer class="support-bot-footer"><span>Automated support · Never share passwords or verification codes.</span><button type="button" id="supportBotReset">Restart</button></footer>
       </section>
     </div>
 
