@@ -2071,24 +2071,8 @@ function openPrimaryVoiceCall(channelName, roomId) {
     status.id = "loungeVoiceCallStatus";
     status.textContent = "You're not connected yet";
 
-    const toolbar = document.createElement("div");
-    toolbar.className = "created-server-voice-toolbar";
-    const join = makeCreatedServerVoiceButton("join", "↗", "Join Voice");
-    join.className = "created-server-voice-join";
-    const controls = document.createElement("div");
-    controls.className = "created-server-voice-toolbar-group";
-    controls.append(
-        makeCreatedServerVoiceButton("mute", "♩", "Microphone"),
-        makeCreatedServerVoiceButton("camera", "▣", "Camera"),
-        makeCreatedServerVoiceButton("screen", "▤", "Share Screen"),
-        makeCreatedServerVoiceButton("hand", "✋", "Raise Hand"),
-        makeCreatedServerVoiceButton("activities", "✣", "Activities"),
-        makeCreatedServerVoiceButton("settings", "•••", "More")
-    );
-    const leave = makeCreatedServerVoiceButton("leave", "☎", "Disconnect");
-    leave.className = "created-server-voice-leave";
-    toolbar.append(status, join, controls, leave);
-    call.append(stage, mediaLayer, audience, toolbar);
+    // Voice actions are consolidated into the persistent sidebar Voice Connected dock.
+    call.append(stage, mediaLayer, audience, status);
     callView.append(call);
     syncDiscordScreenShareLayout();
 
@@ -2265,35 +2249,8 @@ function openCreatedServerVoiceChannel(channel) {
         status.id = "createdServerVoiceCallStatus";
         status.textContent = "You're not connected yet";
 
-        const toolbar = document.createElement("div");
-        toolbar.className = "created-server-voice-toolbar";
-
-        const join = makeCreatedServerVoiceButton("join", "↗", "Join Voice", "join");
-        join.classList.add("created-server-voice-join");
-        join.classList.remove("created-server-voice-tool");
-        join.className = "created-server-voice-join";
-        join.textContent = "Join Voice";
-        // Channel selection auto-connects. Keep retry available only if the
-        // browser denies access or the automatic connection otherwise fails.
-        join.hidden = true;
-        const controls = document.createElement("div");
-        controls.className = "created-server-voice-toolbar-group";
-        controls.append(
-            makeCreatedServerVoiceButton("mute", "♩", "Microphone"),
-            makeCreatedServerVoiceButton("camera", "▣", "Camera"),
-            makeCreatedServerVoiceButton("screen", "▤", "Share Screen"),
-            makeCreatedServerVoiceButton("hand", "✋", "Raise Hand"),
-            makeCreatedServerVoiceButton("activities", "✣", "Activities"),
-            makeCreatedServerVoiceButton("settings", "•••", "More")
-        );
-
-        const leave = makeCreatedServerVoiceButton("leave", "☎", "Disconnect", "danger");
-        leave.classList.add("created-server-voice-leave");
-        leave.classList.remove("created-server-voice-tool");
-        leave.className = "created-server-voice-leave";
-        toolbar.append(status, join, controls, leave);
-
-        call.append(stage, mediaLayer, audience, toolbar);
+        // Voice actions live in the sidebar connection dock, not a duplicate call toolbar.
+        call.append(stage, mediaLayer, audience, status);
         createdServerMessages.append(call);
         syncDiscordScreenShareLayout();
     }
