@@ -44,88 +44,46 @@
     }
   };
 
-  let panel, list, count, toggle;
-  function render() {
-    if (!list || !count) return;
-    count.textContent = String(entries.length);
-    list.replaceChildren();
-    entries.slice().reverse().forEach(item => {
-      const row = document.createElement("div");
-      row.style.cssText = "padding:9px 10px;border-bottom:1px solid #333;font-size:12px;word-break:break-word";
-      const time = document.createElement("div");
-      time.textContent = new Date(item.time).toLocaleTimeString();
-      time.style.cssText = "opacity:.65;margin-bottom:3px";
-      const heading = document.createElement("strong");
-      heading.textContent = item.type;
-      const msg = document.createElement("div");
-      msg.textContent = item.message;
-      msg.style.cssText = "margin-top:4px;white-space:pre-wrap";
-      row.append(time, heading, msg);
-      if (item.details && Object.keys(item.details).length) {
-        const detail = document.createElement("small");
-        detail.textContent = Object.entries(item.details).map(([k,v]) => k + ": " + v).join(" | ");
-        detail.style.cssText = "display:block;opacity:.7;margin-top:5px";
-        row.appendChild(detail);
-      }
-      list.appendChild(row);
-    });
-  }
+  let badge, count;
   function installUI() {
-    const badge = document.createElement("button");
-    badge.type = "button";
-    badge.setAttribute("aria-label", "Open Diamond Lounge diagnostics");
+    badge = document.createElement("div");
+    badge.setAttribute("aria-label", "Diamond Lounge diagnostics status");
+    badge.style.cssText = "z-index:10;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;justify-content:center;gap:5px;padding:2px 6px;font:11px system-ui;cursor:default;white-space:nowrap";
     const gem = document.createElement("img");
     gem.src = "diamond.gif";
     gem.alt = "";
-    gem.style.cssText = "width:132px;height:132px;object-fit:contain;flex-shrink:0";
+    gem.style.cssText = "width:28px;height:28px;object-fit:contain;flex-shrink:0";
     const label = document.createElement("span");
     label.textContent = "DIAMOND WATCHDOG";
+    label.style.cssText = "letter-spacing:.4px";
     badge.append(gem,label);
     count = document.createElement("span");
     count.textContent = "0";
+    count.style.cssText = "opacity:.75;font-size:10px";
     badge.appendChild(count);
-    badge.style.cssText = "z-index:2147483000;border:1px solid #4a78aa;border-radius:12px;background:#101923;color:#dcecff;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;font:13px system-ui;box-shadow:0 4px 18px #0006;cursor:pointer;width:max-content;max-width:100%;margin:10px auto 14px";
-    panel = document.createElement("div");
-    panel.style.cssText = "display:none;position:fixed;right:12px;bottom:54px;width:min(420px,calc(100vw - 24px));max-height:min(60vh,520px);z-index:2147483000;background:#101318;color:#eee;border:1px solid #44566b;border-radius:14px;box-shadow:0 8px 30px #0009;font:13px system-ui;overflow:hidden";
-    const header = document.createElement("div");
-    header.style.cssText = "display:flex;gap:8px;align-items:center;padding:10px;border-bottom:1px solid #333";
-    const title = document.createElement("strong"); title.textContent = "Diamond Watchdog";
-    const clear = document.createElement("button"); clear.textContent = "Clear"; clear.style.cssText = "margin-left:auto";
-    const close = document.createElement("button"); close.textContent = "Close";
-    header.append(title,clear,close);
-    list = document.createElement("div"); list.style.cssText = "overflow:auto;max-height:calc(60vh - 45px)";
-    const empty = document.createElement("div"); empty.textContent = "No browser errors recorded this session."; empty.style.cssText = "padding:12px;opacity:.7";
-    list.appendChild(empty);
-    panel.append(header,list);
-    badge.addEventListener("click",()=>{panel.style.display=panel.style.display==="none"?"block":"none"; if(panel.style.display==="block"){panel.style.position="fixed";panel.style.top="50%";panel.style.left="50%";panel.style.right="auto";panel.style.bottom="auto";panel.style.transform="translate(-50%,-50%)";} });
-    close.addEventListener("click",()=>panel.style.display="none");
-    clear.addEventListener("click",()=>{entries.length=0;render();list.innerHTML='<div style="padding:12px;opacity:.7">No browser errors recorded this session.</div>';count.textContent="0";});
-    document.body.append(badge,panel);
 
-    // Show Watchdog only while the Diamond Support bot view is active.
+    // Keep diagnostics passive and place them tightly centered inside the Support header.
     const botView = document.getElementById("supportBotView");
     function syncBotVisibility() {
       const active = !!botView && !botView.hidden;
       badge.style.display = active ? "flex" : "none";
-      if (!active) panel.style.display = "none";
-      if (active && badge.parentElement !== botView) {
-        const chatElement = botView.querySelector("#supportBotChat");
-        if (chatElement) botView.insertBefore(badge, chatElement);
+      if (active) {
+        const header = botView.querySelector(".support-bot-header");
+        if (header && badge.parentElement !== header) {
+          header.appendChild(badge);
+          header.style.cssText += ";justify-content:center;gap:12px;flex-wrap:wrap";
+        }
       }
     }
     if (botView) {
       syncBotVisibility();
-      new MutationObserver(syncBotVisibility).observe(botView, {
-        attributes: true,
-        attributeFilter: ["hidden"]
-      });
-    } else {
-      badge.style.display = "none";
-    }
-    render();
+      new MutationObserver(syncBotVisibility).observe(botView, {attributes:true,attributeFilter:["hidden"]});
+    } else badge.style.display = "none";
+    renderCountOnly();
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installUI, {once:true});
+  function renderCountOnly() { if (count) count.textContent = String(entries.length); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installUI, {once:true});
   else installUI();
-  window.DiamondWatchdog = { getReports: () => entries.slice(), clear: () => { entries.length=0; render(); } };
+  window.DiamondWatchdog = { getReports: () => entries.slice(), clear: () => { entries.length=0; renderCountOnly(); } };
   record("Watchdog started", "Browser diagnostics enabled for this session.");
 })();
