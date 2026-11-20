@@ -1,7 +1,7 @@
 /* Diamond Lounge Watch — voice-dock activity */
 (function(){
-const button=document.getElementById("diamondWatchButton");
-if(!button)return;
+const buttons=[...document.querySelectorAll("[data-watch-launch]")];
+if(!buttons.length)return;
 const overlay=document.createElement("div");
 overlay.className="dl-watch-overlay";
 overlay.hidden=true;
@@ -66,7 +66,7 @@ function loadVideo(){
  player.prepend(iframe);currentId=id;currentUrl="https://www.youtube.com/watch?v="+id;
  status.textContent="Video loaded. Share its link with people in your voice channel.";
 }
-button.addEventListener("click",show);
+buttons.forEach(button=>button.addEventListener("click",show));
 close.addEventListener("click",hide);
 overlay.addEventListener("click",e=>{if(e.target===overlay)hide();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)hide();});
