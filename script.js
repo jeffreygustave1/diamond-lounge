@@ -3565,6 +3565,7 @@ function renderCroppedPicture() {
 document.getElementById("resetProfilePicture")?.addEventListener("click", () => {
     uploadedPicture = "";
     rawPicture = "";
+    pendingGifFile = null;
     if (profileUploadInput) profileUploadInput.value = "";
     if (profileCrop) profileCrop.hidden = true;
     if (cropZoom) cropZoom.value = "100";
@@ -3577,6 +3578,7 @@ profileChoiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
         uploadedPicture = "";
         rawPicture = "";
+        pendingGifFile = null;
 
         if (profileUploadInput) {
             profileUploadInput.value = "";
@@ -3664,7 +3666,6 @@ profileForm?.addEventListener("submit", async (event) => {
                 displayName: nextName,
                 avatar: currentAvatar,
                 picture: uploadedPicture,
-                pictureType: pendingGifFile ? "gif" : "image",
                 badges: nextBadges,
                 updatedAt: serverTimestamp()
             },
