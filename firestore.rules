@@ -125,8 +125,7 @@ service cloud.firestore {
           && (
             (get(memberPath).data.permissions is list
               && get(memberPath).data.permissions.hasAny(['*', permission]))
-            || (!('permissions' in get(memberPath).data)
-              && permission in ['viewChannels', 'sendMessages', 'connectVoice', 'speak'])
+            || permission in ['viewChannels', 'sendMessages', 'connectVoice', 'speak']
           );
       }
 
