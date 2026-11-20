@@ -896,24 +896,8 @@
     <script type="module" src="script.js?v=63"></script>
     <script type="module" src="supportbot.js?v=2"></script>
 <script type="module" src="dm-call.js?v=4"></script>
-<script type="module" src="voice.js?v=42"></script>
-<script>
-window.diamondTestVoicePresenceSound = async function(type = "join") {
-  try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { console.error("Web Audio unavailable"); return; }
-    window.__diamondTestCtx ||= new AC();
-    const ctx = window.__diamondTestCtx;
-    if (ctx.state !== "running") await ctx.resume();
-    [type === "leave" ? 760 : 520, type === "leave" ? 520 : 760].forEach((f,i)=>{
-      const at=ctx.currentTime+i*.11, osc=ctx.createOscillator(), gain=ctx.createGain();
-      osc.frequency.value=f; osc.type="sine"; gain.gain.setValueAtTime(.001,at);
-      gain.gain.linearRampToValueAtTime(.18,at+.012); gain.gain.exponentialRampToValueAtTime(.001,at+.15);
-      osc.connect(gain); gain.connect(ctx.destination); osc.start(at); osc.stop(at+.16);
-    }); console.log("Diamond test sound fired");
-  } catch(e) { console.error("Sound test error",e); }
-};
-</script>
+<script type="module" src="voice.js?v=43"></script>
+
 
     <!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
     <script type="module">
