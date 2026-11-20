@@ -498,11 +498,43 @@
             <ul id="createdServerVoiceChannels"></ul>
         </div>
         <button type="button" id="addServerChannelButton" class="created-server-add-channel" title="Create channel" aria-label="Create channel">＋ Create Channel</button>
+
+        <section class="created-server-voice-connection" id="createdServerVoiceConnectionPanel" aria-label="Voice connection" hidden>
+            <div class="created-server-voice-connection-top">
+                <span class="created-server-voice-signal" aria-hidden="true">◔</span>
+                <span class="created-server-voice-connection-state" id="createdServerVoiceConnectionState">Voice Connected</span>
+                <button type="button" class="created-server-voice-disconnect" id="createdServerVoiceDisconnect" title="Disconnect from voice" aria-label="Disconnect from voice">⌁</button>
+            </div>
+            <div class="created-server-voice-connection-room" id="createdServerVoiceConnectionRoom">VOICE CHANNEL</div>
+            <div class="created-server-voice-quick-actions">
+                <button type="button" data-voice-action="camera" title="Toggle camera" aria-label="Toggle camera">▣</button>
+                <button type="button" data-voice-action="screen" title="Share screen" aria-label="Share screen">▤</button>
+                <button type="button" data-voice-action="hand" title="Raise hand" aria-label="Raise hand">✋</button>
+                <button type="button" data-voice-action="activities" title="Voice activities" aria-label="Voice activities">✣</button>
+            </div>
+            <div class="created-server-voice-user-row">
+                <button type="button" class="created-server-voice-user" id="createdServerVoiceUserProfile" title="Edit your profile">
+                    <span class="created-server-voice-user-avatar" id="createdServerVoiceUserAvatar">✦</span>
+                    <span class="created-server-voice-user-copy">
+                        <span id="createdServerVoiceUserName">Member</span>
+                        <small id="createdServerVoiceUserSubline">Diamond Lounge</small>
+                    </span>
+                </button>
+                <div class="created-server-voice-user-actions">
+                    <button type="button" data-voice-action="mute" title="Toggle microphone" aria-label="Toggle microphone" aria-pressed="false">♩</button>
+                    <button type="button" data-voice-action="deafen" title="Deafen" aria-label="Toggle audio output" aria-pressed="false">◖</button>
+                    <button type="button" data-voice-action="settings" title="Voice settings" aria-label="Voice settings">⚙</button>
+                </div>
+            </div>
+        </section>
     </aside>
     <section class="created-server-chat">
         <header class="created-server-chat-header">
-            <div><span class="created-server-channel-symbol" id="createdServerChannelSymbol">#</span><span id="createdServerActiveChannel">general</span></div>
-            <button type="button" class="created-server-header-members" data-server-menu-action="members" title="View members">♙ Members</button>
+            <div class="created-server-chat-header-title"><span class="created-server-channel-symbol" id="createdServerChannelSymbol">#</span><span id="createdServerActiveChannel">general</span></div>
+            <div class="created-server-chat-header-actions">
+                <button type="button" class="created-server-header-chat" id="createdServerHeaderChatButton" title="Open channel chat" aria-label="Open channel chat" hidden>▱</button>
+                <button type="button" class="created-server-header-members" data-server-menu-action="members" title="View members">♙ Members</button>
+            </div>
         </header>
         <div id="createdServerMessages" class="created-server-messages" aria-live="polite"></div>
         <form id="createdServerMessageForm" class="message-box glass-surface">
@@ -781,6 +813,14 @@
                     autocomplete="off"
                     required>
 
+                <label for="profileBadgesInput">VOICE BADGES</label>
+                <input
+                    id="profileBadgesInput"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Former, Star Citizen, Creator">
+                <p class="profile-badges-note">Add up to four short badges, separated by commas. They appear beneath your name in voice rooms.</p>
+
                 <div class="server-modal-actions">
 
                     <button
@@ -812,7 +852,7 @@
     </div>
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
-    <script type="module" src="script.js?v=52"></script>
+    <script type="module" src="script.js?v=53"></script>
     <script type="module" src="voice.js?v=34"></script>
 
     <!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
