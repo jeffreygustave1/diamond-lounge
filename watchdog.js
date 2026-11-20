@@ -74,11 +74,11 @@
     const badge = document.createElement("button");
     badge.type = "button";
     badge.setAttribute("aria-label", "Open Diamond Lounge diagnostics");
-    badge.textContent = "◇ Watchdog ";
+    badge.textContent = "◇ DIAMOND WATCHDOG ";
     count = document.createElement("span");
     count.textContent = "0";
     badge.appendChild(count);
-    badge.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483000;border:1px solid #4a78aa;border-radius:12px;background:#101923;color:#dcecff;padding:8px 12px;font:12px system-ui;box-shadow:0 4px 18px #0006;cursor:pointer";
+    badge.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483000;border:1px solid #4a78aa;border-radius:12px;background:#101923;color:#dcecff;padding:10px 14px;font:13px system-ui;box-shadow:0 4px 18px #0006;cursor:pointer";
     panel = document.createElement("div");
     panel.style.cssText = "display:none;position:fixed;right:12px;bottom:54px;width:min(420px,calc(100vw - 24px));max-height:min(60vh,520px);z-index:2147483000;background:#101318;color:#eee;border:1px solid #44566b;border-radius:14px;box-shadow:0 8px 30px #0009;font:13px system-ui;overflow:hidden";
     const header = document.createElement("div");
