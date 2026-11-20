@@ -1848,54 +1848,39 @@ window.addEventListener("pagehide", () => {
 // ==================================================
 
 let voiceSoundAudioContext = null;
-
+function getVoiceSoundContext() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    voiceSoundAudioContext ??= new AudioContextClass();
+    return voiceSoundAudioContext;
+}
+function resumeVoiceSoundFromGesture() {
+    const ctx = getVoiceSoundContext();
+    if (ctx?.state === "suspended") void ctx.resume().catch(() => {});
+}
+document.addEventListener("pointerdown", resumeVoiceSoundFromGesture);
+document.addEventListener("keydown", resumeVoiceSoundFromGesture);
 function playVoicePresenceSound(type) {
-    try {
-        const AudioContextClass =
-            window.AudioContext || window.webkitAudioContext;
-
-        if (!AudioContextClass) return;
-
-        voiceSoundAudioContext ??= new AudioContextClass();
-
-        if (voiceSoundAudioContext.state === "suspended") {
-            voiceSoundAudioContext.resume();
-        }
-
-        const ctx = voiceSoundAudioContext;
+    const ctx = getVoiceSoundContext();
+    if (!ctx) return;
+    const schedule = () => {
         const now = ctx.currentTime;
-
-        const notes = type === "join"
-            ? [660, 880]
-            : [880, 660];
-
+        const notes = type === "join" ? [660, 880] : [880, 660];
         notes.forEach((frequency, index) => {
             const oscillator = ctx.createOscillator();
             const gain = ctx.createGain();
-
             oscillator.type = "sine";
             oscillator.frequency.value = frequency;
-
-            gain.gain.setValueAtTime(0, now + index * 0.12);
-            gain.gain.linearRampToValueAtTime(
-                0.12,
-                now + index * 0.12 + 0.025
-            );
-            gain.gain.exponentialRampToValueAtTime(
-                0.001,
-                now + index * 0.12 + 0.18
-            );
-
-            oscillator.connect(gain);
-            gain.connect(ctx.destination);
-
-            oscillator.start(now + index * 0.12);
-            oscillator.stop(now + index * 0.12 + 0.2);
+            const at = now + index * 0.12;
+            gain.gain.setValueAtTime(0.001, at);
+            gain.gain.linearRampToValueAtTime(0.12, at + 0.025);
+            gain.gain.exponentialRampToValueAtTime(0.001, at + 0.18);
+            oscillator.connect(gain); gain.connect(ctx.destination);
+            oscillator.start(at); oscillator.stop(at + 0.2);
         });
-
-    } catch (error) {
-        console.warn("Voice presence sound failed:", error);
-    }
+    };
+    if (ctx.state === "suspended") ctx.resume().then(schedule).catch(error => console.warn("Voice sound resume failed:", error));
+    else schedule();
 }
 window.diamondWatchCreatedVoiceSidebarRoom = (customRoomId, strip) => {
     const profileCache = new Map();
@@ -2003,6 +1988,8 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
     const tileCache = new Map();
     const tileRoots = new Map();
     const cardColors = ["#26343f", "#17191d", "#dfc5ad", "#4b74b6", "#3a3544", "#315044"];
+    let previousMemberIds = new Set();
+    let initializedMembershipSounds = false;
 
     const avatarPresets = {
         diamond: { background: "linear-gradient(145deg,#2b2924,#141416)", color: "#e1c98f", glyph: "✦", tile: "#26343f" },
@@ -2193,6 +2180,12 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
                 );
 
             const activeIds = new Set(liveMembers.map(member => member.uid));
+            if (initializedMembershipSounds) {
+                activeIds.forEach(uid => { if (!previousMemberIds.has(uid) && uid !== user?.uid) playVoicePresenceSound("join"); });
+                previousMemberIds.forEach(uid => { if (!activeIds.has(uid) && uid !== user?.uid) playVoicePresenceSound("leave"); });
+            }
+            previousMemberIds = activeIds;
+            initializedMembershipSounds = true;
             [...tileCache.keys()].forEach(uid => {
                 if (!activeIds.has(uid)) {
                     tileCache.get(uid)?.tile.remove();
