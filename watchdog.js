@@ -101,6 +101,23 @@
     close.addEventListener("click",()=>panel.style.display="none");
     clear.addEventListener("click",()=>{entries.length=0;render();list.innerHTML='<div style="padding:12px;opacity:.7">No browser errors recorded this session.</div>';count.textContent="0";});
     document.body.append(badge,panel);
+
+    // Show Watchdog only while the Diamond Support bot view is active.
+    const botView = document.getElementById("supportBotView");
+    function syncBotVisibility() {
+      const active = !!botView && !botView.hidden;
+      badge.style.display = active ? "flex" : "none";
+      if (!active) panel.style.display = "none";
+    }
+    if (botView) {
+      syncBotVisibility();
+      new MutationObserver(syncBotVisibility).observe(botView, {
+        attributes: true,
+        attributeFilter: ["hidden"]
+      });
+    } else {
+      badge.style.display = "none";
+    }
     render();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installUI, {once:true});
