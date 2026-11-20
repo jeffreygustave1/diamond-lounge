@@ -3790,3 +3790,22 @@ button {
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-voice-title{margin-bottom:4px!important}
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{min-height:0!important;max-height:none!important;aspect-ratio:16/9!important}
 @media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr!important}.created-server-voice-stage>.dl-watch-voice-tile{min-height:180px!important}}
+
+/* Watch activities: compact expandable menu, positioned near the voice connection panel. */
+.dl-watch-overlay.dl-watch-compact-open{inset:auto auto 150px 350px!important;width:min(370px,calc(100vw - 370px))!important;height:auto!important;min-height:0!important;padding:0!important;background:transparent!important;backdrop-filter:none!important;display:block!important;z-index:12050!important}
+.dl-watch-compact-open .dl-watch-shell{width:100%!important;height:auto!important;max-height:min(65vh,520px)!important;overflow:auto!important;padding:12px!important;border-radius:14px!important}
+.dl-watch-compact-open .dl-watch-top{display:none!important}
+.dl-watch-compact-open .dl-watch-grid{display:block!important}
+.dl-watch-compact-open .dl-watch-main{display:none!important}
+.dl-watch-compact-open .dl-watch-side{padding:10px!important;min-height:0!important}
+.dl-watch-compact-open .dl-watch-side h3{margin:0 0 10px!important}
+.dl-watch-compact-open .dl-watch-note{display:none!important}
+@media(max-width:760px){.dl-watch-overlay.dl-watch-compact-open{left:12px!important;bottom:100px!important;width:min(370px,calc(100vw - 24px))!important}}
+/* Participant-stage grid uses square tiles; Watch video fills its square without stretching the grid row. */
+.created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(0,1fr)!important;align-content:start!important}
+.created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile){aspect-ratio:1/1!important;min-height:0!important;height:auto!important}
+.created-server-voice-stage>.dl-watch-voice-tile{grid-column:auto!important;aspect-ratio:1/1!important;min-height:0!important;height:auto!important;padding:0!important;overflow:hidden!important;display:block!important;position:relative!important}
+.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-voice-title{position:absolute!important;z-index:4;left:10px;right:10px;top:10px;padding:7px 10px;border-radius:9px;background:rgba(10,10,12,.75);backdrop-filter:blur(8px)}
+.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:1/1!important;min-height:0!important;max-height:none!important;border:0!important;border-radius:0!important}
+.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player iframe,.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player #dlWatchYT{width:100%!important;height:100%!important}
+@media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr!important}.created-server-voice-stage>.dl-watch-voice-tile{aspect-ratio:1/1!important}}
