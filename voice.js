@@ -1861,8 +1861,9 @@ function resumeVoiceSoundFromGesture() {
 document.addEventListener("pointerdown", resumeVoiceSoundFromGesture);
 document.addEventListener("keydown", resumeVoiceSoundFromGesture);
 function playVoicePresenceSound(type) {
+    console.info('[Diamond Lounge] presence sound requested:', type);
     const ctx = getVoiceSoundContext();
-    if (!ctx) return;
+    if (!ctx) { console.warn('[Diamond Lounge] AudioContext unavailable'); return; }
     const schedule = () => {
         const now = ctx.currentTime + 0.015;
         // Original, Discord-inspired two-part notification: soft, bright,
@@ -1895,9 +1896,10 @@ function playVoicePresenceSound(type) {
             osc.stop(at + duration + 0.01); overtone.stop(at + duration + 0.01);
         });
     };
-    if (ctx.state === "suspended") ctx.resume().then(schedule).catch(error => console.warn("Voice sound resume failed:", error));
+    if (ctx.state === "suspended") ctx.resume().then(() => { console.info("[Diamond Lounge] AudioContext resumed"); schedule(); }).catch(error => console.warn("Voice sound resume failed:", error));
     else schedule();
 }
+window.diamondTestVoicePresenceSound = (type = 'join') => playVoicePresenceSound(type);
 window.diamondWatchCreatedVoiceSidebarRoom = (customRoomId, strip) => {
     const profileCache = new Map();
     const unsubscribe = onSnapshot(
