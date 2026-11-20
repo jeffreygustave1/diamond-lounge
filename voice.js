@@ -85,6 +85,9 @@ let stopCalls = null;
 let muted = false;
 let cameraOn = false;
 let screenOn = false;
+let deafened = false;
+let raisedHand = false;
+let outputVolume = 1;
 let joining = false;
 
 const participants = new Map();
@@ -104,10 +107,28 @@ let voiceSnapshotInitialized = false;
    GENERAL HELPERS
 ========================================== */
 
+function publishVoiceUiState() {
+    const detail = {
+        connected: Boolean(localStream),
+        joining,
+        muted,
+        cameraOn,
+        screenOn,
+        deafened,
+        raisedHand,
+        selectedChannel,
+        roomId,
+        status: statusElement?.textContent || "",
+        outputVolume
+    };
+    window.dispatchEvent(new CustomEvent("diamond-voice-state", { detail }));
+}
+
 function setStatus(message) {
     if (statusElement) {
         statusElement.textContent = message;
     }
+    publishVoiceUiState();
 }
 
 function makeRoomId(name) {
