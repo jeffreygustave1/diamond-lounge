@@ -97,6 +97,7 @@ const peers = new Map();
 const outgoingCalls = new Map();
 const incomingCalls = new Map();
 const stopCounts = new Map();
+const voiceSidebarProfileCache = new Map();
 
 /* ==========================================
    JOIN / LEAVE SOUND TRACKING
@@ -155,6 +156,69 @@ function setButtonLabel(button, text) {
     }
 }
 
+function renderVoiceRowMiniMembers(row, members) {
+    if (!row) return;
+    let strip = row.querySelector(".voice-row-member-avatars");
+    const live = members.slice(0, 4);
+    if (!live.length) {
+        strip?.remove();
+        row.classList.remove("has-voice-members");
+        return;
+    }
+    if (!strip) {
+        strip = document.createElement("div");
+        strip.className = "voice-row-member-avatars";
+        const head = row.querySelector(".voice-row-head");
+        if (head) head.insertAdjacentElement("afterend", strip);
+        else row.append(strip);
+    }
+    strip.replaceChildren();
+    row.classList.add("has-voice-members");
+    live.forEach(person => {
+        const avatar = document.createElement("span");
+        avatar.className = "voice-row-member-avatar";
+        avatar.textContent = String(person.name || "M").trim().slice(0, 1).toUpperCase();
+        avatar.title = person.name || "Member";
+        strip.append(avatar);
+        let profilePromise = voiceSidebarProfileCache.get(person.uid);
+        if (!profilePromise) {
+            profilePromise = getDoc(doc(db, "users", person.uid))
+                .then(snapshot => snapshot.exists() ? snapshot.data() : {})
+                .catch(() => ({}));
+            voiceSidebarProfileCache.set(person.uid, profilePromise);
+        }
+        profilePromise.then(profile => {
+            if (!avatar.isConnected) return;
+            if (typeof profile.picture === "string" && profile.picture) {
+                avatar.replaceChildren();
+                const image = document.createElement("img");
+                image.src = profile.picture;
+                image.alt = "";
+                avatar.append(image);
+            } else {
+                const colors = {
+                    gold: ["#c7a96b", "#1a1610", "G"],
+                    silver: ["#c9ccd2", "#191a1d", "S"],
+                    emerald: ["#4f8a63", "#eef7f0", "E"],
+                    ruby: ["#a5535a", "#fbeeee", "R"],
+                    royal: ["#5a5fa5", "#eeeffb", "V"],
+                    diamond: ["#2b2924", "#e1c98f", "✦"]
+                };
+                const preset = colors[profile.avatar] || colors.diamond;
+                avatar.style.background = preset[0];
+                avatar.style.color = preset[1];
+                avatar.textContent = preset[2];
+            }
+        });
+    });
+    if (members.length > live.length) {
+        const extra = document.createElement("span");
+        extra.className = "voice-row-member-extra";
+        extra.textContent = "+" + (members.length - live.length);
+        strip.append(extra);
+    }
+}
+
 /* ==========================================
    VOICE CHANNEL COUNTS
 ========================================== */
@@ -186,6 +250,14 @@ function watchChannelCounts() {
                     }
                 });
 
+                const liveMembers = snapshot.docs
+                    .map(entry => entry.data())
+                    .filter(member =>
+                        member.uid &&
+                        Date.now() - Number(member.heartbeatAt || 0) < STALE_AFTER_MS
+                    )
+                    .sort((a, b) => Number(a.heartbeatAt || 0) - Number(b.heartbeatAt || 0));
+
                 element.textContent =
                     live === 0
                         ? "No one in voice"
@@ -194,6 +266,7 @@ function watchChannelCounts() {
                             : `${live} in voice`;
 
                 element.classList.toggle("has-people", live > 0);
+                renderVoiceRowMiniMembers(element.closest(".voice-row"), liveMembers);
             },
 
             (error) => {
