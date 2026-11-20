@@ -1885,45 +1885,8 @@ function resumeVoiceSoundFromGesture() {
 }
 document.addEventListener("pointerdown", resumeVoiceSoundFromGesture);
 document.addEventListener("keydown", resumeVoiceSoundFromGesture);
-function playVoicePresenceSound(type) {
-    console.info('[Diamond Lounge] presence sound requested:', type);
-    const ctx = getVoiceSoundContext();
-    if (!ctx) { console.warn('[Diamond Lounge] AudioContext unavailable'); return; }
-    const schedule = () => {
-        const now = ctx.currentTime + 0.015;
-        // Original, Discord-inspired two-part notification: soft, bright,
-        // rounded digital chirps (not a copied Discord audio asset).
-        const notes = type === "join"
-            ? [{ f: 520, delay: 0, duration: 0.105 }, { f: 760, delay: 0.085, duration: 0.145 }]
-            : [{ f: 760, delay: 0, duration: 0.105 }, { f: 520, delay: 0.085, duration: 0.145 }];
-        notes.forEach(({ f, delay, duration }) => {
-            const at = now + delay;
-            const osc = ctx.createOscillator();
-            const overtone = ctx.createOscillator();
-            const gain = ctx.createGain();
-            const filter = ctx.createBiquadFilter();
-            osc.type = "sine";
-            overtone.type = "triangle";
-            osc.frequency.setValueAtTime(f, at);
-            osc.frequency.exponentialRampToValueAtTime(f * 0.985, at + duration);
-            overtone.frequency.setValueAtTime(f * 2, at);
-            filter.type = "lowpass";
-            filter.frequency.setValueAtTime(2200, at);
-            filter.Q.value = 0.65;
-            gain.gain.setValueAtTime(0.0001, at);
-            gain.gain.linearRampToValueAtTime(0.22, at + 0.012);
-            gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
-            osc.connect(filter);
-            overtone.connect(filter);
-            filter.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(at); overtone.start(at);
-            osc.stop(at + duration + 0.01); overtone.stop(at + duration + 0.01);
-        });
-    };
-    if (ctx.state === "suspended") ctx.resume().then(() => { console.info("[Diamond Lounge] AudioContext resumed"); schedule(); }).catch(error => console.warn("Voice sound resume failed:", error));
-    else schedule();
-}
+import { playVoicePresenceSound } from "./voice-sounds.js?v=1";
+
 window.diamondTestVoicePresenceSound = (type = 'join') => playVoicePresenceSound(type);
 window.diamondWatchCreatedVoiceSidebarRoom = (customRoomId, strip) => {
     const profileCache = new Map();
