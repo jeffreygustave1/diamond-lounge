@@ -1515,7 +1515,8 @@ async function joinVoice() {
 ========================================== */
 
 async function leaveVoice(knownUid = user?.uid) {
-    clearTimeout(guestVoiceTimer); guestVoiceTimer=null;\n    const oldRoom = roomId;
+    clearTimeout(guestVoiceTimer); guestVoiceTimer=null;
+    const oldRoom = roomId;
     const oldUid = knownUid;
 
     if (heartbeatTimer) {
