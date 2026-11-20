@@ -1209,6 +1209,8 @@ function loadCreatedServerChannels(serverId) {
         return;
     }
 
+    createdServerVoicePresenceStop?.();
+    createdServerVoicePresenceStop = null;
     stopServerChannelsListener?.();
     stopServerChannelsListener = null;
 
