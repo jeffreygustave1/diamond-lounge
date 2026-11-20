@@ -308,6 +308,8 @@ function clearServerSelections() {
 }
 
 function showLoungeSidebar() {
+    const channelsSidebar = document.getElementById("channelsSidebar");
+    if (channelsSidebar) channelsSidebar.hidden = false;
     if (dmSidebar) dmSidebar.hidden = true;
     if (loungeSidebar) loungeSidebar.hidden = false;
 
@@ -691,6 +693,8 @@ messageForm?.addEventListener("submit", (event) => {
 
 function showDirectMessages() {
     if (!currentUser) return;
+    const channelsSidebar = document.getElementById("channelsSidebar");
+    if (channelsSidebar) channelsSidebar.hidden = false;
 
     // Prevent server listeners from lingering while viewing DMs.
     stopCreatedServerChannels();
@@ -1837,8 +1841,8 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
     const isCreatedRoom = Boolean(state.roomId && state.roomId.startsWith("cs-"));
     const connectedOrJoining = Boolean(state.connected || state.joining);
     const isViewingJoinedServer = Boolean(activeCreatedServerId && serverView && !serverView.hidden);
-    const showCreatedPanel = isCreatedRoom && connectedOrJoining && isViewingJoinedServer;
-    // Keep a global connection dock visible when the user navigates away from the active voice server.
+    const showCreatedPanel = isViewingJoinedServer && connectedOrJoining;
+    // When the server workspace is open, its sidebar owns the dock. Otherwise use the global sidebar.
     const showMainPanel = connectedOrJoining && !showCreatedPanel;
 
     if (createdPanel) createdPanel.hidden = !showCreatedPanel;
@@ -2810,6 +2814,8 @@ async function serverEventsDialog() {
 function openServer(server) {
     if (!server?.id) return;
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
+    const channelsSidebar = document.getElementById("channelsSidebar");
+    if (channelsSidebar) channelsSidebar.hidden = true;
     restoreCreatedServerVoiceMedia();
 
     stopPublicMessages();
