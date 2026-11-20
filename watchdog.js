@@ -95,6 +95,7 @@
     close.addEventListener("click",()=>panel.style.display="none");
     clear.addEventListener("click",()=>{entries.length=0;render();list.innerHTML='<div style="padding:12px;opacity:.7">No browser errors recorded this session.</div>';count.textContent="0";});
     document.body.append(badge,panel);
+    render();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installUI, {once:true});
   else installUI();
