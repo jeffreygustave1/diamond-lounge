@@ -1,7 +1,7 @@
 // Diamond Support — AI-powered chat (Cloudflare Worker backend).
 // After deploying the Worker, replace the URL below with your Worker endpoint.
 const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
-const view=document.getElementById("supportBotView"),openBtn=document.getElementById("supportBotOpen"),closeBtn=document.getElementById("supportBotClose"),chat=document.getElementById("supportBotChat"),choices=document.getElementById("supportBotChoices"),reset=document.getElementById("supportBotReset"),form=document.getElementById("supportBotForm"),input=document.getElementById("supportBotInput"),sendButton=document.getElementById("supportBotSend");
+const view=document.getElementById("supportBotView"),openBtn=document.getElementById("supportBotOpen"),chat=document.getElementById("supportBotChat"),choices=document.getElementById("supportBotChoices"),reset=document.getElementById("supportBotReset"),form=document.getElementById("supportBotForm"),input=document.getElementById("supportBotInput"),sendButton=document.getElementById("supportBotSend");
 const topics=["Account or login","Profile or avatar","Messages and DMs","Voice or microphone","Camera or video","Screen sharing","Servers or channels","Website bugs"];
 let history=[],busy=false;
 function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
@@ -13,6 +13,6 @@ finally{busy=false;input.disabled=false;if(sendButton)sendButton.disabled=false;
 function start(){chat.replaceChildren();history=[];bubble("Hi! I'm Diamond Support 💎 — now ready for natural conversations. Ask me about Diamond Lounge, or tap a topic to get started. What can I help with?","bot");topicButtons();input.value="";}
 form?.addEventListener("submit",e=>{e.preventDefault();send(input.value);});
 function openSupportConversation(){const area=document.querySelector(".chat-area");if(!area||!view)return;area.querySelectorAll(":scope > section").forEach(section=>{section.hidden=true;});view.hidden=false;const channelsSidebar=document.getElementById("channelsSidebar");if(channelsSidebar)channelsSidebar.hidden=false;const dmSidebar=document.getElementById("dmSidebar");if(dmSidebar)dmSidebar.hidden=false;const loungeSidebar=document.getElementById("loungeSidebar");if(loungeSidebar)loungeSidebar.hidden=true;const dmHomeButton=document.getElementById("dmHomeButton");if(dmHomeButton){dmHomeButton.classList.add("selected");dmHomeButton.setAttribute("aria-pressed","true");}const mainServerButton=document.getElementById("mainServerButton");if(mainServerButton){mainServerButton.classList.remove("selected");mainServerButton.setAttribute("aria-pressed","false");}document.body.classList.add("dm-mode");start();input.focus();}
-openBtn?.addEventListener("click",openSupportConversation);
-closeBtn?.addEventListener("click",()=>{view.hidden=true;const home=document.getElementById("dmHomeView");if(home)home.hidden=false;});
+function closeSupportConversation(){if(!view)return;view.hidden=true;const home=document.getElementById("dmHomeView");if(home)home.hidden=false;}
+openBtn?.addEventListener("click",()=>{if(view&&!view.hidden){closeSupportConversation();return;}openSupportConversation();});
 reset?.addEventListener("click",start);
