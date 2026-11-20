@@ -893,6 +893,16 @@
 
     </div>
 
+    <!-- DIAMOND SUPPORT BOT WINDOW -->
+    <div id="supportBotModal" class="support-bot-backdrop" hidden>
+      <section class="support-bot-panel" role="dialog" aria-modal="true" aria-labelledby="supportBotTitle">
+        <header class="support-bot-header"><div><span class="support-bot-eyebrow">DIAMOND LOUNGE</span><h2 id="supportBotTitle">✦ Diamond Support</h2></div><button type="button" id="supportBotClose" aria-label="Close support">×</button></header>
+        <div id="supportBotChat" class="support-bot-chat" aria-live="polite"></div>
+        <div id="supportBotChoices" class="support-bot-choices"></div>
+        <footer class="support-bot-footer"><span>Automated guidance · Never share passwords or verification codes.</span><button type="button" id="supportBotReset">Restart</button></footer>
+      </section>
+    </div>
+
     <!-- APPLICATION SCRIPTS: load each application module once -->
     <script type="module" src="script.js?v=66"></script>
     <script type="module" src="supportbot.js?v=2"></script>
