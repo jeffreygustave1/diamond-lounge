@@ -1,5 +1,4 @@
-import { auth, db, storage } from "./firebase.js";
-import { getDownloadURL, ref as storageRef, uploadBytes } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
+import { auth, db } from "./firebase.js";
 
 import {
     onAuthStateChanged,
@@ -2405,7 +2404,7 @@ function cropServerImage(file) {
             canvas.onpointermove=e=>{if(!drag)return;offsetX+=e.clientX-lastX;offsetY+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;draw();};
             canvas.onpointerup=canvas.onpointercancel=()=>{drag=false;canvas.style.cursor="grab";};
             cancel.onclick=()=>{overlay.remove();URL.revokeObjectURL(objectUrl);resolve(null);};
-            apply.onclick=()=>canvas.toBlob(blob=>{overlay.remove();URL.revokeObjectURL(objectUrl);blob?resolve(blob):reject(new Error("Crop could not be saved."));},"image/png");
+            apply.onclick=()=>canvas.toBlob(blob=>{overlay.remove();URL.revokeObjectURL(objectUrl);blob?resolve(blob):reject(new Error("Crop could not be saved."));},"image/jpeg",0.82);
         };
         image.onerror=()=>{URL.revokeObjectURL(objectUrl);reject(new Error("Image could not be opened."));};
         image.src=objectUrl;
@@ -2420,38 +2419,113 @@ async function serverSettingsDialog() {
     const data = snapshot.data();
     const content = serverFeatureDialog("Server Settings");
     const nameInput = document.createElement("input");
-    nameInput.value=data.name||"";nameInput.maxLength=40;nameInput.placeholder="Server name";
-    const iconInput=document.createElement("input");iconInput.type="url";iconInput.value=data.iconUrl||"";iconInput.placeholder="Or paste an image URL";
-    const iconFile=document.createElement("input");iconFile.type="file";iconFile.accept="image/png,image/jpeg,image/webp";
-    const iconPreview=document.createElement("img");iconPreview.alt="Server icon preview";iconPreview.style.cssText="width:88px;height:88px;object-fit:cover;border-radius:20px;display:block;background:#222;";
-    iconPreview.src=data.iconUrl||"";
-    const visibility=document.createElement("select");
-    ["private","public"].forEach(value=>{const option=document.createElement("option");option.value=value;option.textContent=value;visibility.append(option);});
-    visibility.value=data.visibility||"private";
-    let croppedBlob=null;
-    iconFile.addEventListener("change",async()=>{
-        const file=iconFile.files?.[0];if(!file)return;
-        if(!file.type.startsWith("image/")||file.size>8*1024*1024){alert("Choose an image smaller than 8 MB.");iconFile.value="";return;}
-        try{croppedBlob=await cropServerImage(file);if(croppedBlob){iconPreview.src=URL.createObjectURL(croppedBlob);iconInput.value="";}}
-        catch(error){alert(error.message||"Crop failed.");}
+    nameInput.value = data.name || "";
+    nameInput.maxLength = 40;
+    nameInput.placeholder = "Server name";
+    const iconInput = document.createElement("input");
+    iconInput.type = "url";
+    iconInput.value = data.iconUrl || "";
+    iconInput.placeholder = "Or paste an image URL";
+    const iconFile = document.createElement("input");
+    iconFile.type = "file";
+    iconFile.accept = "image/png,image/jpeg,image/webp";
+    const iconPreview = document.createElement("img");
+    iconPreview.alt = "Server icon preview";
+    iconPreview.style.cssText = "width:88px;height:88px;object-fit:cover;border-radius:20px;display:block;background:#222;";
+    iconPreview.src = data.iconUrl || "";
+    const visibility = document.createElement("select");
+    ["private", "public"].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        visibility.append(option);
     });
-    content.append(sfNode("label","Server name"),nameInput,sfNode("label","Server picture"),iconPreview,iconFile,sfNode("small","Upload a picture, then crop and zoom it before saving."),sfNode("label","Or use an image URL"),iconInput,sfNode("label","Visibility"),visibility);
-    const save=sfNode("button","Save changes");save.className="created-server-feature-action";content.append(save);
-    save.onclick=async()=>{
-        if(activeCreatedServerOwnerUid!==currentUser.uid){alert("Only the owner can change settings.");return;}
-        const name=nameInput.value.trim();let iconUrl=iconInput.value.trim();
-        if(name.length<2||name.length>40){alert("Server name must be between 2 and 40 characters.");return;}
-        if(iconUrl&&!/^https?:\/\//i.test(iconUrl)){alert("Server icon URL must start with http:// or https://.");return;}
-        save.disabled=true;save.textContent=croppedBlob?"Uploading cropped picture...":"Saving...";
-        try{
-            if(croppedBlob){const path=`uploads/${currentUser.uid}/server-${serverId}-${Date.now()}.png`;const stored=await uploadBytes(storageRef(storage,path),croppedBlob,{contentType:"image/png",cacheControl:"public,max-age=31536000"});iconUrl=await getDownloadURL(stored.ref);}
-            await updateDoc(doc(db,"servers",serverId),{name,nameLower:normalizeServerName(name),visibility:visibility.value,iconUrl});
-            if(serverViewName)serverViewName.textContent=name;if(serverWelcomeName)serverWelcomeName.textContent=name;const menuName=document.getElementById("createdServerMenuName");if(menuName)menuName.textContent=name;await loadServerIcons();save.textContent="Saved";
-        }catch(error){console.error("Server settings save failed:",error);alert(error.code==="permission-denied"?"Firebase denied this change. Storage and Firestore rules may need to be published.":(error.message||"Settings save failed."));save.textContent="Save changes";}
-        finally{save.disabled=false;}
+    visibility.value = data.visibility || "private";
+    let croppedBlob = null;
+    let previewUrl = null;
+    iconFile.addEventListener("change", async () => {
+        const file = iconFile.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/") || file.size > 8 * 1024 * 1024) {
+            alert("Choose an image smaller than 8 MB.");
+            iconFile.value = "";
+            return;
+        }
+        try {
+            croppedBlob = await cropServerImage(file);
+            if (croppedBlob) {
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                previewUrl = URL.createObjectURL(croppedBlob);
+                iconPreview.src = previewUrl;
+                iconInput.value = "";
+            }
+        } catch (error) {
+            alert(error.message || "Crop failed.");
+        }
+    });
+    content.append(
+        sfNode("label", "Server name"), nameInput,
+        sfNode("label", "Server picture"), iconPreview, iconFile,
+        sfNode("small", "Upload a picture, then crop and zoom it before saving."),
+        sfNode("label", "Or use an image URL"), iconInput,
+        sfNode("label", "Visibility"), visibility
+    );
+    const save = sfNode("button", "Save changes");
+    save.className = "created-server-feature-action";
+    content.append(save);
+    save.onclick = async () => {
+        if (activeCreatedServerOwnerUid !== currentUser.uid) {
+            alert("Only the owner can change settings.");
+            return;
+        }
+        const name = nameInput.value.trim();
+        let iconUrl = iconInput.value.trim();
+        if (name.length < 2 || name.length > 40) {
+            alert("Server name must be between 2 and 40 characters.");
+            return;
+        }
+        if (iconUrl && !/^https?:\/\//i.test(iconUrl) && !iconUrl.startsWith("data:image/")) {
+            alert("Server icon URL must start with http:// or https://.");
+            return;
+        }
+        save.disabled = true;
+        save.textContent = croppedBlob ? "Preparing picture..." : "Saving...";
+        try {
+            if (croppedBlob) {
+                // Store a compact image data URL directly in the server document,
+                // avoiding Firebase Storage and its billing requirement.
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(new Error("Picture could not be prepared."));
+                    reader.readAsDataURL(croppedBlob);
+                });
+                if (typeof dataUrl !== "string" || dataUrl.length > 700000) {
+                    throw new Error("The cropped picture is too large to save. Try a smaller or simpler image.");
+                }
+                iconUrl = dataUrl;
+            }
+            await updateDoc(doc(db, "servers", serverId), {
+                name, nameLower: normalizeServerName(name), visibility: visibility.value, iconUrl
+            });
+            if (serverViewName) serverViewName.textContent = name;
+            if (serverWelcomeName) serverWelcomeName.textContent = name;
+            const menuName = document.getElementById("createdServerMenuName");
+            if (menuName) menuName.textContent = name;
+            await loadServerIcons();
+            save.textContent = "Saved";
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        } catch (error) {
+            console.error("Server settings save failed:", error);
+            alert(error.code === "permission-denied"
+                ? "Firebase denied this change. Check the server document Firestore rules."
+                : (error.message || "Settings save failed."));
+            save.textContent = "Save changes";
+        } finally {
+            save.disabled = false;
+        }
     };
 }
-
 async function serverMembersDialog() {
     if (!activeCreatedServerId) return;
     const serverId = activeCreatedServerId;
