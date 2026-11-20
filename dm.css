@@ -382,3 +382,33 @@
     background: rgba(224, 107, 107, .14);
     outline: none;
 }
+
+
+/* FIX: Keep the private-message workspace inside the viewport. Only the message history scrolls. */
+.chat-area {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+#dmConversationView {
+    flex: 1 1 0;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+#dmConversationView .dm-conversation-header {
+    flex: 0 0 auto;
+}
+#dmConversationView #dmMessages {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#dmConversationView #dmMessageForm {
+    flex: 0 0 auto;
+    margin-top: 0;
+}
+#dmConversationView #dmStatus {
+    flex: 0 0 auto;
+}
