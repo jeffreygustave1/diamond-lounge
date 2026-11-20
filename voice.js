@@ -1669,6 +1669,16 @@ window.diamondVoiceControls = {
     toggleScreen,
     toggleDeafen,
     toggleRaiseHand,
+    refreshProfile: async () => {
+        if (!user) return;
+        try {
+            const snapshot = await getDoc(doc(db, "users", user.uid));
+            activeVoiceProfile = snapshot.exists() ? snapshot.data() : {};
+            await refreshPresenceFlags();
+        } catch (error) {
+            console.warn("Live voice profile refresh failed:", error);
+        }
+    },
     leave: () => leaveVoice(),
     setOutputVolume
 };
