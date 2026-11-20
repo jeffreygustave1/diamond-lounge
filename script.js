@@ -859,15 +859,11 @@ function renderMembers() {
             button.classList.add("selected");
         }
 
-        const symbol = document.createElement("span");
-        symbol.className = "channel-symbol";
-        symbol.textContent = "#";
-
         const name = document.createElement("span");
         name.className = "dm-channel-name";
         name.textContent = member.displayName;
 
-        button.append(symbol, name);
+        button.append(name);
 
         button.addEventListener("click", () => {
             void openConversation(member);
