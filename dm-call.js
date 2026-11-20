@@ -2,7 +2,7 @@ import { auth, db } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import { collection, doc, addDoc, onSnapshot, query, where, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
-const startVoice=document.getElementById("dmVoiceCall"),startVideo=document.getElementById("dmVideoCall"),modal=document.getElementById("dmCallModal"),status=document.getElementById("dmCallStatus"),remoteVideo=document.getElementById("dmCallRemoteVideo"),localVideo=document.getElementById("dmCallLocalVideo"),mute=document.getElementById("dmCallMute"),cam=document.getElementById("dmCallCamera"),share=document.getElementById("dmCallShare"),hang=document.getElementById("dmCallHangup");
+const startVoice=document.getElementById("dmVoiceCall"),startVideo=document.getElementById("dmVideoCall"),notifyButton=document.getElementById("dmCallNotifications"),modal=document.getElementById("dmCallModal"),status=document.getElementById("dmCallStatus"),remoteVideo=document.getElementById("dmCallRemoteVideo"),localVideo=document.getElementById("dmCallLocalVideo"),mute=document.getElementById("dmCallMute"),cam=document.getElementById("dmCallCamera"),share=document.getElementById("dmCallShare"),hang=document.getElementById("dmCallHangup");
 let user=null,contact=null,activeRef=null,pc=null,local=null,screen=null,callListener=null,candidateListener=null,incomingListener=null,muted=false,camera=false,sharing=false,handledIncoming=null,remoteStream=null,ringCtx=null,ringTimer=null,callNotification=null;
 const rtcConfig={iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
 function setStatus(t){if(status)status.textContent=t;}
@@ -22,6 +22,7 @@ async function handleIncoming(snap){const d=snap.data();if(!d||d.status!=="ringi
 function subscribeIncoming(){incomingListener?.();incomingListener=onSnapshot(query(collection(db,"dmCalls"),where("participants","array-contains",user.uid),where("calleeUid","==",user.uid),where("status","==","ringing")),s=>s.docChanges().forEach(c=>{if(c.type==="added")void handleIncoming(c.doc);}));}
 onAuthStateChanged(auth,u=>{user=u;if(u)subscribeIncoming();else{incomingListener?.();incomingListener=null;teardown();}});
 function getContact(){return window.dmCallContactGetter?.()||window.selectedMemberForDM||window.selectedMember||null;}
+notifyButton?.addEventListener("click",async()=>{await enableCallNotifications();alert("Notification permission: "+(("Notification" in window)?Notification.permission:"unsupported"));});
 startVoice?.addEventListener("click",()=>{void enableCallNotifications();contact=getContact();if(!contact){alert("Open a member conversation before calling.");return;}if(!contact.uid){alert("Please reopen the conversation and try again.");return;}void startCall("audio");});
 startVideo?.addEventListener("click",()=>{void enableCallNotifications();contact=getContact();if(!contact){alert("Open a member conversation before calling.");return;}if(!contact.uid){alert("Please reopen the conversation and try again.");return;}void startCall("video");});
 mute?.addEventListener("click",()=>{muted=!muted;local?.getAudioTracks().forEach(t=>t.enabled=!muted);mute.textContent=muted?"Unmute":"Mute";});
