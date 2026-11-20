@@ -3782,3 +3782,11 @@ button {
 @media(max-width:700px){
  .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player{min-height:190px!important;max-height:45vh!important}
 }
+
+
+/* Watch video acts as an equal voice-channel participant alongside member tiles. */
+#loungeVoiceStage.created-server-voice-stage,#createdServerVoiceStage.created-server-voice-stage,.created-server-voice-stage{grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr))!important;justify-items:stretch!important;align-content:start!important}
+.created-server-voice-stage>.dl-watch-voice-tile{box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:240px!important;max-height:none!important;margin:0!important;align-self:stretch!important;justify-self:stretch!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:12px!important;background:#232428!important;padding:12px!important}
+.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-voice-title{margin-bottom:4px!important}
+.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{min-height:0!important;max-height:none!important;aspect-ratio:16/9!important}
+@media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr!important}.created-server-voice-stage>.dl-watch-voice-tile{min-height:180px!important}}
