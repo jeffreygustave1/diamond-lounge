@@ -3180,3 +3180,50 @@ button {
 #createdServerMessageStatus[hidden] {
     display: none !important;
 }
+
+
+
+/* =========================================================
+   VIP-LOUNGE VOICE CALL VIEW + PINNED CONNECTION DOCK
+   ========================================================= */
+#loungeView.is-voice-call {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+#loungeView.is-voice-call .chat-header {
+    flex: 0 0 auto;
+    background: #232428;
+}
+#loungeView.is-voice-call .lounge-voice-call-view {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    height: 0;
+    overflow: hidden;
+    background: #000;
+}
+#loungeView .lounge-voice-call-view[hidden] {
+    display: none !important;
+}
+#channelsSidebar.has-voice-connection .profile-card {
+    display: none !important;
+}
+#mainVoiceConnectionPanel {
+    flex: 0 0 auto;
+}
+#mainVoiceConnectionPanel[hidden] {
+    display: none !important;
+}
+#mainVoiceConnectionPanel .created-server-voice-user-badges {
+    margin-top: 1px;
+}
+@media (max-width: 850px) {
+    #loungeView.is-voice-call .chat-header {
+        padding: 12px 14px;
+    }
+}
