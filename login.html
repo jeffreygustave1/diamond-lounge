@@ -34,6 +34,30 @@
         const form = document.getElementById("loginForm");
         const button = document.getElementById("loginButton");
         const errorMessage = document.getElementById("errorMessage");
+        const requestedRedirect = new URLSearchParams(window.location.search).get("redirect");
+
+        function postAuthDestination() {
+            if (!requestedRedirect) return "dashboard.html";
+            try {
+                const target = new URL(requestedRedirect, window.location.origin);
+                const appBasePath = new URL("./", window.location.href).pathname;
+                if (target.origin !== window.location.origin ||
+                    !target.pathname.startsWith(appBasePath)) {
+                    return "dashboard.html";
+                }
+                return target.pathname + target.search + target.hash;
+            } catch {
+                return "dashboard.html";
+            }
+        }
+
+        const createAccountLink = document.querySelector(".signup-link a");
+        if (requestedRedirect && createAccountLink) {
+            const accountUrl = new URL(createAccountLink.href);
+            accountUrl.searchParams.set("redirect", requestedRedirect);
+            createAccountLink.href = accountUrl.toString();
+        }
+
         const errors = {
             "auth/invalid-credential": "Incorrect email or password.",
             "auth/user-not-found": "No account was found with this email.",
@@ -60,7 +84,7 @@
                     document.getElementById("loginEmail").value.trim(),
                     document.getElementById("loginPassword").value
                 );
-                window.location.assign("dashboard.html");
+                window.location.assign(postAuthDestination());
             } catch (error) {
                 console.error("Login error:", error);
                 errorMessage.textContent = errors[error.code] || `Sign in failed${error.code ? ` (${error.code})` : ". Check your connection and try again."}`;
