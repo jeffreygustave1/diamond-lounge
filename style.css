@@ -2536,3 +2536,615 @@ button {
     padding-left: 7px;
     border-left: 1px solid rgba(199,169,107,.18);
 }
+
+
+
+/* =========================================================
+   DISCORD-STYLE LIVE VOICE CALL LAYOUT
+   ========================================================= */
+
+.created-server-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 58px;
+    padding: 0 18px;
+    background: #313338;
+    border-bottom: 1px solid rgba(0,0,0,.28);
+    color: #f2f3f5;
+}
+.created-server-chat-header-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 700;
+}
+.created-server-chat-header-title .created-server-channel-symbol {
+    color: #949ba4;
+    font-size: 20px;
+}
+.created-server-chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.created-server-header-chat,
+.created-server-header-members {
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #b5bac1;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+.created-server-header-chat:hover,
+.created-server-header-members:hover {
+    background: #3f4147;
+    color: #fff;
+}
+.created-server-header-chat[hidden],
+.created-server-header-members[hidden] {
+    display: none !important;
+}
+.created-server-chat-header.is-voice-header {
+    background: #232428;
+}
+
+/* Compact connected panel pinned to the bottom of the channel list. */
+.created-server-voice-connection {
+    position: sticky;
+    bottom: 0;
+    z-index: 8;
+    flex: 0 0 auto;
+    margin-top: auto;
+    padding: 10px 10px 9px;
+    background: #232428;
+    border-top: 1px solid rgba(255,255,255,.06);
+    box-shadow: 0 -8px 18px rgba(0,0,0,.18);
+}
+.created-server-voice-connection[hidden] {
+    display: none !important;
+}
+.created-server-voice-connection-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+.created-server-voice-signal {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: rgba(35,165,90,.17);
+    color: #3ba55d;
+    font-size: 18px;
+    font-weight: 800;
+}
+.created-server-voice-connection-state {
+    min-width: 0;
+    flex: 1;
+    color: #3ba55d;
+    font-size: 13px;
+    font-weight: 600;
+}
+.created-server-voice-disconnect {
+    border: 0;
+    background: transparent;
+    color: #b5bac1;
+    font-size: 19px;
+    cursor: pointer;
+}
+.created-server-voice-disconnect:hover {
+    color: #f23f43;
+}
+.created-server-voice-connection-room {
+    padding: 1px 0 8px 34px;
+    overflow: hidden;
+    color: #b5bac1;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.created-server-voice-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 6px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.created-server-voice-quick-actions button {
+    min-width: 0;
+    height: 34px;
+    border: 0;
+    border-radius: 7px;
+    background: #383a40;
+    color: #f2f3f5;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+.created-server-voice-quick-actions button:hover,
+.created-server-voice-user-actions button:hover {
+    background: #454851;
+}
+.created-server-voice-quick-actions button[aria-pressed="true"] {
+    background: rgba(88,101,242,.28);
+    color: #c8ceff;
+}
+.created-server-voice-user-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 9px;
+}
+.created-server-voice-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #f2f3f5;
+    text-align: left;
+    cursor: pointer;
+}
+.created-server-voice-user-avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: linear-gradient(145deg,#2b2924,#141416);
+    color: #e1c98f;
+    font-weight: 700;
+}
+.created-server-voice-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.created-server-voice-user-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+#createdServerVoiceUserName {
+    overflow: hidden;
+    color: #f2f3f5;
+    font-size: 12px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#createdServerVoiceUserSubline {
+    overflow: hidden;
+    color: #b5bac1;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.created-server-voice-user-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+.created-server-voice-user-badges span {
+    max-width: 90px;
+    padding: 1px 5px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #313338;
+    color: #c9cbd0;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.created-server-voice-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.created-server-voice-user-actions button {
+    width: 28px;
+    height: 30px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #b5bac1;
+    cursor: pointer;
+    font-size: 16px;
+}
+.created-server-voice-user-actions button[aria-pressed="true"] {
+    color: #f23f43;
+    background: rgba(242,63,67,.13);
+}
+
+/* Full-room canvas: header above, member tiles in the middle, control dock below. */
+#createdServerMessages.is-voice-call-view {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0 !important;
+    overflow: hidden;
+    background: #000;
+}
+.created-server-voice-call {
+    position: relative;
+    display: grid;
+    grid-template-rows: minmax(0,1fr) auto;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background: #000;
+}
+.created-server-voice-stage {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    grid-auto-rows: minmax(180px,1fr);
+    align-content: center;
+    gap: 6px;
+    min-height: 0;
+    padding: 6px;
+    overflow-y: auto;
+    background: #000;
+}
+.created-server-voice-empty {
+    grid-column: 1 / -1;
+    align-self: center;
+    justify-self: center;
+    padding: 24px;
+    color: #949ba4;
+    font-size: 14px;
+}
+.created-server-voice-tile {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 180px;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: var(--voice-card-background,#26343f);
+    transition: border-color .15s, box-shadow .15s;
+}
+.created-server-voice-tile.is-self {
+    border: 1px solid #23a55a;
+    box-shadow: 0 0 0 1px rgba(35,165,90,.45);
+}
+.created-server-voice-avatar {
+    display: grid;
+    place-items: center;
+    width: 66px;
+    height: 66px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.12);
+    background: rgba(12,14,18,.28);
+    color: #fff;
+    font-size: 25px;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba(0,0,0,.18);
+}
+.created-server-voice-tile.has-camera .created-server-voice-avatar {
+    display: none;
+}
+.created-server-voice-avatar-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.created-server-voice-tile-footer {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    z-index: 4;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    pointer-events: none;
+}
+.created-server-voice-identity {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-width: 0;
+}
+.created-server-voice-name-pill {
+    max-width: min(250px,65vw);
+    padding: 5px 8px;
+    overflow: hidden;
+    border-radius: 5px;
+    background: rgba(13,15,19,.78);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.created-server-voice-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-width: 0;
+}
+.created-server-voice-badge {
+    max-width: 160px;
+    padding: 4px 7px;
+    overflow: hidden;
+    border-radius: 5px;
+    background: rgba(13,15,19,.76);
+    color: #e5e7eb;
+    font-size: 11px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.created-server-voice-badge.is-role {
+    background: rgba(199,169,107,.9);
+    color: #191a1d;
+    font-weight: 700;
+}
+.created-server-voice-indicators {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.created-server-voice-indicator,
+.created-server-voice-hand {
+    display: grid;
+    place-items: center;
+    min-width: 25px;
+    height: 25px;
+    padding: 0 5px;
+    border-radius: 6px;
+    background: rgba(13,15,19,.76);
+    color: #fff;
+    font-size: 12px;
+}
+.created-server-voice-indicator.is-muted {
+    color: #f23f43;
+}
+.created-server-voice-remote-media {
+    position: absolute;
+    inset: 6px;
+    z-index: 5;
+    pointer-events: none;
+}
+.created-server-voice-remote-media #remoteVideoGrid {
+    display: none;
+}
+.created-server-voice-remote-media #screenShareStage {
+    position: absolute !important;
+    inset: 3% 5% !important;
+    width: auto !important;
+    height: auto !important;
+    z-index: 8;
+    background: #08090b;
+}
+.created-server-voice-remote-media #screenShareStage[hidden] {
+    display: none !important;
+}
+.created-server-voice-remote-media #remoteScreenContainer {
+    width: 100%;
+    height: 100%;
+}
+.created-server-embedded-video,
+.created-server-local-camera {
+    position: absolute !important;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+.created-server-embedded-video[hidden] {
+    display: none !important;
+}
+.created-server-embedded-video video,
+.created-server-local-camera {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    background: #101114;
+}
+.created-server-embedded-video figcaption {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: max-content;
+    max-width: 60%;
+    padding: 4px 7px;
+    border-radius: 4px;
+    background: rgba(13,15,19,.7);
+    color: #fff;
+    font-size: 10px;
+}
+
+/* Bottom-center call dock. */
+.created-server-voice-toolbar {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    min-height: 76px;
+    padding: 10px 18px 18px;
+    background: linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.78) 35%,#000);
+}
+.created-server-voice-call-status {
+    position: absolute;
+    left: 18px;
+    bottom: 24px;
+    color: #949ba4;
+    font-size: 11px;
+}
+.created-server-voice-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+    border: 1px solid #303136;
+    border-radius: 12px;
+    background: rgba(18,19,22,.96);
+    box-shadow: 0 8px 25px rgba(0,0,0,.35);
+}
+.created-server-voice-tool {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 55px;
+    min-width: 0;
+    height: 48px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #dbdee1;
+    cursor: pointer;
+}
+.created-server-voice-tool > span {
+    font-size: 18px;
+    line-height: 1;
+}
+.created-server-voice-tool small {
+    max-width: 100%;
+    overflow: hidden;
+    color: #b5bac1;
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.created-server-voice-tool:hover {
+    background: #3f4147;
+    color: #fff;
+}
+.created-server-voice-tool[aria-pressed="true"] {
+    background: rgba(88,101,242,.25);
+    color: #c7ccff;
+}
+.created-server-voice-join {
+    min-width: 115px;
+    height: 50px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 10px;
+    background: #5865f2;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(88,101,242,.2);
+}
+.created-server-voice-join:hover {
+    background: #4752c4;
+}
+.created-server-voice-join[hidden] {
+    display: none !important;
+}
+.created-server-voice-leave {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    min-width: 58px;
+    height: 50px;
+    border: 0;
+    border-radius: 11px;
+    background: #da373c;
+    color: #fff;
+    font-size: 0;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(218,55,60,.25);
+}
+.created-server-voice-leave::before {
+    content: "☎";
+    font-size: 22px;
+}
+.created-server-voice-leave:hover:not(:disabled) {
+    background: #f23f43;
+}
+.created-server-voice-leave:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+/* Profile badge editor. */
+.profile-badges-note {
+    margin: -6px 0 6px;
+    color: #949ba4;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+@media (max-width: 850px) {
+    .created-server-voice-call-status {
+        display: none;
+    }
+    .created-server-voice-stage {
+        grid-auto-rows: minmax(160px,1fr);
+    }
+}
+@media (max-width: 620px) {
+    .created-server-voice-stage {
+        grid-template-columns: 1fr;
+        grid-auto-rows: minmax(180px,1fr);
+    }
+    .created-server-voice-toolbar {
+        flex-wrap: wrap;
+        gap: 7px;
+        padding: 8px 8px max(12px,env(safe-area-inset-bottom));
+    }
+    .created-server-voice-toolbar-group {
+        gap: 2px;
+        max-width: 100%;
+    }
+    .created-server-voice-tool {
+        width: 43px;
+        height: 43px;
+    }
+    .created-server-voice-join {
+        height: 44px;
+    }
+    .created-server-voice-leave {
+        width: 49px;
+        min-width: 49px;
+        height: 44px;
+    }
+    .created-server-voice-connection {
+        padding: 8px 7px;
+    }
+    .created-server-voice-user-actions button {
+        width: 25px;
+    }
+}
