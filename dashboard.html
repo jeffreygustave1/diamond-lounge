@@ -928,7 +928,7 @@
                 iconCanvas.width = 32;
                 iconCanvas.height = 32;
 
-                const iconCtx = iconCanvas.getContext("2d");
+                const iconCtx = iconCanvas.getContext("2d", { willReadFrequently: true });
 
                 const favicon = document.querySelector('link[rel="icon"]');
                 if (!favicon) return;
