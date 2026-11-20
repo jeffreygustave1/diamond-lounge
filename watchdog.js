@@ -52,7 +52,7 @@
     const gem = document.createElement("img");
     gem.src = "diamond.gif";
     gem.alt = "";
-    gem.style.cssText = "width:168px;height:168px;object-fit:contain;flex-shrink:0";
+    gem.style.cssText = "width:168px;height:168px;object-fit:contain;flex-shrink:0;transform:translateX(12px)";
     const label = document.createElement("span");
     label.textContent = "DIAMOND WATCHDOG";
     label.style.cssText = "letter-spacing:.4px;margin-left:0px";
