@@ -3051,7 +3051,7 @@ function makeServerIcon(server) {
     icon.dataset.serverId = server.id;
     icon.setAttribute("aria-label", `Open ${server.name}`);
     icon.setAttribute("aria-pressed", "false");
-    if (typeof server.iconUrl === "string" && (server.iconUrl.startsWith("https://") || server.iconUrl.startsWith("http://"))) { const img=document.createElement("img"); img.src=server.iconUrl; img.alt=""; img.style.width="100%"; img.style.height="100%"; img.style.objectFit="cover"; img.style.borderRadius="inherit"; icon.append(img); } else { icon.textContent = server.name.trim().charAt(0).toUpperCase(); }
+    if (typeof server.iconUrl === "string" && /^(https?:\\/\\/|data:image\\/)/i.test(server.iconUrl)) { const img=document.createElement("img"); img.src=server.iconUrl; img.alt=""; img.style.width="100%"; img.style.height="100%"; img.style.objectFit="cover"; img.style.borderRadius="inherit"; icon.append(img); } else { icon.textContent = server.name.trim().charAt(0).toUpperCase(); }
 
     server.button = icon;
 
