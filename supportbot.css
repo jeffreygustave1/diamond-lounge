@@ -54,4 +54,11 @@ body.dm-mode #supportBotView .support-bot-avatar {
     transform: scale(4.95) !important;
     transform-origin: center center !important;
     pointer-events: none !important;
+    animation: diamondFacetSweep 5.8s ease-in-out infinite !important;
+}
+
+@keyframes diamondFacetSweep {
+    0%, 62%, 100% { filter: drop-shadow(0 0 7px rgba(0, 145, 255, .38)) brightness(1); }
+    72% { filter: drop-shadow(0 0 13px rgba(150, 220, 255, .85)) brightness(1.28); }
+    82% { filter: drop-shadow(0 0 9px rgba(0, 180, 255, .65)) brightness(1.12); }
 }
