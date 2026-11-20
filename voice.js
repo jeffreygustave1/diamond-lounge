@@ -2001,9 +2001,9 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
         }
 
         parts.badges.replaceChildren();
-        const labels = Array.isArray(profile.badges)
-            ? profile.badges
-            : (Array.isArray(member.badges) ? member.badges : []);
+        const labels = Array.isArray(member.badges)
+            ? member.badges
+            : (Array.isArray(profile.badges) ? profile.badges : []);
         labels.slice(0, 4).forEach(label => {
             const badge = document.createElement("span");
             badge.className = "created-server-voice-badge";
@@ -2023,7 +2023,8 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
                 if (!parts.tile.isConnected) return;
                 const roleIds = Array.isArray(memberRecord.roleIds) ? memberRecord.roleIds : [];
                 const roleLabel = roleIds.includes("owner") ? "Owner" : roleIds.includes("admin") ? "Admin" : "";
-                if (roleLabel && !parts.badges.querySelector('[data-server-role="true"]')) {
+                parts.badges.querySelector('[data-server-role="true"]')?.remove();
+                if (roleLabel) {
                     const roleBadge = document.createElement("span");
                     roleBadge.className = "created-server-voice-badge is-role";
                     roleBadge.dataset.serverRole = "true";
