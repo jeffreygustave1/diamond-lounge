@@ -50,7 +50,9 @@ const HEARTBEAT_MS = 10000;
 const STALE_AFTER_MS = 35000;
 
 const ICE_SERVERS = [
-    { urls: "stun:stun.l.google.com:19302" }
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" }
 ];
 
 /* ==========================================
@@ -607,9 +609,19 @@ function makePeer(person, callRef) {
             const tile = document.getElementById(
                 `tile-${kind}-${person.uid}`
             );
+            const remoteVideo = tile?.querySelector("video");
+            if (remoteVideo) {
+                remoteVideo.srcObject = stream;
+                remoteVideo.autoplay = true;
+                remoteVideo.playsInline = true;
+                remoteVideo.muted = true;
+                remoteVideo.play().catch(error => console.warn("Remote video autoplay retry failed:", error));
+            }
+            if (tile) tile.hidden = event.track.muted;
 
             event.track.onunmute = () => {
                 if (tile) tile.hidden = false;
+                if (remoteVideo) remoteVideo.play().catch(error => console.warn("Remote video playback retry failed:", error));
                 if (kind === "camera") tile?.parentElement?.classList.add("has-camera");
                 if (kind === "screen") {
                     activeRemoteScreenUids.add(person.uid);
@@ -695,7 +707,14 @@ function makePeer(person, callRef) {
        CONNECTION STATUS
     ====================================== */
 
+    pc.oniceconnectionstatechange = () => {
+        console.info("[Diamond Lounge] ICE state:", person.name, pc.iceConnectionState);
+    };
+    pc.onicegatheringstatechange = () => {
+        console.info("[Diamond Lounge] ICE gathering:", person.name, pc.iceGatheringState);
+    };
     pc.onconnectionstatechange = () => {
+        console.info("[Diamond Lounge] Peer connection state:", person.name, pc.connectionState);
         if (pc.connectionState === "connected") {
             setStatus(`Voice connected to ${person.name}`);
         }
