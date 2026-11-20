@@ -2087,6 +2087,7 @@ function openPrimaryVoiceCall(channelName, roomId) {
     toolbar.append(status, join, controls, leave);
     call.append(stage, mediaLayer, audience, toolbar);
     callView.append(call);
+    syncDiscordScreenShareLayout();
 
     primaryVoicePresenceStop = window.diamondWatchCreatedVoiceRoom?.(roomId, stage, audience, {}) || null;
     syncCreatedServerVoiceUser();
@@ -2289,6 +2290,7 @@ function openCreatedServerVoiceChannel(channel) {
 
         call.append(stage, mediaLayer, audience, toolbar);
         createdServerMessages.append(call);
+        syncDiscordScreenShareLayout();
     }
 
     createdServerVoicePresenceStop = window.diamondWatchCreatedVoiceRoom?.(
