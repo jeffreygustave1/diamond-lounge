@@ -1,0 +1,15 @@
+name = "diamond-lounge-phone-verification"
+main = "worker.js"
+compatibility_date = "2026-11-20"
+
+# Configure exact allowed origin and secrets in Cloudflare dashboard.
+[vars]
+ALLOWED_ORIGIN = "https://jeffreygustave1.github.io"
+
+[[durable_objects.bindings]]
+name = "CHALLENGE_STORE"
+class_name = "VerificationChallengeStore"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["VerificationChallengeStore"]
