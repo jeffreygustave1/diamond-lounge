@@ -1880,6 +1880,57 @@ function openCreatedServerVoiceActivities() {
     content.append(hand, chat);
 }
 
+document.addEventListener("click", event => {
+    const button = event.target.closest("[data-voice-action]");
+    if (!button) return;
+    const action = button.dataset.voiceAction;
+    const controls = window.diamondVoiceControls;
+    if (!controls && !["join", "leave"].includes(action)) return;
+
+    switch (action) {
+        case "join":
+            if (activeCreatedServerVoiceChannel && activeCreatedServerId) {
+                void window.diamondJoinCreatedVoiceRoom?.(
+                    activeCreatedServerVoiceChannel.name,
+                    "cs-" + activeCreatedServerId + "-" + activeCreatedServerVoiceChannel.id
+                );
+            }
+            break;
+        case "leave":
+            void window.diamondLeaveVoice?.();
+            break;
+        case "mute":
+            controls?.toggleMute?.();
+            break;
+        case "deafen":
+            controls?.toggleDeafen?.();
+            break;
+        case "camera":
+            void controls?.toggleCamera?.();
+            break;
+        case "screen":
+            void controls?.toggleScreen?.();
+            break;
+        case "hand":
+            void controls?.toggleRaiseHand?.();
+            break;
+        case "activities":
+            openCreatedServerVoiceActivities();
+            break;
+        case "settings":
+            openCreatedServerVoiceSettings();
+            break;
+    }
+});
+
+document.getElementById("createdServerVoiceDisconnect")?.addEventListener("click", () => {
+    void window.diamondLeaveVoice?.();
+});
+
+document.getElementById("createdServerVoiceUserProfile")?.addEventListener("click", () => {
+    profileButton?.click();
+});
+
 function openCreatedServerVoiceChannel(channel) {
     if (!channel?.id || !activeCreatedServerId) return;
     stopCreatedServerMessages();
