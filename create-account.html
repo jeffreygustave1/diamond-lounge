@@ -28,7 +28,7 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="At least 6 characters" autocomplete="new-password" required minlength="6">
 
-            <button type="submit" class="login-button" id="createButton">Create account</button>
+            <button type="submit" class="login-button" id="createButton">Create account</button><button type="button" class="login-button" id="googleSignupButton">Continue with Google</button>
             <p id="errorMessage" role="alert" aria-live="polite"></p>
         </form>
 
@@ -86,6 +86,13 @@
             "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console."
         };
 
+        document.getElementById("googleSignupButton").addEventListener("click", async () => {
+          try {
+            const result = await signInWithPopup(auth, new GoogleAuthProvider());
+            await setDoc(doc(db, "users", result.user.uid), {uid:result.user.uid,displayName:result.user.displayName || "Member",createdAt:serverTimestamp()}, {merge:true});
+            window.location.assign(postAuthDestination());
+          } catch(e) { errorMessage.textContent = errors[e.code] || e.message; }
+        });
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             if (!form.reportValidity()) return;
