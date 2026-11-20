@@ -1448,7 +1448,11 @@ function renderCreatedServerChannels() {
             appendCategoryHeading(container, category);
             channels
                 .filter(channel => channel.parentCategoryId === category.id)
-                .forEach(channel => container.append(makeChannelRow(channel)));
+                .forEach(channel => {
+                    const row = makeChannelRow(channel);
+                    row.classList.add("is-categorized");
+                    container.append(row);
+                });
         });
     }
 
