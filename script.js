@@ -303,6 +303,8 @@ function hideMainViews() {
     if (loungeView) loungeView.hidden = true;
     if (dmHomeView) dmHomeView.hidden = true;
     if (dmConversationView) dmConversationView.hidden = true;
+    const supportBotView = document.getElementById("supportBotView");
+    if (supportBotView) supportBotView.hidden = true;
 }
 
 function clearServerSelections() {
