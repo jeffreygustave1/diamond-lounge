@@ -3057,10 +3057,15 @@ function makeServerIcon(server) {
         const img = document.createElement("img");
         img.src = server.iconUrl;
         img.alt = "";
+        img.draggable = false;
         img.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;";
+        img.addEventListener("error", () => {
+            img.remove();
+            icon.style.overflow = "visible";
+            icon.textContent = server.name.trim().charAt(0).toUpperCase();
+        }, { once: true });
         icon.style.overflow = "hidden";
-        icon.append(img);
-        icon.textContent = "";
+        icon.replaceChildren(img);
     } else {
         icon.textContent = server.name.trim().charAt(0).toUpperCase();
     }
