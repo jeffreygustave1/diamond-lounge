@@ -90,6 +90,7 @@ let raisedHand = false;
 let outputVolume = 1;
 let joining = false;
 let activeVoiceProfile = {};
+let activeVoiceServerName = "";
 
 const participants = new Map();
 const peers = new Map();
@@ -120,6 +121,7 @@ function publishVoiceUiState() {
         selectedChannel,
         roomId,
         status: statusElement?.textContent || "",
+        serverName: activeVoiceServerName,
         outputVolume
     };
     window.dispatchEvent(new CustomEvent("diamond-voice-state", { detail }));
@@ -1385,6 +1387,7 @@ async function leaveVoice(knownUid = user?.uid) {
     deafened = false;
     raisedHand = false;
     activeVoiceProfile = {};
+    activeVoiceServerName = "";
     syncLocalVoiceCameraPreview();
 
     [
@@ -1746,7 +1749,7 @@ function playVoicePresenceSound(type) {
     }
 }
 /* CREATED-SERVER VOICE BRIDGE */
-window.diamondJoinCreatedVoiceRoom=async(label,customRoomId)=>{if(localStream)await leaveVoice();selectedChannel=label;roomId=customRoomId;setStatus("Connecting to "+label+"...");watchParticipants();await joinVoice();};
+window.diamondJoinCreatedVoiceRoom=async(label,customRoomId,serverName="")=>{if(localStream)await leaveVoice();selectedChannel=label;roomId=customRoomId;activeVoiceServerName=serverName||"";setStatus("Connecting to "+label+"...");watchParticipants();await joinVoice();};
 window.diamondLeaveVoice=()=>leaveVoice();
 window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = {}) => {
     const profileCache = new Map();
