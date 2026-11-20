@@ -17,24 +17,31 @@
         <h1>Welcome back</h1>
         <p class="login-subtitle">Your lounge is waiting.</p>
         <form id="loginForm" class="login-form">
-            <label for="loginEmail">Email address</label>
-            <input type="email" id="loginEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
+            <label for="loginEmail">Email or username</label>
+            <input type="text" id="loginEmail" name="email" placeholder="Email address" autocomplete="username" required>
             <label for="loginPassword">Password</label>
             <input type="password" id="loginPassword" name="password" placeholder="Your password" autocomplete="current-password" required>
             <button type="submit" class="login-button" id="loginButton">Sign in</button>
+<button type="button" class="login-button" id="googleButton">Continue with Google</button>
+<p>Or sign in with phone</p><label for="phoneNumber">Phone number</label><input type="tel" id="phoneNumber" placeholder="+1 555 123 4567" autocomplete="tel"><button type="button" class="login-button" id="phoneButton">Send verification code</button>
+<div id="phoneCodeArea" hidden><label for="phoneCode">SMS verification code</label><input id="phoneCode" inputmode="numeric" autocomplete="one-time-code"><button type="button" class="login-button" id="verifyPhoneButton">Verify code</button></div><div id="recaptcha-container"></div>
             <p id="errorMessage" role="alert" aria-live="polite"></p>
         </form>
         <p class="signup-link">New to the lounge? <a href="create-account.html">Create an account</a></p>
         <a class="back-home" href="index.html">← Back to Diamond Lounge</a>
     </main>
     <script type="module">
-        import { auth } from "./firebase.js";
-        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { auth, db } from "./firebase.js";
+        import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const form = document.getElementById("loginForm");
         const button = document.getElementById("loginButton");
         const errorMessage = document.getElementById("errorMessage");
-        const requestedRedirect = new URLSearchParams(window.location.search).get("redirect");
+        const googleButton = document.getElementById("googleButton");
+const phoneButton = document.getElementById("phoneButton");
+const phoneCodeArea = document.getElementById("phoneCodeArea");
+const requestedRedirect = new URLSearchParams(window.location.search).get("redirect");
 
         function postAuthDestination() {
             if (!requestedRedirect) return "dashboard.html";
@@ -71,7 +78,12 @@
             "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console."
         };
 
-        form.addEventListener("submit", async (event) => {
+        async function ensureProfile(user) { await setDoc(doc(db,"users",user.uid), {uid:user.uid,displayName:user.displayName || user.phoneNumber || "Member",createdAt:serverTimestamp()}, {merge:true}); }
+googleButton.addEventListener("click", async()=>{try{const result=await signInWithPopup(auth,new GoogleAuthProvider());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||e.message;}});
+let confirmationResult=null;
+phoneButton.addEventListener("click",async()=>{try{const phone=document.getElementById("phoneNumber").value.trim();if(!phone){errorMessage.textContent="Enter your phone number including country code.";return;}if(!window.phoneRecaptcha)window.phoneRecaptcha=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});confirmationResult=await signInWithPhoneNumber(auth,phone,window.phoneRecaptcha);phoneCodeArea.hidden=false;phoneButton.disabled=true;phoneButton.textContent="Code sent";}catch(e){errorMessage.textContent=errors[e.code]||e.message;phoneButton.disabled=false;if(window.phoneRecaptcha){window.phoneRecaptcha.clear();window.phoneRecaptcha=null;}}});
+document.getElementById("verifyPhoneButton").addEventListener("click",async()=>{try{const result=await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||"Verification failed."; }});
+form.addEventListener("submit", async (event) =>
             event.preventDefault();
             if (!form.reportValidity()) return;
             errorMessage.textContent = "";
