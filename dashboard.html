@@ -647,6 +647,15 @@
             </section>
 
             <!-- MAIN SCREEN SHARE VIEWER -->
+<!-- DIAMOND SUPPORT CONVERSATION IN THE MAIN CHAT COLUMN -->
+    <section id="supportBotView" class="support-bot-view" hidden>
+      <header class="chat-header support-bot-header dm-conversation-header"><div class="chat-header-main dm-contact-heading"><div class="support-bot-avatar">◇</div><div><div class="channel-title" id="supportBotTitle">Diamond Support</div><div class="sub-header"><span class="support-bot-online"><i></i> Online · Support assistant</span></div></div></div><button type="button" id="supportBotClose" class="support-bot-back" aria-label="Back to Direct Messages">←</button></header>
+      <div id="supportBotChat" class="messages dm-messages support-bot-chat" aria-live="polite" aria-label="Support conversation"></div>
+      <div id="supportBotChoices" class="support-bot-choices"></div>
+      <form id="supportBotForm" class="message-box dm-message-box glass-surface support-bot-input-row"><input id="supportBotInput" type="text" maxlength="1000" autocomplete="off" placeholder="Message Diamond Support..." aria-label="Message Diamond Support"><button type="submit" id="supportBotSend" aria-label="Send message">➤</button></form>
+      <footer class="support-bot-footer"><span>Automated support · Never share passwords or verification codes.</span><button type="button" id="supportBotReset">Restart</button></footer>
+    </section>
+
             <div id="remoteVideoGrid" class="remote-video-grid"></div>
 
         </main>
@@ -893,14 +902,7 @@
 
     </div>
 
-    <!-- DIAMOND SUPPORT CONVERSATION IN THE MAIN CHAT COLUMN -->
-    <section id="supportBotView" class="support-bot-view" hidden>
-      <header class="chat-header support-bot-header dm-conversation-header"><div class="chat-header-main dm-contact-heading"><div class="support-bot-avatar">◇</div><div><div class="channel-title" id="supportBotTitle">Diamond Support</div><div class="sub-header"><span class="support-bot-online"><i></i> Online · Support assistant</span></div></div></div><button type="button" id="supportBotClose" class="support-bot-back" aria-label="Back to Direct Messages">←</button></header>
-      <div id="supportBotChat" class="messages dm-messages support-bot-chat" aria-live="polite" aria-label="Support conversation"></div>
-      <div id="supportBotChoices" class="support-bot-choices"></div>
-      <form id="supportBotForm" class="message-box dm-message-box glass-surface support-bot-input-row"><input id="supportBotInput" type="text" maxlength="1000" autocomplete="off" placeholder="Message Diamond Support..." aria-label="Message Diamond Support"><button type="submit" id="supportBotSend" aria-label="Send message">➤</button></form>
-      <footer class="support-bot-footer"><span>Automated support · Never share passwords or verification codes.</span><button type="button" id="supportBotReset">Restart</button></footer>
-    </section>
+    
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
     <script type="module" src="script.js?v=66"></script>
