@@ -382,3 +382,41 @@
     background: rgba(224, 107, 107, .14);
     outline: none;
 }
+
+
+/* FIX: Keep the selected private conversation in the third workspace column,
+   filling the chat area beside the DM list (never stacking at the bottom). */
+body.dm-mode .chat-area {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+body.dm-mode #dmConversationView {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    flex-direction: column !important;
+    align-self: stretch !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+}
+body.dm-mode #dmConversationView[hidden] { display: none !important; }
+body.dm-mode #dmConversationView .dm-messages {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+body.dm-mode #dmConversationView .dm-message-box,
+body.dm-mode #dmConversationView .dm-call-toolbar,
+body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto !important; }
