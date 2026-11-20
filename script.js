@@ -890,6 +890,7 @@ async function openConversation(member) {
 
     activeCreatedServerId = null;
     selectedMember = member;
+    window.dmCallContactGetter = () => selectedMember;
 
     currentConversationId = getConversationId(
         currentUser.uid,
