@@ -83,6 +83,7 @@ const closeProfileModalButton = document.getElementById("closeProfileModal");
 const cancelProfileEdit = document.getElementById("cancelProfileEdit");
 const profileForm = document.getElementById("profileForm");
 const profileDisplayName = document.getElementById("profileDisplayName");
+const profileBadgesInput = document.getElementById("profileBadgesInput");
 const profileStatus = document.getElementById("profileStatus");
 const profilePreviewImage = document.getElementById("profilePreviewImage");
 const myProfilePicture = document.getElementById("myProfilePicture");
@@ -129,6 +130,11 @@ let createdServerChannels = [];
 let createdServerVoicePresenceStop = null;
 let pendingInviteServer = null;
 let pendingInviteChannelId = null;
+let activeCreatedServerVoiceChannel = null;
+let createdServerRemoteMediaLayer = null;
+let remoteVideoGridHomeParent = null;
+let remoteScreenStageHomeParent = null;
+
 
 const createdServerTextChannels = document.getElementById("createdServerTextChannels");
 const createdServerVoiceChannels = document.getElementById("createdServerVoiceChannels");
@@ -150,6 +156,7 @@ let suppressServerClick = false;
 
 let currentAvatar = "diamond";
 let uploadedPicture = "";
+let currentProfileBadges = [];
 let rawPicture = "";
 let cropScale = 1;
 let cropX = 0;
@@ -2722,6 +2729,10 @@ async function loadProfile() {
 
         uploadedPicture =
             typeof data.picture === "string" ? data.picture : "";
+        currentProfileBadges = Array.isArray(data.badges)
+            ? data.badges.map(value => String(value).trim()).filter(Boolean).slice(0, 4)
+            : [];
+        syncCreatedServerVoiceUser();
 
         applyAvatar(
             typeof data.avatar === "string" ? data.avatar : "diamond"
@@ -2740,6 +2751,9 @@ function openProfileModal() {
     if (profileDisplayName) {
         profileDisplayName.value =
             profileName?.textContent?.trim() || "Member";
+    }
+    if (profileBadgesInput) {
+        profileBadgesInput.value = currentProfileBadges.join(", ");
     }
 
     if (profileStatus) {
@@ -2986,6 +3000,12 @@ profileForm?.addEventListener("submit", async (event) => {
     if (!currentUser) return;
 
     const nextName = (profileDisplayName?.value || "").trim().slice(0, 30);
+    const nextBadges = (profileBadgesInput?.value || "")
+        .split(",")
+        .map(value => value.trim().replace(/\s+/g, " "))
+        .filter(Boolean)
+        .slice(0, 4)
+        .map(value => value.slice(0, 24));
 
     if (nextName.length < 2) {
         if (profileStatus) {
@@ -3027,6 +3047,7 @@ profileForm?.addEventListener("submit", async (event) => {
                 displayName: nextName,
                 avatar: currentAvatar,
                 picture: uploadedPicture,
+                badges: nextBadges,
                 updatedAt: serverTimestamp()
             },
             { merge: true }
@@ -3042,6 +3063,8 @@ profileForm?.addEventListener("submit", async (event) => {
             currentName.textContent = nextName;
         }
 
+        currentProfileBadges = nextBadges;
+        syncCreatedServerVoiceUser();
         applyAvatar(currentAvatar);
 
         if (profileStatus) {
