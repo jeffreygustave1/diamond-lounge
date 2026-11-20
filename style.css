@@ -3148,3 +3148,35 @@ button {
         width: 25px;
     }
 }
+
+
+/* Final alignment refinements for the reference call layout. */
+.created-server-voice-tool small { display: none; }
+.created-server-voice-tile:only-child {
+    grid-column: 1 / -1;
+    width: min(100%, 1180px);
+    min-height: 250px;
+    margin: 0 auto;
+}
+.created-server-voice-remote-media #remoteVideoGrid:not(:empty) {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 7;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+    width: min(34%,360px);
+    max-height: 175px;
+    overflow: auto;
+}
+.created-server-voice-remote-media #remoteVideoGrid:not(:empty) .remote-video-tile {
+    min-width: 0;
+    background: #111214;
+}
+.created-server-voice-remote-media #remoteVideoGrid:not(:empty) video {
+    max-height: 110px;
+}
+#createdServerMessageForm[hidden],
+#createdServerMessageStatus[hidden] {
+    display: none !important;
+}
