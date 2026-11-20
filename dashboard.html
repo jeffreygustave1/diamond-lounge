@@ -287,6 +287,36 @@
 
                 </section>
 
+                <section class="created-server-voice-connection main-voice-connection" id="mainVoiceConnectionPanel" aria-label="Voice connection" hidden>
+                    <div class="created-server-voice-connection-top">
+                        <span class="created-server-voice-signal" aria-hidden="true">◔</span>
+                        <span class="created-server-voice-connection-state" id="mainVoiceConnectionState">Voice Connected</span>
+                        <button type="button" class="created-server-voice-disconnect" id="mainVoiceDisconnect" title="Disconnect from voice" aria-label="Disconnect from voice">⌁</button>
+                    </div>
+                    <div class="created-server-voice-connection-room" id="mainVoiceConnectionRoom">VOICE CHANNEL</div>
+                    <div class="created-server-voice-quick-actions">
+                        <button type="button" data-voice-action="camera" title="Toggle camera" aria-label="Toggle camera">▣</button>
+                        <button type="button" data-voice-action="screen" title="Share screen" aria-label="Share screen">▤</button>
+                        <button type="button" data-voice-action="hand" title="Raise hand" aria-label="Raise hand">✋</button>
+                        <button type="button" data-voice-action="activities" title="Voice activities" aria-label="Voice activities">✣</button>
+                    </div>
+                    <div class="created-server-voice-user-row">
+                        <button type="button" class="created-server-voice-user" id="mainVoiceUserProfile" title="Edit your profile">
+                            <span class="created-server-voice-user-avatar" id="mainVoiceUserAvatar">✦</span>
+                            <span class="created-server-voice-user-copy">
+                                <span id="mainVoiceUserName">Member</span>
+                                <small id="mainVoiceUserSubline">VIP-LOUNGE</small>
+                                <span class="created-server-voice-user-badges" id="mainVoiceUserBadges"></span>
+                            </span>
+                        </button>
+                        <div class="created-server-voice-user-actions">
+                            <button type="button" data-voice-action="mute" title="Toggle microphone" aria-label="Toggle microphone" aria-pressed="false">♩⌄</button>
+                            <button type="button" data-voice-action="deafen" title="Deafen" aria-label="Toggle audio output" aria-pressed="false">◖⌄</button>
+                            <button type="button" data-voice-action="settings" title="Voice settings" aria-label="Voice settings">⚙</button>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- PROFILE CARD -->
                 <div class="profile-card">
 
@@ -408,6 +438,7 @@
                 </header>
 
                 <div class="messages" id="messages" aria-live="polite"></div>
+                <div class="lounge-voice-call-view" id="loungeVoiceCallView" hidden></div>
 
                 <form class="message-box glass-surface" id="messageForm">
 
@@ -853,7 +884,7 @@
     </div>
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
-    <script type="module" src="script.js?v=54"></script>
+    <script type="module" src="script.js?v=55"></script>
     <script type="module" src="voice.js?v=35"></script>
 
     <!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
