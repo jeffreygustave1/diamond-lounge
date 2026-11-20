@@ -48,14 +48,14 @@
   function installUI() {
     badge = document.createElement("div");
     badge.setAttribute("aria-label", "Diamond Lounge diagnostics status");
-    badge.style.cssText = "z-index:10;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;justify-content:center;gap:5px;padding:2px 6px;font:11px system-ui;cursor:default;white-space:nowrap";
+    badge.style.cssText = "z-index:10;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;justify-content:flex-start;gap:0;padding:0;font:11px system-ui;cursor:default;white-space:nowrap;flex-shrink:0";
     const gem = document.createElement("img");
     gem.src = "diamond.gif";
     gem.alt = "";
     gem.style.cssText = "width:168px;height:168px;object-fit:contain;flex-shrink:0";
     const label = document.createElement("span");
     label.textContent = "DIAMOND WATCHDOG";
-    label.style.cssText = "letter-spacing:.4px";
+    label.style.cssText = "letter-spacing:.4px;margin-left:0px";
     badge.append(gem,label);
     count = document.createElement("span");
     count.textContent = "0";
