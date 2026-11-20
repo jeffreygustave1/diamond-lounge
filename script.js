@@ -3795,7 +3795,7 @@ window.diamondLoungeStartTour=start;window.diamondLoungeResetTour=()=>localStora
 document.querySelectorAll(".dl-store-buy").forEach(button=>button.addEventListener("click",()=>{const note=document.getElementById("dlStorePaymentNote");if(note){note.textContent="\u2726 "+(button.dataset.cosmetic==="silver-gif"?"Silver-exclusive animated GIF profile pictures and server icons are planned.":"This premium cosmetic is reserved for paid members.")+" Secure checkout and server-verified purchases are not connected yet, so all premium items remain locked.";note.scrollIntoView({block:"nearest",behavior:"smooth"});}}));
 
 // Silver cosmetic checkout (requires the deployed premium Worker URL configured below).
-const PREMIUM_WORKER_URL = "https://diamond-lounge-premium.YOUR-CLOUDFLARE-SUBDOMAIN.workers.dev";
+const PREMIUM_WORKER_URL = "https://diamond-lounge-premium.jeffreygustave1.workers.dev";
 document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click", async (event) => {
   const button=event.currentTarget; const note=document.getElementById("dlStorePaymentNote");
   if(!auth.currentUser){if(note)note.textContent="Please sign in before purchasing premium cosmetics.";return;}
