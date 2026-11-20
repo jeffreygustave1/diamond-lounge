@@ -525,5 +525,10 @@ service cloud.firestore {
         allow update, delete: if false;
       }
     }
+    // Premium cosmetics entitlements: user can read their own flags; client writes forbidden.
+    match /premiumEntitlements/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+    }
   }
 }
