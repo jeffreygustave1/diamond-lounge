@@ -346,6 +346,7 @@ function showEmptyView() {
 
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
+    if (primaryVoiceChannelName) closePrimaryVoiceCallView();
 
     // Release created-server channel listeners when returning to VIP-LOUNGE.
     stopCreatedServerChannels();
@@ -1798,22 +1799,34 @@ function syncCreatedServerVoiceUser() {
 }
 
 function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getState?.() || {}) {
-    const panel = document.getElementById("createdServerVoiceConnectionPanel");
-    const stateLabel = document.getElementById("createdServerVoiceConnectionState");
-    const roomLabel = document.getElementById("createdServerVoiceConnectionRoom");
-    const belongsToCreatedServer = Boolean(
-        activeCreatedServerId &&
-        state.roomId &&
-        state.roomId.startsWith("cs-")
-    );
-    const visible = belongsToCreatedServer && (state.connected || state.joining);
-    if (panel) panel.hidden = !visible;
-    if (stateLabel) stateLabel.textContent =
-        state.joining && !state.connected ? "Connecting..." : "Voice Connected";
-    if (roomLabel) roomLabel.textContent = visible
+    const createdPanel = document.getElementById("createdServerVoiceConnectionPanel");
+    const createdState = document.getElementById("createdServerVoiceConnectionState");
+    const createdRoom = document.getElementById("createdServerVoiceConnectionRoom");
+    const mainPanel = document.getElementById("mainVoiceConnectionPanel");
+    const mainState = document.getElementById("mainVoiceConnectionState");
+    const mainRoom = document.getElementById("mainVoiceConnectionRoom");
+
+    const isCreatedRoom = Boolean(state.roomId && state.roomId.startsWith("cs-"));
+    const isPrimaryRoom = Boolean(state.roomId && !isCreatedRoom);
+    const connectedOrJoining = Boolean(state.connected || state.joining);
+    const showCreatedPanel = isCreatedRoom && connectedOrJoining;
+    const showMainPanel = isPrimaryRoom && connectedOrJoining;
+
+    if (createdPanel) createdPanel.hidden = !showCreatedPanel;
+    if (createdState) createdState.textContent = state.joining && !state.connected ? "Connecting..." : "Voice Connected";
+    if (createdRoom) createdRoom.textContent = showCreatedPanel
         ? (state.selectedChannel || activeCreatedServerVoiceChannel?.name || "VOICE CHANNEL") +
             " / " + (state.serverName || serverViewName?.textContent?.trim() || "DIAMOND LOUNGE")
         : "";
+
+    if (mainPanel) mainPanel.hidden = !showMainPanel;
+    if (mainState) mainState.textContent = state.joining && !state.connected ? "Connecting..." : "Voice Connected";
+    if (mainRoom) mainRoom.textContent = showMainPanel
+        ? (state.selectedChannel || primaryVoiceChannelName || "VOICE CHANNEL") +
+            " / " + (state.serverName || "VIP-LOUNGE")
+        : "";
+
+    document.getElementById("channelsSidebar")?.classList.toggle("has-voice-connection", showMainPanel);
 
     document.querySelectorAll('[data-voice-action="mute"]').forEach(button => {
         button.setAttribute("aria-pressed", String(Boolean(state.muted)));
@@ -1846,12 +1859,11 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
     document.querySelectorAll(".created-server-voice-leave").forEach(button => {
         button.disabled = !state.connected && !state.joining;
     });
-    const callStatus = document.getElementById("createdServerVoiceCallStatus");
-    if (callStatus) {
+    document.querySelectorAll(".created-server-voice-call-status").forEach(callStatus => {
         callStatus.textContent = state.connected
             ? (state.muted ? "Microphone muted" : "Voice connected")
             : state.joining ? "Connecting to voice..." : "You're not connected yet";
-    }
+    });
 }
 
 window.addEventListener("diamond-voice-state", event => {
@@ -1905,6 +1917,121 @@ function openCreatedServerVoiceActivities() {
     content.append(hand, chat);
 }
 
+function closePrimaryVoiceCallView() {
+    primaryVoicePresenceStop?.();
+    primaryVoicePresenceStop = null;
+    const callView = document.getElementById("loungeVoiceCallView");
+    if (callView) {
+        callView.replaceChildren();
+        callView.hidden = true;
+    }
+    loungeView?.classList.remove("is-voice-call");
+    const messages = document.getElementById("messages");
+    const messageForm = document.getElementById("messageForm");
+    const uploadStatus = document.getElementById("uploadStatus");
+    if (messages) messages.hidden = false;
+    if (messageForm) messageForm.hidden = false;
+    if (uploadStatus) uploadStatus.hidden = false;
+    const title = document.querySelector("#loungeView .channel-title");
+    if (title?.firstChild?.nodeType === 3) title.firstChild.textContent = "# ";
+    document.querySelector("#loungeView .chat-header")?.classList.remove("is-voice-header");
+    restoreCreatedServerVoiceMedia();
+    primaryVoiceChannelName = null;
+    primaryVoiceRoomId = null;
+    updateCreatedServerVoiceUI();
+}
+
+function openPrimaryVoiceCall(channelName, roomId) {
+    if (!channelName || !roomId) return;
+    primaryVoicePresenceStop?.();
+    primaryVoicePresenceStop = null;
+    restoreCreatedServerVoiceMedia();
+    primaryVoiceChannelName = channelName;
+    primaryVoiceRoomId = roomId;
+
+    if (loungeView) loungeView.hidden = false;
+    if (serverView) serverView.hidden = true;
+    if (communitySidebar) communitySidebar.hidden = false;
+    const messages = document.getElementById("messages");
+    const messageForm = document.getElementById("messageForm");
+    const uploadStatus = document.getElementById("uploadStatus");
+    if (messages) messages.hidden = true;
+    if (messageForm) messageForm.hidden = true;
+    if (uploadStatus) uploadStatus.hidden = true;
+    if (activeChannelName) activeChannelName.textContent = channelName;
+    if (activeChannelDescription) activeChannelDescription.textContent = "Voice channel";
+
+    const title = document.querySelector("#loungeView .channel-title");
+    if (title?.firstChild?.nodeType === 3) title.firstChild.textContent = "◖ ";
+    document.querySelector("#loungeView .chat-header")?.classList.add("is-voice-header");
+
+    const callView = document.getElementById("loungeVoiceCallView");
+    if (!callView) return;
+    callView.replaceChildren();
+    callView.hidden = false;
+    loungeView?.classList.add("is-voice-call");
+
+    const call = document.createElement("div");
+    call.className = "created-server-voice-call";
+    call.dataset.channelId = roomId;
+
+    const stage = document.createElement("div");
+    stage.className = "created-server-voice-stage";
+    stage.id = "loungeVoiceStage";
+    stage.setAttribute("aria-label", "People in voice");
+
+    const audience = document.createElement("div");
+    audience.className = "created-server-audience";
+    audience.hidden = true;
+
+    const mediaLayer = document.createElement("div");
+    mediaLayer.className = "created-server-voice-remote-media";
+    createdServerRemoteMediaLayer = mediaLayer;
+    const remoteVideoGrid = document.getElementById("remoteVideoGrid");
+    const screenShareStage = document.getElementById("screenShareStage");
+    const main = document.querySelector("main");
+    if (remoteVideoGrid && remoteVideoGrid.parentElement !== mediaLayer) {
+        remoteVideoGridHomeParent = remoteVideoGrid.parentElement || main;
+        mediaLayer.append(remoteVideoGrid);
+    }
+    if (screenShareStage && screenShareStage.parentElement !== mediaLayer) {
+        remoteScreenStageHomeParent = screenShareStage.parentElement || main;
+        mediaLayer.append(screenShareStage);
+    }
+
+    const status = document.createElement("div");
+    status.className = "created-server-voice-call-status";
+    status.id = "loungeVoiceCallStatus";
+    status.textContent = "You're not connected yet";
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "created-server-voice-toolbar";
+    const join = makeCreatedServerVoiceButton("join", "↗", "Join Voice");
+    join.className = "created-server-voice-join";
+    const controls = document.createElement("div");
+    controls.className = "created-server-voice-toolbar-group";
+    controls.append(
+        makeCreatedServerVoiceButton("mute", "♩", "Microphone"),
+        makeCreatedServerVoiceButton("camera", "▣", "Camera"),
+        makeCreatedServerVoiceButton("screen", "▤", "Share Screen"),
+        makeCreatedServerVoiceButton("hand", "✋", "Raise Hand"),
+        makeCreatedServerVoiceButton("activities", "✣", "Activities"),
+        makeCreatedServerVoiceButton("settings", "•••", "More")
+    );
+    const leave = makeCreatedServerVoiceButton("leave", "☎", "Disconnect");
+    leave.className = "created-server-voice-leave";
+    toolbar.append(status, join, controls, leave);
+    call.append(stage, mediaLayer, audience, toolbar);
+    callView.append(call);
+
+    primaryVoicePresenceStop = window.diamondWatchCreatedVoiceRoom?.(roomId, stage, audience, {}) || null;
+    syncCreatedServerVoiceUser();
+    updateCreatedServerVoiceUI();
+}
+
+window.diamondOpenPrimaryVoiceCall = openPrimaryVoiceCall;
+window.diamondClosePrimaryVoiceCall = closePrimaryVoiceCallView;
+
 document.addEventListener("click", event => {
     const button = event.target.closest("[data-voice-action]");
     if (!button) return;
@@ -1919,6 +2046,10 @@ document.addEventListener("click", event => {
                     activeCreatedServerVoiceChannel.name,
                     "cs-" + activeCreatedServerId + "-" + activeCreatedServerVoiceChannel.id,
                     serverViewName?.textContent?.trim() || "Diamond Lounge"
+                );
+            } else if (primaryVoiceChannelName && primaryVoiceRoomId) {
+                void window.diamondJoinCreatedVoiceRoom?.(
+                    primaryVoiceChannelName, primaryVoiceRoomId, "VIP-LOUNGE"
                 );
             }
             break;
@@ -1951,6 +2082,12 @@ document.addEventListener("click", event => {
 
 document.getElementById("createdServerVoiceDisconnect")?.addEventListener("click", () => {
     void window.diamondLeaveVoice?.();
+});
+document.getElementById("mainVoiceDisconnect")?.addEventListener("click", () => {
+    void window.diamondLeaveVoice?.();
+});
+document.getElementById("mainVoiceUserProfile")?.addEventListener("click", () => {
+    profileButton?.click();
 });
 
 document.getElementById("createdServerVoiceUserProfile")?.addEventListener("click", () => {
@@ -2630,6 +2767,7 @@ async function serverEventsDialog() {
 
 function openServer(server) {
     if (!server?.id) return;
+    if (primaryVoiceChannelName) closePrimaryVoiceCallView();
     restoreCreatedServerVoiceMedia();
 
     stopPublicMessages();
