@@ -402,7 +402,10 @@ window.openTextChannel = openTextChannel;
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-        window.location.replace("login.html");
+        const destination = window.location.pathname + window.location.search + window.location.hash;
+        const loginUrl = new URL("login.html", window.location.href);
+        loginUrl.searchParams.set("redirect", destination);
+        window.location.replace(loginUrl.toString());
         return;
     }
 
