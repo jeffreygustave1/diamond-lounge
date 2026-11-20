@@ -1,6 +1,6 @@
 // Diamond Support — AI-powered chat (Cloudflare Worker backend).
 // After deploying the Worker, replace the URL below with your Worker endpoint.
-const DIAMOND_AI_ENDPOINT = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
+const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
 const view=document.getElementById("supportBotView"),openBtn=document.getElementById("supportBotOpen"),closeBtn=document.getElementById("supportBotClose"),chat=document.getElementById("supportBotChat"),choices=document.getElementById("supportBotChoices"),reset=document.getElementById("supportBotReset"),form=document.getElementById("supportBotForm"),input=document.getElementById("supportBotInput"),sendButton=document.getElementById("supportBotSend");
 const topics=["Account or login","Profile or avatar","Messages and DMs","Voice or microphone","Camera or video","Screen sharing","Servers or channels","Website bugs"];
 let history=[],busy=false;
