@@ -1026,6 +1026,7 @@ async function toggleCamera() {
         });
 
         await replaceVideoTrack("camera", null);
+        syncLocalVoiceCameraPreview();
 
         setPressed(cameraButton, false);
         setButtonLabel(cameraButton, "Camera");
@@ -1046,6 +1047,7 @@ async function toggleCamera() {
         await replaceVideoTrack("camera", track);
 
         cameraOn = true;
+        syncLocalVoiceCameraPreview();
 
         setPressed(cameraButton, true);
         setButtonLabel(cameraButton, "Camera on");
@@ -1209,6 +1211,15 @@ async function joinVoice() {
         muted = false;
         cameraOn = false;
         screenOn = false;
+        deafened = false;
+        raisedHand = false;
+        activeVoiceProfile = {};
+        try {
+            const profileSnapshot = await getDoc(doc(db, "users", user.uid));
+            activeVoiceProfile = profileSnapshot.exists() ? profileSnapshot.data() : {};
+        } catch (profileError) {
+            console.warn("Voice profile could not be loaded:", profileError);
+        }
 
         if (controlsRow) {
             controlsRow.hidden = false;
@@ -1247,15 +1258,17 @@ async function joinVoice() {
             return setDoc(presenceRef, {
                 uid: user.uid,
 
-                name: (
-                    user.displayName || "Member"
-                ).slice(0, 80),
+                name: String(activeVoiceProfile.displayName || user.displayName || "Member").slice(0, 80),
 
                 sessionId,
                 heartbeatAt: Date.now(),
 
                 cameraOn,
-                screenOn
+                screenOn,
+                muted,
+                deafened,
+                raisedHand,
+                badges: Array.isArray(activeVoiceProfile.badges) ? activeVoiceProfile.badges.slice(0, 4) : []
             });
         };
 
@@ -1309,6 +1322,7 @@ async function joinVoice() {
         if (joinButton) {
             joinButton.disabled = false;
         }
+        publishVoiceUiState();
     }
 }
 
@@ -1363,6 +1377,10 @@ async function leaveVoice(knownUid = user?.uid) {
     muted = false;
     cameraOn = false;
     screenOn = false;
+    deafened = false;
+    raisedHand = false;
+    activeVoiceProfile = {};
+    syncLocalVoiceCameraPreview();
 
     [
         muteButton,
@@ -1449,6 +1467,7 @@ function toggleMute() {
     setStatus(
         `${muted ? "Muted in" : "Connected to"} ${selectedChannel}`
     );
+    void refreshPresenceFlags();
 }
 
 /* ==========================================
