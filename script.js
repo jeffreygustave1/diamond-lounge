@@ -469,7 +469,7 @@ onAuthStateChanged(auth, async (user) => {
     await loadServerIcons();
     await consumeServerInviteFromUrl();
 
-    // Start with no server or channel selected.
+    // Start members in the default VIP-LOUNGE server and its general channel.
     stopCreatedServerChannels();
     stopPublicMessages();
     stopDirectMessages();
@@ -479,35 +479,12 @@ onAuthStateChanged(auth, async (user) => {
     selectedMember = null;
     currentConversationId = null;
 
-    const channelsSidebar = document.getElementById("channelsSidebar");
-    if (channelsSidebar) channelsSidebar.hidden = true;
-    if (loungeSidebar) loungeSidebar.hidden = true;
-    if (dmSidebar) dmSidebar.hidden = true;
-    if (communitySidebar) communitySidebar.hidden = true;
-
-    hideMainViews();
-
-    if (emptyView) emptyView.hidden = false;
-
-    clearServerSelections();
-
-    if (mainServerButton) {
-        mainServerButton.classList.remove("selected");
-        mainServerButton.setAttribute("aria-pressed", "false");
-    }
-
-    if (dmHomeButton) {
-        dmHomeButton.classList.remove("selected");
-        dmHomeButton.setAttribute("aria-pressed", "false");
-    }
-
-    document.body.classList.remove("dm-mode");
-    setMobileSidebar(false);
-
     if (pendingInviteServer) {
         const invitedServer = pendingInviteServer;
         pendingInviteServer = null;
         openServer(invitedServer);
+    } else {
+        openTextChannel("general");
     }
 });
 
