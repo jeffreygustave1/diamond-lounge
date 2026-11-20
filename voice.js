@@ -1470,6 +1470,37 @@ function toggleMute() {
     void refreshPresenceFlags();
 }
 
+function toggleDeafen() {
+    if (!localStream) return;
+    deafened = !deafened;
+    peers.forEach(peer => {
+        if (peer.audio) peer.audio.muted = deafened;
+    });
+    audioContainer?.querySelectorAll("audio").forEach(audio => {
+        audio.muted = deafened;
+    });
+    setStatus(deafened ? "Audio muted for you" : "Voice connected to " + selectedChannel);
+    void refreshPresenceFlags();
+}
+
+function toggleRaiseHand() {
+    if (!localStream) return;
+    raisedHand = !raisedHand;
+    setStatus(raisedHand ? "You raised your hand" : "You lowered your hand");
+    void refreshPresenceFlags();
+}
+
+function setOutputVolume(value) {
+    outputVolume = Math.max(0, Math.min(1, Number(value) || 0));
+    peers.forEach(peer => {
+        if (peer.audio) peer.audio.volume = outputVolume;
+    });
+    audioContainer?.querySelectorAll("audio").forEach(audio => {
+        audio.volume = outputVolume;
+    });
+    publishVoiceUiState();
+}
+
 /* ==========================================
    VOICE CHANNEL SELECTION
    AUTO JOIN
@@ -1605,6 +1636,28 @@ onAuthStateChanged(auth, (nextUser) => {
 ========================================== */
 
 window.leaveVoiceChat = leaveVoice;
+window.diamondVoiceControls = {
+    getState: () => ({
+        connected: Boolean(localStream),
+        joining,
+        muted,
+        cameraOn,
+        screenOn,
+        deafened,
+        raisedHand,
+        selectedChannel,
+        roomId,
+        status: statusElement?.textContent || "",
+        outputVolume
+    }),
+    toggleMute,
+    toggleCamera,
+    toggleScreen,
+    toggleDeafen,
+    toggleRaiseHand,
+    leave: () => leaveVoice(),
+    setOutputVolume
+};
 
 /* ==========================================
    PAGE CLEANUP
