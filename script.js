@@ -1356,6 +1356,8 @@ if (selectedChannel) {
             }
         },
         (error) => {
+            // Ignore late errors from a server that is no longer active.
+            if (activeCreatedServerId !== serverId) return;
             console.error("Server channels failed to load:", error);
 
             createdServerTextChannels.textContent =
@@ -1690,6 +1692,13 @@ function loadCreatedServerMessages(serverId, channelId) {
                 createdServerMessages.scrollHeight;
         },
         (error) => {
+            // Prevent a stale listener from replacing the UI after navigation.
+            if (
+                activeCreatedServerId !== serverId ||
+                activeCreatedServerChannelId !== channelId
+            ) {
+                return;
+            }
             console.error("Created server messages failed:", error);
 
             createdServerMessages.textContent =
