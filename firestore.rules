@@ -181,18 +181,48 @@ service cloud.firestore {
         allow read: if isServerMember();
         allow create: if isServerMember()
           && (isServerOwner() || hasServerPermission('manageChannels'))
+          && request.resource.data.keys().hasOnly([
+            'name', 'nameLower', 'type', 'createdBy', 'createdAt', 'parentCategoryId'
+          ])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 40
+          && request.resource.data.nameLower is string
+          && request.resource.data.type in ['text', 'voice', 'category']
           && request.resource.data.createdBy == request.auth.uid
-          && request.resource.data.type in ['text', 'voice', 'category'];
-        allow update, delete: if isServerOwner() || hasServerPermission('manageChannels');
+          && request.resource.data.createdAt == request.time;
+        allow update: if isServerOwner() || (
+          hasServerPermission('manageChannels')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'nameLower'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 40
+          && request.resource.data.nameLower is string
+        );
+        allow delete: if isServerOwner() || hasServerPermission('manageChannels');
 
         match /messages/{messageId} {
           allow read: if isServerMember();
           allow create: if isServerMember()
             && (isServerOwner() || hasServerPermission('sendMessages'))
+            && request.resource.data.keys().hasOnly([
+              'uid', 'username', 'displayName', 'text', 'timestamp'
+            ])
             && request.resource.data.uid == request.auth.uid
+            && (
+              ('username' in request.resource.data
+                && request.resource.data.username is string
+                && request.resource.data.username.size() > 0
+                && request.resource.data.username.size() <= 30)
+              || ('displayName' in request.resource.data
+                && request.resource.data.displayName is string
+                && request.resource.data.displayName.size() > 0
+                && request.resource.data.displayName.size() <= 30)
+            )
             && request.resource.data.text is string
             && request.resource.data.text.size() > 0
-            && request.resource.data.text.size() <= 2000;
+            && request.resource.data.text.size() <= 2000
+            && request.resource.data.timestamp == request.time;
           allow update, delete: if isServerOwner() || hasServerPermission('manageMessages');
         }
       }
@@ -201,8 +231,30 @@ service cloud.firestore {
         allow read: if isServerMember();
         allow create: if isServerMember()
           && (isServerOwner() || hasServerPermission('manageEvents'))
-          && request.resource.data.createdBy == request.auth.uid;
-        allow update, delete: if isServerOwner() || hasServerPermission('manageEvents');
+          && request.resource.data.keys().hasOnly([
+            'title', 'startsAt', 'details', 'createdBy', 'createdAt'
+          ])
+          && request.resource.data.title is string
+          && request.resource.data.title.size() >= 1
+          && request.resource.data.title.size() <= 80
+          && request.resource.data.startsAt is string
+          && request.resource.data.startsAt.size() <= 40
+          && request.resource.data.details is string
+          && request.resource.data.details.size() <= 1000
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.createdAt == request.time;
+        allow update: if isServerOwner() || (
+          hasServerPermission('manageEvents')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'startsAt', 'details'])
+          && request.resource.data.title is string
+          && request.resource.data.title.size() >= 1
+          && request.resource.data.title.size() <= 80
+          && request.resource.data.startsAt is string
+          && request.resource.data.startsAt.size() <= 40
+          && request.resource.data.details is string
+          && request.resource.data.details.size() <= 1000
+        );
+        allow delete: if isServerOwner() || hasServerPermission('manageEvents');
       }
 
       match /invites/{inviteCode} {
