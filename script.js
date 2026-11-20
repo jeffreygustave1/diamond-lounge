@@ -846,27 +846,21 @@ function renderMembers() {
 
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "dm-member-button";
+        button.className = "text-channel dm-channel-entry";
 
         if (selectedMember?.uid === member.uid) {
-            button.classList.add("active");
+            button.classList.add("selected");
         }
 
-        const avatar = document.createElement("span");
-        avatar.className = "dm-member-avatar";
-        avatar.textContent = member.displayName.charAt(0).toUpperCase();
+        const symbol = document.createElement("span");
+        symbol.className = "channel-symbol";
+        symbol.textContent = "#";
 
-        const copy = document.createElement("span");
-        copy.className = "dm-member-copy";
-
-        const name = document.createElement("strong");
+        const name = document.createElement("span");
+        name.className = "dm-channel-name";
         name.textContent = member.displayName;
 
-        const status = document.createElement("small");
-        status.textContent = "Diamond Lounge member";
-
-        copy.append(name, status);
-        button.append(avatar, copy);
+        button.append(symbol, name);
 
         button.addEventListener("click", () => {
             void openConversation(member);
