@@ -11,7 +11,7 @@
     <link rel="icon" type="image/gif" href="diamond-favicon.gif?v=1">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="style.css?v=42">
+    <link rel="stylesheet" href="style.css?v=43">
     <link rel="stylesheet" href="luxury.css?v=9">
     <link rel="stylesheet" href="branding-polish.css?v=9">
     <link rel="stylesheet" href="dm.css?v=9">
@@ -260,23 +260,6 @@
 
                 </section>
 
-                <!-- WATCH ACTIVITY PANEL: shown with the server channel sidebar -->
-                <section class="dl-watch-sidebar-panel" aria-label="Watch activity">
-                    <div class="dl-watch-sidebar-heading">
-                        <span class="dl-watch-sidebar-avatar" id="dlWatchSidebarAvatar"><img src="diamond.gif" alt=""></span>
-                        <span><strong>WATCH</strong><small>LOUNGE ACTIVITY</small></span>
-                    </div>
-                    <button class="dl-watch-sidebar-open" id="diamondWatchButton" type="button">
-                        <span class="dl-watch-sidebar-play">▶</span>
-                        <span><strong>Open Watch</strong><small>Watch videos together</small></span>
-                        <span class="dl-watch-sidebar-arrow">↗</span>
-                    </button>
-                    <div class="dl-watch-sidebar-actions">
-                        <button type="button" data-watch-action="share">Share video</button>
-                        <button type="button" data-watch-action="browse">Browse</button>
-                    </div>
-                </section>
-
                 <!-- DIRECT MESSAGE SIDEBAR -->
                 <section id="dmSidebar" hidden>
 
@@ -318,6 +301,7 @@
                         <button type="button" data-voice-action="screen" title="Share screen" aria-label="Share screen">▤</button>
                         <button type="button" data-voice-action="hand" title="Raise hand" aria-label="Raise hand">✋</button>
                         <button type="button" data-voice-action="activities" title="Voice activities" aria-label="Voice activities">✣</button>
+                        <button type="button" id="diamondWatchButton" class="dl-watch-dock-button" title="Open Watch activities" aria-label="Open Watch activities">▶</button>
                     </div>
                     <div class="created-server-voice-user-row">
                         <button type="button" class="created-server-voice-user" id="mainVoiceUserProfile" title="Edit your profile">
@@ -923,7 +907,7 @@
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
     <script type="module" src="script.js?v=69"></script>
-<script src="watch-feature.js?v=2"></script>
+<script src="watch-feature.js?v=3"></script>
     <script type="module" src="supportbot.js?v=4"></script>
 <script type="module" src="dm-call.js?v=7"></script>
 <script type="module" src="voice.js?v=45"></script>
