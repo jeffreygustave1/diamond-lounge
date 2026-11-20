@@ -22,7 +22,7 @@ import {
 ========================================== */
 
 const HEARTBEAT_MS = 10000;
-const STALE_AFTER_MS = 35000;
+const STALE_AFTER_MS = 35000;\nconst GUEST_VOICE_LIMIT_MS = 30 * 60 * 1000;\nlet guestVoiceTimer = null;
 
 const ICE_SERVERS = [
     { urls: "stun:stun.l.google.com:19302" },
@@ -1465,7 +1465,7 @@ async function joinVoice() {
 
         watchIncomingCalls();
 
-        setStatus(`Connected to ${selectedChannel}`);
+        setStatus(`Connected to ${selectedChannel}`);\n        if (user?.isAnonymous) {\n            clearTimeout(guestVoiceTimer);\n            guestVoiceTimer=setTimeout(()=>{if(localStream){setStatus('Guest voice session ended after 30 minutes. You may rejoin.');leaveVoice();}},GUEST_VOICE_LIMIT_MS);\n        }
 
     } catch (error) {
         console.error("Unable to join voice:", error);
@@ -1509,7 +1509,7 @@ async function joinVoice() {
 ========================================== */
 
 async function leaveVoice(knownUid = user?.uid) {
-    const oldRoom = roomId;
+    clearTimeout(guestVoiceTimer); guestVoiceTimer=null;\n    const oldRoom = roomId;
     const oldUid = knownUid;
 
     if (heartbeatTimer) {
