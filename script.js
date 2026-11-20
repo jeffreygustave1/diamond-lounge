@@ -128,6 +128,7 @@ let activeCreatedServerChannelId = null;
 let activeCreatedServerChannelType = "text";
 let createdServerChannels = [];
 let createdServerVoicePresenceStop = null;
+let createdServerSidebarVoiceStops = new Map();
 let pendingInviteServer = null;
 let pendingInviteChannelId = null;
 let activeCreatedServerVoiceChannel = null;
@@ -273,6 +274,8 @@ function stopCreatedServerChannels() {
     activeCreatedServerVoiceChannel = null;
     const connectionPanel = document.getElementById("createdServerVoiceConnectionPanel");
     if (connectionPanel) connectionPanel.hidden = true;
+    createdServerSidebarVoiceStops.forEach(stop => stop?.());
+    createdServerSidebarVoiceStops.clear();
     stopServerChannelsListener?.();
     stopServerChannelsListener = null;
 
@@ -1362,6 +1365,8 @@ if (selectedChannel) {
 
 function renderCreatedServerChannels() {
     if (!createdServerTextChannels || !createdServerVoiceChannels) return;
+    createdServerSidebarVoiceStops.forEach(stop => stop?.());
+    createdServerSidebarVoiceStops.clear();
     createdServerTextChannels.replaceChildren();
     createdServerVoiceChannels.replaceChildren();
 
@@ -1394,6 +1399,14 @@ function renderCreatedServerChannels() {
             ? openCreatedServerChannel(channel)
             : openCreatedServerVoiceChannel(channel);
         li.append(button);
+
+        let sidebarMembers = null;
+        if (channel.type === "voice") {
+            sidebarMembers = document.createElement("div");
+            sidebarMembers.className = "created-server-voice-sidebar-members";
+            sidebarMembers.setAttribute("aria-label", "People in this voice channel");
+            li.append(sidebarMembers);
+        }
 
         // These three actions are exclusive to voice-channel rows.
         if (channel.type === "voice") {
@@ -1488,6 +1501,19 @@ function renderCreatedServerChannels() {
 
     renderChannelList(createdServerTextChannels, "text", texts);
     renderChannelList(createdServerVoiceChannels, "voice", voices);
+
+    if (activeCreatedServerId) {
+        voices.forEach(channel => {
+            const row = [...createdServerVoiceChannels.querySelectorAll(".created-server-channel-item")]
+                .find(item => item.dataset.channelId === channel.id);
+            const strip = row?.querySelector(".created-server-voice-sidebar-members");
+            const stop = strip && window.diamondWatchCreatedVoiceSidebarRoom?.(
+                "cs-" + activeCreatedServerId + "-" + channel.id,
+                strip
+            );
+            if (typeof stop === "function") createdServerSidebarVoiceStops.set(channel.id, stop);
+        });
+    }
 }
 // DELETE CREATED SERVER CHANNEL
 async function deleteCreatedServerChannel(channel) {
