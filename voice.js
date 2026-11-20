@@ -1997,6 +1997,8 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
     };
 
     window.diamondVoiceTileRoots = tileRoots;
+    window.diamondActiveVoiceStage = stage;
+    window.dispatchEvent(new CustomEvent("diamond-voice-stage", { detail: { stage } }));
 
     function makeTile(member) {
         const tile = document.createElement("article");
@@ -2220,6 +2222,10 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
         tileRoots.clear();
         if (window.diamondVoiceTileRoots === tileRoots) {
             window.diamondVoiceTileRoots = new Map();
+        }
+        if (window.diamondActiveVoiceStage === stage) {
+            window.diamondActiveVoiceStage = null;
+            window.dispatchEvent(new CustomEvent("diamond-voice-stage", { detail: { stage: null } }));
         }
     };
 };
