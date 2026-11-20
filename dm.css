@@ -384,42 +384,66 @@
 }
 
 
-/* DM workspace: normal-flow main pane, never overlay or stacked. */
+/* DM mode column layout: member directory occupies the channel/sidebar column;
+   selected conversation fills the adjacent chat column. */
+body.dm-mode #channelsSidebar {
+    display: flex !important;
+    flex: 0 0 275px !important;
+    width: 275px !important;
+    min-width: 230px !important;
+    max-width: 32vw !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+body.dm-mode #channelsSidebar #dmSidebar:not([hidden]) {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+body.dm-mode #channelsSidebar #dmMemberList {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+body.dm-mode #channelsSidebar .profile-card {
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+}
 body.dm-mode .chat-area {
-    display: flex;
-    flex: 1 1 0;
-    width: auto;
-    min-width: 0;
-    min-height: 0;
-    height: auto;
-    flex-direction: column;
-    overflow: hidden;
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
 }
-body.dm-mode #dmConversationView:not([hidden]) {
-    position: relative;
-    display: flex;
-    flex: 1 1 0;
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    min-height: 0;
-    height: auto;
-    flex-direction: column;
-    align-self: stretch;
-    margin: 0;
-    overflow: hidden;
-    inset: auto;
-    transform: none;
-    float: none;
-    order: 0;
-    z-index: auto;
+body.dm-mode .chat-area > #dmConversationView:not([hidden]) {
+    position: relative !important;
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    inset: auto !important;
+    transform: none !important;
+    float: none !important;
+    order: 0 !important;
 }
-body.dm-mode #dmConversationView[hidden] { display: none !important; }
+body.dm-mode .chat-area > #dmConversationView[hidden] { display: none !important; }
 body.dm-mode #dmConversationView .dm-messages {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
 }
 body.dm-mode #dmConversationView .dm-message-box,
 body.dm-mode #dmConversationView .dm-call-toolbar,
-body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto; }
+body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto !important; }
