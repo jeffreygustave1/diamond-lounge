@@ -1551,6 +1551,8 @@ function openCreatedServerChannel(channel) {
     if (createdServerSendButton) {
         createdServerSendButton.disabled = false;
     }
+    if (createdServerMessageForm) createdServerMessageForm.hidden = false;
+    if (createdServerMessageStatus) createdServerMessageStatus.hidden = false;
 
     if (createdServerMessageStatus) {
         createdServerMessageStatus.textContent = "";
@@ -1961,6 +1963,8 @@ function openCreatedServerVoiceChannel(channel) {
         createdServerMessageInput.placeholder = "Voice channels use the voice chat panel.";
     }
     if (createdServerSendButton) createdServerSendButton.disabled = true;
+    if (createdServerMessageForm) createdServerMessageForm.hidden = true;
+    if (createdServerMessageStatus) createdServerMessageStatus.hidden = true;
 
     const chatHeader = document.querySelector(".created-server-chat-header");
     chatHeader?.classList.add("is-voice-header");
@@ -2019,13 +2023,6 @@ function openCreatedServerVoiceChannel(channel) {
         join.className = "created-server-voice-join";
         join.textContent = "Join Voice";
         join.hidden = Boolean(window.diamondVoiceControls?.getState?.().connected);
-        join.onclick = () => {
-            void window.diamondJoinCreatedVoiceRoom?.(
-                channel.name,
-                "cs-" + activeCreatedServerId + "-" + channel.id
-            );
-        };
-
         const controls = document.createElement("div");
         controls.className = "created-server-voice-toolbar-group";
         controls.append(
@@ -2041,7 +2038,6 @@ function openCreatedServerVoiceChannel(channel) {
         leave.classList.add("created-server-voice-leave");
         leave.classList.remove("created-server-voice-tool");
         leave.className = "created-server-voice-leave";
-        leave.onclick = () => void window.diamondLeaveVoice?.();
         toolbar.append(status, join, controls, leave);
 
         call.append(stage, mediaLayer, audience, toolbar);
