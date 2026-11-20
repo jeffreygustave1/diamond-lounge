@@ -1,0 +1,8 @@
+name = "diamond-lounge-premium"
+main = "src/index.js"
+compatibility_date = "2026-11-20"
+
+[vars]
+SITE_URL = "https://diamond-lounge.pages.dev"
+FIREBASE_PROJECT_ID = "diamond-lounge-7caf6"
+# Set PRICE_SILVER_GIF_PACK to the Stripe Price ID in wrangler vars or dashboard.
