@@ -464,6 +464,7 @@ function makePeer(person, callRef) {
 
             event.track.onunmute = () => {
                 if (tile) tile.hidden = false;
+                if (kind === "camera") tile?.parentElement?.classList.add("has-camera");
 
                 if (kind === "screen" && screenShareStage) {
                     screenShareStage.hidden = false;
@@ -472,6 +473,9 @@ function makePeer(person, callRef) {
 
             event.track.onmute = () => {
                 if (tile) tile.hidden = true;
+                if (kind === "camera" && !tile?.parentElement?.querySelector("#local-voice-camera-preview")) {
+                    tile?.parentElement?.classList.remove("has-camera");
+                }
 
                 if (kind === "screen" && screenShareStage) {
                     screenShareStage.hidden = true;
@@ -480,6 +484,7 @@ function makePeer(person, callRef) {
 
             if (!event.track.muted && tile) {
                 tile.hidden = false;
+                if (kind === "camera") tile.parentElement?.classList.add("has-camera");
 
                 if (kind === "screen" && screenShareStage) {
                     screenShareStage.hidden = false;
