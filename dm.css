@@ -420,3 +420,20 @@ body.dm-mode #dmConversationView .dm-messages {
 body.dm-mode #dmConversationView .dm-message-box,
 body.dm-mode #dmConversationView .dm-call-toolbar,
 body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto !important; }
+
+/* DM workspace safety: the conversation is a single normal-flow column.
+   No duplicate/overlay positioning; hidden sibling views remain hidden. */
+body.dm-mode .chat-area > #dmConversationView:not([hidden]) {
+    position: relative !important;
+    float: none !important;
+    order: 0 !important;
+    transform: none !important;
+    inset: auto !important;
+    z-index: auto !important;
+}
+body.dm-mode .chat-area > #dmHomeView,
+body.dm-mode .chat-area > #loungeView,
+body.dm-mode .chat-area > #serverView,
+body.dm-mode .chat-area > #emptyView {
+    display: none !important;
+}
