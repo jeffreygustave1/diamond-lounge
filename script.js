@@ -1760,6 +1760,7 @@ function syncCreatedServerVoiceUser() {
         currentUser?.email?.split("@")[0] ||
         "Member";
     if (subline) subline.textContent =
+        window.diamondVoiceControls?.getState?.().serverName ||
         serverViewName?.textContent?.trim() || "Diamond Lounge";
     if (badges) {
         badges.replaceChildren();
@@ -1791,18 +1792,18 @@ function updateCreatedServerVoiceUI(state = window.diamondVoiceControls?.getStat
     const panel = document.getElementById("createdServerVoiceConnectionPanel");
     const stateLabel = document.getElementById("createdServerVoiceConnectionState");
     const roomLabel = document.getElementById("createdServerVoiceConnectionRoom");
-    const belongsToActiveServer = Boolean(
+    const belongsToCreatedServer = Boolean(
         activeCreatedServerId &&
         state.roomId &&
-        state.roomId.startsWith("cs-" + activeCreatedServerId + "-")
+        state.roomId.startsWith("cs-")
     );
-    const visible = belongsToActiveServer && (state.connected || state.joining);
+    const visible = belongsToCreatedServer && (state.connected || state.joining);
     if (panel) panel.hidden = !visible;
     if (stateLabel) stateLabel.textContent =
         state.joining && !state.connected ? "Connecting..." : "Voice Connected";
     if (roomLabel) roomLabel.textContent = visible
         ? (state.selectedChannel || activeCreatedServerVoiceChannel?.name || "VOICE CHANNEL") +
-            " / " + (serverViewName?.textContent?.trim() || "DIAMOND LOUNGE")
+            " / " + (state.serverName || serverViewName?.textContent?.trim() || "DIAMOND LOUNGE")
         : "";
 
     document.querySelectorAll('[data-voice-action="mute"]').forEach(button => {
@@ -1907,7 +1908,8 @@ document.addEventListener("click", event => {
             if (activeCreatedServerVoiceChannel && activeCreatedServerId) {
                 void window.diamondJoinCreatedVoiceRoom?.(
                     activeCreatedServerVoiceChannel.name,
-                    "cs-" + activeCreatedServerId + "-" + activeCreatedServerVoiceChannel.id
+                    "cs-" + activeCreatedServerId + "-" + activeCreatedServerVoiceChannel.id,
+                    serverViewName?.textContent?.trim() || "Diamond Lounge"
                 );
             }
             break;
