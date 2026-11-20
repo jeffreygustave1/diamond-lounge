@@ -3690,3 +3690,9 @@ button {
 .dl-watch-chat-form input{min-width:0;flex:1;padding:8px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(0,0,0,.35);color:#fff;font-size:11px}
 .dl-watch-chat-form button{padding:8px 10px;border:1px solid rgba(199,169,107,.4);border-radius:8px;background:rgba(199,169,107,.18);color:#e8d6b1;font-size:11px;cursor:pointer}
 .dl-watch-chat-glass[hidden]{display:none!important}
+
+/* FIX: stable, centered voice stage and normal-sized single-member tile */
+#loungeVoiceStage.created-server-voice-stage,
+#createdServerVoiceStage.created-server-voice-stage { justify-items:stretch!important; align-content:center!important; grid-template-columns:minmax(0,1fr)!important; }
+#loungeVoiceStage .created-server-voice-tile:only-child,
+#createdServerVoiceStage .created-server-voice-tile:only-child { width:min(100%,480px)!important; height:240px!important; min-height:240px!important; max-height:240px!important; justify-self:center!important; align-self:center!important; box-sizing:border-box!important; }
