@@ -22,7 +22,9 @@ import {
 ========================================== */
 
 const HEARTBEAT_MS = 10000;
-const STALE_AFTER_MS = 35000;\nconst GUEST_VOICE_LIMIT_MS = 30 * 60 * 1000;\nlet guestVoiceTimer = null;
+const STALE_AFTER_MS = 35000;
+const GUEST_VOICE_LIMIT_MS = 30 * 60 * 1000;
+let guestVoiceTimer = null;
 
 const ICE_SERVERS = [
     { urls: "stun:stun.l.google.com:19302" },
