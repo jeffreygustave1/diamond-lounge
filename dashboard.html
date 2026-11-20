@@ -301,7 +301,7 @@
                         <button type="button" data-voice-action="screen" title="Share screen" aria-label="Share screen">▤</button>
                         <button type="button" data-voice-action="hand" title="Raise hand" aria-label="Raise hand">✋</button>
                         <button type="button" data-voice-action="activities" title="Voice activities" aria-label="Voice activities">✣</button>
-                        <button type="button" id="diamondWatchButton" class="dl-watch-dock-button" title="Open Watch activities" aria-label="Open Watch activities">▶</button>
+                        <button type="button" class="dl-watch-dock-button" data-watch-launch title="Open Watch activities" aria-label="Open Watch activities">▶</button>
                     </div>
                     <div class="created-server-voice-user-row">
                         <button type="button" class="created-server-voice-user" id="mainVoiceUserProfile" title="Edit your profile">
@@ -545,6 +545,7 @@
                 <button type="button" data-voice-action="screen" title="Share screen" aria-label="Share screen">▤</button>
                 <button type="button" data-voice-action="hand" title="Raise hand" aria-label="Raise hand">✋</button>
                 <button type="button" data-voice-action="activities" title="Voice activities" aria-label="Voice activities">✣</button>
+                <button type="button" class="dl-watch-dock-button" data-watch-launch title="Open Watch activities" aria-label="Open Watch activities">▶</button>
             </div>
             <div class="created-server-voice-user-row">
                 <button type="button" class="created-server-voice-user" id="createdServerVoiceUserProfile" title="Edit your profile">
@@ -907,7 +908,7 @@
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
     <script type="module" src="script.js?v=69"></script>
-<script src="watch-feature.js?v=4"></script>
+<script src="watch-feature.js?v=5"></script>
     <script type="module" src="supportbot.js?v=4"></script>
 <script type="module" src="dm-call.js?v=7"></script>
 <script type="module" src="voice.js?v=45"></script>
