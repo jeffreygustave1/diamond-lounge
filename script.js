@@ -1956,6 +1956,7 @@ async function serverMembersDialog() {
                 ]);
                 const userData = userSnapshot.exists() ? userSnapshot.data() : {};
                 const memberData = memberSnapshot.exists() ? memberSnapshot.data() : {};
+                let hasMemberRecord = memberSnapshot.exists();
                 const row = document.createElement("section");
                 row.style.padding = "12px";
                 row.style.borderRadius = "9px";
@@ -2003,7 +2004,7 @@ async function serverMembersDialog() {
                             });
                             const memberRef = doc(db, "servers", serverId, "members", uid);
                             const roleUpdate = { roleIds, permissions: [...permissions] };
-                            if (memberSnapshot.exists()) {
+                            if (hasMemberRecord) {
                                 await updateDoc(memberRef, roleUpdate);
                             } else {
                                 await setDoc(memberRef, {
@@ -2012,6 +2013,7 @@ async function serverMembersDialog() {
                                     ...roleUpdate,
                                     joinedAt: serverTimestamp()
                                 });
+                                hasMemberRecord = true;
                             }
                             status.textContent = "Saved";
                         } catch (error) {
