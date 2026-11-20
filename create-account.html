@@ -52,6 +52,30 @@
         const button = document.getElementById("createButton");
         const errorMessage = document.getElementById("errorMessage");
 
+        const requestedRedirect = new URLSearchParams(window.location.search).get("redirect");
+
+        function postAuthDestination() {
+            if (!requestedRedirect) return "dashboard.html";
+            try {
+                const target = new URL(requestedRedirect, window.location.origin);
+                const appBasePath = new URL("./", window.location.href).pathname;
+                if (target.origin !== window.location.origin ||
+                    !target.pathname.startsWith(appBasePath)) {
+                    return "dashboard.html";
+                }
+                return target.pathname + target.search + target.hash;
+            } catch {
+                return "dashboard.html";
+            }
+        }
+
+        const signInLink = document.querySelector(".signup-link a");
+        if (requestedRedirect && signInLink) {
+            const loginUrl = new URL(signInLink.href);
+            loginUrl.searchParams.set("redirect", requestedRedirect);
+            signInLink.href = loginUrl.toString();
+        }
+
         const errors = {
             "auth/email-already-in-use": "This email already has an account. Try signing in instead.",
             "auth/invalid-email": "Please enter a valid email address.",
@@ -93,7 +117,7 @@
                     createdAt: serverTimestamp()
                 });
 
-                window.location.assign("dashboard.html");
+                window.location.assign(postAuthDestination());
 
             } catch (error) {
                 console.error("Account creation error:", error);
