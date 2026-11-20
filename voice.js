@@ -2216,13 +2216,12 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
             });
 
             if (audience) audience.replaceChildren();
-            if (!liveMembers.length) {
-                stage.replaceChildren();
-                const empty = document.createElement("div");
-                empty.className = "created-server-voice-empty";
-                empty.textContent = "Waiting for people to join…";
-                stage.append(empty);
-                return;
+            stage.querySelector(".created-server-voice-empty")?.remove();
+            if (liveMembers.length === 1) {
+                const waiting = document.createElement("div");
+                waiting.className = "created-server-voice-empty";
+                waiting.textContent = "Waiting for people to join…";
+                stage.prepend(waiting);
             }
 
             liveMembers.forEach(member => updateTile(member));
