@@ -2,11 +2,13 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isGuest() { return request.auth != null && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
+    function isMemberAccount() { return request.auth != null && !isGuest(); }
 
     match /users/{userId} {
       allow read: if request.auth != null;
 
-      allow create: if request.auth != null
+      allow create: if isMemberAccount()
         && request.auth.uid == userId
         && request.resource.data.keys().hasAll([
           'uid', 'displayName', 'createdAt'
@@ -40,7 +42,7 @@ service cloud.firestore {
     match /messages/{messageId} {
       allow read: if request.auth != null;
 
-      allow create: if request.auth != null
+      allow create: if isMemberAccount()
         && request.resource.data.keys().hasAll([
           'uid', 'username', 'channelId', 'text', 'timestamp'
         ])
@@ -306,7 +308,7 @@ service cloud.firestore {
 
       allow list: if false;
 
-      allow create: if request.auth != null
+      allow create: if isMemberAccount()
         && request.resource.data.keys().hasAll([
           'participantUids', 'createdAt'
         ])
@@ -332,7 +334,7 @@ service cloud.firestore {
 
         allow read: if isConversationParticipant();
 
-        allow create: if isConversationParticipant()
+        allow create: if isMemberAccount() && isConversationParticipant()
           && request.resource.data.keys().hasAll([
             'uid', 'username', 'text', 'timestamp'
           ])
