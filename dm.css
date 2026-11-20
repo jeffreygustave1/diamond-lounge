@@ -447,3 +447,19 @@ body.dm-mode #dmConversationView .dm-messages {
 body.dm-mode #dmConversationView .dm-message-box,
 body.dm-mode #dmConversationView .dm-call-toolbar,
 body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto !important; }
+
+/* Final DM column correction: directory stays in column two; conversation is
+   a direct child of the main (third) column, with header at its top. */
+body.dm-mode .dashboard { display:flex !important; flex-direction:row !important; }
+body.dm-mode .mobile-sidebar { display:flex !important; flex:0 0 auto !important; width:auto !important; }
+body.dm-mode #channelsSidebar { height:100% !important; box-sizing:border-box !important; }
+body.dm-mode #dmSidebar:not([hidden]) { order:0 !important; }
+body.dm-mode #channelsSidebar > .profile-card { order:99 !important; margin-top:auto !important; }
+body.dm-mode .chat-area { flex:1 1 0 !important; width:auto !important; min-width:0 !important; position:relative !important; }
+body.dm-mode #dmConversationView:not([hidden]) { display:flex !important; position:relative !important; inset:auto !important; order:0 !important; align-self:stretch !important; flex:1 1 0 !important; width:100% !important; min-width:0 !important; min-height:0 !important; max-height:100% !important; }
+body.dm-mode #dmConversationView > .dm-conversation-header { order:0 !important; flex:0 0 auto !important; position:relative !important; top:auto !important; }
+body.dm-mode #dmConversationView > #dmMessages { order:1 !important; flex:1 1 auto !important; min-height:0 !important; }
+body.dm-mode #dmConversationView > .dm-message-box { order:2 !important; }
+body.dm-mode #dmConversationView > .dm-call-toolbar,
+body.dm-mode #dmConversationView > #dmStatus { order:3 !important; }
+body.dm-mode #communitySidebar { display:none !important; }
