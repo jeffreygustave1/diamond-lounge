@@ -89,6 +89,7 @@ let deafened = false;
 let raisedHand = false;
 let outputVolume = 1;
 let joining = false;
+let activeVoiceProfile = {};
 
 const participants = new Map();
 const peers = new Map();
