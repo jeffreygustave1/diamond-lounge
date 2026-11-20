@@ -1837,6 +1837,81 @@ function playVoicePresenceSound(type) {
         console.warn("Voice presence sound failed:", error);
     }
 }
+window.diamondWatchCreatedVoiceSidebarRoom = (customRoomId, strip) => {
+    const profileCache = new Map();
+    const unsubscribe = onSnapshot(
+        collection(db, "voiceRooms", customRoomId, "participants"),
+        snapshot => {
+            const members = snapshot.docs
+                .map(entry => entry.data())
+                .filter(member =>
+                    member.uid &&
+                    Date.now() - Number(member.heartbeatAt || 0) < STALE_AFTER_MS
+                )
+                .sort((a, b) => Number(a.heartbeatAt || 0) - Number(b.heartbeatAt || 0));
+
+            strip.replaceChildren();
+            if (!members.length) {
+                strip.hidden = true;
+                return;
+            }
+            strip.hidden = false;
+
+            members.slice(0, 4).forEach(member => {
+                const avatar = document.createElement("span");
+                avatar.className = "created-server-voice-sidebar-member";
+                avatar.textContent = String(member.name || "M").trim().slice(0, 1).toUpperCase();
+                avatar.title = member.name || "Member";
+                strip.append(avatar);
+
+                let promise = profileCache.get(member.uid);
+                if (!promise) {
+                    promise = getDoc(doc(db, "users", member.uid))
+                        .then(profile => profile.exists() ? profile.data() : {})
+                        .catch(() => ({}));
+                    profileCache.set(member.uid, promise);
+                }
+                promise.then(profile => {
+                    if (!avatar.isConnected) return;
+                    if (typeof profile.picture === "string" && profile.picture) {
+                        avatar.replaceChildren();
+                        const image = document.createElement("img");
+                        image.src = profile.picture;
+                        image.alt = "";
+                        avatar.append(image);
+                    } else {
+                        const styles = {
+                            diamond: ["#2b2924", "#e1c98f", "✦"],
+                            gold: ["#c7a96b", "#1a1610", "G"],
+                            silver: ["#c9ccd2", "#191a1d", "S"],
+                            emerald: ["#4f8a63", "#eef7f0", "E"],
+                            ruby: ["#a5535a", "#fbeeee", "R"],
+                            royal: ["#5a5fa5", "#eeeffb", "V"]
+                        };
+                        const style = styles[profile.avatar] || styles.diamond;
+                        avatar.style.background = style[0];
+                        avatar.style.color = style[1];
+                        avatar.textContent = style[2];
+                    }
+                });
+            });
+
+            if (members.length > 4) {
+                const extra = document.createElement("span");
+                extra.className = "voice-row-member-extra";
+                extra.textContent = "+" + (members.length - 4);
+                strip.append(extra);
+            }
+        },
+        error => {
+            console.warn("Voice sidebar member listener failed:", error);
+            strip.replaceChildren();
+            strip.hidden = true;
+        }
+    );
+    return () => unsubscribe();
+};
+
 /* CREATED-SERVER VOICE BRIDGE */
 window.diamondJoinCreatedVoiceRoom=async(label,customRoomId,serverName="")=>{if(localStream)await leaveVoice();selectedChannel=label;roomId=customRoomId;activeVoiceServerName=serverName||"";setStatus("Connecting to "+label+"...");watchParticipants();await joinVoice();};
 window.diamondLeaveVoice=()=>leaveVoice();
