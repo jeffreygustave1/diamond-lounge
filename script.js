@@ -3464,6 +3464,17 @@ function renderCroppedPicture() {
     });
 }
 
+document.getElementById("resetProfilePicture")?.addEventListener("click", () => {
+    uploadedPicture = "";
+    rawPicture = "";
+    if (profileUploadInput) profileUploadInput.value = "";
+    if (profileCrop) profileCrop.hidden = true;
+    if (cropZoom) cropZoom.value = "100";
+    cropScale = 1; cropX = 0; cropY = 0;
+    applyAvatar("diamond");
+    if (profileStatus) { profileStatus.textContent = "Uploaded picture removed. Diamond avatar selected."; profileStatus.className = "success"; }
+});
+
 profileChoiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
         uploadedPicture = "";
