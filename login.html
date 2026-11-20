@@ -33,7 +33,7 @@
     <script type="module">
         import { auth, db } from "./firebase.js";
         import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const form = document.getElementById("loginForm");
         const button = document.getElementById("loginButton");
@@ -75,14 +75,22 @@ const requestedRedirect = new URLSearchParams(window.location.search).get("redir
             "auth/network-request-failed": "Network error. Check your connection and try again.",
             "auth/operation-not-allowed": "Enable Email/Password sign-in in Firebase Authentication.",
             "auth/unauthorized-domain": "Add jeffreygustave1.github.io under Firebase Authentication → Settings → Authorized domains.",
-            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console."
+            "auth/invalid-api-key": "The Firebase API key in firebase.js is invalid. Copy the Web app config from Firebase Console.",
+            "auth/captcha-check-failed": "Phone verification CAPTCHA failed. Refresh and try again.",
+            "auth/invalid-phone-number": "Enter your phone number in international format, such as +1 followed by your number.",
+            "auth/quota-exceeded": "Firebase SMS quota is exhausted. Check Firebase Authentication phone settings.",
+            "auth/invalid-verification-code": "That verification code is incorrect. Try again.",
+            "auth/code-expired": "That verification code expired. Request a new one.",
+            "auth/popup-blocked": "The Google sign-in popup was blocked. Allow popups for Diamond Lounge and try again.",
+            "auth/popup-closed-by-user": "Google sign-in was closed before completion.",
+            "auth/account-exists-with-different-credential": "An account already exists with this email using another sign-in method. Sign in with that method, then link Google from your profile."
         };
 
-        async function ensureProfile(user) { await setDoc(doc(db,"users",user.uid), {uid:user.uid,displayName:user.displayName || user.phoneNumber || "Member",createdAt:serverTimestamp()}, {merge:true}); }
+        async function ensureProfile(user) { const profileRef=doc(db,"users",user.uid); const existing=await getDoc(profileRef); if(!existing.exists()){ await setDoc(profileRef,{uid:user.uid,displayName:user.displayName || user.phoneNumber || "Member",createdAt:serverTimestamp()}); } }
 googleButton.addEventListener("click", async()=>{try{const result=await signInWithPopup(auth,new GoogleAuthProvider());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||e.message;}});
 let confirmationResult=null;
-phoneButton.addEventListener("click",async()=>{try{const phone=document.getElementById("phoneNumber").value.trim();if(!phone){errorMessage.textContent="Enter your phone number including country code.";return;}if(!window.phoneRecaptcha)window.phoneRecaptcha=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});confirmationResult=await signInWithPhoneNumber(auth,phone,window.phoneRecaptcha);phoneCodeArea.hidden=false;phoneButton.disabled=true;phoneButton.textContent="Code sent";}catch(e){errorMessage.textContent=errors[e.code]||e.message;phoneButton.disabled=false;if(window.phoneRecaptcha){window.phoneRecaptcha.clear();window.phoneRecaptcha=null;}}});
-document.getElementById("verifyPhoneButton").addEventListener("click",async()=>{try{const result=await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||"Verification failed."; }});
+phoneButton.addEventListener("click",async()=>{try{const phone=document.getElementById("phoneNumber").value.trim();if(!phone){errorMessage.textContent="Enter your phone number including country code.";return;}if(!window.phoneRecaptcha)window.phoneRecaptcha=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});confirmationResult=await signInWithPhoneNumber(auth,phone,window.phoneRecaptcha);phoneCodeArea.hidden=false;phoneButton.disabled=true;phoneButton.textContent="Code sent";errorMessage.textContent="Verification SMS sent. Enter the code below.";}catch(e){errorMessage.textContent=errors[e.code]||e.message;phoneButton.disabled=false;if(window.phoneRecaptcha){window.phoneRecaptcha.clear();window.phoneRecaptcha=null;}}});
+document.getElementById("verifyPhoneButton").addEventListener("click",async()=>{try{const result=await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());await ensureProfile(result.user);window.location.assign(postAuthDestination());}catch(e){errorMessage.textContent=errors[e.code]||"Verification failed.";phoneButton.disabled=false;phoneButton.textContent="Send verification code"; }});
 form.addEventListener("submit", async (event) => {
             event.preventDefault();
             if (!form.reportValidity()) return;
