@@ -2371,123 +2371,84 @@ function serverFeatureDialog(title){let o=document.getElementById("serverFeature
 async function serverInviteDialog(channel=null){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog("Invite Friends"),p=sfNode("p",channel?"Create a link to invite someone directly to this voice channel.":"Create a shareable invite link.");c.append(p);const b=sfNode("button","Create invite link");b.className="created-server-feature-action";c.append(b);const area=document.createElement("div");c.append(area);b.onclick=async()=>{try{b.disabled=true;const code=(crypto.randomUUID?.()||Date.now()+"-"+Math.random()).replace(/-/g,"").slice(0,20);await setDoc(doc(db,"servers",activeCreatedServerId,"invites",code),{code,createdBy:currentUser.uid,createdAt:serverTimestamp(),channelId:channel?.id||null});const url=new URL(location.href);url.searchParams.set("serverInvite",activeCreatedServerId);url.searchParams.set("invite",code);if(channel)url.searchParams.set("inviteChannel",channel.id);area.replaceChildren();const input=document.createElement("input");input.readOnly=true;input.value=url.href;const cp=sfNode("button","Copy");cp.className="created-server-feature-action";cp.onclick=async()=>{try{await navigator.clipboard.writeText(input.value);cp.textContent="Copied";}catch{input.select();document.execCommand("copy");}};area.append(input,cp);}catch(e){console.error("Invite creation failed:",e);area.replaceChildren();const errorMessage=sfNode("p","Invite link failed: "+(e?.code||"unknown error")+" — "+(e?.message||"Please try again."));errorMessage.style.color="#ed4245";area.append(errorMessage);}finally{b.disabled=false;}};}
 async function serverVoiceChannelSettings(channel){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog("Voice Channel Settings");const label=sfNode("label","Channel name");const input=document.createElement("input");input.value=channel.name||"";input.maxLength=40;c.append(label,input);const save=sfNode("button","Save");save.className="created-server-feature-action";c.append(save);save.onclick=async()=>{try{await updateDoc(doc(db,"servers",activeCreatedServerId,"channels",channel.id),{name:input.value.trim(),nameLower:normalizeServerName(input.value)});channel.name=input.value.trim();renderCreatedServerChannels();if(activeCreatedServerChannelId===channel.id&&createdServerActiveChannel)createdServerActiveChannel.textContent=channel.name;save.textContent="Saved";}catch(e){alert("Channel update failed. Check Firebase rules.");}};if(currentServerCanManageChannels||activeCreatedServerOwnerUid===currentUser.uid){const del=sfNode("button","Delete channel");del.className="created-server-feature-action";del.style.background="#ed4245";c.append(del);del.onclick=()=>{if(confirm("Delete this voice channel?"))void deleteCreatedServerChannel(channel);};}}
 async function openCreatedServerVoiceChat(channel){if(!currentUser||!activeCreatedServerId)return;const c=serverFeatureDialog(channel.name+" — Chat");c.className="created-server-feature-content created-server-voice-chat-content";const log=document.createElement("div");log.className="created-server-voice-chat-log";c.append(log);const form=document.createElement("form");form.className="created-server-voice-chat-form";const input=document.createElement("input");input.placeholder="Message #"+channel.name;input.maxLength=2000;input.required=true;const send=sfNode("button","Send");send.className="created-server-feature-action";form.append(input,send);c.append(form);const ref=collection(db,"servers",activeCreatedServerId,"channels",channel.id,"messages");const unsub=onSnapshot(query(ref,orderBy("timestamp","asc")),snap=>{log.replaceChildren();snap.forEach(d=>{const data=d.data(),row=document.createElement("div");row.className="created-server-voice-chat-message";const name=sfNode("strong",data.displayName||data.username||"Member");const body=sfNode("span",data.text||"");row.append(name,body);log.append(row);});log.scrollTop=log.scrollHeight;},e=>{console.error(e);log.textContent="Chat could not be loaded. Firebase rules may need updating.";});form.onsubmit=async e=>{e.preventDefault();const text=input.value.trim();if(!text)return;send.disabled=true;try{await addDoc(ref,{uid:currentUser.uid,displayName:currentUser.displayName||currentUser.email?.split("@")[0]||"Member",text,timestamp:serverTimestamp()});input.value="";}catch(e){console.error(e);alert("Message failed to send. Firebase rules may need updating.");}finally{send.disabled=false;}};const modal=document.getElementById("serverFeatureDialog");modal?.querySelector(".created-server-feature-close")?.addEventListener("click",unsub,{once:true});modal?.addEventListener("DOMNodeRemoved",unsub,{once:true});}
+function cropServerImage(file) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        image.onload = () => {
+            const overlay = document.createElement("div");
+            overlay.style.cssText = "position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.78);display:grid;place-items:center;padding:18px;";
+            const panel = document.createElement("div");
+            panel.style.cssText = "width:min(440px,100%);background:#17181c;border:1px solid rgba(199,169,107,.35);border-radius:20px;padding:20px;box-shadow:0 24px 80px #000;display:grid;gap:14px;";
+            const title = sfNode("h2","Crop server picture"); title.style.margin="0";
+            const canvas=document.createElement("canvas"); canvas.width=320;canvas.height=320;
+            canvas.style.cssText="width:min(320px,100%);aspect-ratio:1;border-radius:16px;background:#111;cursor:grab;touch-action:none;justify-self:center;";
+            const ctx=canvas.getContext("2d");
+            const zoom=document.createElement("input");zoom.type="range";zoom.min="1";zoom.max="3";zoom.step=".01";zoom.value="1";
+            const hint=sfNode("small","Drag the image to reposition. Zoom to adjust.");hint.style.color="#aaa";
+            const actions=document.createElement("div");actions.style.cssText="display:flex;justify-content:flex-end;gap:10px;";
+            const cancel=sfNode("button","Cancel");const apply=sfNode("button","Use crop");
+            apply.style.cssText="padding:10px 16px;border-radius:12px;background:#c7a96b;color:#111;border:0;font-weight:700;cursor:pointer;";
+            cancel.style.cssText="padding:10px 16px;border-radius:12px;background:#28292e;border:1px solid #444;cursor:pointer;";
+            actions.append(cancel,apply);panel.append(title,canvas,hint,sfNode("label","Zoom"),zoom,actions);overlay.append(panel);document.body.append(overlay);
+            let factor=1,offsetX=0,offsetY=0,drag=false,lastX=0,lastY=0;
+            const base=Math.max(canvas.width/image.width,canvas.height/image.height);
+            function draw(){
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                const w=image.width*base*factor,h=image.height*base*factor;
+                offsetX=Math.min(0,Math.max(canvas.width-w,offsetX));offsetY=Math.min(0,Math.max(canvas.height-h,offsetY));
+                ctx.drawImage(image,offsetX,offsetY,w,h);
+            }
+            factor=1;offsetX=(canvas.width-image.width*base)/2;offsetY=(canvas.height-image.height*base)/2;draw();
+            zoom.oninput=()=>{factor=Number(zoom.value);offsetX=(canvas.width-image.width*base*factor)/2;offsetY=(canvas.height-image.height*base*factor)/2;draw();};
+            canvas.onpointerdown=e=>{drag=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);canvas.style.cursor="grabbing";};
+            canvas.onpointermove=e=>{if(!drag)return;offsetX+=e.clientX-lastX;offsetY+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;draw();};
+            canvas.onpointerup=canvas.onpointercancel=()=>{drag=false;canvas.style.cursor="grab";};
+            cancel.onclick=()=>{overlay.remove();URL.revokeObjectURL(objectUrl);resolve(null);};
+            apply.onclick=()=>canvas.toBlob(blob=>{overlay.remove();URL.revokeObjectURL(objectUrl);blob?resolve(blob):reject(new Error("Crop could not be saved."));},"image/png");
+        };
+        image.onerror=()=>{URL.revokeObjectURL(objectUrl);reject(new Error("Image could not be opened."));};
+        image.src=objectUrl;
+    });
+}
+
 async function serverSettingsDialog() {
     if (!activeCreatedServerId || !currentUser) return;
     const serverId = activeCreatedServerId;
     const snapshot = await getDoc(doc(db, "servers", serverId));
     if (!snapshot.exists()) return;
-
     const data = snapshot.data();
     const content = serverFeatureDialog("Server Settings");
     const nameInput = document.createElement("input");
-    nameInput.value = data.name || "";
-    nameInput.maxLength = 40;
-    nameInput.placeholder = "Server name";
-
-    const iconInput = document.createElement("input");
-    iconInput.type = "url";
-    iconInput.value = data.iconUrl || "";
-    iconInput.placeholder = "Or paste an image URL";
-
-    const iconFile = document.createElement("input");
-    iconFile.type = "file";
-    iconFile.accept = "image/png,image/jpeg,image/webp,image/gif";
-    const iconPreview = document.createElement("img");
-    iconPreview.alt = "Server icon preview";
-    iconPreview.style.width = "64px";
-    iconPreview.style.height = "64px";
-    iconPreview.style.objectFit = "cover";
-    iconPreview.style.borderRadius = "16px";
-    iconPreview.style.display = data.iconUrl ? "block" : "none";
-    if (data.iconUrl) iconPreview.src = data.iconUrl;
-
-    iconFile.addEventListener("change", () => {
-        const file = iconFile.files?.[0];
-        if (!file) return;
-        if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
-            alert("Choose an image smaller than 5 MB.");
-            iconFile.value = "";
-            return;
-        }
-        iconPreview.src = URL.createObjectURL(file);
-        iconPreview.style.display = "block";
+    nameInput.value=data.name||"";nameInput.maxLength=40;nameInput.placeholder="Server name";
+    const iconInput=document.createElement("input");iconInput.type="url";iconInput.value=data.iconUrl||"";iconInput.placeholder="Or paste an image URL";
+    const iconFile=document.createElement("input");iconFile.type="file";iconFile.accept="image/png,image/jpeg,image/webp";
+    const iconPreview=document.createElement("img");iconPreview.alt="Server icon preview";iconPreview.style.cssText="width:88px;height:88px;object-fit:cover;border-radius:20px;display:block;background:#222;";
+    iconPreview.src=data.iconUrl||"";
+    const visibility=document.createElement("select");
+    ["private","public"].forEach(value=>{const option=document.createElement("option");option.value=value;option.textContent=value;visibility.append(option);});
+    visibility.value=data.visibility||"private";
+    let croppedBlob=null;
+    iconFile.addEventListener("change",async()=>{
+        const file=iconFile.files?.[0];if(!file)return;
+        if(!file.type.startsWith("image/")||file.size>8*1024*1024){alert("Choose an image smaller than 8 MB.");iconFile.value="";return;}
+        try{croppedBlob=await cropServerImage(file);if(croppedBlob){iconPreview.src=URL.createObjectURL(croppedBlob);iconInput.value="";}}
+        catch(error){alert(error.message||"Crop failed.");}
     });
-
-    const visibility = document.createElement("select");
-    ["private", "public"].forEach(value => {
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = value;
-        visibility.append(option);
-    });
-    visibility.value = data.visibility || "private";
-
-    content.append(
-        sfNode("label", "Server name"), nameInput,
-        sfNode("label", "Server icon"), iconPreview, iconFile,
-        sfNode("label", "Or use an image URL"), iconInput,
-        sfNode("label", "Visibility"), visibility
-    );
-
-    const save = sfNode("button", "Save changes");
-    save.className = "created-server-feature-action";
-    content.append(save);
-
-    save.onclick = async () => {
-        if (activeCreatedServerOwnerUid !== currentUser.uid) {
-            alert("Only the owner can change settings.");
-            return;
-        }
-        const name = nameInput.value.trim();
-        let iconUrl = iconInput.value.trim();
-        const file = iconFile.files?.[0];
-        if (name.length < 2 || name.length > 40) {
-            alert("Server name must be between 2 and 40 characters.");
-            return;
-        }
-        if (iconUrl && !/^https?:\/\//i.test(iconUrl)) {
-            alert("Server icon URL must start with http:// or https://.");
-            return;
-        }
-
-        save.disabled = true;
-        save.textContent = file ? "Uploading icon..." : "Saving...";
-        try {
-            if (file) {
-                if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
-                    throw new Error("Choose an image smaller than 5 MB.");
-                }
-                const extension = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "");
-                const path = `uploads/${currentUser.uid}/server-${serverId}-${Date.now()}.${extension || "png"}`;
-                const stored = await uploadBytes(storageRef(storage, path), file, {
-                    contentType: file.type,
-                    cacheControl: "public,max-age=31536000"
-                });
-                iconUrl = await getDownloadURL(stored.ref);
-            }
-
-            await updateDoc(doc(db, "servers", serverId), {
-                name,
-                nameLower: normalizeServerName(name),
-                visibility: visibility.value,
-                iconUrl
-            });
-
-            if (serverViewName) serverViewName.textContent = name;
-            if (serverWelcomeName) serverWelcomeName.textContent = name;
-            const menuName = document.getElementById("createdServerMenuName");
-            if (menuName) menuName.textContent = name;
-            await loadServerIcons();
-            save.textContent = "Saved";
-        } catch (error) {
-            console.error("Server settings save failed:", error);
-            alert(error.code === "permission-denied"
-                ? "Firebase denied this change. Storage and Firestore rules may need to be published."
-                : (error.message || "Settings save failed."));
-            save.textContent = "Save changes";
-        } finally {
-            save.disabled = false;
-        }
+    content.append(sfNode("label","Server name"),nameInput,sfNode("label","Server picture"),iconPreview,iconFile,sfNode("small","Upload a picture, then crop and zoom it before saving."),sfNode("label","Or use an image URL"),iconInput,sfNode("label","Visibility"),visibility);
+    const save=sfNode("button","Save changes");save.className="created-server-feature-action";content.append(save);
+    save.onclick=async()=>{
+        if(activeCreatedServerOwnerUid!==currentUser.uid){alert("Only the owner can change settings.");return;}
+        const name=nameInput.value.trim();let iconUrl=iconInput.value.trim();
+        if(name.length<2||name.length>40){alert("Server name must be between 2 and 40 characters.");return;}
+        if(iconUrl&&!/^https?:\/\//i.test(iconUrl)){alert("Server icon URL must start with http:// or https://.");return;}
+        save.disabled=true;save.textContent=croppedBlob?"Uploading cropped picture...":"Saving...";
+        try{
+            if(croppedBlob){const path=`uploads/${currentUser.uid}/server-${serverId}-${Date.now()}.png`;const stored=await uploadBytes(storageRef(storage,path),croppedBlob,{contentType:"image/png",cacheControl:"public,max-age=31536000"});iconUrl=await getDownloadURL(stored.ref);}
+            await updateDoc(doc(db,"servers",serverId),{name,nameLower:normalizeServerName(name),visibility:visibility.value,iconUrl});
+            if(serverViewName)serverViewName.textContent=name;if(serverWelcomeName)serverWelcomeName.textContent=name;const menuName=document.getElementById("createdServerMenuName");if(menuName)menuName.textContent=name;await loadServerIcons();save.textContent="Saved";
+        }catch(error){console.error("Server settings save failed:",error);alert(error.code==="permission-denied"?"Firebase denied this change. Storage and Firestore rules may need to be published.":(error.message||"Settings save failed."));save.textContent="Save changes";}
+        finally{save.disabled=false;}
     };
 }
 
