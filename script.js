@@ -346,12 +346,14 @@ function showEmptyView() {
 
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
-    if (primaryVoiceChannelName) closePrimaryVoiceCallView();
+    const returningFromPrimaryVoice = Boolean(primaryVoiceChannelName);
+    if (returningFromPrimaryVoice) closePrimaryVoiceCallView();
 
     // Release created-server channel listeners when returning to VIP-LOUNGE.
     stopCreatedServerChannels();
 
     if (
+        !returningFromPrimaryVoice &&
         activeTextChannel === channelName &&
         loungeView &&
         !loungeView.hidden
@@ -1943,6 +1945,9 @@ function closePrimaryVoiceCallView() {
 
 function openPrimaryVoiceCall(channelName, roomId) {
     if (!channelName || !roomId) return;
+    createdServerVoicePresenceStop?.();
+    createdServerVoicePresenceStop = null;
+    activeCreatedServerVoiceChannel = null;
     primaryVoicePresenceStop?.();
     primaryVoicePresenceStop = null;
     restoreCreatedServerVoiceMedia();
