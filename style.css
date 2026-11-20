@@ -3335,3 +3335,10 @@ button {
 .created-server-channel-panel.has-voice-connection > .profile-card {
     display: none !important;
 }
+
+
+.created-server-channel-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
