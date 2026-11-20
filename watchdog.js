@@ -52,7 +52,7 @@
     const gem = document.createElement("img");
     gem.src = "diamond.gif";
     gem.alt = "";
-    gem.style.cssText = "width:168px;height:168px;object-fit:contain;flex-shrink:0;transform:translateX(12px)";
+    gem.style.cssText = "width:168px;height:168px;object-fit:contain;flex-shrink:0;transform:none";
     const label = document.createElement("span");
     label.textContent = "DIAMOND WATCHDOG";
     label.style.cssText = "letter-spacing:.4px;margin-left:0px";
@@ -71,7 +71,9 @@
         const header = botView.querySelector(".support-bot-header");
         if (header && badge.parentElement !== header) {
           header.appendChild(badge);
-          header.style.cssText += ";justify-content:center;gap:12px;flex-wrap:wrap";
+          header.style.justifyContent = "space-between";
+          header.style.gap = "0px";
+          header.style.flexWrap = "nowrap";
         }
       }
     }
