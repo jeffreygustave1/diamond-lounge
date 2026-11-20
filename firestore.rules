@@ -62,7 +62,11 @@ service cloud.firestore {
     }
 
     match /servers/{serverId} {
-      allow read: if request.auth != null;
+      // Members can list only servers they belong to. Direct gets are needed
+      // to resolve invite URLs before membership is established.
+      allow get: if request.auth != null;
+      allow list: if request.auth != null
+        && request.auth.uid in resource.data.memberUids;
 
       allow create: if request.auth != null
         && request.resource.data.keys().hasAll([
@@ -203,7 +207,9 @@ service cloud.firestore {
       }
 
       match /invites/{inviteCode} {
-        allow read: if request.auth != null;
+        // Invitees fetch a known code from the link; invite collections cannot be enumerated.
+        allow get: if request.auth != null;
+        allow list: if false;
         allow create: if isServerMember()
           && request.resource.data.createdBy == request.auth.uid;
         allow update, delete: if isServerOwner() || hasServerPermission('manageInvites');
