@@ -32,3 +32,14 @@
  .dm-call-panel{padding:12px!important}
  .dm-call-videos video{min-height:90px!important}
 }
+
+/* Private calls reuse the exact server voice control panel. */
+.dm-call-voice-controls{display:block;margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid rgba(199,169,107,.18)}
+.dm-call-voice-controls[hidden],.dm-call-main-stage[hidden]{display:none!important}
+.dm-call-voice-controls .voice-panel-status{margin:0 0 10px}
+.dm-call-voice-buttons{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dm-call-voice-buttons .voice-control{width:100%;min-height:42px}
+.dm-call-voice-buttons #dmCallHangup{grid-column:1/-1}
+.dm-call-main-stage{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:12px;min-height:220px;margin:16px auto;width:100%;max-width:1100px}
+.dm-call-main-stage video{width:min(48%,520px);min-width:220px;max-height:55vh;aspect-ratio:16/9;object-fit:contain;background:#08090c;border:1px solid rgba(199,169,107,.22);border-radius:14px}
+@media(max-width:650px){.dm-call-main-stage video{width:100%;min-width:0;max-height:38vh}}
