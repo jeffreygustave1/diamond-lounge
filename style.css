@@ -3758,3 +3758,27 @@ button {
  .dl-watch-shell{max-height:65vh!important;padding:10px!important}
  .dl-watch-voice-tile{width:100%;margin:8px 0}
 }
+
+
+/* Shared Watch belongs in the large voice participant stage, not the tiny remote-video tray. */
+.created-server-voice-stage > .dl-watch-voice-tile{
+  grid-column:1/-1!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:14px!important;
+  order:-1;
+}
+.created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player{
+  width:100%!important;
+  aspect-ratio:16/9!important;
+  min-height:280px!important;
+  max-height:68vh!important;
+}
+.created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player iframe,
+.created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player #dlWatchYT{
+  width:100%!important;height:100%!important;
+}
+@media(max-width:700px){
+ .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player{min-height:190px!important;max-height:45vh!important}
+}
