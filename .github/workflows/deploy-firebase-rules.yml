@@ -1,16 +1,40 @@
 name: Deploy Firebase Rules
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   deploy-rules:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install --global firebase-tools
+
+      - name: Check Firebase credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "::error::Add the Firebase service-account JSON as the FIREBASE_SERVICE_ACCOUNT repository secret."
+            exit 1
+          fi
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: diamond-lounge-7caf6
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+
       - name: Deploy Firestore and Storage rules
-        run: firebase deploy --only firestore:rules,storage --project diamond-lounge-7caf6 --token "${{ secrets.FIREBASE_TOKEN }}"
+        run: firebase deploy --only firestore:rules,storage --project diamond-lounge-7caf6
