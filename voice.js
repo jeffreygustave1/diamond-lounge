@@ -1643,4 +1643,124 @@ function playVoicePresenceSound(type) {
 /* CREATED-SERVER VOICE BRIDGE */
 window.diamondJoinCreatedVoiceRoom=async(label,customRoomId)=>{if(localStream)await leaveVoice();selectedChannel=label;roomId=customRoomId;setStatus("Connecting to "+label+"...");watchParticipants();await joinVoice();};
 window.diamondLeaveVoice=()=>leaveVoice();
-window.diamondWatchCreatedVoiceRoom=(customRoomId,stage,audience)=>{const unsub=onSnapshot(collection(db,"voiceRooms",customRoomId,"participants"),snap=>{const live=snap.docs.map(d=>d.data()).filter(p=>Date.now()-Number(p.heartbeatAt||0)<STALE_AFTER_MS);stage.replaceChildren();audience.replaceChildren();if(!live.length){stage.textContent="No one connected yet.";return;}live.forEach(p=>{const tile=document.createElement("div");tile.className="created-server-voice-tile";const avatar=document.createElement("div");avatar.className="created-server-voice-avatar";avatar.textContent=(p.name||"Member").trim().slice(0,1).toUpperCase();const nm=document.createElement("div");nm.className="created-server-voice-name";nm.textContent=p.name||"Member";tile.append(avatar,nm);if(p.cameraOn||p.screenOn){const badge=document.createElement("span");badge.textContent=p.cameraOn?"📷":"🖥️";tile.append(badge);}stage.append(tile);const person=document.createElement("div");person.className="created-server-audience-member";person.textContent=p.name||"Member";audience.append(person);if(p.uid){getDoc(doc(db,"users",p.uid)).then(profile=>{if(!profile.exists())return;const data=profile.data();if(data.picture){avatar.textContent="";const image=document.createElement("img");image.src=data.picture;image.alt=(p.name||"Member")+" avatar";image.className="created-server-voice-avatar-image";avatar.append(image);}else if(data.avatar){avatar.textContent="";avatar.style.background=data.avatar;}}).catch(()=>{});}});});return()=>unsub();};
+window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience) => {
+    const profileCache = new Map();
+    const avatarPresets = {
+        diamond: {
+            background: "linear-gradient(145deg,#2b2924,#141416)",
+            color: "#e1c98f",
+            glyph: "✦"
+        },
+        gold: {
+            background: "linear-gradient(145deg,#c7a96b,#8b7040)",
+            color: "#1a1610",
+            glyph: "G"
+        },
+        silver: {
+            background: "linear-gradient(145deg,#c9ccd2,#8d9198)",
+            color: "#191a1d",
+            glyph: "S"
+        },
+        emerald: {
+            background: "linear-gradient(145deg,#4f8a63,#2c5740)",
+            color: "#eef7f0",
+            glyph: "E"
+        },
+        ruby: {
+            background: "linear-gradient(145deg,#a5535a,#6f2f36)",
+            color: "#fbeeee",
+            glyph: "R"
+        },
+        royal: {
+            background: "linear-gradient(145deg,#5a5fa5,#33376f)",
+            color: "#eeeffb",
+            glyph: "V"
+        }
+    };
+
+    const unsubscribe = onSnapshot(
+        collection(db, "voiceRooms", customRoomId, "participants"),
+        snapshot => {
+            const liveMembers = snapshot.docs
+                .map(entry => entry.data())
+                .filter(member =>
+                    Date.now() - Number(member.heartbeatAt || 0) < STALE_AFTER_MS
+                );
+
+            stage.replaceChildren();
+            audience.replaceChildren();
+
+            if (!liveMembers.length) {
+                stage.textContent = "No one connected yet.";
+                return;
+            }
+
+            liveMembers.forEach(member => {
+                const displayName = member.name || "Member";
+                const tile = document.createElement("div");
+                tile.className = "created-server-voice-tile";
+
+                const avatar = document.createElement("div");
+                avatar.className = "created-server-voice-avatar";
+                avatar.textContent = displayName.trim().slice(0, 1).toUpperCase();
+
+                const name = document.createElement("div");
+                name.className = "created-server-voice-name";
+                name.textContent = displayName;
+                tile.append(avatar, name);
+
+                if (member.cameraOn || member.screenOn) {
+                    const mediaBadge = document.createElement("span");
+                    mediaBadge.textContent = member.cameraOn ? "📷" : "🖥️";
+                    tile.append(mediaBadge);
+                }
+
+                stage.append(tile);
+
+                const audienceMember = document.createElement("div");
+                audienceMember.className = "created-server-audience-member";
+                audienceMember.textContent = displayName;
+                audience.append(audienceMember);
+
+                if (!member.uid) return;
+
+                let profilePromise = profileCache.get(member.uid);
+                if (!profilePromise) {
+                    profilePromise = getDoc(doc(db, "users", member.uid))
+                        .then(profile => profile.exists() ? profile.data() : {})
+                        .catch(error => {
+                            console.warn("Voice avatar profile unavailable:", error);
+                            return {};
+                        });
+                    profileCache.set(member.uid, profilePromise);
+                }
+
+                profilePromise.then(profile => {
+                    if (!avatar.isConnected) return;
+
+                    if (typeof profile.picture === "string" && profile.picture) {
+                        avatar.replaceChildren();
+                        const image = document.createElement("img");
+                        image.src = profile.picture;
+                        image.alt = displayName + " avatar";
+                        image.className = "created-server-voice-avatar-image";
+                        avatar.append(image);
+                        return;
+                    }
+
+                    const preset = avatarPresets[profile.avatar] || avatarPresets.diamond;
+                    avatar.textContent = preset.glyph;
+                    avatar.style.background = preset.background;
+                    avatar.style.color = preset.color;
+                });
+            });
+        },
+        error => {
+            console.error("Created-server voice presence failed:", error);
+            stage.textContent = "Voice members could not be loaded.";
+            audience.replaceChildren();
+        }
+    );
+
+    return () => unsubscribe();
+};
