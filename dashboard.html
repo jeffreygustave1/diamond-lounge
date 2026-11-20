@@ -922,7 +922,7 @@
                 sourceCanvas.width = gif.lsd.width;
                 sourceCanvas.height = gif.lsd.height;
 
-                const sourceCtx = sourceCanvas.getContext("2d");
+                const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
 
                 const iconCanvas = document.createElement("canvas");
                 iconCanvas.width = 32;
