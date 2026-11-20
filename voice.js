@@ -1526,8 +1526,11 @@ channelItems.forEach((channel) => {
 
         const nextRoom = makeRoomId(nextName);
 
-        // Already connected to this channel.
+        // Already connected: reopen the call screen without reconnecting.
         if (localStream && nextRoom === roomId) {
+            activeVoiceServerName = "VIP-LOUNGE";
+            window.diamondOpenPrimaryVoiceCall?.(nextName, nextRoom);
+            watchParticipants();
             return;
         }
 
@@ -1555,8 +1558,10 @@ channelItems.forEach((channel) => {
 
         selectedChannel = nextName;
         roomId = nextRoom;
+        activeVoiceServerName = "VIP-LOUNGE";
+        window.diamondOpenPrimaryVoiceCall?.(nextName, nextRoom);
 
-        // Move the voice panel into the selected row.
+        // Keep the old inline control panel out of the Discord-style voice layout. 
         const ownRow = channel.closest(".voice-row");
 
         if (
@@ -1568,7 +1573,7 @@ channelItems.forEach((channel) => {
         }
 
         if (panel) {
-            panel.hidden = false;
+            panel.hidden = true;
         }
 
         // Watch the selected room.
