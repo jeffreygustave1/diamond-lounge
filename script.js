@@ -3793,3 +3793,14 @@ window.diamondLoungeStartTour=start;window.diamondLoungeResetTour=()=>localStora
 
 // Premium customization storefront: display catalogue details without granting entitlements.
 document.querySelectorAll(".dl-store-buy").forEach(button=>button.addEventListener("click",()=>{const note=document.getElementById("dlStorePaymentNote");if(note){note.textContent="\u2726 "+(button.dataset.cosmetic==="silver-gif"?"Silver-exclusive animated GIF profile pictures and server icons are planned.":"This premium cosmetic is reserved for paid members.")+" Secure checkout and server-verified purchases are not connected yet, so all premium items remain locked.";note.scrollIntoView({block:"nearest",behavior:"smooth"});}}));
+
+// Silver cosmetic checkout (requires the deployed premium Worker URL configured below).
+const PREMIUM_WORKER_URL = "https://diamond-lounge-premium.YOUR-CLOUDFLARE-SUBDOMAIN.workers.dev";
+document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click", async (event) => {
+  const button=event.currentTarget; const note=document.getElementById("dlStorePaymentNote");
+  if(!auth.currentUser){if(note)note.textContent="Please sign in before purchasing premium cosmetics.";return;}
+  if(PREMIUM_WORKER_URL.includes("YOUR-CLOUDFLARE-SUBDOMAIN")){if(note)note.textContent="Checkout is being prepared. The secure Worker must be deployed and its URL configured first.";return;}
+  button.disabled=true;button.textContent="Opening secure checkout…";
+  try{const token=await auth.currentUser.getIdToken();const response=await fetch(PREMIUM_WORKER_URL+"/checkout/silver-gif-pack",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"}});const data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Checkout could not be started.");window.location.assign(data.url);}
+  catch(error){if(note)note.textContent=error.message||"Unable to start checkout.";button.disabled=false;button.textContent="View Silver";}
+});
