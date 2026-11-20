@@ -1966,7 +1966,7 @@ async function serverMembersDialog() {
                 if (uid === activeCreatedServerOwnerUid) heading.textContent += " · Owner";
                 row.append(heading);
 
-                if (canManageMembers && uid !== activeCreatedServerOwnerUid && memberSnapshot.exists()) {
+                if (canManageMembers && uid !== activeCreatedServerOwnerUid) {
                     const roleWrap = document.createElement("div");
                     roleWrap.style.display = "flex";
                     roleWrap.style.flexWrap = "wrap";
