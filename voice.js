@@ -1467,7 +1467,11 @@ async function joinVoice() {
 
         watchIncomingCalls();
 
-        setStatus(`Connected to ${selectedChannel}`);\n        if (user?.isAnonymous) {\n            clearTimeout(guestVoiceTimer);\n            guestVoiceTimer=setTimeout(()=>{if(localStream){setStatus('Guest voice session ended after 30 minutes. You may rejoin.');leaveVoice();}},GUEST_VOICE_LIMIT_MS);\n        }
+        setStatus(`Connected to ${selectedChannel}`);
+        if (user?.isAnonymous) {
+            clearTimeout(guestVoiceTimer);
+            guestVoiceTimer=setTimeout(()=>{if(localStream){setStatus('Guest voice session ended after 30 minutes. You may rejoin.');leaveVoice();}},GUEST_VOICE_LIMIT_MS);
+        }
 
     } catch (error) {
         console.error("Unable to join voice:", error);
