@@ -344,6 +344,7 @@ function showEmptyView() {
         button.classList.remove("selected");
         button.setAttribute("aria-pressed", "false");
     });
+    updateCreatedServerVoiceUI();
 }
 
 // ==================================================
@@ -735,6 +736,7 @@ function showDirectMessages() {
         memberSearch.value = "";
         renderMembers();
     }
+    updateCreatedServerVoiceUI();
 }
 
 dmHomeButton?.addEventListener("click", (event) => {
@@ -2896,6 +2898,7 @@ loadCreatedServerChannels(server.id);
     serverButton?.classList.add("selected");
     serverButton?.setAttribute("aria-pressed", "true");
 
+    updateCreatedServerVoiceUI();
     setMobileSidebar(false);
 }
 
