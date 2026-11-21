@@ -1,10 +1,9 @@
-import { auth, db, storage } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 
 import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
 
 import {
     addDoc,
@@ -3696,8 +3695,9 @@ profileUploadInput?.addEventListener("change", () => {
     const gif = file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif");
     if (!file.type.startsWith("image/")) { if (profileStatus) { profileStatus.textContent = "Choose an image file."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
     if (gif && !silverGifEntitled) { if (profileStatus) { profileStatus.textContent = "GIF profile pictures require the Silver GIF Pack. Purchase it, then refresh."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
-    if (file.size > 5*1024*1024) { if (profileStatus) { profileStatus.textContent = "Please choose an image smaller than 5 MB."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
-    if (gif) { pendingGifFile=file; rawPicture=""; uploadedPicture=""; if(profileCrop)profileCrop.hidden=true; if(profilePreviewImage){profilePreviewImage.src=URL.createObjectURL(file);profilePreviewImage.style.display="block";} if(profileStatus){profileStatus.textContent="Silver GIF selected. Save your profile to upload it.";profileStatus.className="success";} return; }
+    if (gif && file.size > 400*1024) { if (profileStatus) { profileStatus.textContent = "GIFs must be 400 KB or smaller. This keeps profile uploads within the free Firestore document size limit."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
+    if (!gif && file.size > 5*1024*1024) { if (profileStatus) { profileStatus.textContent = "Please choose an image smaller than 5 MB."; profileStatus.className = "error"; } profileUploadInput.value = ""; return; }
+    if (gif) { pendingGifFile=file; rawPicture=""; uploadedPicture=""; if(profileCrop)profileCrop.hidden=true; if(profilePreviewImage){profilePreviewImage.src=URL.createObjectURL(file);profilePreviewImage.style.display="block";} if(profileStatus){profileStatus.textContent="Silver GIF selected (up to 400 KB). Save your profile to upload it.";profileStatus.className="success";} return; }
     pendingGifFile=null; const reader=new FileReader();
     reader.onload=()=>{rawPicture=String(reader.result||"");cropScale=1;cropX=0;cropY=0;if(profileCrop)profileCrop.hidden=false;if(cropZoom)cropZoom.value="100";if(cropImage){cropImage.src=rawPicture;cropImage.style.transformOrigin="center center";cropImage.style.transform="translate(0px, 0px) scale(1)";}if(profileStatus){profileStatus.textContent="Drag the image to position it. Adjust zoom, then save.";profileStatus.className="success";}};
     reader.onerror=()=>{if(profileStatus){profileStatus.textContent="The image could not be opened.";profileStatus.className="error";}};reader.readAsDataURL(file);
@@ -3739,9 +3739,15 @@ profileForm?.addEventListener("submit", async (event) => {
     try {
         if (pendingGifFile) {
             if (!silverGifEntitled) throw new Error("Silver GIF Pack entitlement required.");
-            const gifRef = storageRef(storage, "premium-gifs/" + currentUser.uid + "/profile.gif");
-            await uploadBytes(gifRef, pendingGifFile, { contentType: "image/gif" });
-            uploadedPicture = await getDownloadURL(gifRef);
+            uploadedPicture = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ""));
+                reader.onerror = () => reject(new Error("The GIF could not be read."));
+                reader.readAsDataURL(pendingGifFile);
+            });
+            if (!uploadedPicture.startsWith("data:image/gif;base64,")) {
+                throw new Error("The selected file could not be saved as a GIF.");
+            }
         } else if (rawPicture) {
             const croppedPicture = await renderCroppedPicture();
 
@@ -3752,9 +3758,12 @@ profileForm?.addEventListener("submit", async (event) => {
             uploadedPicture = croppedPicture;
         }
 
-        if (uploadedPicture.length > 400000) {
+        const maxPictureLength = pendingGifFile ? 600000 : 400000;
+        if (uploadedPicture.length > maxPictureLength) {
             throw new Error(
-                "The cropped picture is too large. Please choose another image."
+                pendingGifFile
+                    ? "This GIF is too large after encoding. Please choose a GIF smaller than 400 KB."
+                    : "The cropped picture is too large. Please choose another image."
             );
         }
 
