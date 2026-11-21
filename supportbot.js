@@ -5,7 +5,10 @@ const diamondBrowserErrors=[];
 function diamondSafeError(value){return String(value||'').replace(/https?:\\/\\/[^\\s?#]+(?:\\?[^\\s]*)?/g,'[URL]').replace(/(token|password|secret|apiKey|authorization)\\s*[:=]\\s*[^\\s,;]+/gi,'$1=[redacted]').slice(0,500);}
 window.addEventListener('error',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError((e.message||'Script error')+' ('+(e.filename||'')+':'+(e.lineno||0)+')'));});
 window.addEventListener('unhandledrejection',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError('Unhandled promise: '+(e.reason?.message||e.reason||'unknown')));});
-const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";\nconst DIAMOND_REPAIR_BRIDGE_ENDPOINT = "https://YOUR-REPAIR-BRIDGE-WORKER.workers.dev";\nconst DIAMOND_REPAIR_PATHS = new Set(["dashboard.html","supportbot.js","supportbot.css","style.css","dm.css","voice.js","watch.js","server.js","channels.js","dm.js","profile.js","calls.js","activities.js","README.md"]);\nimport { auth } from "./firebase.js";
+const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
+const DIAMOND_REPAIR_BRIDGE_ENDPOINT = "https://YOUR-REPAIR-BRIDGE-WORKER.workers.dev";
+const DIAMOND_REPAIR_PATHS = new Set(["dashboard.html","supportbot.js","supportbot.css","style.css","dm.css","voice.js","watch.js","server.js","channels.js","dm.js","profile.js","calls.js","activities.js","README.md" ]);
+import { auth } from "./firebase.js";
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support, the helpful technical support assistant for DIAMOND LOUNGE, a Discord-like community web app.
 
 Use supplied project-source excerpts to diagnose real code, cite filenames, and avoid speculative fixes. If source is missing, say so. Your job is to troubleshoot issues step by step, not just give generic replies. When browser diagnostics are included, prioritize matching errors, explain their likely causes, and propose a focused fix. You still cannot change files or deploy code unless an actual tool grants that ability.
