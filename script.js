@@ -317,8 +317,7 @@ function applyProfileCosmetics() {
 
     const backdropTargets = [
         document.querySelector(".profile-card"),
-        document.querySelector(".created-server-voice-user-row"),
-        document.querySelector("#mainVoiceConnectionPanel .created-server-voice-user-row")
+        ...document.querySelectorAll(".created-server-voice-user-row")
     ].filter(Boolean);
     backdropTargets.forEach(element => {
         [...element.classList].filter(name => name.startsWith("dl-backdrop-"))
