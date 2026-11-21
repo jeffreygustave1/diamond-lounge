@@ -166,6 +166,45 @@ let suppressServerClick = false;
 
 let currentAvatar = "diamond";
 let uploadedPicture = "";
+const DIAMOND_LOUNGE_OWNER_UID = "NlOxj6tdInP9SMKcYIUtz1MeZ2z2";
+function isDiamondLoungeOwner() {
+    return Boolean(currentUser && currentUser.uid === DIAMOND_LOUNGE_OWNER_UID);
+}
+function syncCustomizationShopOwnerState() {
+    if (!isDiamondLoungeOwner()) return;
+
+    const heading = document.querySelector(".dl-store-heading p");
+    if (heading) {
+        heading.textContent = "Diamond Lounge owner benefit: available cosmetics are free for you. Items still in development will unlock here at no charge when released.";
+    }
+
+    const cards = [...document.querySelectorAll(".dl-store-item")];
+    cards.forEach((card, index) => {
+        const badge = card.querySelector(".dl-store-lock");
+        const button = card.querySelector(".dl-store-buy");
+        if (badge) {
+            badge.textContent = index === 0
+                ? "✦ OWNER ACCESS · FREE NOW"
+                : "✦ OWNER ACCESS · FREE AT RELEASE";
+        }
+        if (!button) return;
+        if (index === 0) {
+            button.textContent = "Included · Free";
+            button.disabled = false;
+            button.setAttribute("aria-label", "Silver GIF pack included free for the Diamond Lounge owner");
+        } else {
+            button.textContent = "Coming soon · Free for owner";
+            button.disabled = true;
+            button.setAttribute("aria-label", "This cosmetic is still in development and will be free for the Diamond Lounge owner when released");
+        }
+    });
+
+    const note = document.getElementById("dlStorePaymentNote");
+    if (note) {
+        note.textContent = "Owner access is active. Profile GIF uploads are available now. Profile auras, avatar frames, nameplates, exclusive badges, and server themes are catalog previews still under development; they are not yet equipable.";
+    }
+}
+
 let silverGifEntitled = false;
 let pendingGifFile = null;
 let currentProfileBadges = [];
@@ -3362,7 +3401,13 @@ function applyAvatar(key) {
 
 async function loadProfile() {
     if (!currentUser) return;
-    try { const ent = await getDoc(doc(db, "premiumEntitlements", currentUser.uid)); silverGifEntitled = ent.exists() && ent.data().silverGifPack === true; } catch (_) { silverGifEntitled = false; }
+    let purchasedSilverGif = false;
+    try {
+        const ent = await getDoc(doc(db, "premiumEntitlements", currentUser.uid));
+        purchasedSilverGif = ent.exists() && ent.data().silverGifPack === true;
+    } catch (_) {}
+    silverGifEntitled = isDiamondLoungeOwner() || purchasedSilverGif;
+    syncCustomizationShopOwnerState();
     const uploadLabel = document.querySelector('label[for="profileUploadInput"]');
     if (uploadLabel) uploadLabel.textContent = silverGifEntitled ? "Upload your own picture or Silver GIF" : "Upload your own picture";
 
@@ -3756,6 +3801,7 @@ const PREMIUM_WORKER_URL = "https://diamond-lounge-premium.jeffreygustave1.worke
 document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click", async (event) => {
   const button=event.currentTarget; const note=document.getElementById("dlStorePaymentNote");
   if(!auth.currentUser){if(note)note.textContent="Please sign in before purchasing premium cosmetics.";return;}
+  if(isDiamondLoungeOwner()){if(note)note.textContent="The Silver GIF Pack is already included free with your Diamond Lounge owner account. Use the profile upload control above to add a GIF.";return;}
   if(PREMIUM_WORKER_URL.includes("YOUR-CLOUDFLARE-SUBDOMAIN")){if(note)note.textContent="Checkout is being prepared. The secure Worker must be deployed and its URL configured first.";return;}
   button.disabled=true;button.textContent="Opening secure checkout…";
   try{const token=await auth.currentUser.getIdToken();const response=await fetch(PREMIUM_WORKER_URL+"/checkout/silver-gif-pack",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"}});const data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Checkout could not be started.");window.location.assign(data.url);}
