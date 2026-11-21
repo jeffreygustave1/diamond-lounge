@@ -8,11 +8,14 @@
     <title>DIAMOND LOUNGE — Mobile</title>
 
     <!-- Animated browser tab logo -->
-    <link rel="icon" type="image/gif" href="diamond-animated.svg?v=1">
+    <link rel="icon" type="image/gif" href="../diamond-animated.svg?v=1">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="mobile-base.css?v=1">
-        <link rel="stylesheet" href="mobile.css?v=1">
+    <link rel="stylesheet" href="./mobile-base.css?v=2">
+        <link rel="stylesheet" href="./mobile.css?v=2">
+    <link rel="stylesheet" href="./mobile-fixes.css?v=1">
+    <link rel="stylesheet" href="./mobile-layout-v2.css?v=1">
+    <link rel="stylesheet" href="./mobile-shell-normalize.css?v=2">
 </head>
 <body>
     <div class="dashboard">
@@ -30,7 +33,7 @@
                     title="Direct Messages"
                     aria-label="Open Direct Messages"
                     aria-pressed="true">
-                    <img src="diamond.gif" alt="DIAMOND LOUNGE Direct Messages">
+                    <img src="../diamond.gif" alt="DIAMOND LOUNGE Direct Messages">
                 </button>
 
                 <div class="server-divider"></div>
@@ -1006,12 +1009,12 @@
     
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
-    <script type="module" src="script.js?v=87"></script>
-<script type="module" src="watch-feature.js?v=19"></script>
-    <script type="module" src="supportbot.js?v=13"></script>
-<script type="module" src="dm-call.js?v=9"></script>
-<script type="module" src="voice.js?v=51"></script>
-<script src="watchdog.js?v=13"></script>
+    <script type="module" src="../script.js?v=87"></script>
+<script type="module" src="../watch-feature.js?v=19"></script>
+    <script type="module" src="../supportbot.js?v=13"></script>
+<script type="module" src="../dm-call.js?v=9"></script>
+<script type="module" src="../voice.js?v=51"></script>
+<script src="../watchdog.js?v=13"></script>
 
 
     <!-- ANIMATED, AUTO-CROPPED DIAMOND FAVICON -->
@@ -1021,7 +1024,7 @@
 
         (async () => {
             try {
-                const response = await fetch("diamond-favicon.gif?v=3");
+                const response = await fetch("../diamond-favicon.gif?v=3");
                 if (!response.ok) {
                     throw new Error("Could not load diamond-favicon.gif");
                 }
