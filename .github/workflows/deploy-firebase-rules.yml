@@ -37,4 +37,4 @@ jobs:
         run: npm install --global firebase-tools
 
       - name: Deploy Firestore rules only
-        run: firebase deploy --only firestore:rules --project diamond-lounge-7caf6
+        run: firebase deploy --only firestore:rules,storage --project diamond-lounge-7caf6
