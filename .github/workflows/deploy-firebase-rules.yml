@@ -36,5 +36,5 @@ jobs:
       - name: Install Firebase CLI
         run: npm install --global firebase-tools
 
-      - name: Deploy Firestore rules only
+      - name: Deploy Firestore and Storage rules
         run: firebase deploy --only firestore:rules,storage --project diamond-lounge-7caf6
