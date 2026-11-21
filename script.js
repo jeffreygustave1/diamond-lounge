@@ -1089,7 +1089,8 @@ dmHomeButton?.addEventListener("click", (event) => {
         showDirectMessages();
     }
 
-    setMobileSidebar(false);
+    // Keep the navigation drawer open while the DM home/member list is visible.
+    if (!(dmHomeView && !dmHomeView.hidden)) setMobileSidebar(false);
 });
 
 mainServerButton?.addEventListener("click", () => {
