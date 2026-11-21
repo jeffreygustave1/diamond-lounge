@@ -130,7 +130,7 @@ export default {
             } else {
               searchResults = mergeResearchResults([], searchResults);
             }
-          }          }
+          }
         } catch (searchError) {
           console.warn("Search step unavailable:", searchError?.message || searchError);
         }
