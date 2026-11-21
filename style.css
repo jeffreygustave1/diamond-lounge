@@ -3848,3 +3848,16 @@ button {
 /* ENLARGE SHARED YOUTUBE TILE: make Watch video span both stage columns; member cards remain unchanged. */
 .created-server-voice-stage>.dl-watch-voice-tile{grid-column:1/-1!important;width:100%!important;max-width:none!important;justify-self:stretch!important;}
 @media(max-width:600px){.created-server-voice-stage>.dl-watch-voice-tile{grid-column:1!important;}}
+
+
+/* Silver GIF in-site product details */
+.dl-silver-details{margin-top:8px;padding:14px;border:1px solid rgba(199,169,107,.25);border-radius:12px;background:rgba(8,10,14,.72);color:#e8e6df}
+.dl-silver-details[hidden]{display:none!important}
+.dl-silver-details-heading strong{display:block;margin-top:5px;font-size:15px;color:#f4e7ca}
+.dl-silver-details-heading p,.dl-silver-details-copy p{margin:7px 0 0;color:#b8b8c1;font-size:12px;line-height:1.55}
+.dl-silver-details-copy{margin-top:12px;font-size:12px;color:#d8d8df;line-height:1.6}
+.dl-silver-details-copy ol{margin:6px 0 0;padding-left:20px}
+.dl-silver-details-copy li{margin:3px 0}
+.dl-silver-action{width:100%;margin-top:12px;padding:10px 14px;border:1px solid rgba(199,169,107,.55);border-radius:9px;background:linear-gradient(135deg,rgba(199,169,107,.2),rgba(199,169,107,.07));color:#f0dfbd;font-weight:750;cursor:pointer}
+.dl-silver-action:hover{background:rgba(199,169,107,.25)}
+@media(max-width:560px){.dl-silver-details{padding:12px}.dl-silver-details-heading strong{font-size:14px}}
