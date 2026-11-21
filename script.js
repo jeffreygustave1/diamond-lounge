@@ -784,7 +784,9 @@ window.openTextChannel = openTextChannel;
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
         const destination = window.location.pathname + window.location.search + window.location.hash;
-        const loginUrl = new URL("login.html", window.location.href);
+        // Mobile dashboard is nested in /Mobile/; login page lives at the site root.
+        const loginPath = window.location.pathname.startsWith("/Mobile/") ? "../login.html" : "login.html";
+        const loginUrl = new URL(loginPath, window.location.href);
         loginUrl.searchParams.set("redirect", destination);
         window.location.replace(loginUrl.toString());
         return;
