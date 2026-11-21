@@ -116,3 +116,24 @@
   #dmMessageForm input, #supportBotForm input { font-size:16px!important; line-height:1.25!important; }
   #supportBotView .support-bot-footer { padding:6px 8px!important; font-size:11px!important; }
 }
+
+
+/* Mobile polish pass: touch targets, overflow containment and safer tap interactions */
+@media(max-width:900px){
+  html,body,.dashboard,.chat-area{overscroll-behavior:none!important;}
+  .dashboard, .chat-area, #mobileSidebar, #channelsSidebar, #dmSidebar{ -webkit-tap-highlight-color:transparent!important; }
+  #mobileSidebar button, #channelsSidebar button, #dmSidebar button, .chat-header button, .message-box button, .dm-message-box button{touch-action:manipulation!important;}
+  #mobileSidebar .channels,#channelsSidebar,#dmSidebar{overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;}
+  .chat-area>section:not([hidden]),#loungeView:not([hidden]),#dmConversationView:not([hidden]),#supportBotView:not([hidden]){min-width:0!important;max-width:100vw!important;}
+  .chat-header-main,.dm-contact-heading,.channel-title{min-width:0!important;overflow-wrap:anywhere!important;}
+  .message,.dm-message,.created-server-message{overflow-wrap:anywhere!important;word-break:break-word!important;}
+  .message img,.dm-message img,.message video,.dm-message video{max-width:min(100%,280px)!important;height:auto!important;}
+  .message-box button,.dm-message-box button{min-height:40px!important;}
+}
+@media(max-width:600px){
+  .text-channel,.voice-channel,#supportBotOpen,#dmMemberList button,.server-icon{touch-action:manipulation!important;}
+  #mobileSidebar .profile-card{margin-top:auto!important;}
+  #mobileSidebar .channels{padding-bottom:max(14px,env(safe-area-inset-bottom))!important;}
+  .mobile-sidebar-backdrop{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:opacity .18s ease!important;}
+  .dashboard.mobile-nav-open .mobile-sidebar-backdrop{opacity:1!important;visibility:visible!important;pointer-events:auto!important;}
+}
