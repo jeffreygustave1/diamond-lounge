@@ -120,7 +120,7 @@ function bubble(text,kind="bot",sources=[],toolsUsed=[]){
  message.textContent=text;stack.appendChild(message);
  if(kind!=="user"&&Array.isArray(toolsUsed)&&toolsUsed.length){
   const used=document.createElement("div");used.className="support-bot-tools-used";
-  const labels={"web_search":"Live web search","get_live_diamond_context":"Live Diamond Lounge context"};
+  const labels={"web_search":"Live web search","get_live_diamond_context":"Live Diamond Lounge context","calculate":"Calculator"};
   [...new Set(toolsUsed)].forEach(name=>{if(!labels[name])return;const tag=document.createElement("span");tag.textContent=labels[name];used.appendChild(tag);});
   if(used.childElementCount)stack.appendChild(used);
  }
