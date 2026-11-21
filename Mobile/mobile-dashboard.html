@@ -1189,38 +1189,14 @@
 </html>
 
 <style>
-/* Mobile DM home screen and equal-size rail diamond correction */
+/* Restore fixed rail diamond geometry; image itself stays contained */
 @media(max-width:600px){
- #mobileSidebar .servers>#dmHomeButton.server-icon.dm-home{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;padding:0!important;box-sizing:border-box!important;overflow:hidden!important;}
- #mobileSidebar #dmHomeButton.server-icon.dm-home img{display:block!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;max-width:46px!important;max-height:46px!important;object-fit:contain!important;margin:0!important;padding:0!important;}
- #dmHomeView:not([hidden]){display:flex!important;align-items:center!important;justify-content:center!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:auto!important;background:#111319!important;}
- #dmHomeView .dm-home-welcome{max-width:320px!important;margin:auto!important;padding:24px!important;text-align:center!important;color:#e7e8ed!important;}
- #dmHomeView .dm-home-gem{font-size:54px!important;color:#9bc8ff!important;margin-bottom:16px!important;}
- #dmHomeView h2{margin:0 0 10px!important;font-size:22px!important;}
- #dmHomeView p{font-size:14px!important;line-height:1.5!important;color:#aeb4c2!important;}
+ #mobileSidebar .servers>#dmHomeButton.server-icon.dm-home{position:relative!important;overflow:hidden!important;flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;padding:0!important;box-sizing:border-box!important;}
+ #mobileSidebar #dmHomeButton.server-icon.dm-home img{position:static!important;display:block!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;max-width:46px!important;max-height:46px!important;transform:none!important;object-fit:contain!important;margin:0!important;padding:0!important;}
 }
-</style>
-
-<style>
-/* Requested: enlarge top DM gem fourfold visually without changing its button's rail position; leave drawer open on DM home */
-@media(max-width:600px){
-#mobileSidebar .servers>#dmHomeButton.server-icon.dm-home{position:relative!important;overflow:visible!important;transform:none!important;}
-#mobileSidebar #dmHomeButton.server-icon.dm-home img{position:absolute!important;left:50%!important;top:50%!important;width:184px!important;height:184px!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;transform:translate(-50%,-50%)!important;object-fit:contain!important;pointer-events:none!important;}
-}
-</style>
-
-<style>
-/* Prevent iOS Safari's automatic page zoom when focusing DM/support text fields (inputs below 16px). */
 @media(max-width:900px){
- #dmConversationView input,#dmConversationView textarea,#supportBotView input,#supportBotView textarea,#dmMessageInput,#supportBotInput{font-size:16px!important;}
-}
-</style>
-
-<style>
-/* Give the bottom logout diamond the same framed rail-button appearance as the top DM gem. */
-@media(max-width:900px){
- #mobileSidebar .profile-card #logoutButton.profile-avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;display:grid!important;place-items:center!important;padding:0!important;border:1px solid rgba(199,169,107,.28)!important;border-radius:16px!important;background:#1a1b1f!important;box-sizing:border-box!important;overflow:visible!important;}
- #mobileSidebar .profile-card #logoutButton.profile-avatar img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;transform:scale(1.7)!important;transform-origin:center!important;pointer-events:none!important;}
- #mobileSidebar .profile-card #logoutButton.profile-avatar:hover{background:#332d20!important;border-color:rgba(199,169,107,.44)!important;border-radius:13px!important;}
+ #mobileSidebar .profile-card #logoutButton.profile-avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;display:grid!important;place-items:center!important;padding:0!important;border:1px solid rgba(199,169,107,.34)!important;border-radius:16px!important;background:#1a1b1f!important;box-sizing:border-box!important;overflow:hidden!important;position:relative!important;}
+ #mobileSidebar .profile-card #logoutButton.profile-avatar img{position:static!important;display:block!important;width:46px!important;height:46px!important;max-width:46px!important;max-height:46px!important;object-fit:contain!important;transform:scale(1.7)!important;transform-origin:center!important;pointer-events:none!important;}
+ #mobileSidebar #dmHomeButton.server-icon.dm-home::after,#mobileSidebar .profile-card #logoutButton.profile-avatar::after{content:"⚡";position:absolute!important;right:0!important;bottom:0!important;width:16px!important;height:16px!important;display:grid!important;place-items:center!important;font-size:10px!important;color:#d6b46a!important;background:#202127!important;border:1px solid rgba(199,169,107,.5)!important;border-radius:5px!important;z-index:3!important;pointer-events:none!important;}
 }
 </style>
