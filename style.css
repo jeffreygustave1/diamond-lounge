@@ -4000,3 +4000,15 @@ button {
 .created-server-category-add:hover{
   color:var(--dl-server-accent,#f2f3f5)!important
 }
+
+
+/* Preserve the circular crop when the voice avatar frame sits outside the image. */
+.created-server-voice-user-avatar img{
+  border-radius:inherit;display:block
+}
+.voice-participant .dl-cosmetic-badge-rail{
+  display:inline-flex;align-items:center;gap:3px;margin-left:4px;vertical-align:middle
+}
+.voice-participant .dl-cosmetic-badge-chip{
+  width:16px;height:16px;font-size:9px
+}
