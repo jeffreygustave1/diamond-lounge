@@ -4033,3 +4033,24 @@ button {
 .server-assets-future-art{background:linear-gradient(135deg,#6a5739,#2b2c34 52%,#18202c);color:#f0d6a3;font-size:34px}
 .emoji-future-art{background:linear-gradient(135deg,#394d4a,#252b3b 60%,#48374a);color:#dce8dc;font-size:22px}
 .voice-future-art{background:linear-gradient(135deg,#35435a,#1b202b 55%,#51405a);color:#d9d5f2;font-size:36px}
+
+
+/* MOBILE DRAWER / PROFILE VISIBILITY SAFETY OVERRIDE (mobile only) */
+@media (max-width: 900px) {
+  .mobile-sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100dvh !important;
+    transform: translateX(-110%) !important;
+    z-index: 1002 !important;
+  }
+  .dashboard.mobile-nav-open .mobile-sidebar {
+    transform: translateX(0) !important;
+  }
+  .mobile-menu-button { display: flex !important; visibility: visible !important; opacity: 1 !important; }
+  .profile-card { display: flex !important; width: 100% !important; min-width: 0 !important; flex-shrink: 0 !important; }
+  #myProfilePicture.member-picture { display: grid !important; visibility: visible !important; opacity: 1 !important; width: 30px !important; height: 30px !important; flex: 0 0 30px !important; }
+  .profile-identity { display: flex !important; min-width: 0 !important; visibility: visible !important; }
+}
