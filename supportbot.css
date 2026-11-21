@@ -80,3 +80,6 @@ body.dm-mode #supportBotView #supportBotChoices{display:flex!important;visibilit
 .support-bot-sources span{font-weight:700;letter-spacing:.4px;color:#8eabf6}
 .support-bot-sources a{color:#a9c6ff;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
 .support-bot-sources a:hover{color:#e4efff}
+
+.support-bot-tools-used{display:flex;flex-wrap:wrap;gap:5px;padding:0 3px}
+.support-bot-tools-used span{display:inline-flex;align-items:center;padding:3px 7px;border:1px solid rgba(115,157,255,.18);border-radius:10px;background:rgba(58,88,150,.12);color:#aebfe6;font-size:9px;letter-spacing:.2px}
