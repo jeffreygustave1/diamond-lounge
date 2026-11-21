@@ -64,6 +64,13 @@ export default {
       const needsLiveSearch = /\b(latest|newest|current|today|right now|live|recent|patch|hotfix|release|news|version|price|pricing|availability|schedule|status)\b/i.test(latestUserText);
       let responseData = await createResponse(env, { model, effort, instructions, input, tools, toolChoice: needsLiveSearch ? { type: "web_search" } : "auto" });
       const toolsUsed = new Set();
+      let searchUsed = false;
+      const citationMap = new Map();
+      const captureSearchEvidence = (response) => {
+        for (const item of response?.output || []) if (item.type === "web_search_call") searchUsed = true;
+        for (const cite of extractCitations(response)) citationMap.set(cite.url, cite);
+      };
+      captureSearchEvidence(responseData);
 
       for (let turn = 0; turn < 5; turn++) {
         const calls = Array.isArray(responseData.output)
@@ -102,13 +109,13 @@ export default {
         });
         input = [...input, ...outputs];
         responseData = await createResponse(env, { model, effort, instructions, input, tools, toolChoice: "auto" });
+        captureSearchEvidence(responseData);
       }
 
       const answer = extractOutputText(responseData);
       if (!answer) return json({ error: "The AI returned no text answer." }, 502, origin, allowed);
-      const citations = extractCitations(responseData);
-      const searched = Array.isArray(responseData.output) &&
-        responseData.output.some(item => item.type === "web_search_call");
+      const citations = [...citationMap.values()].slice(0, 8);
+      const searched = searchUsed;
       if (searched) toolsUsed.add("web_search");
 
       return json({ reply: answer, citations, searched, tools_used: [...toolsUsed] }, 200, origin, allowed);
