@@ -585,6 +585,30 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
+// MOBILE ONLY: open the existing navigation drawer with a left-edge swipe.
+// Desktop pointer/mouse behavior and layout are deliberately unchanged.
+(() => {
+    const mobileQuery = window.matchMedia("(max-width: 900px)");
+    let startX = 0, startY = 0, tracking = false;
+    document.addEventListener("pointerdown", (event) => {
+        if (!mobileQuery.matches || event.pointerType !== "touch") return;
+        if (dashboard?.classList.contains("mobile-nav-open")) return;
+        if (event.clientX > 26) return;
+        startX = event.clientX; startY = event.clientY; tracking = true;
+    }, { passive: true });
+    document.addEventListener("pointermove", (event) => {
+        if (!tracking || !mobileQuery.matches || event.pointerType !== "touch") return;
+        const dx = event.clientX - startX, dy = event.clientY - startY;
+        if (dx >= 75 && Math.abs(dy) < 55) {
+            tracking = false;
+            setMobileSidebar(true);
+        } else if (dx < -15 || Math.abs(dy) > 65) tracking = false;
+    }, { passive: true });
+    const stopTracking = () => { tracking = false; };
+    document.addEventListener("pointerup", stopTracking, { passive: true });
+    document.addEventListener("pointercancel", stopTracking, { passive: true });
+})();
+
 // ==================================================
 // VIEW AND LISTENER MANAGEMENT
 // ==================================================
