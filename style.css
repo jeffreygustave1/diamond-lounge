@@ -3811,11 +3811,11 @@ button {
 @media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr!important}.created-server-voice-stage>.dl-watch-voice-tile{aspect-ratio:1/1!important}}
 
 /* FINAL WATCH ACTIVITY + SQUARE STAGE FIX */
-.dl-watch-overlay.dl-watch-compact-open{position:fixed!important;inset:auto auto 142px 20px!important;width:min(390px,calc(100vw - 24px))!important;height:auto!important;max-height:none!important;padding:0!important;display:block!important;overflow:visible!important;background:transparent!important;backdrop-filter:none!important;}
+.dl-watch-overlay.dl-watch-compact-open{position:fixed!important;inset:auto auto 205px 20px!important;width:min(390px,calc(100vw - 24px))!important;height:auto!important;max-height:none!important;padding:0!important;display:block!important;overflow:visible!important;background:transparent!important;backdrop-filter:none!important;}
 .dl-watch-compact-open .dl-watch-shell{width:100%!important;height:auto!important;max-height:60vh!important;overflow:auto!important;padding:14px!important;border-radius:16px!important}
 .dl-watch-compact-open .dl-watch-top{display:none!important}.dl-watch-compact-open .dl-watch-grid{display:block!important}.dl-watch-compact-open .dl-watch-main{display:none!important}.dl-watch-compact-open .dl-watch-side{display:block!important;min-height:0!important;padding:8px!important}
 .dl-watch-compact-open .dl-watch-side h3{margin:0 0 10px!important}.dl-watch-compact-open .dl-watch-note{display:none!important}
-@media(max-width:700px){.dl-watch-overlay.dl-watch-compact-open{left:12px!important;bottom:112px!important;width:calc(100vw - 24px)!important}}
+@media(max-width:700px){.dl-watch-overlay.dl-watch-compact-open{left:12px!important;bottom:165px!important;width:calc(100vw - 24px)!important}}
 .created-server-voice-stage{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:14px!important;align-content:start!important;justify-items:stretch!important}
 .created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile){aspect-ratio:1/1!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;box-sizing:border-box!important;justify-self:stretch!important;align-self:stretch!important;overflow:hidden!important}
 .created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile) .created-server-voice-avatar{width:min(34%,110px)!important;height:auto!important;aspect-ratio:1/1!important;flex-shrink:0!important}
