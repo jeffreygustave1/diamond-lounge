@@ -4054,3 +4054,23 @@ button {
   #myProfilePicture.member-picture { display: grid !important; visibility: visible !important; opacity: 1 !important; width: 30px !important; height: 30px !important; flex: 0 0 30px !important; }
   .profile-identity { display: flex !important; min-width: 0 !important; visibility: visible !important; }
 }
+
+
+/* MOBILE GENERAL VOICE: swipe replaces the legacy three-dot sidebar navigation. Desktop is unchanged. */
+@media (max-width: 900px) {
+  .voice-mobile-dots,
+  .voice-nav-dots,
+  .voice-swipe-dots,
+  .voice-panel-dots,
+  .voice-page-indicators,
+  .mobile-voice-dots,
+  #voiceMobileDots,
+  #voiceNavDots,
+  #voiceSwipeDots,
+  #voicePanelDots,
+  #voicePageIndicators,
+  [data-voice-navigation-dots],
+  [data-mobile-voice-dots] {
+    display: none !important;
+  }
+}
