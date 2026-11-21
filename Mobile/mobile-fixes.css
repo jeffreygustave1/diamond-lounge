@@ -1,0 +1,111 @@
+/* Diamond Lounge mobile drawer: final cascade layer */
+@media(max-width:900px){
+html,body{width:100%;height:100%;overflow:hidden!important}
+body{height:100dvh;overscroll-behavior:none}
+.dashboard{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;display:flex!important;overflow:hidden!important}
+#communitySidebar,.members{display:none!important}
+.chat-area{flex:1 1 100%!important;width:100%!important;min-width:0!important;height:100dvh!important;overflow:hidden!important}
+#mobileSidebar{position:fixed!important;inset:0 auto 0 0!important;width:min(300px,88vw)!important;max-width:88vw!important;height:100dvh!important;z-index:12000!important;display:flex!important;transform:translateX(-110%)!important;transition:transform .25s ease!important;overflow:hidden!important;box-shadow:0 0 36px #0008!important;background:#101114!important}
+.dashboard.mobile-nav-open #mobileSidebar{transform:translateX(0)!important}
+#mobileSidebar .servers{flex:0 0 54px!important;width:54px!important;min-width:54px!important}
+#mobileSidebar .channels,#channelsSidebar{flex:1 1 auto!important;width:auto!important;min-width:0!important;overflow-y:auto!important}
+.mobile-menu-button{display:flex!important;min-width:44px!important;min-height:44px!important;z-index:5!important}
+.mobile-sidebar-backdrop{position:fixed!important;inset:0!important;z-index:11999!important;display:block!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+.dashboard.mobile-nav-open .mobile-sidebar-backdrop{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+.chat-area>*{min-width:0!important;max-width:100%!important}
+.messages,.dm-messages,.created-server-messages{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
+.message-box,.dm-message-box{flex-shrink:0!important}
+}
+@media(max-width:600px){
+.chat-header,.created-server-chat-header{min-height:54px!important;padding:7px 10px!important}
+.voice-controls,.voice-leave-row{display:flex!important;flex-wrap:wrap!important;gap:8px!important;justify-content:center!important}
+.voice-control,.voice-controls button,.voice-leave-row button{min-width:44px!important;min-height:46px!important}
+.created-server-voice-stage{grid-template-columns:minmax(0,1fr)!important}
+}
+
+/* Full-screen mobile voice room (Discord-style stage) */
+@media(max-width:900px){
+body:has(#loungeView.is-voice-call) .chat-area{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:2!important}
+#loungeView.is-voice-call{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;background:#101114!important;z-index:2!important}
+#loungeView.is-voice-call .chat-header{flex:0 0 auto!important;min-height:58px!important;z-index:3!important}
+#loungeVoiceCallView{display:flex!important;flex:1 1 auto!important;min-height:0!important;width:100%!important;overflow:auto!important;padding:12px!important;padding-bottom:140px!important;box-sizing:border-box!important}
+#loungeVoiceCallView[hidden]{display:none!important}
+#loungeVoiceCallView .created-server-voice-call{display:flex!important;flex-direction:column!important;gap:12px!important;width:100%!important;min-height:100%!important}
+#loungeVoiceCallView .created-server-voice-stage{width:100%!important;flex:1 1 auto!important;align-content:center!important;justify-content:center!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(0,auto)!important;gap:10px!important;padding:4px!important}
+#loungeVoiceCallView .created-server-voice-empty{grid-column:1/-1!important;text-align:center!important;padding:24px!important;color:#aaa!important}
+#loungeVoiceCallView .created-server-voice-call-status{margin:8px auto!important;text-align:center!important;color:#aaa!important}
+#voicePanel{position:fixed!important;left:12px!important;right:12px!important;bottom:12px!important;width:auto!important;max-width:none!important;z-index:12500!important;margin:0!important;padding:10px!important;border-radius:18px!important;background:rgba(20,21,26,.94)!important;border:1px solid rgba(199,169,107,.3)!important;box-shadow:0 14px 40px #0008!important;backdrop-filter:blur(18px)!important}
+#voicePanel:not([hidden]){display:block!important}
+#voicePanel .voice-panel-status{font-size:12px!important;margin:0 0 8px!important;text-align:center!important}
+#voicePanel .voice-leave-row{display:flex!important;justify-content:center!important}
+#voicePanel .voice-leave-row button{width:100%!important;min-height:46px!important}
+#voicePanel .voice-controls{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+#voicePanel .voice-control{min-width:0!important;min-height:48px!important;border-radius:14px!important}
+#voicePanel #leaveVoiceButton{grid-column:1/-1!important}
+}
+@media(max-width:600px){#loungeVoiceCallView .created-server-voice-stage{grid-template-columns:minmax(0,1fr)!important;align-content:start!important}#loungeVoiceCallView .created-server-voice-tile{min-height:180px!important}}
+
+/* Mobile voice recovery: keep navigation and room header visible, avoid opaque blackout */
+@media(max-width:900px){
+#loungeView.is-voice-call{z-index:1!important;background:#141419!important}
+#loungeView.is-voice-call .chat-header{display:flex!important;position:relative!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+#loungeView.is-voice-call .mobile-menu-button{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:13000!important}
+#loungeView.is-voice-call #loungeVoiceCallView{background:transparent!important;visibility:visible!important;opacity:1!important}
+#loungeVoiceCallView .created-server-voice-call-status{color:#d8d8de!important}
+#mobileSidebar{z-index:14000!important}
+.mobile-sidebar-backdrop{z-index:13999!important}
+.dashboard.mobile-nav-open #mobileSidebar{transform:translateX(0)!important}
+#loungeView.is-voice-call .chat-header .mobile-menu-button{min-width:46px!important;min-height:46px!important;flex-shrink:0!important}
+#mobileSidebar .servers{width:66px!important;flex-basis:66px!important;min-width:66px!important;overflow:visible!important}
+#mobileSidebar .servers>*{visibility:visible!important;opacity:1!important}
+}
+
+
+/* Mobile voice layout correction: stage visibility, dock placement, rail sizing */
+@media(max-width:900px){
+  .chat-area{position:fixed!important;inset:0!important;z-index:10!important}
+  #loungeView.is-voice-call{display:flex!important;position:absolute!important;inset:0!important;height:100dvh!important;width:100vw!important;overflow:hidden!important;flex-direction:column!important}
+  #loungeView.is-voice-call .chat-header{position:relative!important;flex:0 0 58px!important;width:100%!important;background:#16171b!important}
+  #loungeView.is-voice-call #loungeVoiceCallView{display:flex!important;position:relative!important;flex:1 1 0!important;min-height:0!important;height:auto!important;width:100%!important;overflow-y:auto!important;overflow-x:hidden!important;z-index:1!important}
+  #loungeVoiceCallView .created-server-voice-call{position:relative!important;display:flex!important;min-height:0!important;height:100%!important;flex:1 1 auto!important}
+  #loungeVoiceCallView .created-server-voice-stage{display:grid!important;min-height:120px!important}
+  #loungeVoiceCallView .created-server-voice-remote-media{position:relative!important;display:block!important;width:100%!important;min-height:0!important}
+  #voicePanel{position:fixed!important;left:10px!important;right:10px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;z-index:15000!important}
+  #mobileSidebar{width:min(340px,90vw)!important;max-width:90vw!important;z-index:16000!important}
+  #mobileSidebar .servers{width:76px!important;min-width:76px!important;flex:0 0 76px!important;box-sizing:border-box!important;padding-left:0!important;padding-right:0!important}
+  #mobileSidebar .server-logo,#mobileSidebar .server-icon{width:46px!important;min-width:46px!important;height:46px!important;min-height:46px!important;flex-shrink:0!important}
+  #mobileSidebar .servers{padding-top:max(12px,env(safe-area-inset-top))!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+}
+
+
+/* MOBILE ONLY — final layout guardrails (desktop styles intentionally untouched) */
+@media (max-width: 900px) {
+  /* Respect the inactive state; earlier selectors must not resurrect hidden call views. */
+  #loungeView:not(.is-voice-call) #loungeVoiceCallView[hidden] { display:none!important; }
+  #loungeView.is-voice-call #loungeVoiceCallView:not([hidden]) { display:flex!important; }
+  #loungeView.is-voice-call { min-width:0!important; min-height:0!important; }
+  #loungeView.is-voice-call .created-server-voice-call { min-width:0!important; width:100%!important; }
+  #loungeView.is-voice-call .created-server-voice-stage,
+  #loungeView.is-voice-call .created-server-voice-remote-media { min-width:0!important; max-width:100%!important; }
+  #mobileSidebar .servers { overflow-x:hidden!important; overflow-y:auto!important; align-items:center!important; }
+  #mobileSidebar .server-icon { box-sizing:border-box!important; margin-inline:auto!important; }
+  #mobileSidebar .server-icon img { max-width:100%!important; max-height:100%!important; object-fit:contain!important; }
+  #mobileSidebar .created-servers { width:100%!important; min-width:0!important; }
+}
+@media (max-width: 600px) {
+  #loungeView.is-voice-call #loungeVoiceCallView { padding:8px 8px 150px!important; }
+  #loungeView.is-voice-call .created-server-voice-call { height:auto!important; }
+  #loungeView.is-voice-call .created-server-voice-stage { grid-template-columns:minmax(0,1fr)!important; }
+  #voicePanel { left:max(8px,env(safe-area-inset-left))!important; right:max(8px,env(safe-area-inset-right))!important; bottom:max(8px,env(safe-area-inset-bottom))!important; width:auto!important; }
+  #mobileSidebar .servers { flex-basis:64px!important; width:64px!important; min-width:64px!important; padding-inline:4px!important; }
+  #mobileSidebar .server-icon { width:46px!important; min-width:46px!important; height:46px!important; min-height:46px!important; }
+}
+
+
+/* MOBILE FIX — pin the Direct Messages diamond at the top of the rail */
+@media (max-width: 900px) {
+  #mobileSidebar .servers { justify-content:flex-start!important; align-items:center!important; padding-top:max(14px,env(safe-area-inset-top))!important; }
+  #mobileSidebar #dmHomeButton { display:grid!important; visibility:visible!important; opacity:1!important; position:relative!important; inset:auto!important; order:0!important; flex:0 0 46px!important; width:46px!important; min-width:46px!important; height:46px!important; min-height:46px!important; margin:0 auto!important; transform:none!important; overflow:visible!important; }
+  #mobileSidebar #dmHomeButton img { display:block!important; visibility:visible!important; opacity:1!important; width:100%!important; height:100%!important; object-fit:contain!important; }
+  #mobileSidebar .server-divider { display:block!important; flex:0 0 1px!important; width:28px!important; margin:3px auto!important; }
+}
