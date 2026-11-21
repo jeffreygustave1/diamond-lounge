@@ -25,12 +25,22 @@ export default {
       const lastUser = [...messages].reverse().find(m => m.role === "user")?.content || "";
       let searchResults = [];
       let searchQuery = "";
-      // Deterministic search intent avoids a fragile extra AI classification call.
-      const needsSearch = /\b(search (the web|online|for|about)|research|latest|current|today|right now|recent|newest|patch notes|release notes|driver updates|news|price of|available now|schedule|what happened|this week|this month)\b/i.test(lastUser);
+      // Search intent is deterministic: do not rely on the model to decide whether freshness is needed.
+      const needsSearch = /\b(search (the )?(web|internet|online|for|about)|look up|browse|research|latest|current|today|right now|recent|newest|as of now|this week|this month|upcoming|next (patch|update|release|event|version)|patch(es)?|release notes|changelog|driver(s)?|news|price of|available now|availability|schedule|what happened|when is .{0,40}(next|release|patch|update)|new version)\b/i.test(lastUser);
       if (needsSearch) {
         searchQuery = lastUser.trim().replace(/\s+/g, " ").slice(0, 240);
         try { searchResults = await searchWeb(searchQuery); }
         catch (searchError) { console.warn("Search step unavailable:", searchError?.message || searchError); }
+        // Fail closed: never let the model invent a current answer when live search failed.
+        if (!searchResults.length) {
+          return json({
+            reply: "I couldn't retrieve usable live search results just now, so I can't verify the current information. I won't guess or give you an outdated answer. Please try the search again in a moment.",
+            citations: [],
+            searched: true,
+            tools_used: ["web_search"],
+            provider: "Cloudflare Workers AI"
+          }, 200, origin, allowed);
+        }
       }
       const clientTime = sanitizeClientTime(body.client_time);
       let instructions = SYSTEM_PROMPT.replace("{{SERVER_TIME}}", new Date().toISOString()) +
@@ -51,21 +61,79 @@ export default {
 
 async function searchWeb(query) {
   const url = "https://html.duckduckgo.com/html/?q=" + encodeURIComponent(query);
-  const response = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; DiamondSupport/1.0)", "Accept": "text/html" } });
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (compatible; DiamondSupport/1.0)",
+      "Accept": "text/html,application/xhtml+xml"
+    },
+    redirect: "follow"
+  });
   if (!response.ok) throw new Error("Search provider returned HTTP " + response.status);
+
   const html = await response.text();
+  if (!html || html.length < 500) throw new Error("Search provider returned an empty or blocked response");
+
+  const decode = value => value
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#0*39;/gi, "'")
+    .replace(/&#x0*27;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
+
+  const clean = value => decode(value.replace(/<[^>]*>/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Parse anchor attributes independently of their order; DDG can put href before class.
+  const anchors = [...html.matchAll(/<a\b[^>]*>/gi)];
   const results = [];
-  const links = [...html.matchAll(/<a[^>]*class=["']result__a["'][^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)];
-  for (const match of links.slice(0, 10)) {
-    let href = match[1].replace(/&amp;/g, "&");
-    try { const u = new URL(href); if (u.hostname.includes("duckduckgo.com") && u.searchParams.has("uddg")) href = u.searchParams.get("uddg"); } catch {}
+  for (let i = 0; i < anchors.length && results.length < 10; i++) {
+    const anchor = anchors[i];
+    const tag = anchor[0];
+    const className = (tag.match(/\bclass\s*=\s*["']([^"']*)["']/i) || [])[1] || "";
+    if (!className.split(/\s+/).includes("result__a")) continue;
+
+    let href = (tag.match(/\bhref\s*=\s*["']([^"']+)["']/i) || [])[1] || "";
+    if (!href) continue;
+    href = decode(href);
+    try {
+      const parsed = new URL(href, "https://duckduckgo.com");
+      if (parsed.hostname.endsWith("duckduckgo.com") && parsed.searchParams.has("uddg")) {
+        href = parsed.searchParams.get("uddg");
+      } else {
+        href = parsed.href;
+      }
+    } catch { continue; }
     if (!/^https?:\/\//i.test(href)) continue;
-    const clean = s => s.replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/&#39;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim();
-    const nearby = html.slice(match.index, match.index + 2500);
-    const snippetMatch = nearby.match(/class=["']result__snippet["'][^>]*>([\s\S]*?)<\/[^>]+>/i);
-    results.push({title:clean(match[2]).slice(0,240),url:href,snippet:clean(snippetMatch?.[1] || "").slice(0,700)});
+
+    const innerStart = anchor.index + tag.length;
+    const closeIndex = html.indexOf("</a>", innerStart);
+    if (closeIndex < 0) continue;
+    const title = clean(html.slice(innerStart, closeIndex));
+    if (!title) continue;
+
+    const nextResult = anchors.slice(i + 1).find(a => {
+      const c = ((a[0].match(/\bclass\s*=\s*["']([^"']*)["']/i) || [])[1] || "");
+      return c.split(/\s+/).includes("result__a");
+    });
+    const segmentEnd = nextResult ? nextResult.index : Math.min(html.length, closeIndex + 5000);
+    const segment = html.slice(closeIndex, segmentEnd);
+    const snippetMatch = segment.match(/class\s*=\s*["'][^"']*result__snippet[^"']*["'][^>]*>([\s\S]*?)<\/(?:div|a|span)>/i);
+    const snippet = clean(snippetMatch?.[1] || "");
+
+    results.push({
+      title: title.slice(0, 240),
+      url: href,
+      snippet: snippet.slice(0, 700)
+    });
   }
-  return results.filter((r,i,a)=>a.findIndex(x=>x.url===r.url)===i).slice(0,6);
+
+  return results
+    .filter((r, i, all) => all.findIndex(x => x.url === r.url) === i)
+    .slice(0, 6);
 }
 
 function sanitizeClientTime(value) {
