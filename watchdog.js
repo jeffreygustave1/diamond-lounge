@@ -11,6 +11,12 @@
     if(entries.length>MAX)entries.shift();
     render();
   }
+  // Navigation tap tracer: captures the actual topmost element and sidebar state on mobile.
+  window.addEventListener("pointerdown",event=>{
+    const target=event.target;const nav=target?.closest?.("button,.server-icon,.text-channel,.mobile-menu-button,#mobileSidebar,#channelsSidebar");
+    if(!nav)return;let top="";try{top=document.elementFromPoint(event.clientX,event.clientY)?.tagName+"#"+(document.elementFromPoint(event.clientX,event.clientY)?.id||"")+"."+(document.elementFromPoint(event.clientX,event.clientY)?.className||"");}catch{}
+    record("Navigation tap",nav.tagName+"#"+(nav.id||"")+"."+(typeof nav.className==="string"?nav.className:""),{topmost:top,point:{x:event.clientX,y:event.clientY},mobileNavOpen:!!document.querySelector(".dashboard.mobile-nav-open"),dmMode:document.body.classList.contains("dm-mode"),targetText:(nav.innerText||nav.getAttribute("aria-label")||"").slice(0,100)});
+  },true);
   window.addEventListener("error",event=>{
     if(event.target&&event.target!==window){
       const el=event.target;record("Resource load failure",el.src||el.href||el.tagName,{tag:el.tagName||"",url:el.src||el.href||""});return;
