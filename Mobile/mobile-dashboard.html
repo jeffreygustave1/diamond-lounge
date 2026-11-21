@@ -1215,3 +1215,12 @@
  #dmConversationView input,#dmConversationView textarea,#supportBotView input,#supportBotView textarea,#dmMessageInput,#supportBotInput{font-size:16px!important;}
 }
 </style>
+
+<style>
+/* Give the bottom logout diamond the same framed rail-button appearance as the top DM gem. */
+@media(max-width:900px){
+ #mobileSidebar .profile-card #logoutButton.profile-avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;display:grid!important;place-items:center!important;padding:0!important;border:1px solid rgba(199,169,107,.28)!important;border-radius:16px!important;background:#1a1b1f!important;box-sizing:border-box!important;overflow:visible!important;}
+ #mobileSidebar .profile-card #logoutButton.profile-avatar img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;transform:scale(1.7)!important;transform-origin:center!important;pointer-events:none!important;}
+ #mobileSidebar .profile-card #logoutButton.profile-avatar:hover{background:#332d20!important;border-color:rgba(199,169,107,.44)!important;border-radius:13px!important;}
+}
+</style>
