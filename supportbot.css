@@ -65,3 +65,10 @@ body.dm-mode #supportBotView .support-bot-avatar {
 
 /* AI repair proposal review */
 .support-repair-proposal{margin:12px;padding:16px;border:1px solid rgba(105,155,255,.35);border-radius:14px;background:#191d27;color:#e5e9f3;max-width:95%;}.support-repair-proposal h3{margin:0 0 8px;color:#dce6ff}.support-repair-proposal p{line-height:1.5}.support-repair-proposal button{margin-top:12px;padding:10px 14px;border-radius:9px;border:1px solid #648bdf;background:#284b91;color:#fff;cursor:pointer}.support-repair-proposal button:disabled{opacity:.5;cursor:not-allowed}.support-repair-proposal details{margin-top:12px}.support-repair-proposal summary{cursor:pointer;color:#b8c9f4}.support-repair-file pre{max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;padding:10px;background:#0c0d10;border-radius:8px;font-size:11px}.support-repair-proposal a{display:inline-block;margin:12px;color:#a9c6ff}
+
+
+/* FIX: keep Diamond Support message composer visible and usable in the DM column. */
+body.dm-mode #supportBotView #supportBotForm{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;flex:0 0 auto!important;z-index:5!important;width:100%!important;box-sizing:border-box!important;min-height:58px!important;overflow:visible!important;align-items:center!important;}
+body.dm-mode #supportBotView #supportBotInput{display:block!important;visibility:visible!important;opacity:1!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;height:42px!important;box-sizing:border-box!important;pointer-events:auto!important;}
+body.dm-mode #supportBotView #supportBotSend{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;align-items:center!important;justify-content:center!important;}
+body.dm-mode #supportBotView #supportBotChoices{display:flex!important;visibility:visible!important;flex:0 0 auto!important;}
