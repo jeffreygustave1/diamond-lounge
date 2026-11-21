@@ -124,9 +124,13 @@ export default {
           } else {
             searchResults = await searchWeb(searchQuery);
             if (searchResults.length < 3) {
-              const refinements = buildRefinedQueries(lastUser, searchQuery);\n              const retryResults = await Promise.all(refinements.map(q => searchWeb(q)));\n              searchResults = mergeResearchResults(searchResults, retryResults.flat());\n            } else {\n              searchResults = mergeResearchResults([], searchResults);
+              const refinements = buildRefinedQueries(lastUser, searchQuery);
+              const retryResults = await Promise.all(refinements.map(q => searchWeb(q)));
+              searchResults = mergeResearchResults(searchResults, retryResults.flat());
+            } else {
+              searchResults = mergeResearchResults([], searchResults);
             }
-          }
+          }          }
         } catch (searchError) {
           console.warn("Search step unavailable:", searchError?.message || searchError);
         }
