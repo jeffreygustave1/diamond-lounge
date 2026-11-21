@@ -83,3 +83,15 @@
  .chat-header,.created-server-chat-header{padding-left:max(10px,env(safe-area-inset-left))!important;padding-right:max(10px,env(safe-area-inset-right))!important;}
  .message-box,.dm-message-box{margin-bottom:max(6px,env(safe-area-inset-bottom))!important;}
 }
+
+
+/* Mobile interaction stability: drawer layering, touch scroll, keyboard-safe composer */
+@media(max-width:900px){
+ #mobileSidebar{box-sizing:border-box!important;max-height:100dvh!important;touch-action:pan-y!important;}
+ #mobileSidebar .servers,#mobileSidebar .channels,#channelsSidebar,#dmSidebar,#dmMemberList{overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;}
+ .mobile-sidebar-backdrop{touch-action:manipulation!important;}
+ .chat-area>section:not([hidden]){box-sizing:border-box!important;min-width:0!important;min-height:0!important;}
+ #dmConversationView,#supportBotView{padding-bottom:env(safe-area-inset-bottom,0px)!important;}
+ #dmConversationView .dm-message-box,#supportBotView #supportBotForm{position:relative!important;z-index:4!important;}
+ #dmConversationView input,#dmConversationView textarea,#supportBotView input,#supportBotView textarea{font-size:16px!important;line-height:1.25!important;}
+}
