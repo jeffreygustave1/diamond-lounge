@@ -171,41 +171,322 @@ function isDiamondLoungeOwner() {
     const uid = auth.currentUser?.uid || currentUser?.uid;
     return Boolean(uid && uid === DIAMOND_LOUNGE_OWNER_UID);
 }
-function syncCustomizationShopOwnerState() {
-    if (!isDiamondLoungeOwner()) return;
 
-    const heading = document.querySelector(".dl-store-heading p");
-    if (heading) {
-        heading.textContent = "Diamond Lounge owner benefit: available cosmetics are free for you. Items still in development will unlock here at no charge when released.";
-    }
+// Every launch cosmetic below is usable by members at no charge.
+// Silver GIF upload remains a separate, entitlement-controlled exclusive.
+const PROFILE_COSMETIC_CATALOG = {
+    aura: [
+        { id: "none", label: "Natural", swatch: "linear-gradient(135deg,#34363d,#17191e)" },
+        { id: "moonlight", label: "Moonlight", swatch: "linear-gradient(135deg,#d5e5ff,#667ca8)" },
+        { id: "starlight", label: "Starlight", swatch: "linear-gradient(135deg,#fff0b9,#d69d48)" },
+        { id: "aurora", label: "Aurora", swatch: "linear-gradient(135deg,#6df4d2,#687ce7)" },
+        { id: "nebula", label: "Nebula", swatch: "linear-gradient(135deg,#d48bff,#5268d8)" },
+        { id: "ember", label: "Ember", swatch: "linear-gradient(135deg,#ffbf74,#d44c4c)" },
+        { id: "frost", label: "Frost", swatch: "linear-gradient(135deg,#e2fbff,#78c9e7)" },
+        { id: "rose", label: "Rose", swatch: "linear-gradient(135deg,#ffd1df,#b85f90)" }
+    ],
+    frame: [
+        { id: "none", label: "No frame", swatch: "linear-gradient(135deg,#34363d,#17191e)" },
+        { id: "silver", label: "Silver", swatch: "linear-gradient(135deg,#f0f4fa,#8e9aa9)" },
+        { id: "gold", label: "Gold", swatch: "linear-gradient(135deg,#ffe6a0,#a87932)" },
+        { id: "diamond", label: "Diamond", swatch: "linear-gradient(135deg,#e8ffff,#68cbd8)" },
+        { id: "aurora", label: "Aurora", swatch: "linear-gradient(135deg,#74f4cf,#5a75e9)" },
+        { id: "obsidian", label: "Obsidian", swatch: "linear-gradient(135deg,#777b8a,#171820)" },
+        { id: "rose", label: "Rose gold", swatch: "linear-gradient(135deg,#ffd0c0,#a85e68)" },
+        { id: "celestial", label: "Celestial", swatch: "linear-gradient(135deg,#fff2c8,#9a88e8)" },
+        { id: "sapphire", label: "Sapphire", swatch: "linear-gradient(135deg,#8ec9ff,#344da8)" }
+    ],
+    nameplate: [
+        { id: "classic", label: "Classic", swatch: "linear-gradient(135deg,#e8e8eb,#aeb3bb)" },
+        { id: "champagne", label: "Champagne", swatch: "linear-gradient(135deg,#fff0c7,#c49b57)" },
+        { id: "silverline", label: "Silverline", swatch: "linear-gradient(135deg,#f2f7ff,#8d9bae)" },
+        { id: "aurora", label: "Aurora", swatch: "linear-gradient(135deg,#7df5d6,#9d83f5)" },
+        { id: "sapphire", label: "Sapphire", swatch: "linear-gradient(135deg,#9fd6ff,#5378d8)" },
+        { id: "rosegold", label: "Rose gold", swatch: "linear-gradient(135deg,#ffe0d7,#cc7e8c)" },
+        { id: "obsidian", label: "Obsidian", swatch: "linear-gradient(135deg,#e3d9c6,#7f756a)" },
+        { id: "emerald", label: "Emerald", swatch: "linear-gradient(135deg,#b5f4c9,#4c9d74)" },
+        { id: "violet", label: "Violet", swatch: "linear-gradient(135deg,#e1cbff,#9872de)" }
+    ],
+    badges: [
+        { id: "comet", label: "Comet", symbol: "☄", swatch: "linear-gradient(135deg,#ffdfaa,#d17942)" },
+        { id: "starlight", label: "Starlight", symbol: "✦", swatch: "linear-gradient(135deg,#fff0b9,#d59b48)" },
+        { id: "music", label: "Music lover", symbol: "♫", swatch: "linear-gradient(135deg,#c9b8ff,#7667c7)" },
+        { id: "gamer", label: "Gamer", symbol: "⌘", swatch: "linear-gradient(135deg,#9bd7ff,#4677bb)" },
+        { id: "creator", label: "Creator", symbol: "✧", swatch: "linear-gradient(135deg,#ffc5e3,#b65e96)" },
+        { id: "artist", label: "Artist", symbol: "❖", swatch: "linear-gradient(135deg,#ffd1b1,#ba784d)" },
+        { id: "explorer", label: "Explorer", symbol: "⌖", swatch: "linear-gradient(135deg,#b8e8d6,#4e927b)" },
+        { id: "builder", label: "Builder", symbol: "⚒", swatch: "linear-gradient(135deg,#e6d2ad,#90734c)" },
+        { id: "bookworm", label: "Bookworm", symbol: "▤", swatch: "linear-gradient(135deg,#c5d2f4,#647aa8)" },
+        { id: "bloom", label: "Bloom", symbol: "✿", swatch: "linear-gradient(135deg,#ffd5df,#ca759a)" },
+        { id: "frost", label: "Frost", symbol: "❄", swatch: "linear-gradient(135deg,#e4fbff,#71b7d5)" },
+        { id: "flame", label: "Flame", symbol: "♨", swatch: "linear-gradient(135deg,#ffd18f,#d65c45)" },
+        { id: "crown", label: "Crown", symbol: "♛", swatch: "linear-gradient(135deg,#fff0b9,#b68a36)" },
+        { id: "moon", label: "Moon", symbol: "☾", swatch: "linear-gradient(135deg,#d7dcff,#6b75ad)" },
+        { id: "crystal", label: "Crystal", symbol: "◇", swatch: "linear-gradient(135deg,#d8ffff,#6ab8bb)" }
+    ],
+    backdrop: [
+        { id: "midnight", label: "Midnight", swatch: "linear-gradient(135deg,#202630,#101318)" },
+        { id: "aurora", label: "Aurora", swatch: "linear-gradient(135deg,#193f43,#25254b)" },
+        { id: "sapphire", label: "Sapphire", swatch: "linear-gradient(135deg,#1c3457,#141b2d)" },
+        { id: "rose", label: "Rose", swatch: "linear-gradient(135deg,#432938,#21191f)" },
+        { id: "emerald", label: "Emerald", swatch: "linear-gradient(135deg,#1f4034,#15221e)" },
+        { id: "sunset", label: "Sunset", swatch: "linear-gradient(135deg,#52352d,#24202a)" },
+        { id: "violet", label: "Violet", swatch: "linear-gradient(135deg,#392d54,#1d1a2c)" },
+        { id: "champagne", label: "Champagne", swatch: "linear-gradient(135deg,#4b4030,#211e19)" }
+    ]
+};
 
-    const cards = [...document.querySelectorAll(".dl-store-item")];
-    cards.forEach((card, index) => {
-        const badge = card.querySelector(".dl-store-lock");
-        const button = card.querySelector(".dl-store-buy");
-        if (badge) {
-            badge.textContent = index === 0
-                ? "✦ OWNER ACCESS · FREE NOW"
-                : "✦ OWNER ACCESS · FREE AT RELEASE";
-        }
-        if (!button) return;
-        if (index === 0) {
-            button.textContent = "Included · Free";
-            button.disabled = false;
-            button.setAttribute("aria-label", "Silver GIF pack included free for the Diamond Lounge owner");
-        } else {
-            button.textContent = "Coming soon · Free for owner";
-            button.disabled = true;
-            button.setAttribute("aria-label", "This cosmetic is still in development and will be free for the Diamond Lounge owner when released");
-        }
+const SERVER_THEME_CATALOG = [
+    { id: "midnight", label: "Midnight", sidebar: "#282b35", chat: "#30333e", header: "linear-gradient(100deg,#272b39,#3a4052)", accent: "#b8c7ff" },
+    { id: "aurora", label: "Aurora", sidebar: "#20383b", chat: "#294146", header: "linear-gradient(100deg,#21434a,#396c69)", accent: "#8cebd2" },
+    { id: "sapphire", label: "Sapphire", sidebar: "#1e2c46", chat: "#263750", header: "linear-gradient(100deg,#20395b,#315782)", accent: "#a8d5ff" },
+    { id: "rose", label: "Rose", sidebar: "#3b2936", chat: "#45313e", header: "linear-gradient(100deg,#4a2d3b,#70475c)", accent: "#ffc1d8" },
+    { id: "emerald", label: "Emerald", sidebar: "#26392f", chat: "#30453a", header: "linear-gradient(100deg,#294436,#406b50)", accent: "#a8e8bd" },
+    { id: "sunset", label: "Sunset", sidebar: "#402f2c", chat: "#4b3935", header: "linear-gradient(100deg,#57362d,#8a5540)", accent: "#ffd0a3" },
+    { id: "violet", label: "Violet", sidebar: "#332b46", chat: "#3c3451", header: "linear-gradient(100deg,#3b3158,#625184)", accent: "#dcc4ff" },
+    { id: "champagne", label: "Champagne", sidebar: "#39352e", chat: "#454036", header: "linear-gradient(100deg,#514633,#756141)", accent: "#f1d8a2" }
+];
+
+const DEFAULT_PROFILE_COSMETICS = {
+    aura: "none",
+    frame: "none",
+    nameplate: "classic",
+    badges: [],
+    backdrop: "midnight"
+};
+let currentProfileCosmetics = { ...DEFAULT_PROFILE_COSMETICS, badges: [] };
+let selectedProfileCosmetics = { ...DEFAULT_PROFILE_COSMETICS, badges: [] };
+let activeServerAppearanceTheme = "midnight";
+
+function isDiamondLoungeOwner() {
+    const uid = auth.currentUser?.uid || currentUser?.uid;
+    return Boolean(uid && uid === DIAMOND_LOUNGE_OWNER_UID);
+}
+function normalizeProfileCosmetics(value) {
+    const source = value && typeof value === "object" ? value : {};
+    const valid = (group, id, fallback) =>
+        PROFILE_COSMETIC_CATALOG[group].some(option => option.id === id) ? id : fallback;
+    return {
+        aura: valid("aura", source.aura, DEFAULT_PROFILE_COSMETICS.aura),
+        frame: valid("frame", source.frame, DEFAULT_PROFILE_COSMETICS.frame),
+        nameplate: valid("nameplate", source.nameplate, DEFAULT_PROFILE_COSMETICS.nameplate),
+        backdrop: valid("backdrop", source.backdrop, DEFAULT_PROFILE_COSMETICS.backdrop),
+        badges: Array.isArray(source.badges)
+            ? [...new Set(source.badges.filter(id => PROFILE_COSMETIC_CATALOG.badges.some(option => option.id === id)))].slice(0, 3)
+            : []
+    };
+}
+function cosmeticClassNames(cosmetics) {
+    const c = normalizeProfileCosmetics(cosmetics);
+    return [
+        c.aura !== "none" ? "dl-aura-" + c.aura : "",
+        c.frame !== "none" ? "dl-frame-" + c.frame : "",
+        c.nameplate !== "classic" ? "dl-nameplate-" + c.nameplate : "",
+        c.backdrop !== "midnight" ? "dl-backdrop-" + c.backdrop : ""
+    ].filter(Boolean);
+}
+function applyProfileCosmetics() {
+    const c = normalizeProfileCosmetics(selectedProfileCosmetics);
+    const avatarTargets = [
+        myProfilePicture,
+        document.getElementById("mainVoiceUserAvatar"),
+        document.getElementById("createdServerVoiceUserAvatar"),
+        document.querySelector(".profile-modal-preview")
+    ].filter(Boolean);
+    avatarTargets.forEach(element => {
+        [...element.classList].filter(name =>
+            name.startsWith("dl-aura-") || name.startsWith("dl-frame-")
+        ).forEach(name => element.classList.remove(name));
+        cosmeticClassNames(c).filter(name => name.startsWith("dl-aura-") || name.startsWith("dl-frame-"))
+            .forEach(name => element.classList.add(name));
     });
 
-    const note = document.getElementById("dlStorePaymentNote");
+    const nameTargets = [
+        profileName,
+        document.getElementById("mainVoiceUserName"),
+        document.getElementById("createdServerVoiceUserName")
+    ].filter(Boolean);
+    nameTargets.forEach(element => {
+        [...element.classList].filter(name => name.startsWith("dl-nameplate-"))
+            .forEach(name => element.classList.remove(name));
+        const nameplateClass = cosmeticClassNames(c).find(name => name.startsWith("dl-nameplate-"));
+        if (nameplateClass) element.classList.add(nameplateClass);
+    });
+
+    const backdropTargets = [
+        document.querySelector(".profile-card"),
+        document.querySelector(".created-server-voice-user-row"),
+        document.querySelector("#mainVoiceConnectionPanel .created-server-voice-user-row")
+    ].filter(Boolean);
+    backdropTargets.forEach(element => {
+        [...element.classList].filter(name => name.startsWith("dl-backdrop-"))
+            .forEach(name => element.classList.remove(name));
+        if (c.backdrop !== "midnight") element.classList.add("dl-backdrop-" + c.backdrop);
+    });
+
+    renderCosmeticBadgeRail(document.getElementById("profileCosmeticBadges"), c.badges);
+    renderCosmeticBadgeRail(document.getElementById("mainVoiceUserCosmeticBadges"), c.badges);
+    renderCosmeticBadgeRail(document.getElementById("createdServerVoiceUserCosmeticBadges"), c.badges);
+}
+function renderCosmeticBadgeRail(container, badgeIds) {
+    if (!container) return;
+    container.replaceChildren();
+    (Array.isArray(badgeIds) ? badgeIds : []).slice(0, 3).forEach(id => {
+        const option = PROFILE_COSMETIC_CATALOG.badges.find(item => item.id === id);
+        if (!option) return;
+        const chip = document.createElement("span");
+        chip.className = "dl-cosmetic-badge-chip";
+        chip.textContent = option.symbol;
+        chip.title = option.label;
+        chip.setAttribute("aria-label", option.label);
+        container.append(chip);
+    });
+}
+function renderCosmeticPicker(containerId, group) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.replaceChildren();
+    const isBadgeGroup = group === "badges";
+    PROFILE_COSMETIC_CATALOG[group].forEach(option => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "dl-cosmetic-option";
+        const chosen = isBadgeGroup
+            ? selectedProfileCosmetics.badges.includes(option.id)
+            : selectedProfileCosmetics[group] === option.id;
+        button.classList.toggle("selected", chosen);
+        button.setAttribute("aria-pressed", chosen ? "true" : "false");
+        button.title = option.label;
+
+        const swatch = document.createElement("span");
+        swatch.className = "dl-cosmetic-swatch";
+        if (isBadgeGroup) {
+            swatch.classList.add("is-symbol");
+            swatch.textContent = option.symbol;
+        } else {
+            swatch.style.background = option.swatch;
+        }
+        const label = document.createElement("span");
+        label.className = "dl-cosmetic-option-label";
+        label.textContent = option.label;
+        button.append(swatch, label);
+
+        button.addEventListener("click", () => {
+            if (isBadgeGroup) {
+                const next = selectedProfileCosmetics.badges.filter(id => id !== option.id);
+                if (next.length === selectedProfileCosmetics.badges.length) {
+                    if (next.length >= 3) {
+                        const note = document.getElementById("dlStorePaymentNote");
+                        if (note) note.textContent = "Choose up to three profile badges at a time.";
+                        return;
+                    }
+                    next.push(option.id);
+                }
+                selectedProfileCosmetics.badges = next;
+            } else {
+                selectedProfileCosmetics[group] = option.id;
+            }
+            renderCosmeticPickers();
+            applyProfileCosmetics();
+            const note = document.getElementById("dlStorePaymentNote");
+            if (note) note.textContent = "Preview updated. Click Save profile below to keep your selected styles.";
+        });
+        container.append(button);
+    });
+}
+function renderServerThemePicker() {
+    const container = document.getElementById("dlServerThemeOptions");
+    const note = document.getElementById("dlServerThemeStatus");
+    if (!container) return;
+    container.replaceChildren();
+    const canCustomize = Boolean(
+        currentUser && activeCreatedServerId && activeCreatedServerOwnerUid === currentUser.uid
+    );
     if (note) {
-        note.textContent = "Owner access is active. Profile GIF uploads are available now. Profile auras, avatar frames, nameplates, exclusive badges, and server themes are catalog previews still under development; they are not yet equipable.";
+        note.textContent = canCustomize
+            ? "Choose a theme for the server you're currently viewing. Changes save immediately for everyone in that server."
+            : "Open a server you own to customize its shared theme. Only that server's owner can change it.";
+    }
+    SERVER_THEME_CATALOG.forEach(theme => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "dl-cosmetic-option";
+        button.disabled = !canCustomize;
+        button.classList.toggle("selected", activeServerAppearanceTheme === theme.id);
+        button.setAttribute("aria-pressed", activeServerAppearanceTheme === theme.id ? "true" : "false");
+        const swatch = document.createElement("span");
+        swatch.className = "dl-cosmetic-swatch";
+        swatch.style.background = theme.header;
+        const label = document.createElement("span");
+        label.className = "dl-cosmetic-option-label";
+        label.textContent = theme.label;
+        button.append(swatch, label);
+        button.addEventListener("click", () => void saveServerAppearanceTheme(theme.id));
+        container.append(button);
+    });
+}
+function renderCosmeticPickers() {
+    renderCosmeticPicker("dlAuraOptions", "aura");
+    renderCosmeticPicker("dlFrameOptions", "frame");
+    renderCosmeticPicker("dlNameplateOptions", "nameplate");
+    renderCosmeticPicker("dlProfileBadgeOptions", "badges");
+    renderCosmeticPicker("dlBackdropOptions", "backdrop");
+    renderServerThemePicker();
+}
+function applyServerAppearanceTheme(id) {
+    const theme = SERVER_THEME_CATALOG.find(item => item.id === id) || SERVER_THEME_CATALOG[0];
+    activeServerAppearanceTheme = theme.id;
+    const workspace = document.getElementById("createdServerWorkspace");
+    if (!workspace) return;
+    workspace.style.setProperty("--dl-server-sidebar", theme.sidebar);
+    workspace.style.setProperty("--dl-server-chat", theme.chat);
+    workspace.style.setProperty("--dl-server-header", theme.header);
+    workspace.style.setProperty("--dl-server-accent", theme.accent);
+    workspace.dataset.dlTheme = theme.id;
+}
+async function saveServerAppearanceTheme(id) {
+    if (!activeCreatedServerId || activeCreatedServerOwnerUid !== currentUser?.uid) {
+        const note = document.getElementById("dlServerThemeStatus");
+        if (note) note.textContent = "You must be the owner of an open server to change its theme.";
+        return;
+    }
+    const theme = SERVER_THEME_CATALOG.find(item => item.id === id);
+    if (!theme) return;
+    const note = document.getElementById("dlServerThemeStatus");
+    try {
+        await updateDoc(doc(db, "servers", activeCreatedServerId), { appearanceTheme: theme.id });
+        applyServerAppearanceTheme(theme.id);
+        renderServerThemePicker();
+        if (note) note.textContent = theme.label + " theme saved for this server.";
+    } catch (error) {
+        console.error("Server theme update failed:", error);
+        if (note) note.textContent = "The server theme could not be saved. Check that you own this server.";
     }
 }
-
+function syncCustomizationShopOwnerState() {
+    const owner = isDiamondLoungeOwner();
+    const heading = document.querySelector(".dl-store-heading p");
+    if (heading) {
+        heading.textContent = owner
+            ? "Owner benefit active: every launch profile style and server theme is free for you. Silver GIF uploads are included too."
+            : "Every launch aura, frame, nameplate, badge and profile backdrop is free for members. Silver animated profile GIFs remain a separate Silver exclusive.";
+    }
+    const silverBadge = document.querySelector('.dl-store-item.silver .dl-store-lock');
+    const silverButton = document.querySelector('[data-cosmetic="silver-gif"]');
+    if (silverBadge) silverBadge.textContent = owner ? "✦ OWNER ACCESS · FREE" : "✦ SILVER EXCLUSIVE";
+    if (silverButton) {
+        silverButton.textContent = owner ? "Included · Free" : "View Silver";
+        silverButton.setAttribute("aria-label", owner
+            ? "Silver GIF pack included free for the Diamond Lounge owner"
+            : "View Silver GIF pack details");
+    }
+    const note = document.getElementById("dlStorePaymentNote");
+    if (note) {
+        note.textContent = owner
+            ? "All profile cosmetics are available free to the owner. Select styles above, preview them next to your avatar/name, then click Save profile."
+            : "The full launch styling collection is free for all members. Select your favorite options, preview them, then click Save profile. Silver GIF access is separate.";
+    }
+}
 let silverGifEntitled = false;
 let pendingGifFile = null;
 let currentProfileBadges = [];
@@ -3023,6 +3304,7 @@ function openServer(server) {
     currentConversationId = null;
     activeCreatedServerId = server.id;
 activeCreatedServerOwnerUid = server.ownerUid || null;
+applyServerAppearanceTheme(server.appearanceTheme || "midnight");
 currentServerCanManageChannels = activeCreatedServerOwnerUid === currentUser?.uid;
 if (!currentServerCanManageChannels) {
     const permissionServerId = server.id;
@@ -3273,6 +3555,7 @@ async function loadServerIcons() {
                     visibility: data.visibility || "private",
                     iconUrl: typeof data.iconUrl === "string" ? data.iconUrl : "",
                     ownerUid: data.ownerUid || "",
+                    appearanceTheme: data.appearanceTheme || "midnight",
                     createdAt: data.createdAt || null
                 };
             })
@@ -3450,6 +3733,7 @@ function applyAvatar(key) {
             button.dataset.avatar === currentAvatar
         );
     });
+    applyProfileCosmetics();
 }
 
 async function loadProfile() {
@@ -3485,11 +3769,18 @@ async function loadProfile() {
         currentProfileBadges = Array.isArray(data.badges)
             ? data.badges.map(value => String(value).trim()).filter(Boolean).slice(0, 4)
             : [];
+        currentProfileCosmetics = normalizeProfileCosmetics(data.cosmetics);
+        selectedProfileCosmetics = {
+            ...currentProfileCosmetics,
+            badges: [...currentProfileCosmetics.badges]
+        };
         syncCreatedServerVoiceUser();
 
         applyAvatar(
             typeof data.avatar === "string" ? data.avatar : "diamond"
         );
+        applyProfileCosmetics();
+        renderCosmeticPickers();
     } catch (error) {
         console.warn("Profile could not be read:", error);
 
@@ -3508,6 +3799,12 @@ function openProfileModal() {
     if (profileBadgesInput) {
         profileBadgesInput.value = currentProfileBadges.join(", ");
     }
+    selectedProfileCosmetics = {
+        ...currentProfileCosmetics,
+        badges: [...currentProfileCosmetics.badges]
+    };
+    renderCosmeticPickers();
+    applyProfileCosmetics();
 
     if (profileStatus) {
         profileStatus.textContent = "";
@@ -3537,6 +3834,11 @@ function closeProfileModal() {
 
     profileModal.hidden = true;
     document.body.classList.remove("modal-open");
+    selectedProfileCosmetics = {
+        ...currentProfileCosmetics,
+        badges: [...currentProfileCosmetics.badges]
+    };
+    applyProfileCosmetics();
 
     if (profileStatus) {
         profileStatus.textContent = "";
@@ -3775,6 +4077,7 @@ profileForm?.addEventListener("submit", async (event) => {
                 avatar: currentAvatar,
                 picture: uploadedPicture,
                 badges: nextBadges,
+                cosmetics: normalizeProfileCosmetics(selectedProfileCosmetics),
                 updatedAt: serverTimestamp()
             },
             { merge: true }
@@ -3791,10 +4094,16 @@ profileForm?.addEventListener("submit", async (event) => {
         }
 
         currentProfileBadges = nextBadges;
+        currentProfileCosmetics = normalizeProfileCosmetics(selectedProfileCosmetics);
+        selectedProfileCosmetics = {
+            ...currentProfileCosmetics,
+            badges: [...currentProfileCosmetics.badges]
+        };
         pendingGifFile = null; rawPicture = "";
         syncCreatedServerVoiceUser();
         void window.diamondVoiceControls?.refreshProfile?.();
         applyAvatar(currentAvatar);
+        applyProfileCosmetics();
 
         if (profileStatus) {
             profileStatus.textContent = "Profile saved successfully.";
