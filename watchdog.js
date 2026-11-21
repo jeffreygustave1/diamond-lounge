@@ -31,8 +31,8 @@
   function closePanel(){if(panel)panel.style.display="none";}
   function installUI(){
     badge=document.createElement("button");badge.type="button";badge.setAttribute("aria-label","Open Diamond Watchdog diagnostics");
-    badge.style.cssText="position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:2147483646;border:1px solid #6684a9;background:rgba(12,18,29,.96);color:#dcecff;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:24px;font:12px system-ui;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 4px 18px #0008";
-    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:22px;height:28px;object-fit:cover;flex-shrink:0";
+    badge.style.cssText="z-index:20;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;gap:0;padding:0;font:11px system-ui;cursor:pointer;white-space:nowrap;flex-shrink:0";
+    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:30px;height:75px;object-fit:cover;flex-shrink:0";
     const label=document.createElement("span");label.textContent="DIAMOND WATCHDOG";label.style.cssText="letter-spacing:.4px";
     count=document.createElement("span");count.style.cssText="opacity:.75;font-size:10px;margin-left:8px";
     badge.append(gem,label,count);badge.addEventListener("click",openPanel);
@@ -44,7 +44,9 @@
     panel.querySelector("[data-clear]").onclick=()=>{entries.length=0;render();};
     panel.addEventListener("click",e=>{if(e.target===panel)closePanel();});
     document.body.appendChild(panel);
-    document.body.appendChild(badge);
+    const botView=document.getElementById("supportBotView");
+    function sync(){const active=!!botView&&!botView.hidden;badge.style.display=active?"flex":"none";if(active){const header=botView.querySelector(".support-bot-header");if(header&&badge.parentElement!==header){header.appendChild(badge);header.style.justifyContent="space-between";header.style.gap="0";header.style.flexWrap="nowrap";}}}
+    if(botView){sync();new MutationObserver(sync).observe(botView,{attributes:true,attributeFilter:["hidden"]});}else badge.style.display="none";
     render();
   }
   function render(){if(count)count.textContent=String(entries.length);if(panel){panel.querySelector("[data-summary]").textContent=entries.length+" captured event(s). Stored locally in this page session. Copy the report to share it.";panel.querySelector("[data-log]").textContent=entries.length?reportText():"No errors captured yet. If the app is blank, refresh and reproduce the issue, then reopen Watchdog.";}}
