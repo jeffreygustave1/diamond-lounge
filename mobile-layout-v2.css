@@ -142,12 +142,15 @@
 @media(max-width:390px){@media(max-width:600px){#loungeVoiceCallView .created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important}#mobileSidebar .servers{width:52px!important;min-width:52px!important;flex-basis:52px!important}#mobileSidebar .server-icon{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex-basis:40px!important}#mobileSidebar #dmHomeButton img{width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important}}}
 
 
-/* Mobile viewport density: scale compact layout to fill phone viewport instead of shrinking into top-left. */
-@media(max-width:600px){html{zoom:1!important}body{width:100%!important;min-width:0!important}.dashboard{zoom:.75!important;width:133.333vw!important;height:133.333dvh!important;max-width:none!important;max-height:none!important;transform-origin:top left!important;}}
-@media(max-width:390px){@media(max-width:600px){.dashboard{zoom:.72!important;width:138.889vw!important;height:138.889dvh!important;}}}
+/* Mobile compact layout: transform-scale and compensate dimensions to fill the phone viewport. */
+@media(max-width:600px){html{zoom:1!important}body{width:100%!important;min-width:0!important}.dashboard{zoom:1!important;transform:scale(.75)!important;transform-origin:top left!important;width:133.333vw!important;height:133.333dvh!important;}}
+@media(max-width:390px){@media(max-width:600px){.dashboard{transform:scale(.72)!important;width:138.889vw!important;height:138.889dvh!important;}}}
 
 /* Restore the animated diamond inside the DM-home server button (mobile). */
 @media(max-width:600px){
  #mobileSidebar #dmHomeButton.server-icon.dm-home{background:#20232b!important;overflow:visible!important;clip-path:none!important;}
  #mobileSidebar #dmHomeButton.server-icon.dm-home img{visibility:visible!important;opacity:1!important;display:block!important;position:static!important;inset:auto!important;width:38px!important;height:38px!important;max-width:38px!important;max-height:38px!important;min-width:0!important;min-height:0!important;object-fit:contain!important;object-position:center!important;margin:auto!important;padding:0!important;clip-path:none!important;filter:none!important;transform:none!important;}
 }
+
+/* Match DM diamond icon size to the neighboring server icon. */
+@media(max-width:600px){#mobileSidebar #dmHomeButton.server-icon.dm-home{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex-basis:42px!important;padding:0!important;}#mobileSidebar #dmHomeButton.server-icon.dm-home img{width:42px!important;height:42px!important;max-width:42px!important;max-height:42px!important;min-width:42px!important;min-height:42px!important;object-fit:contain!important;}}
