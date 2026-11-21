@@ -62,3 +62,6 @@ body.dm-mode #supportBotView .support-bot-avatar {
     72% { filter: drop-shadow(0 0 13px rgba(150, 220, 255, .85)) brightness(1.28); }
     82% { filter: drop-shadow(0 0 9px rgba(0, 180, 255, .65)) brightness(1.12); }
 }
+
+/* AI repair proposal review */
+.support-repair-proposal{margin:12px;padding:16px;border:1px solid rgba(105,155,255,.35);border-radius:14px;background:#191d27;color:#e5e9f3;max-width:95%;}.support-repair-proposal h3{margin:0 0 8px;color:#dce6ff}.support-repair-proposal p{line-height:1.5}.support-repair-proposal button{margin-top:12px;padding:10px 14px;border-radius:9px;border:1px solid #648bdf;background:#284b91;color:#fff;cursor:pointer}.support-repair-proposal button:disabled{opacity:.5;cursor:not-allowed}.support-repair-proposal details{margin-top:12px}.support-repair-proposal summary{cursor:pointer;color:#b8c9f4}.support-repair-file pre{max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;padding:10px;background:#0c0d10;border-radius:8px;font-size:11px}.support-repair-proposal a{display:inline-block;margin:12px;color:#a9c6ff}
