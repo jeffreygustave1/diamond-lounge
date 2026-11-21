@@ -1,10 +1,14 @@
-// Diamond Support — context-aware troubleshooting assistant.
-// This client provides product knowledge and troubleshooting guidance.
-// Actual server diagnostics require backend integrations and must not be claimed unless implemented.
+// Diamond Support — browser-aware troubleshooting assistant.
+// Captures a bounded sample of browser errors to help diagnose user-reported problems.
+// This does not grant repository, code-editing, or deployment access.
+const diamondBrowserErrors=[];
+function diamondSafeError(value){return String(value||'').replace(/https?:\\/\\/[^\\s?#]+(?:\\?[^\\s]*)?/g,'[URL]').replace(/(token|password|secret|apiKey|authorization)\\s*[:=]\\s*[^\\s,;]+/gi,'$1=[redacted]').slice(0,500);}
+window.addEventListener('error',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError((e.message||'Script error')+' ('+(e.filename||'')+':'+(e.lineno||0)+')'));});
+window.addEventListener('unhandledrejection',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError('Unhandled promise: '+(e.reason?.message||e.reason||'unknown')));});
 const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support, the helpful technical support assistant for DIAMOND LOUNGE, a Discord-like community web app.
 
-Your job is to troubleshoot issues step by step, not just give generic replies.
+Your job is to troubleshoot issues step by step, not just give generic replies. When browser diagnostics are included, prioritize matching errors, explain their likely causes, and propose a focused fix. You still cannot change files or deploy code unless an actual tool grants that ability.
 Website features include user accounts and profiles/avatar uploads, text channels and messages, direct messages, server creation/membership/roles/channels, voice chat, camera/video, screen sharing, voice-room watch activities, and premium cosmetics/entitlements.
 
 Guidelines:
