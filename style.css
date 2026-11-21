@@ -4074,3 +4074,43 @@ button {
     display: none !important;
   }
 }
+
+
+/* MOBILE RESPONSIVE AUDIT PASS — constrain panels and voice stage without desktop changes */
+@media (max-width: 900px) {
+  html, body, .dashboard { width:100%; max-width:100%; overflow:hidden; }
+  .chat-area, #loungeView, .lounge-view, #serverView, .server-view,
+  #dmHomeView, #dmConversationView, .dm-conversation-view, .empty-channel-view {
+    min-width:0!important; max-width:100%!important; min-height:0!important;
+  }
+  .chat-area { flex:1 1 auto!important; height:100dvh!important; }
+  #loungeView, .lounge-view, .server-view, .dm-conversation-view {
+    flex:1 1 auto!important; height:100%; overflow:hidden!important;
+  }
+  .chat-header, .chat-header-main, .chat-header-main > div,
+  .channel-title, .sub-header { min-width:0!important; }
+  .messages, .dm-messages { overflow-x:hidden!important; min-width:0!important; }
+  .message-box, .message-box input, .message-box textarea { min-width:0!important; max-width:100%!important; }
+  .voice-panel, #voicePanel { max-width:100vw!important; min-width:0!important; }
+  .voice-controls { grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:8px!important; }
+  .voice-controls button, .voice-control-button { min-width:0!important; max-width:100%!important; }
+  .created-server-chat, .created-server-workspace, .created-server-voice-stage {
+    min-width:0!important; max-width:100%!important;
+  }
+  .created-server-messages { overflow-x:hidden!important; }
+  .created-server-feature-backdrop, .support-bot-backdrop, .dm-call-backdrop {
+    padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right))
+      max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important;
+  }
+  input, select, textarea { max-width:100%; }
+}
+@media (max-width:600px) {
+  .chat-header { padding: max(8px,env(safe-area-inset-top)) 10px 8px!important; gap:7px!important; }
+  .voice-controls { gap:6px!important; padding-inline:8px!important; }
+  .voice-controls button { padding:9px 5px!important; font-size:13px!important; }
+  .created-server-chat-header { padding:10px!important; gap:6px!important; }
+  .created-server-messages { padding:8px!important; }
+  .created-server-voice-controls { flex-wrap:wrap!important; }
+  .created-server-feature-modal { max-width:calc(100vw - 16px)!important; max-height:calc(100dvh - 16px)!important; }
+  .dm-call-panel { width:calc(100vw - 16px)!important; }
+}
