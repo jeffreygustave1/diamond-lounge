@@ -1,4 +1,4 @@
-/* Diamond Lounge Watchdog — on-device diagnostics. Logs stay in this browser session. */
+/* Diamond Lounge Watchdog — mobile-accessible on-device diagnostics. */
 (() => {
   if (window.__diamondWatchdogInstalled) return;
   window.__diamondWatchdogInstalled = true;
@@ -25,13 +25,14 @@
     try{const response=await originalFetch(...args);if(!response.ok)record("HTTP request failure",response.status+" "+response.statusText,{url:label});return response;}
     catch(error){record("Network failure",safeDetails(error),{url:label});throw error;}
   };
-  function reportText(){return entries.map((e,i)=>[i+1,e.time,e.type,e.message,JSON.stringify(e.details)].join("\n")).join("\n\n");}
+  function redact(value){return String(value??"").replace(/(token|password|passwd|secret|authorization|api[_-]?key|credential)([=: ]+)[^&\\s,;]+/gi,"$1$2[REDACTED]").replace(/([?&](?:token|key|auth|password|secret)=)[^&\\s]+/gi,"$1[REDACTED]");}
+  function reportText(){const header=["DIAMOND LOUNGE DIAGNOSTIC REPORT","Time: "+new Date().toISOString(),"Page: "+location.origin+location.pathname,"Browser: "+navigator.userAgent,"Events captured: "+entries.length,""];return header.concat(entries.map((e,i)=>[i+1,e.time,e.type,redact(e.message),redact(JSON.stringify(e.details))].join("\\n")).join("\\n\\n")).join("\\n");}
   function openPanel(){if(panel){panel.style.display="flex";render();}}
   function closePanel(){if(panel)panel.style.display="none";}
   function installUI(){
     badge=document.createElement("button");badge.type="button";badge.setAttribute("aria-label","Open Diamond Watchdog diagnostics");
-    badge.style.cssText="z-index:20;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;gap:0;padding:0;font:11px system-ui;cursor:pointer;white-space:nowrap;flex-shrink:0";
-    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:30px;height:75px;object-fit:cover;flex-shrink:0";
+    badge.style.cssText="position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:2147483646;border:1px solid #6684a9;background:rgba(12,18,29,.96);color:#dcecff;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:24px;font:12px system-ui;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 4px 18px #0008";
+    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:22px;height:28px;object-fit:cover;flex-shrink:0";
     const label=document.createElement("span");label.textContent="DIAMOND WATCHDOG";label.style.cssText="letter-spacing:.4px";
     count=document.createElement("span");count.style.cssText="opacity:.75;font-size:10px;margin-left:8px";
     badge.append(gem,label,count);badge.addEventListener("click",openPanel);
@@ -39,16 +40,16 @@
     panel.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,7,12,.94);color:#edf3ff;display:none;flex-direction:column;padding:env(safe-area-inset-top,12px) 12px env(safe-area-inset-bottom,12px);font:14px system-ui;box-sizing:border-box";
     panel.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0"><strong style="font-size:17px">DIAMOND WATCHDOG</strong><button data-close style="padding:10px 14px;border-radius:10px">Close</button></div><div data-summary style="padding:8px 0"></div><div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 0"><button data-copy style="padding:10px;border-radius:10px">Copy report</button><button data-clear style="padding:10px;border-radius:10px">Clear logs</button></div><pre data-log style="overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#151922;border:1px solid #303746;border-radius:12px;padding:12px;flex:1;min-height:0;margin:0;font:12px ui-monospace,monospace"></pre>';
     panel.querySelector("[data-close]").onclick=closePanel;
-    panel.querySelector("[data-copy]").onclick=async()=>{try{await navigator.clipboard.writeText(reportText()||"No errors recorded.");panel.querySelector("[data-summary]").textContent="Report copied."; }catch{panel.querySelector("[data-summary]").textContent="Copy unavailable here. You can select and copy the log manually."; }};
+    panel.querySelector("[data-copy]").onclick=async()=>{const t=reportText()||"No errors recorded.";try{await navigator.clipboard.writeText(t);panel.querySelector("[data-summary]").textContent="Report copied — paste it into your ChatGPT chat."; }catch{try{const ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;opacity:0";panel.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();panel.querySelector("[data-summary]").textContent="Copy attempted. Paste the report into ChatGPT."; }catch{panel.querySelector("[data-summary]").textContent="Copy failed. Select the report text below manually.";}}};
     panel.querySelector("[data-clear]").onclick=()=>{entries.length=0;render();};
     panel.addEventListener("click",e=>{if(e.target===panel)closePanel();});
     document.body.appendChild(panel);
-    const botView=document.getElementById("supportBotView");
-    function sync(){const active=!!botView&&!botView.hidden;badge.style.display=active?"flex":"none";if(active){const header=botView.querySelector(".support-bot-header");if(header&&badge.parentElement!==header){header.appendChild(badge);header.style.justifyContent="space-between";header.style.gap="0";header.style.flexWrap="nowrap";}}}
-    if(botView){sync();new MutationObserver(sync).observe(botView,{attributes:true,attributeFilter:["hidden"]});}else badge.style.display="none";
+    document.body.appendChild(badge);
     render();
   }
-  function render(){if(count)count.textContent=String(entries.length);if(panel){panel.querySelector("[data-summary]").textContent=entries.length+" captured event(s). Logs are stored only in this page session.";panel.querySelector("[data-log]").textContent=entries.length?reportText():"No errors captured yet. If the app is blank, refresh and reproduce the issue, then reopen Watchdog.";}}
+
+  }
+  function render(){if(count)count.textContent=String(entries.length);if(panel){panel.querySelector("[data-summary]").textContent=entries.length+" captured event(s). Stored locally in this page session. Copy the report to share it.";panel.querySelector("[data-log]").textContent=entries.length?reportText():"No errors captured yet. If the app is blank, refresh and reproduce the issue, then reopen Watchdog.";}}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",installUI,{once:true});else installUI();
   window.DiamondWatchdog={getReports:()=>entries.slice(),clear:()=>{entries.length=0;render();},open:openPanel};
   record("Watchdog started","Diagnostics enabled for this browser session.");
