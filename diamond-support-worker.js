@@ -27,10 +27,13 @@ export default {
       const model = useWebSearch ? (env.SEARCH_MODEL || "gpt-5-search-api") : (env.AI_MODEL || "gpt-4o-mini");
       const requestBody = {
         model,
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
-        max_tokens: useWebSearch ? 900 : 700
+        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages]
       };
-      if (useWebSearch) requestBody.web_search_options = {};
+      if (useWebSearch) {
+        requestBody.web_search_options = {};
+      } else {
+        requestBody.max_tokens = 700;
+      }
 
       const completion = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
