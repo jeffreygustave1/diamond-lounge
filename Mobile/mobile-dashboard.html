@@ -596,6 +596,16 @@
 
             </section>
 
+            <!-- DIRECT MESSAGE HOME: mobile standalone page lacked this view, causing the DM diamond to open a blank screen -->
+            <section id="dmHomeView" class="dm-home-view" hidden>
+              <div class="dm-home-welcome">
+                <div class="dm-home-gem" aria-hidden="true">◇</div>
+                <h2>Direct Messages</h2>
+                <p>Find a member in the sidebar to start a private conversation.</p>
+                <p class="dm-home-hint">Open the navigation drawer and choose someone from your member list.</p>
+              </div>
+            </section>
+
             <!-- PRIVATE CONVERSATION -->
             <section id="dmConversationView" class="dm-conversation-view" hidden>
 
@@ -1177,3 +1187,16 @@
 </script>
 </body>
 </html>
+
+<style>
+/* Mobile DM home screen and equal-size rail diamond correction */
+@media(max-width:600px){
+ #mobileSidebar .servers>#dmHomeButton.server-icon.dm-home{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;padding:0!important;box-sizing:border-box!important;overflow:hidden!important;}
+ #mobileSidebar #dmHomeButton.server-icon.dm-home img{display:block!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;max-width:46px!important;max-height:46px!important;object-fit:contain!important;margin:0!important;padding:0!important;}
+ #dmHomeView:not([hidden]){display:flex!important;align-items:center!important;justify-content:center!important;flex:1 1 auto!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:auto!important;background:#111319!important;}
+ #dmHomeView .dm-home-welcome{max-width:320px!important;margin:auto!important;padding:24px!important;text-align:center!important;color:#e7e8ed!important;}
+ #dmHomeView .dm-home-gem{font-size:54px!important;color:#9bc8ff!important;margin-bottom:16px!important;}
+ #dmHomeView h2{margin:0 0 10px!important;font-size:22px!important;}
+ #dmHomeView p{font-size:14px!important;line-height:1.5!important;color:#aeb4c2!important;}
+}
+</style>
