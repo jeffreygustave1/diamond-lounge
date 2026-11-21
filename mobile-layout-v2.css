@@ -98,3 +98,10 @@
   }
   #voicePanel { bottom:max(8px,var(--dl-mobile-safe-bottom))!important; }
 }
+
+/* Mobile-only: correct the DM-home diamond's visual size and containment */
+@media (max-width:600px){
+ #mobileSidebar .servers>#dmHomeButton.server-icon.dm-home{flex:0 0 54px!important;width:54px!important;min-width:54px!important;height:54px!important;min-height:54px!important;}
+ #mobileSidebar #dmHomeButton img{width:52px!important;height:52px!important;max-width:52px!important;max-height:52px!important;object-fit:contain!important;}
+}
+@media (max-width:390px){#mobileSidebar .servers>#dmHomeButton.server-icon.dm-home{flex-basis:52px!important;width:52px!important;min-width:52px!important;height:52px!important;min-height:52px!important;}#mobileSidebar #dmHomeButton img{width:50px!important;height:50px!important;max-width:50px!important;max-height:50px!important;}}
