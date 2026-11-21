@@ -140,7 +140,7 @@ async function send(message){
   const context=DIAMOND_SUPPORT_SYSTEM+"\n\nInitial user request: "+original+"\n\nRecent browser diagnostics (bounded):\n"+errorText;
   const messages=[{role:"user",content:context.slice(0,3800)},{role:"user",content:snapshot.manifest.slice(0,3800)}];
   for(const chunk of snapshot.chunks.slice(0,10))messages.push({role:"user",content:chunk.slice(0,3800)});
-  const recent=history.slice(1).slice(-4).map(m=>({role:m.role,content:String(m.content||"").slice(0,3800)}));
+  const recent=history.slice(1).slice(-4).map(m=>({role:m.role,content:String(m.content||"").slice(0,1500)}));
   messages.push(...recent);
   const response=await fetch(DIAMOND_AI_ENDPOINT,{
    method:"POST",
