@@ -33,7 +33,7 @@
     </main>
     <script type="module">
         import { auth, db } from "./firebase.js";
-        import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, signInAnonymously } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, RecaptchaVerifier, signInWithPhoneNumber, signInAnonymously } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const form = document.getElementById("loginForm");
@@ -104,6 +104,7 @@ googleButton.addEventListener("click", async () => {
     try {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: "select_account" });
+        await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
         await ensureProfile(result.user);
         window.location.assign(postAuthDestination());
