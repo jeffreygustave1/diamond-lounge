@@ -110,13 +110,19 @@ async function getProjectSnapshot(focus=""){
  })();
  try{return await projectSnapshotPromise;}finally{projectSnapshotPromise=null;}
 }
-function bubble(text,kind="bot",sources=[]){
+function bubble(text,kind="bot",sources=[],toolsUsed=[]){
  const row=document.createElement("div");
  row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");
  const stack=document.createElement("div");stack.className="support-bot-message-stack";
- const b=document.createElement("div");
- b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");
- b.textContent=text;stack.appendChild(b);
+ const message=document.createElement("div");
+ message.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");
+ message.textContent=text;stack.appendChild(message);
+ if(kind!=="user"&&Array.isArray(toolsUsed)&&toolsUsed.length){
+  const used=document.createElement("div");used.className="support-bot-tools-used";
+  const labels={"web_search":"Live web search","get_live_diamond_context":"Live Diamond Lounge context"};
+  [...new Set(toolsUsed)].forEach(name=>{if(!labels[name])return;const tag=document.createElement("span");tag.textContent=labels[name];used.appendChild(tag);});
+  if(used.childElementCount)stack.appendChild(used);
+ }
  if(kind!=="user"&&Array.isArray(sources)&&sources.length){
   const wrap=document.createElement("div");wrap.className="support-bot-sources";
   const label=document.createElement("span");label.textContent="Sources";wrap.appendChild(label);
@@ -221,7 +227,7 @@ async function send(message){
   thinking.remove();
   const rawAnswer=String(data.reply||"The support service returned an empty reply. Please try again.");
   const answer=parseRepairAnswer(rawAnswer);
-  bubble(answer,"bot",data.citations||[]);
+  bubble(answer,"bot",data.citations||[],data.tools_used||[]);
   history.push({role:"assistant",content:rawAnswer});
  }catch(error){
   thinking.remove();
