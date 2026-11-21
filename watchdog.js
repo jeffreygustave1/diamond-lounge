@@ -26,7 +26,7 @@
     catch(error){record("Network failure",safeDetails(error),{url:label});throw error;}
   };
   function redact(value){return String(value??"").replace(/(token|password|passwd|secret|authorization|api[_-]?key|credential)([=: ]+)[^&\\s,;]+/gi,"$1$2[REDACTED]").replace(/([?&](?:token|key|auth|password|secret)=)[^&\\s]+/gi,"$1[REDACTED]");}
-  function reportText(){const header=["DIAMOND LOUNGE DIAGNOSTIC REPORT","Time: "+new Date().toISOString(),"Page: "+location.origin+location.pathname,"Browser: "+navigator.userAgent,"Events captured: "+entries.length,""];return header.concat(entries.map((e,i)=>[i+1,e.time,e.type,redact(e.message),redact(JSON.stringify(e.details))].join("\\n")).join("\\n\\n")).join("\\n");}
+  function reportText(){const header=["DIAMOND LOUNGE DIAGNOSTIC REPORT","Time: "+new Date().toISOString(),"Page: "+location.origin+location.pathname,"Browser: "+navigator.userAgent,"Events captured: "+entries.length,""];return header.concat(entries.map((e,i)=>[i+1,e.time,e.type,redact(e.message),redact(JSON.stringify(e.details))].join("\n")).join("\n\n")).join("\n");}
   function openPanel(){if(panel){panel.style.display="flex";render();}}
   function closePanel(){if(panel)panel.style.display="none";}
   function installUI(){
@@ -46,8 +46,6 @@
     document.body.appendChild(panel);
     document.body.appendChild(badge);
     render();
-  }
-
   }
   function render(){if(count)count.textContent=String(entries.length);if(panel){panel.querySelector("[data-summary]").textContent=entries.length+" captured event(s). Stored locally in this page session. Copy the report to share it.";panel.querySelector("[data-log]").textContent=entries.length?reportText():"No errors captured yet. If the app is blank, refresh and reproduce the issue, then reopen Watchdog.";}}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",installUI,{once:true});else installUI();
