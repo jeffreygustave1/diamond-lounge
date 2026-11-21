@@ -304,6 +304,7 @@ function applyProfileCosmetics() {
 
     const nameTargets = [
         profileName,
+        currentUserElement?.querySelector("span"),
         document.getElementById("mainVoiceUserName"),
         document.getElementById("createdServerVoiceUserName")
     ].filter(Boolean);
@@ -326,6 +327,7 @@ function applyProfileCosmetics() {
     });
 
     renderCosmeticBadgeRail(document.getElementById("profileCosmeticBadges"), c.badges);
+    renderCosmeticBadgeRail(document.getElementById("currentUserCosmeticBadges"), c.badges);
     renderCosmeticBadgeRail(document.getElementById("mainVoiceUserCosmeticBadges"), c.badges);
     renderCosmeticBadgeRail(document.getElementById("createdServerVoiceUserCosmeticBadges"), c.badges);
 }
