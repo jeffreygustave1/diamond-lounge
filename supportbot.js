@@ -235,9 +235,16 @@ async function send(message){
  }
 }
 
-function start(){chat.replaceChildren();history=[];bubble("Hi! I'm Diamond Support 💎. Tell me what isn't working and I'll help troubleshoot it step by step. What happened?","bot");topicButtons();input.value="";}
+let supportConversationStarted=false;
+function start(force=false){
+ if(supportConversationStarted&&!force)return;
+ supportConversationStarted=true;
+ chat.replaceChildren();history=[];
+ bubble("Hi! I'm Diamond Support 💎. Ask me anything, or tell me what you need help with in Diamond Lounge.","bot");
+ topicButtons();input.value="";
+}
 form?.addEventListener("submit",e=>{e.preventDefault();send(input.value);});
 function openSupportConversation(){const area=document.querySelector(".chat-area");if(!area||!view)return;area.querySelectorAll(":scope > section").forEach(section=>{section.hidden=true;});view.hidden=false;const channelsSidebar=document.getElementById("channelsSidebar");if(channelsSidebar)channelsSidebar.hidden=false;const dmSidebar=document.getElementById("dmSidebar");if(dmSidebar)dmSidebar.hidden=false;const loungeSidebar=document.getElementById("loungeSidebar");if(loungeSidebar)loungeSidebar.hidden=true;const dmHomeButton=document.getElementById("dmHomeButton");if(dmHomeButton){dmHomeButton.classList.add("selected");dmHomeButton.setAttribute("aria-pressed","true");}const mainServerButton=document.getElementById("mainServerButton");if(mainServerButton){mainServerButton.classList.remove("selected");mainServerButton.setAttribute("aria-pressed","false");}document.body.classList.add("dm-mode");start();input.focus();}
 function closeSupportConversation(){if(!view)return;view.hidden=true;const home=document.getElementById("dmHomeView");if(home)home.hidden=false;}
 openBtn?.addEventListener("click",()=>{if(view&&!view.hidden){closeSupportConversation();return;}openSupportConversation();});
-reset?.addEventListener("click",start);
+reset?.addEventListener("click",()=>start(true));
