@@ -259,10 +259,7 @@ let currentProfileCosmetics = { ...DEFAULT_PROFILE_COSMETICS, badges: [] };
 let selectedProfileCosmetics = { ...DEFAULT_PROFILE_COSMETICS, badges: [] };
 let activeServerAppearanceTheme = "midnight";
 
-function isDiamondLoungeOwner() {
-    const uid = auth.currentUser?.uid || currentUser?.uid;
-    return Boolean(uid && uid === DIAMOND_LOUNGE_OWNER_UID);
-}
+
 function normalizeProfileCosmetics(value) {
     const source = value && typeof value === "object" ? value : {};
     const valid = (group, id, fallback) =>
