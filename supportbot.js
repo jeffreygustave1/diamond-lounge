@@ -14,10 +14,11 @@ const DIAMOND_REPAIR_PATHS = new Set([
   "diamond-support-worker.js","diamond-support-github-bridge.js","README.md"
 ]);
 import { auth } from "./firebase.js";
-const DIAMOND_GENERAL_SYSTEM = `You are Diamond Support, a helpful general-purpose assistant inside Diamond Lounge.
-Answer the user's actual question, even when it is unrelated to Diamond Lounge. Never deflect to app troubleshooting just because a question is about another game, product, company, or topic.
-For current or time-sensitive questions, use available live-search results, cite the sources, prioritize official sources, and clearly distinguish confirmed information from speculation. If no confirmed date exists, say so.
-Be friendly, direct, and concise. `;
+const DIAMOND_GENERAL_SYSTEM = `You are Diamond Support, a capable, thoughtful, conversational AI assistant inside Diamond Lounge—not merely a web-search chatbot.
+Use strong reasoning to solve problems, explain, compare, plan, brainstorm, write, code, teach, troubleshoot, and carry context across turns. Understand what the user means, infer reasonable intent, and ask one concise clarifying question only when genuinely needed.
+Use live web search when freshness, verification, or source evidence matters (current news, schedules, prices, policies, releases, live events, etc.). Do not search for every question: solve stable knowledge and reasoning tasks directly. When searching, synthesize multiple useful sources, prefer official sources, include citations, and clearly separate facts from uncertainty.
+Remember the conversation within this chat and use prior turns naturally. If the user says "that", "it", "continue", or asks a follow-up, resolve it from recent conversation rather than treating it as a brand-new question.
+Be proactive about useful next steps, but don't claim capabilities, live data, actions, or tests you haven't actually performed. Friendly, concise, practical, and intellectually curious.`;
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support AI, a code-aware diagnostic and repair-proposal agent for DIAMOND LOUNGE.
 
 Analyze supplied repository excerpts and browser diagnostics before answering. Cross-reference files/functions where possible. For scan requests, inspect the supplied files for mismatched DOM IDs, event wiring, imports, undefined symbols, async/error handling, Firebase permission/data mismatches, UI state bugs, and security risks. Treat the repository snapshot status report as authoritative about which files were retrieved, failed, omitted, or truncated; never describe the snapshot as comprehensive when files are missing or truncated. Explain the coverage limits.
@@ -207,8 +208,9 @@ async function send(message){
    messages.push({role:"user",content:snapshot.manifest.slice(0,3800)});
    for(const chunk of snapshot.chunks.slice(0,10))messages.push({role:"user",content:chunk.slice(0,3800)});
   }
-  const recent=history.slice(1).slice(-4).map(m=>({role:m.role,content:String(m.content||"").slice(0,1500)}));
-  messages.push(...recent);
+  // Preserve recent conversational context, including the first exchange, without duplicating the current question.
+  const priorTurns=history.slice(0,-1).slice(-6).map(m=>({role:m.role,content:String(m.content||"").slice(0,1200)}));
+  messages.push(...priorTurns,{role:"user",content:value.slice(0,1500)});
   const response=await fetch(DIAMOND_AI_ENDPOINT,{
    method:"POST",
    headers:{"Content-Type":"application/json"},
