@@ -11,7 +11,7 @@
     <link rel="icon" type="image/gif" href="diamond-animated.svg?v=1">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="style.css?v=58">
+    <link rel="stylesheet" href="style.css?v=59">
     <link rel="stylesheet" href="luxury.css?v=9">
     <link rel="stylesheet" href="branding-polish.css?v=9">
     <link rel="stylesheet" href="dm.css?v=9">
@@ -689,6 +689,7 @@
                     <li id="currentUser">
                         <i></i>
                         <span>Member</span>
+                        <span class="dl-cosmetic-badge-rail" id="currentUserCosmeticBadges" aria-label="Your selected profile badges"></span>
                         <em>you</em>
                     </li>
                 </ul>
@@ -938,13 +939,13 @@
                     autocomplete="off"
                     required>
 
-                <label for="profileBadgesInput">VOICE BADGES</label>
+                <label for="profileBadgesInput">VOICE TAGS (OPTIONAL)</label>
                 <input
                     id="profileBadgesInput"
                     type="text"
                     maxlength="120"
                     placeholder="Former, Star Citizen, Creator">
-                <p class="profile-badges-note">Add up to four short badges, separated by commas. They appear beneath your name in voice rooms.</p>
+                <p class="profile-badges-note">Add up to four short text tags to show beneath your name in voice rooms. The collectible icon badges you choose in the shop appear beside your name.</p>
 
                 <div class="server-modal-actions">
 
@@ -979,11 +980,11 @@
     
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
-    <script type="module" src="script.js?v=78"></script>
+    <script type="module" src="script.js?v=79"></script>
 <script type="module" src="watch-feature.js?v=19"></script>
     <script type="module" src="supportbot.js?v=13"></script>
 <script type="module" src="dm-call.js?v=9"></script>
-<script type="module" src="voice.js?v=49"></script>
+<script type="module" src="voice.js?v=50"></script>
 <script src="watchdog.js?v=8"></script>
 
 
