@@ -25,3 +25,21 @@
   .messages,.dm-messages,.created-server-messages { margin:4px 6px 0!important; padding:6px!important; }
   .message,.dm-message,.created-server-message { max-width:94%!important; margin-bottom:4px!important; padding:5px 8px!important; font-size:12px!important; line-height:1.34!important; }
 }
+
+
+/* FINAL MOBILE DRAWER GUARD: prevent oversized workspace and profile elements */
+@media(max-width:900px){
+ #mobileSidebar,#mobileSidebar .channels,#channelsSidebar{box-sizing:border-box!important;min-width:0!important;max-width:100%!important;overflow-x:hidden!important;}
+ #mobileSidebar .workspace-heading{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;overflow:hidden!important;padding:8px!important;}
+ #mobileSidebar .workspace-title{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;}
+ #mobileSidebar .workspace-gem{display:block!important;flex:0 0 48px!important;width:48px!important;height:48px!important;max-width:48px!important;max-height:48px!important;object-fit:contain!important;}
+ #mobileSidebar .workspace-title h1{font-size:clamp(14px,4vw,20px)!important;min-width:0!important;overflow-wrap:anywhere!important;}
+ #mobileSidebar .server-icon img,#mobileSidebar .rail-gem{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;display:block!important;}
+ #mobileSidebar .profile-card{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;left:auto!important;right:auto!important;margin:8px 0 max(8px,env(safe-area-inset-bottom))!important;overflow:hidden!important;}
+ #mobileSidebar .profile-avatar,#mobileSidebar .profile-identity{min-width:0!important;max-width:100%!important;box-sizing:border-box!important;}
+ #mobileSidebar .profile-card img,#mobileSidebar .member-picture img{max-width:44px!important;max-height:44px!important;object-fit:cover!important;}
+}
+@media(max-width:600px){
+ #mobileSidebar .workspace-gem{flex-basis:42px!important;width:42px!important;height:42px!important;max-width:42px!important;max-height:42px!important;}
+ #mobileSidebar .profile-card{padding:6px!important;border-radius:14px!important;}
+}
