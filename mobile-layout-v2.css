@@ -142,9 +142,13 @@
 @media(max-width:390px){@media(max-width:600px){#loungeVoiceCallView .created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important}#mobileSidebar .servers{width:52px!important;min-width:52px!important;flex-basis:52px!important}#mobileSidebar .server-icon{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex-basis:40px!important}#mobileSidebar #dmHomeButton img{width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important}}}
 
 
-/* Mobile compact layout: transform-scale and compensate dimensions to fill the phone viewport. */
-@media(max-width:600px){html{zoom:1!important}body{width:100%!important;min-width:0!important}.dashboard{zoom:1!important;transform:scale(.75)!important;transform-origin:top left!important;width:133.333vw!important;height:133.333dvh!important;}}
-@media(max-width:390px){@media(max-width:600px){.dashboard{transform:scale(.72)!important;width:138.889vw!important;height:138.889dvh!important;}}}
+/* Mobile compact viewport: use CSS zoom with viewport compensation; avoid transform anchoring in iOS. */
+@media(max-width:600px){
+ html,body{width:100%!important;height:100%!important;min-width:0!important;overflow:hidden!important;}
+ body{height:100dvh!important;}
+ .dashboard{position:fixed!important;inset:0!important;zoom:.75!important;transform:none!important;transform-origin:top left!important;width:133.333vw!important;height:133.333dvh!important;max-width:none!important;max-height:none!important;}
+}
+@media(max-width:390px){@media(max-width:600px){.dashboard{zoom:.72!important;width:138.889vw!important;height:138.889dvh!important;}}}
 
 /* Restore the animated diamond inside the DM-home server button (mobile). */
 @media(max-width:600px){
