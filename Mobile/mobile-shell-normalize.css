@@ -63,3 +63,6 @@
  #supportBotView>#supportBotForm{order:3!important;flex:0 0 auto!important;}
  #supportBotView>.support-bot-footer{order:4!important;flex:0 0 auto!important;}
 }
+
+/* FIX: hidden support view must not be force-displayed by the mobile flex layout */
+@media(max-width:900px){#supportBotView[hidden]{display:none!important;}#supportBotView:not([hidden]){display:flex!important;}}
