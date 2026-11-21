@@ -14,7 +14,7 @@ service firebase.storage {
         && request.auth.uid == userId;
     }
 
-    // Silver GIF uploads require the server-verified purchase entitlement.
+    // Silver GIF uploads require a paid entitlement, except for the Diamond Lounge owner.
     match /premium-gifs/{userId}/{fileName} {
       allow read: if request.auth != null;
       allow create, update: if request.auth != null
