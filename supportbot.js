@@ -46,10 +46,29 @@ function proposalCard(proposal){
 }
 function parseRepairAnswer(answer){try{let raw=answer.trim().replace(/^\s*\x60\x60\x60(?:json)?\s*/i,"").replace(/\s*\x60\x60\x60$/,"");const p=JSON.parse(raw);if(proposalCard(p))return "Repair proposal prepared for review. The complete proposed files are displayed below; no changes have been applied."; }catch{}return answer;}
 function topicButtons(){choices.replaceChildren();topics.forEach(topic=>{const b=document.createElement("button");b.type="button";b.textContent=topic;b.addEventListener("click",()=>send(topic));choices.appendChild(b);});}
-async function send(message){const value=(message||"").trim();if(!value||busy)return;bubble(value,"user");history.push({role:"user",content:value});input.value="";busy=true;if(sendButton)sendButton.disabled=true;input.disabled=true;choices.replaceChildren();bubble("Diamond is investigating…","bot");const thinking=chat.lastElementChild;
-try{if(DIAMOND_AI_ENDPOINT.includes("YOUR-WORKER-NAME"))throw new Error("Support backend endpoint is not configured.");const snapshot=await getProjectSnapshot();const response=await fetch(DIAMOND_AI_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history.map((m,i)=>i===0&&m.role==="user"?{...m,content:DIAMOND_SUPPORT_SYSTEM+"\n\nRecent browser errors (if any): "+(diamondBrowserErrors.length?diamondBrowserErrors.join("\n"):"No captured browser errors.")+"\n\n"+snapshot+"\n\nUser question: "+m.content}:m)})});let data={};try{data=await response.json();}catch{}if(!response.ok)throw new Error("Support service returned HTTP "+response.status+(data.error?": "+String(data.error).slice(0,240):""));thinking?.remove();const rawAnswer=String(data.reply||"The support service returned an empty reply. Please try again.");const answer=parseRepairAnswer(rawAnswer);history.push({role:"assistant",content:answer==="Repair proposal prepared for review. The complete proposed files are displayed below; no changes have been applied."?"Repair proposal is displayed for review.":rawAnswer);bubble(answer,"bot");}
-catch(error){thinking?.remove();bubble("I couldn't reach the support service just now. "+(error?.message||"Request failed.")+" Your issue hasn't been diagnosed yet. Please try sending your message again in a moment. If it continues, tell the developer that Diamond Support's endpoint is failing.","bot");}
-finally{busy=false;input.disabled=false;if(sendButton)sendButton.disabled=false;topicButtons();input.focus();}}
+async function send(message){
+ const value=(message||"").trim();
+ if(!value||busy)return;
+ bubble(value,"user");history.push({role:"user",content:value});input.value="";
+ busy=true;if(sendButton)sendButton.disabled=true;input.disabled=true;choices.replaceChildren();
+ bubble("Diamond is investigating…","bot");const thinking=chat.lastElementChild;
+ try{
+  if(DIAMOND_AI_ENDPOINT.includes("YOUR-WORKER-NAME"))throw new Error("Support backend endpoint is not configured.");
+  const snapshot=await getProjectSnapshot();
+  const firstMessage=history[0];
+  const enrichedFirst={role:"user",content:DIAMOND_SUPPORT_SYSTEM+"\n\nRecent browser errors (if any): "+(diamondBrowserErrors.length?diamondBrowserErrors.join("\n"):"No captured browser errors.")+"\n\n"+snapshot+"\n\nUser question: "+firstMessage.content};
+  const messages=history.map((m,i)=>i===0?enrichedFirst:m);
+  const response=await fetch(DIAMOND_AI_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages})});
+  let data={};try{data=await response.json();}catch{}
+  if(!response.ok)throw new Error("Support service returned HTTP "+response.status+(data.error?": "+String(data.error).slice(0,240):""));
+  thinking?.remove();const rawAnswer=String(data.reply||"The support service returned an empty reply. Please try again.");
+  const answer=parseRepairAnswer(rawAnswer);
+  history.push({role:"assistant",content:answer==="Repair proposal prepared for review. The complete proposed files are displayed below; no changes have been applied."?"Repair proposal is displayed for review.":rawAnswer});
+  bubble(answer,"bot");
+ }catch(error){
+  thinking?.remove();bubble("I couldn't reach the support service just now. "+(error?.message||"Request failed.")+" Your issue hasn't been diagnosed yet. Please try sending your message again in a moment. If it continues, tell the developer that Diamond Support's endpoint is failing.","bot");
+ }finally{busy=false;input.disabled=false;if(sendButton)sendButton.disabled=false;topicButtons();input.focus();}
+}
 function start(){chat.replaceChildren();history=[];bubble("Hi! I'm Diamond Support 💎. Tell me what isn't working and I'll help troubleshoot it step by step. What happened?","bot");topicButtons();input.value="";}
 form?.addEventListener("submit",e=>{e.preventDefault();send(input.value);});
 function openSupportConversation(){const area=document.querySelector(".chat-area");if(!area||!view)return;area.querySelectorAll(":scope > section").forEach(section=>{section.hidden=true;});view.hidden=false;const channelsSidebar=document.getElementById("channelsSidebar");if(channelsSidebar)channelsSidebar.hidden=false;const dmSidebar=document.getElementById("dmSidebar");if(dmSidebar)dmSidebar.hidden=false;const loungeSidebar=document.getElementById("loungeSidebar");if(loungeSidebar)loungeSidebar.hidden=true;const dmHomeButton=document.getElementById("dmHomeButton");if(dmHomeButton){dmHomeButton.classList.add("selected");dmHomeButton.setAttribute("aria-pressed","true");}const mainServerButton=document.getElementById("mainServerButton");if(mainServerButton){mainServerButton.classList.remove("selected");mainServerButton.setAttribute("aria-pressed","false");}document.body.classList.add("dm-mode");start();input.focus();}
