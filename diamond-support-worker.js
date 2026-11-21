@@ -101,80 +101,110 @@ export default {
 };
 
 async function searchWeb(query) {
-  const url = "https://html.duckduckgo.com/html/?q=" + encodeURIComponent(query) + "&df=m";
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; DiamondSupport/1.0)",
-      "Accept": "text/html,application/xhtml+xml"
-    },
-    redirect: "follow"
-  });
-  if (!response.ok) throw new Error("Search provider returned HTTP " + response.status);
-
-  const html = await response.text();
-  if (!html || html.length < 500) throw new Error("Search provider returned an empty or blocked response");
-
-  const decode = value => value
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#0*39;/gi, "'")
-    .replace(/&#x0*27;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+  const headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9"
+  };
+  const clean = value => decodeEntities(String(value || "").replace(/<[^>]*>/g, " "))
+    .replace(/\\s+/g, " ").trim();
+  const decodeEntities = value => value
+    .replace(/&amp;/gi, "&").replace(/&quot;/gi, '"')
+    .replace(/&#0*39;/gi, "'").replace(/&#x0*27;/gi, "'")
+    .replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
+    .replace(/&#(\\d+);/g, (_, n) => String.fromCharCode(Number(n)))
     .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
 
-  const clean = value => decode(value.replace(/<[^>]*>/g, " "))
-    .replace(/\s+/g, " ")
-    .trim();
-
-  // Parse anchor attributes independently of their order; DDG can put href before class.
-  const anchors = [...html.matchAll(/<a\b[^>]*>/gi)];
-  const results = [];
-  for (let i = 0; i < anchors.length && results.length < 10; i++) {
-    const anchor = anchors[i];
-    const tag = anchor[0];
-    const className = (tag.match(/\bclass\s*=\s*["']([^"']*)["']/i) || [])[1] || "";
-    if (!className.split(/\s+/).includes("result__a")) continue;
-
-    let href = (tag.match(/\bhref\s*=\s*["']([^"']+)["']/i) || [])[1] || "";
-    if (!href) continue;
-    href = decode(href);
+  const normalizeUrl = (raw, base) => {
     try {
-      const parsed = new URL(href, "https://duckduckgo.com");
+      let value = decodeEntities(raw || "");
+      let parsed = new URL(value, base);
       if (parsed.hostname.endsWith("duckduckgo.com") && parsed.searchParams.has("uddg")) {
-        href = parsed.searchParams.get("uddg");
+        value = parsed.searchParams.get("uddg");
+      } else if (parsed.hostname.endsWith("bing.com") && parsed.pathname.includes("/ck/a")) {
+        const token = parsed.searchParams.get("u") || "";
+        if (token.startsWith("a1")) {
+          let encoded = token.slice(2).replace(/-/g, "+").replace(/_/g, "/");
+          while (encoded.length % 4) encoded += "=";
+          try { value = atob(encoded); } catch { return ""; }
+        } else {
+          return "";
+        }
       } else {
-        href = parsed.href;
+        value = parsed.href;
       }
-    } catch { continue; }
-    if (!/^https?:\/\//i.test(href)) continue;
+      parsed = new URL(value);
+      return /^https?:$/.test(parsed.protocol) ? parsed.href : "";
+    } catch { return ""; }
+  };
 
-    const innerStart = anchor.index + tag.length;
-    const closeIndex = html.indexOf("</a>", innerStart);
-    if (closeIndex < 0) continue;
-    const title = clean(html.slice(innerStart, closeIndex));
-    if (!title) continue;
-
-    const nextResult = anchors.slice(i + 1).find(a => {
-      const c = ((a[0].match(/\bclass\s*=\s*["']([^"']*)["']/i) || [])[1] || "");
-      return c.split(/\s+/).includes("result__a");
-    });
-    const segmentEnd = nextResult ? nextResult.index : Math.min(html.length, closeIndex + 5000);
-    const segment = html.slice(closeIndex, segmentEnd);
-    const snippetMatch = segment.match(/class\s*=\s*["'][^"']*result__snippet[^"']*["'][^>]*>([\s\S]*?)<\/(?:div|a|span)>/i);
-    const snippet = clean(snippetMatch?.[1] || "");
-
-    results.push({
-      title: title.slice(0, 240),
-      url: href,
-      snippet: snippet.slice(0, 700)
-    });
+  async function searchDuckDuckGo() {
+    const url = "https://html.duckduckgo.com/html/?q=" + encodeURIComponent(query) + "&kl=us-en";
+    const response = await fetch(url, { headers, redirect: "follow", signal: AbortSignal.timeout(9000) });
+    if (!response.ok) throw new Error("DuckDuckGo HTTP " + response.status);
+    const html = await response.text();
+    if (!html || html.length < 500) throw new Error("DuckDuckGo returned an empty or blocked page");
+    const anchors = [...html.matchAll(/<a\\b[^>]*>/gi)];
+    const results = [];
+    for (let i = 0; i < anchors.length && results.length < 8; i++) {
+      const tag = anchors[i][0];
+      const classes = (tag.match(/\\bclass\\s*=\\s*["']([^"']*)["']/i) || [])[1] || "";
+      if (!classes.split(/\\s+/).includes("result__a")) continue;
+      const href = (tag.match(/\\bhref\\s*=\\s*["']([^"']+)["']/i) || [])[1] || "";
+      const url = normalizeUrl(href, "https://duckduckgo.com/");
+      if (!url) continue;
+      const innerStart = anchors[i].index + tag.length;
+      const close = html.indexOf("</a>", innerStart);
+      if (close < 0) continue;
+      const title = clean(html.slice(innerStart, close));
+      if (!title) continue;
+      const next = anchors.slice(i + 1).find(a => {
+        const c = ((a[0].match(/\\bclass\\s*=\\s*["']([^"']*)["']/i) || [])[1] || "");
+        return c.split(/\\s+/).includes("result__a");
+      });
+      const section = html.slice(close, next ? next.index : Math.min(html.length, close + 3500));
+      const snippetMatch = section.match(/class\\s*=\\s*["'][^"']*result__snippet[^"']*["'][^>]*>([\\s\\S]*?)<\\/(?:div|a|span)>/i);
+      results.push({ title: title.slice(0, 240), url, snippet: clean(snippetMatch?.[1] || ""), provider: "DuckDuckGo" });
+    }
+    return results;
   }
 
+  async function searchBing() {
+    const url = "https://www.bing.com/search?q=" + encodeURIComponent(query) + "&count=10&setlang=en&cc=us";
+    const response = await fetch(url, { headers, redirect: "follow", signal: AbortSignal.timeout(9000) });
+    if (!response.ok) throw new Error("Bing HTTP " + response.status);
+    const html = await response.text();
+    if (!html || html.length < 500) throw new Error("Bing returned an empty or blocked page");
+    const blocks = [...html.matchAll(/<li\\b[^>]*class=["'][^"']*\\bb_algo\\b[^"']*["'][^>]*>([\\s\\S]*?)<\\/li>/gi)];
+    const results = [];
+    for (const blockMatch of blocks) {
+      if (results.length >= 8) break;
+      const block = blockMatch[1];
+      const heading = block.match(/<h2\\b[^>]*>\\s*<a\\b([^>]*)>([\\s\\S]*?)<\\/a>/i);
+      if (!heading) continue;
+      const href = (heading[1].match(/\\bhref\\s*=\\s*["']([^"']+)["']/i) || [])[1] || "";
+      const resultUrl = normalizeUrl(href, "https://www.bing.com/");
+      const title = clean(heading[2]);
+      if (!resultUrl || !title) continue;
+      const captionAt = block.indexOf("b_caption");
+      const caption = captionAt >= 0 ? block.slice(captionAt) : block;
+      const snippetMatch = caption.match(/<p\\b[^>]*>([\\s\\S]*?)<\\/p>/i);
+      results.push({ title: title.slice(0, 240), url: resultUrl, snippet: clean(snippetMatch?.[1] || ""), provider: "Bing" });
+    }
+    return results;
+  }
+
+  // Use two independent public search providers. A single provider block or markup
+  // change must not turn every current-information request into a false "no results".
+  const attempts = await Promise.allSettled([searchDuckDuckGo(), searchBing()]);
+  const results = [];
+  for (const attempt of attempts) {
+    if (attempt.status === "fulfilled") results.push(...attempt.value);
+    else console.warn("A web search provider failed:", attempt.reason?.message || attempt.reason);
+  }
   return results
     .filter((r, i, all) => all.findIndex(x => x.url === r.url) === i)
-    .slice(0, 6);
+    .slice(0, 8);
 }
 
 function sanitizeClientTime(value) {
