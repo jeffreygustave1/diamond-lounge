@@ -1,28 +1,34 @@
-# Premium Customization — implementation foundation
+# Diamond Lounge customization shop
 
-## Catalogue
-- Silver GIF pack: animated profile GIF upload.
-- Profile aura cosmetics.
-- Avatar frames.
-- Nameplate styles.
-- Exclusive profile badges.
-- Server themes and banners.
+## Launch collections
 
-## Access and payment design
-1. Silver GIF access is granted by the trusted `premiumEntitlements/{uid}` document, or by the fixed Diamond Lounge owner UID.
-2. Clients cannot write entitlement records; Firestore rules verify the GIF entitlement when a GIF data URL is saved.
-3. The Silver GIF profile upload uses Firestore data URLs capped at 400 KB to avoid requiring Cloud Storage / Blaze billing for this small-file feature.
-4. Never unlock based on a client-supplied payment flag, query string, or local storage.
-5. A future Stripe checkout must validate Firebase ID tokens, verify webhook signatures, and write entitlements from a trusted server.
-6. Refunds and chargebacks must revoke entitlements if paid cosmetics are enabled.
+The profile editor contains a real, selectable styling catalog:
 
-## Current state
-- The storefront catalog UI is present in the profile editor.
-- The Diamond Lounge owner receives Silver GIF profile upload access without checkout.
-- Silver GIF profile uploads are limited to 400 KB and stored in the user's Firestore profile document.
-- Animated server-icon uploads are not implemented yet.
-- Profile auras, avatar frames, nameplates, badges, and server themes remain catalog previews, not equipable cosmetics.
-- Stripe checkout and the paid-member purchase flow are not yet end-to-end deployed and verified.
+- **Profile auras:** Natural, Moonlight, Starlight, Aurora, Nebula, Ember, Frost and Rose.
+- **Avatar frames:** No frame, Silver, Gold, Diamond, Aurora, Obsidian, Rose Gold, Celestial and Sapphire.
+- **Nameplates:** Classic, Champagne, Silverline, Aurora, Sapphire, Rose Gold, Obsidian, Emerald and Violet.
+- **Collectible profile badges:** Comet, Starlight, Music Lover, Gamer, Creator, Artist, Explorer, Builder, Bookworm, Bloom, Frost, Flame, Crown, Moon and Crystal. Users can equip up to three; they appear beside the display name and never cover the avatar.
+- **Profile backdrops:** Midnight, Aurora, Sapphire, Rose, Emerald, Sunset, Violet and Champagne.
+- **Server themes:** Midnight, Aurora, Sapphire, Rose, Emerald, Sunset, Violet and Champagne. A server owner can set the shared theme for their own created server.
 
-## Future work
-Silver paid checkout -> signed-in user validation -> verified Stripe webhook -> Firestore entitlement -> member GIF profile access -> optional server-icon upload implementation.
+The launch styling collection is free for all members. The Diamond Lounge owner also receives the Silver GIF pack for free. Regular members still need the Silver entitlement for animated profile GIF uploads.
+
+## Profile storage and security
+
+- User cosmetic choices are saved under `users/{uid}.cosmetics`.
+- Firestore rules restrict the values to the published catalog IDs and allow up to three profile badge IDs.
+- Voice presence documents share the current user's validated cosmetic selection so other members see badge chips and nameplate styling in voice.
+- Server appearance is stored as `servers/{serverId}.appearanceTheme`; only the server owner can edit the server document.
+- Silver GIF profile images are stored as Firestore data URLs capped at 400 KB. The separate Silver purchase entitlement is checked by Firestore rules and the owner UID bypass is fixed in the rules.
+- The app does not need Firebase Storage / Blaze billing for the current profile GIF implementation.
+
+## Silver GIF and payments
+
+- Silver GIF profile uploads are implemented.
+- Animated server-icon uploads are not implemented.
+- The premium worker currently has a Silver GIF checkout/webhook path, but it still requires its Stripe/Firebase secrets, price ID and end-to-end test-mode verification before member checkout can be considered live.
+- Other styling choices are intentionally free in the launch catalog; future paid packs must use server-verified entitlements and webhook grants, not client-side flags.
+
+## Advertising and partnerships
+
+The site can host clearly labeled sponsor placements for direct brand partnerships. No ad network or live advertiser inventory is connected yet. Any partner campaign should have a written agreement, approved creative, placement dates, click destination, payment terms and a clear "Sponsored" disclosure. Do not show a company's logo or claim a partnership until it has been approved by that company.
