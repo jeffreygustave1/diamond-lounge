@@ -14,6 +14,10 @@ const DIAMOND_REPAIR_PATHS = new Set([
   "diamond-support-worker.js","diamond-support-github-bridge.js","README.md"
 ]);
 import { auth } from "./firebase.js";
+const DIAMOND_GENERAL_SYSTEM = `You are Diamond Support, a helpful general-purpose assistant inside Diamond Lounge.
+Answer the user's actual question, even when it is unrelated to Diamond Lounge. Never deflect to app troubleshooting just because a question is about another game, product, company, or topic.
+For current or time-sensitive questions, use available live-search results, cite the sources, prioritize official sources, and clearly distinguish confirmed information from speculation. If no confirmed date exists, say so.
+Be friendly, direct, and concise. `;
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support AI, a code-aware diagnostic and repair-proposal agent for DIAMOND LOUNGE.
 
 Analyze supplied repository excerpts and browser diagnostics before answering. Cross-reference files/functions where possible. For scan requests, inspect the supplied files for mismatched DOM IDs, event wiring, imports, undefined symbols, async/error handling, Firebase permission/data mismatches, UI state bugs, and security risks. Treat the repository snapshot status report as authoritative about which files were retrieved, failed, omitted, or truncated; never describe the snapshot as comprehensive when files are missing or truncated. Explain the coverage limits.
@@ -106,7 +110,27 @@ async function getProjectSnapshot(focus=""){
  })();
  try{return await projectSnapshotPromise;}finally{projectSnapshotPromise=null;}
 }
-function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
+function bubble(text,kind="bot",sources=[]){
+ const row=document.createElement("div");
+ row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");
+ const stack=document.createElement("div");stack.className="support-bot-message-stack";
+ const b=document.createElement("div");
+ b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");
+ b.textContent=text;stack.appendChild(b);
+ if(kind!=="user"&&Array.isArray(sources)&&sources.length){
+  const wrap=document.createElement("div");wrap.className="support-bot-sources";
+  const label=document.createElement("span");label.textContent="Sources";wrap.appendChild(label);
+  sources.forEach(source=>{
+   if(!source||typeof source.url!=="string")return;
+   try{const url=new URL(source.url);if(url.protocol!=="https:")return;
+    const link=document.createElement("a");link.href=url.href;link.target="_blank";link.rel="noopener noreferrer";
+    link.textContent=String(source.title||url.hostname).slice(0,180);wrap.appendChild(link);
+   }catch{}
+  });
+  if(wrap.querySelector("a"))stack.appendChild(wrap);
+ }
+ row.appendChild(stack);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;
+}
 function proposalCard(proposal){
   if(!proposal||proposal.repair!==true||!Array.isArray(proposal.files)||proposal.files.length<1||proposal.files.length>6)return false;
   const files=proposal.files.filter(f=>f&&DIAMOND_REPAIR_PATHS.has(f.path)&&typeof f.content==="string"&&f.content.trim());
@@ -133,6 +157,9 @@ function parseRepairAnswer(answer){
  }catch(error){}
  return answer;
 }
+function isDiamondLoungeRequest(message){
+ return /\b(diamond lounge|website|web site|dashboard|login|log in|account|profile|avatar|messages|direct message|\bdm\b|voice|microphone|camera|screen share|screen sharing|server|channel|firebase|firestore|support bot|supportbot|code|bug|error|crash|repair|audit|worker|app)\b/i.test(String(message||""));
+}
 function topicButtons(){choices.replaceChildren();topics.forEach(topic=>{const b=document.createElement("button");b.type="button";b.textContent=topic;b.addEventListener("click",()=>send(topic));choices.appendChild(b);});}
 async function send(message){
  const value=(message||"").trim();
@@ -147,12 +174,19 @@ async function send(message){
  bubble("Diamond is investigating…","bot");
  const thinking=chat.lastElementChild;
  try{
-  const snapshot=await getProjectSnapshot(value);
-  const original=(history[0]?.content||value).slice(0,650);
+  const appRequest=isDiamondLoungeRequest(value);
+  const snapshot=appRequest
+   ? await getProjectSnapshot(value)
+   : {manifest:"General question: repository source was intentionally not included.",chunks:[]};
   const errorText=diamondBrowserErrors.length?diamondBrowserErrors.join("\n").slice(0,650):"No captured browser errors.";
-  const context=DIAMOND_SUPPORT_SYSTEM+"\n\nInitial user request: "+original+"\n\nRecent browser diagnostics (bounded):\n"+errorText;
-  const messages=[{role:"user",content:context.slice(0,3800)},{role:"user",content:snapshot.manifest.slice(0,3800)}];
-  for(const chunk of snapshot.chunks.slice(0,10))messages.push({role:"user",content:chunk.slice(0,3800)});
+  const currentPrompt=appRequest
+   ? DIAMOND_SUPPORT_SYSTEM+"\n\nInitial user request: "+(history[0]?.content||value).slice(0,650)+"\n\nRecent browser diagnostics (bounded):\n"+errorText
+   : DIAMOND_GENERAL_SYSTEM+"\n\nUser question: "+value;
+  const messages=[{role:"user",content:currentPrompt.slice(0,3800)}];
+  if(appRequest){
+   messages.push({role:"user",content:snapshot.manifest.slice(0,3800)});
+   for(const chunk of snapshot.chunks.slice(0,10))messages.push({role:"user",content:chunk.slice(0,3800)});
+  }
   const recent=history.slice(1).slice(-4).map(m=>({role:m.role,content:String(m.content||"").slice(0,1500)}));
   messages.push(...recent);
   const response=await fetch(DIAMOND_AI_ENDPOINT,{
@@ -169,7 +203,7 @@ async function send(message){
   thinking.remove();
   const rawAnswer=String(data.reply||"The support service returned an empty reply. Please try again.");
   const answer=parseRepairAnswer(rawAnswer);
-  bubble(answer,"bot");
+  bubble(answer,"bot",data.citations||[]);
   history.push({role:"assistant",content:rawAnswer});
  }catch(error){
   thinking.remove();
