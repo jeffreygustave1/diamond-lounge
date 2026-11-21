@@ -3877,3 +3877,126 @@ button {
   .created-server-channel-add-actions button{min-width:30px}
   .created-server-category-add{width:28px;height:28px}
 }
+
+
+/* =========================================================
+   DIAMOND EXCLUSIVES — live profile cosmetics
+   The avatar image remains unobstructed; frames and badges sit
+   outside the portrait or beside the display name.
+========================================================= */
+.profile-name-line,.dl-voice-name-line{
+  display:inline-flex;align-items:center;gap:5px;min-width:0;max-width:100%;flex-wrap:wrap
+}
+.dl-cosmetic-badge-rail{
+  display:inline-flex;align-items:center;gap:3px;flex:none;min-width:0
+}
+.dl-cosmetic-badge-chip{
+  width:17px;height:17px;display:inline-grid;place-items:center;flex:none;
+  border:1px solid rgba(255,255,255,.18);border-radius:50%;
+  background:linear-gradient(145deg,#393d4a,#20232b);
+  color:#f4e7c6;font-size:10px;font-weight:800;line-height:1;
+  box-shadow:0 1px 5px rgba(0,0,0,.22)
+}
+#profileCosmeticBadges .dl-cosmetic-badge-chip{width:16px;height:16px;font-size:9px}
+.created-server-voice-user-copy .dl-cosmetic-badge-rail{gap:2px}
+.created-server-voice-user-copy .dl-cosmetic-badge-chip{width:15px;height:15px;font-size:9px}
+.dl-cosmetic-options{
+  display:flex;flex-wrap:wrap;align-items:center;gap:7px;
+  max-height:174px;overflow:auto;padding:3px 2px 5px
+}
+.dl-cosmetic-option{
+  display:inline-flex;align-items:center;gap:7px;min-height:34px;
+  padding:5px 9px;border:1px solid rgba(255,255,255,.12);
+  border-radius:9px;background:rgba(255,255,255,.035);
+  color:#d8dbe2;font-size:11px;line-height:1.2;cursor:pointer;
+  transition:border-color .15s ease,background .15s ease,transform .15s ease
+}
+.dl-cosmetic-option:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(199,169,107,.48);transform:translateY(-1px)}
+.dl-cosmetic-option.selected{
+  border-color:#c7a96b;background:rgba(199,169,107,.16);
+  color:#fff1d0;box-shadow:0 0 0 1px rgba(199,169,107,.12)
+}
+.dl-cosmetic-option:disabled{opacity:.45;cursor:not-allowed}
+.dl-cosmetic-swatch{
+  width:22px;height:22px;display:inline-grid;place-items:center;flex:none;
+  border:1px solid rgba(255,255,255,.22);border-radius:7px;
+  background:linear-gradient(135deg,#39404c,#17191e);
+  color:#fff;font-size:12px;font-weight:800
+}
+.dl-cosmetic-swatch.is-symbol{border-radius:50%;font-size:13px}
+.dl-cosmetic-option-label{white-space:nowrap}
+.dl-server-theme-status{
+  margin:0;color:#aeb3bd;font-size:11px;line-height:1.5
+}
+.dl-server-theme-art{background:linear-gradient(135deg,#27344c,#52757d,#c7a96b);color:#f8f4e8;font-size:28px}
+.dl-cosmetic-store-note{color:#aeb3bd;font-size:11px;line-height:1.5}
+
+/* Auras: restrained glows that do not cover the image. */
+.dl-aura-moonlight{box-shadow:0 0 0 1px rgba(198,220,255,.75),0 0 10px 3px rgba(126,165,230,.58)}
+.dl-aura-starlight{box-shadow:0 0 0 1px rgba(255,226,165,.8),0 0 11px 3px rgba(217,169,83,.62)}
+.dl-aura-aurora{box-shadow:0 0 0 1px rgba(112,242,207,.8),0 0 12px 4px rgba(93,194,201,.58)}
+.dl-aura-nebula{box-shadow:0 0 0 1px rgba(198,149,255,.8),0 0 12px 4px rgba(126,106,226,.58)}
+.dl-aura-ember{box-shadow:0 0 0 1px rgba(255,176,112,.8),0 0 12px 4px rgba(220,90,64,.58)}
+.dl-aura-frost{box-shadow:0 0 0 1px rgba(210,248,255,.85),0 0 12px 4px rgba(106,194,231,.58)}
+.dl-aura-rose{box-shadow:0 0 0 1px rgba(255,197,218,.8),0 0 12px 4px rgba(205,104,155,.58)}
+
+/* Frames draw outside the portrait edge, never over the face/photo. */
+.member-picture[class*="dl-frame-"],.created-server-voice-user-avatar[class*="dl-frame-"],.profile-modal-preview[class*="dl-frame-"]{
+  position:relative!important;overflow:visible!important
+}
+.member-picture[class*="dl-frame-"]::after,
+.created-server-voice-user-avatar[class*="dl-frame-"]::after,
+.profile-modal-preview[class*="dl-frame-"]::after{
+  content:"";position:absolute;inset:-3px;z-index:3;border:2px solid transparent;
+  border-radius:inherit;pointer-events:none
+}
+.dl-frame-silver::after{border-color:#d9e2ef!important;box-shadow:0 0 5px rgba(205,220,242,.45)}
+.dl-frame-gold::after{border-color:#d6b36c!important;box-shadow:0 0 6px rgba(214,179,108,.4)}
+.dl-frame-diamond::after{border-color:#a7edf1!important;box-shadow:0 0 6px rgba(123,224,231,.48)}
+.dl-frame-aurora::after{border-color:#75dfc4!important;box-shadow:0 0 7px rgba(107,223,204,.5)}
+.dl-frame-obsidian::after{border-color:#777d8d!important;box-shadow:0 0 4px rgba(140,145,160,.38)}
+.dl-frame-rose::after{border-color:#d993a5!important;box-shadow:0 0 6px rgba(217,147,165,.42)}
+.dl-frame-celestial::after{border-color:#c1adf2!important;box-shadow:0 0 7px rgba(193,173,242,.5)}
+.dl-frame-sapphire::after{border-color:#7cb9f4!important;box-shadow:0 0 7px rgba(124,185,244,.48)}
+
+/* Nameplates style only the text. */
+.dl-nameplate-champagne{color:#f0d9a3!important;text-shadow:0 0 8px rgba(205,164,91,.3)}
+.dl-nameplate-silverline{color:#e1eaf4!important;text-shadow:0 0 7px rgba(191,212,237,.3)}
+.dl-nameplate-aurora{background:linear-gradient(90deg,#a5f0d6,#b8c6ff);background-clip:text;-webkit-background-clip:text;color:transparent!important}
+.dl-nameplate-sapphire{color:#9bcaff!important;text-shadow:0 0 8px rgba(103,160,236,.4)}
+.dl-nameplate-rosegold{color:#f2b9b1!important;text-shadow:0 0 7px rgba(219,135,145,.32)}
+.dl-nameplate-obsidian{color:#ddd5c8!important;text-shadow:0 1px 0 #34302a,0 0 7px rgba(211,197,174,.2)}
+.dl-nameplate-emerald{color:#9be0b5!important;text-shadow:0 0 7px rgba(92,185,128,.35)}
+.dl-nameplate-violet{color:#d0b7ff!important;text-shadow:0 0 8px rgba(157,119,228,.38)}
+
+/* Profile backdrops apply to the card/voice dock, away from the avatar itself. */
+.profile-card.dl-backdrop-aurora,.created-server-voice-user-row.dl-backdrop-aurora{background:linear-gradient(120deg,#1b4142,#292a48)!important}
+.profile-card.dl-backdrop-sapphire,.created-server-voice-user-row.dl-backdrop-sapphire{background:linear-gradient(120deg,#1d3557,#151c2d)!important}
+.profile-card.dl-backdrop-rose,.created-server-voice-user-row.dl-backdrop-rose{background:linear-gradient(120deg,#462a3a,#211820)!important}
+.profile-card.dl-backdrop-emerald,.created-server-voice-user-row.dl-backdrop-emerald{background:linear-gradient(120deg,#1f4235,#15211d)!important}
+.profile-card.dl-backdrop-sunset,.created-server-voice-user-row.dl-backdrop-sunset{background:linear-gradient(120deg,#53352b,#24202a)!important}
+.profile-card.dl-backdrop-violet,.created-server-voice-user-row.dl-backdrop-violet{background:linear-gradient(120deg,#392d55,#1d1a2c)!important}
+.profile-card.dl-backdrop-champagne,.created-server-voice-user-row.dl-backdrop-champagne{background:linear-gradient(120deg,#4b4030,#211e19)!important}
+
+/* Shared themes for member-created servers. */
+.created-server-workspace{
+  background:var(--dl-server-chat,#313338)!important
+}
+.created-server-channel-panel{
+  background:var(--dl-server-sidebar,#2b2d31)!important
+}
+.created-server-chat{
+  background:var(--dl-server-chat,#313338)!important
+}
+.created-server-chat-header{
+  background:var(--dl-server-header,#313338)!important;
+  border-bottom-color:color-mix(in srgb,var(--dl-server-accent,#c7a96b) 25%,transparent)!important
+}
+.created-server-channel-heading h3,
+.created-server-category-heading{
+  color:var(--dl-server-accent,#949ba4)!important
+}
+.created-server-channel-heading button:hover,
+.created-server-category-add:hover{
+  color:var(--dl-server-accent,#f2f3f5)!important
+}
