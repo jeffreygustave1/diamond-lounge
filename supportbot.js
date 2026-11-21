@@ -60,11 +60,11 @@ async function getProjectSnapshot(focus=""){
     const tailStart=Math.max(midStart+mid,full.length-tail);
     const sample=full.slice(0,head)+"\n...[middle omitted]...\n"+full.slice(midStart,midStart+mid)+"\n...[end excerpt]...\n"+full.slice(tailStart);
     let index="";
-    if(/\\.js$/i.test(path)){
+    if(/\.js$/i.test(path)){
      const names=[];
      const lines=full.split("\n");
      for(let i=0;i<lines.length;i++){
-      const m=lines[i].match(/^\\s*(?:export\\s+)?(?:async\\s+)?function\\s+([A-Za-z_$][\\w$]*)/);
+      const m=lines[i].match(/^\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/);
       if(m)names.push((i+1)+":"+m[1]);
      }
      if(names.length)index="Function index (source line numbers): "+names.slice(0,24).join(", ")+(names.length>24?" … ("+names.length+" total)":"");
@@ -85,13 +85,13 @@ async function getProjectSnapshot(focus=""){
      chunks.push("REPOSITORY SOURCE: "+path+"\n"+excerpt);
     }catch(e){manifest.push(path+": FETCH ERROR "+String(e).slice(0,120));}
    }
-   const extra=entries.filter(x=>x.type==="blob"&&/\\.(js|css|html|rules)$/i.test(x.path)&&!targets.includes(x.path)).map(x=>x.path);
+   const extra=entries.filter(x=>x.type==="blob"&&/\.(js|css|html|rules)$/i.test(x.path)&&!targets.includes(x.path)).map(x=>x.path);
    manifest.push("Other source files present but not sampled: "+(extra.slice(0,24).join(", ")||"none")+(extra.length>24?" … ("+extra.length+" total)":""));
    manifest.push("The live app entry points visible in dashboard.html are script.js, watch-feature.js, supportbot.js, dm-call.js, voice.js, and watchdog.js. Main application features are consolidated in script.js; separate server.js/channels.js/dm.js/calls.js/profile.js files are not part of this repository tree.");
    return {manifest:"REPOSITORY RETRIEVAL STATUS (each source excerpt is a separate message):\n"+manifest.join("\n"),chunks};
   }catch(e){return {manifest:"Repository context unavailable: "+String(e).slice(0,180),chunks:[]};}
  })();
- return projectSnapshotPromise;
+ try{return await projectSnapshotPromise;}finally{projectSnapshotPromise=null;}
 }
 function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
 function proposalCard(proposal){
@@ -136,8 +136,8 @@ async function send(message){
  try{
   const snapshot=await getProjectSnapshot(value);
   const original=(history[0]?.content||value).slice(0,650);
-  const errorText=diamondBrowserErrors.length?diamondBrowserErrors.join("\\n").slice(0,650):"No captured browser errors.";
-  const context=DIAMOND_SUPPORT_SYSTEM+"\\n\\nInitial user request: "+original+"\\n\\nRecent browser diagnostics (bounded):\\n"+errorText;
+  const errorText=diamondBrowserErrors.length?diamondBrowserErrors.join("\n").slice(0,650):"No captured browser errors.";
+  const context=DIAMOND_SUPPORT_SYSTEM+"\n\nInitial user request: "+original+"\n\nRecent browser diagnostics (bounded):\n"+errorText;
   const messages=[{role:"user",content:context.slice(0,3800)},{role:"user",content:snapshot.manifest.slice(0,3800)}];
   for(const chunk of snapshot.chunks.slice(0,10))messages.push({role:"user",content:chunk.slice(0,3800)});
   const recent=history.slice(1).slice(-4).map(m=>({role:m.role,content:String(m.content||"").slice(0,3800)}));
