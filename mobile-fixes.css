@@ -76,3 +76,27 @@ body:has(#loungeView.is-voice-call) .chat-area{position:fixed!important;inset:0!
   #mobileSidebar .server-logo,#mobileSidebar .server-icon{width:46px!important;min-width:46px!important;height:46px!important;min-height:46px!important;flex-shrink:0!important}
   #mobileSidebar .servers{padding-top:max(12px,env(safe-area-inset-top))!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
 }
+
+
+/* MOBILE ONLY — final layout guardrails (desktop styles intentionally untouched) */
+@media (max-width: 900px) {
+  /* Respect the inactive state; earlier selectors must not resurrect hidden call views. */
+  #loungeView:not(.is-voice-call) #loungeVoiceCallView[hidden] { display:none!important; }
+  #loungeView.is-voice-call #loungeVoiceCallView:not([hidden]) { display:flex!important; }
+  #loungeView.is-voice-call { min-width:0!important; min-height:0!important; }
+  #loungeView.is-voice-call .created-server-voice-call { min-width:0!important; width:100%!important; }
+  #loungeView.is-voice-call .created-server-voice-stage,
+  #loungeView.is-voice-call .created-server-voice-remote-media { min-width:0!important; max-width:100%!important; }
+  #mobileSidebar .servers { overflow-x:hidden!important; overflow-y:auto!important; align-items:center!important; }
+  #mobileSidebar .server-icon { box-sizing:border-box!important; margin-inline:auto!important; }
+  #mobileSidebar .server-icon img { max-width:100%!important; max-height:100%!important; object-fit:contain!important; }
+  #mobileSidebar .created-servers { width:100%!important; min-width:0!important; }
+}
+@media (max-width: 600px) {
+  #loungeView.is-voice-call #loungeVoiceCallView { padding:8px 8px 150px!important; }
+  #loungeView.is-voice-call .created-server-voice-call { height:auto!important; }
+  #loungeView.is-voice-call .created-server-voice-stage { grid-template-columns:minmax(0,1fr)!important; }
+  #voicePanel { left:max(8px,env(safe-area-inset-left))!important; right:max(8px,env(safe-area-inset-right))!important; bottom:max(8px,env(safe-area-inset-bottom))!important; width:auto!important; }
+  #mobileSidebar .servers { flex-basis:64px!important; width:64px!important; min-width:64px!important; padding-inline:4px!important; }
+  #mobileSidebar .server-icon { width:46px!important; min-width:46px!important; height:46px!important; min-height:46px!important; }
+}
