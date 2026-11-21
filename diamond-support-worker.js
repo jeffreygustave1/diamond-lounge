@@ -24,11 +24,11 @@ export default {
     const origin = request.headers.get("Origin") || "";
     const allowed = env.ALLOWED_ORIGIN || "https://diamond-lounge.pages.dev";
     if (request.method === "OPTIONS") {
-      if (origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
+      if (allowed !== "*" && origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
       return new Response(null, { status: 204, headers: cors(origin, allowed) });
     }
     if (request.method !== "POST") return json({ error: "Use POST." }, 405, origin, allowed);
-    if (origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
+    if (allowed !== "*" && origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
     if (!env.OPENAI_API_KEY) return json({ error: "AI service is not configured yet." }, 503, origin, allowed);
 
     try {
