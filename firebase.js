@@ -12,15 +12,10 @@ import {
   getFirestore
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
-import {
-  getStorage
-} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-storage.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyCyYt66fWu-jMN8PrU6SA7eEZ0XBIYl9to",
   authDomain: "diamond-lounge-7caf6.firebaseapp.com",
   projectId: "diamond-lounge-7caf6",
-  storageBucket: "diamond-lounge-7caf6.firebasestorage.app",
   messagingSenderId: "773006638410",
   appId: "1:773006638410:web:f39a00e63b494cd7f015b3"
 };
@@ -29,7 +24,6 @@ const requiredConfig = [
   "apiKey",
   "authDomain",
   "projectId",
-  "storageBucket",
   "messagingSenderId",
   "appId"
 ];
@@ -51,4 +45,3 @@ const app = getApps().length
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);
