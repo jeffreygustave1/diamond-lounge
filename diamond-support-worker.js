@@ -61,7 +61,7 @@ export default {
 
       let input = messages;
       const latestUserText = messages.filter(m => m.role === "user").at(-1)?.content || "";
-      const needsLiveSearch = /\\b(latest|newest|current|today|right now|live|recent|patch|hotfix|release|news|version|price|pricing|availability|schedule|status)\\b/i.test(latestUserText);
+      const needsLiveSearch = /\b(latest|newest|current|today|right now|live|recent|patch|hotfix|release|news|version|price|pricing|availability|schedule|status)\b/i.test(latestUserText);
       let responseData = await createResponse(env, { model, effort, instructions, input, tools, toolChoice: needsLiveSearch ? { type: "web_search" } : "auto" });
       const toolsUsed = new Set();
 
