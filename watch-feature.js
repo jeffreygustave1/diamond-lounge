@@ -32,7 +32,7 @@ function removeWatchTile(){watchTile.remove();}
 window.addEventListener("diamond-voice-stage",e=>{voiceStage=e.detail?.stage||null;if(voice.connected&&currentId)mountWatchTile();});
 function parseVideo(raw){try{const u=new URL(raw);if(u.hostname==="youtu.be")return u.pathname.slice(1);if(u.hostname==="youtube.com"||u.hostname.endsWith(".youtube.com"))return u.searchParams.get("v")||u.pathname.split("/").filter(Boolean).pop();}catch{}return null;}
 function roomBase(){return voice.roomId&&user?doc(db,"voiceRooms",voice.roomId,"watch","state"):null;}
-function chatBase(){return voice.roomId&&user?collection(db,"voiceRooms",voice.roomId,"watch","messages"):null;}
+function chatBase(){return voice.roomId&&user?collection(db,"voiceRooms",voice.roomId,"watch","state","messages"):null;}
 function setStatus(s){status.textContent=s;}
 function emptyPlayer(){player.querySelector("#dlWatchPlayer iframe")?.remove();player.querySelector("iframe")?.remove();player.querySelector(".dl-watch-empty")?.remove();removeWatchTile();const e=document.createElement("div");e.className="dl-watch-empty";e.innerHTML="<span>◆</span><strong>YOUR WATCH LOUNGE</strong><small>Choose a video to get started</small>";player.prepend(e);}
 function loadLocal(id,autoplay=true,startAt=0){currentId=id;currentUrl="https://www.youtube.com/watch?v="+id;input.value=currentUrl;mountWatchTile();player.querySelector(".dl-watch-empty")?.remove();if(!apiReady){ensureApi();setStatus("Preparing synchronized video player…");return;}buildPlayer(id,autoplay,startAt);}
