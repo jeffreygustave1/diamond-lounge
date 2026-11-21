@@ -182,6 +182,25 @@ function setButtonLabel(button, text) {
     }
 }
 
+const VOICE_COSMETIC_BADGE_SYMBOLS = {
+    comet: "☄", starlight: "✦", music: "♫", gamer: "⌘", creator: "✧",
+    artist: "❖", explorer: "⌖", builder: "⚒", bookworm: "▤", bloom: "✿",
+    frost: "❄", flame: "♨", crown: "♛", moon: "☾", crystal: "◇"
+};
+function applyVoiceAvatarCosmetics(element, cosmetics) {
+    if (!element) return;
+    const c = cosmetics && typeof cosmetics === "object" ? cosmetics : {};
+    [...element.classList].filter(name =>
+        name.startsWith("dl-aura-") || name.startsWith("dl-frame-")
+    ).forEach(name => element.classList.remove(name));
+    if (["moonlight","starlight","aurora","nebula","ember","frost","rose"].includes(c.aura)) {
+        element.classList.add("dl-aura-" + c.aura);
+    }
+    if (["silver","gold","diamond","aurora","obsidian","rose","celestial","sapphire"].includes(c.frame)) {
+        element.classList.add("dl-frame-" + c.frame);
+    }
+}
+
 function renderVoiceRowMiniMembers(row, members) {
     if (!row) return;
     let strip = row.querySelector(".voice-row-member-avatars");
@@ -234,6 +253,13 @@ function renderVoiceRowMiniMembers(row, members) {
                 avatar.style.background = preset[0];
                 avatar.style.color = preset[1];
                 avatar.textContent = preset[2];
+            }
+            applyVoiceAvatarCosmetics(avatar, profile.cosmetics);
+            const cosmeticBadges = Array.isArray(profile.cosmetics?.badges)
+                ? profile.cosmetics.badges.filter(id => VOICE_COSMETIC_BADGE_SYMBOLS[id]).slice(0, 3)
+                : [];
+            if (cosmeticBadges.length) {
+                avatar.title = (profile.displayName || person.name || "Member") + " · " + cosmeticBadges.join(", ");
             }
         });
     });
@@ -342,9 +368,23 @@ function renderParticipants() {
         dot.className = "voice-speaking-indicator";
 
         const label = document.createElement("span");
-
         label.textContent =
             `${person.name}${person.uid === user?.uid ? " (you)" : ""}`;
+        const cosmetics = person.cosmetics && typeof person.cosmetics === "object" ? person.cosmetics : {};
+        if (["champagne","silverline","aurora","sapphire","rosegold","obsidian","emerald","violet"].includes(cosmetics.nameplate)) {
+            label.classList.add("dl-nameplate-" + cosmetics.nameplate);
+        }
+        const cosmeticRail = document.createElement("span");
+        cosmeticRail.className = "dl-cosmetic-badge-rail";
+        (Array.isArray(cosmetics.badges) ? cosmetics.badges : []).slice(0, 3).forEach(id => {
+            const symbol = VOICE_COSMETIC_BADGE_SYMBOLS[id];
+            if (!symbol) return;
+            const chip = document.createElement("span");
+            chip.className = "dl-cosmetic-badge-chip";
+            chip.textContent = symbol;
+            chip.title = id;
+            cosmeticRail.append(chip);
+        });
 
         const badges = document.createElement("em");
         badges.className = "voice-badges";
@@ -357,7 +397,7 @@ function renderParticipants() {
             badges.textContent += "🖥️";
         }
 
-        item.append(dot, label, badges);
+        item.append(dot, label, cosmeticRail, badges);
         participantsElement.appendChild(item);
     });
 }
@@ -1149,7 +1189,8 @@ async function refreshPresenceFlags() {
                 muted,
                 deafened,
                 raisedHand,
-                badges: Array.isArray(activeVoiceProfile.badges) ? activeVoiceProfile.badges.slice(0, 4) : []
+                badges: Array.isArray(activeVoiceProfile.badges) ? activeVoiceProfile.badges.slice(0, 4) : [],
+                cosmetics: activeVoiceProfile.cosmetics || { aura: "none", frame: "none", nameplate: "classic", badges: [], backdrop: "midnight" }
             },
             { merge: true }
         );
@@ -1448,7 +1489,8 @@ async function joinVoice() {
                 muted,
                 deafened,
                 raisedHand,
-                badges: Array.isArray(activeVoiceProfile.badges) ? activeVoiceProfile.badges.slice(0, 4) : []
+                badges: Array.isArray(activeVoiceProfile.badges) ? activeVoiceProfile.badges.slice(0, 4) : [],
+                cosmetics: activeVoiceProfile.cosmetics || { aura: "none", frame: "none", nameplate: "classic", badges: [], backdrop: "midnight" }
             });
         };
 
@@ -1934,6 +1976,7 @@ window.diamondWatchCreatedVoiceSidebarRoom = (customRoomId, strip) => {
                         avatar.style.color = style[1];
                         avatar.textContent = style[2];
                     }
+                    applyVoiceAvatarCosmetics(avatar, profile.cosmetics);
                 });
             });
 
