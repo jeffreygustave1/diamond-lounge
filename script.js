@@ -116,6 +116,7 @@ const channelDescriptions = {
 let currentUser = null;
 let activeTextChannel = null;
 let activeCreatedServerId = null;
+let activeCreatedServerRecord = null;
 let activeCreatedServerOwnerUid = null;
 let currentServerCanManageChannels = false;
 
@@ -455,6 +456,9 @@ async function saveServerAppearanceTheme(id) {
     const note = document.getElementById("dlServerThemeStatus");
     try {
         await updateDoc(doc(db, "servers", activeCreatedServerId), { appearanceTheme: theme.id });
+        if (activeCreatedServerRecord && activeCreatedServerRecord.id === activeCreatedServerId) {
+            activeCreatedServerRecord.appearanceTheme = theme.id;
+        }
         applyServerAppearanceTheme(theme.id);
         renderServerThemePicker();
         if (note) note.textContent = theme.label + " theme saved for this server.";
@@ -3303,6 +3307,7 @@ function openServer(server) {
     selectedMember = null;
     currentConversationId = null;
     activeCreatedServerId = server.id;
+activeCreatedServerRecord = server;
 activeCreatedServerOwnerUid = server.ownerUid || null;
 applyServerAppearanceTheme(server.appearanceTheme || "midnight");
 currentServerCanManageChannels = activeCreatedServerOwnerUid === currentUser?.uid;
