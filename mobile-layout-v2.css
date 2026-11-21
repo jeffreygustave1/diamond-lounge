@@ -147,3 +147,9 @@
  html { zoom: .75!important; }
  body { width:100%!important; min-width:0!important; }
 }
+
+/* Mobile density: recreate the user's 3-step browser zoom-out appearance at default zoom. */
+@media (max-width:600px){
+ .dashboard{zoom:.75!important;width:133.333vw!important;height:133.333dvh!important;max-width:none!important;max-height:none!important;}
+}
+@media(max-width:390px){.dashboard{zoom:.72!important;width:138.889vw!important;height:138.889dvh!important;}}
