@@ -169,3 +169,17 @@
  .created-server-voice-stage .created-server-voice-tile.dl-voice-expanded{position:fixed!important;inset:0!important;z-index:26000!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;aspect-ratio:auto!important;margin:0!important;border-radius:0!important;display:flex!important;justify-content:center!important;background:#101114!important;}
  .created-server-voice-stage .created-server-voice-tile.dl-voice-expanded .created-server-voice-avatar{width:min(38vw,180px)!important;height:min(38vw,180px)!important;}
 }
+
+/* Discord-inspired phone sizing normalization (override legacy accumulated rules) */
+@media(max-width:600px){
+ #communitySidebar,.members,.member-list,.members-sidebar{display:none!important;}
+ #loungeVoiceCallView:not([hidden]){display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important;}
+ #loungeVoiceCallView .created-server-voice-call{display:flex!important;flex-direction:column!important;min-height:0!important;max-height:100%!important;overflow:auto!important;}
+ #loungeVoiceCallView .created-server-voice-stage,#createdServerVoiceStage,.created-server-voice-stage{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:8px!important;width:100%!important;min-width:0!important;align-content:start!important;justify-items:stretch!important;padding:8px!important;box-sizing:border-box!important;}
+ #loungeVoiceCallView .created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile),.created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile){width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;max-height:none!important;aspect-ratio:1/1!important;margin:0!important;padding:8px!important;box-sizing:border-box!important;border-radius:12px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;}
+ .created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile) .created-server-voice-avatar{width:38%!important;height:auto!important;aspect-ratio:1/1!important;max-width:92px!important;}
+ .created-server-voice-tile-footer{max-width:100%!important;padding:5px!important;box-sizing:border-box!important;}
+ .created-server-voice-name-pill{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+ .created-server-voice-stage>.dl-watch-voice-tile{grid-column:span 2!important;width:100%!important;min-width:0!important;aspect-ratio:16/9!important;min-height:0!important;max-height:none!important;}
+ .created-server-voice-remote-media #screenShareStage{max-width:100%!important;min-width:0!important;}
+}
