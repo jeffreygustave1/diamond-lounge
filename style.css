@@ -3836,3 +3836,6 @@ button {
 .dl-watch-chat-launch{padding:7px 12px;border:1px solid rgba(199,169,107,.32);border-radius:9px;background:rgba(199,169,107,.1);color:#e8d4a9;font-size:11px;font-weight:700;cursor:pointer;}
 .dl-watch-chat-launch:hover{background:rgba(199,169,107,.18);}
 @media(max-width:600px){.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{aspect-ratio:16/9!important;min-height:0!important;}}
+
+/* Live and Watch Chat controls live in the expandable Watch side panel. */
+.dl-watch-live-chat-control{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:9px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035);}
