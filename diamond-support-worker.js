@@ -389,12 +389,13 @@ function mergeResearchResults(existing, incoming) {
     const u = new URL(result.url);
     if (!/^https?:$/.test(u.protocol)) return false;
     const host = u.hostname.toLowerCase();
-    if (/login|signin|sign-in|account|myaccount|myapps|portal/i.test(host + u.pathname)) return false;
-    if (/^(www\.)?(google|bing|duckduckgo)\.com$/i.test(host)) return false;
+    if (/login|signin|sign-in|account|myaccount|myapps|portal|mypay/i.test(host + u.pathname)) return false;
+    if (/^(www\\.)?(google|bing|duckduckgo)\\.com$/i.test(host)) return false;
     const text = (result.title + " " + (result.snippet || "") + " " + u.pathname).toLowerCase();
     const terms = String(query || "").toLowerCase().split(/[^a-z0-9]+/).filter(t => t.length > 3);
-    // Relevance: require at least one substantive query term match in the result.
-    const matched = terms.filter(term => text.includes(term));\n    // Reject low-quality matches: require multiple substantive terms, or one strong distinctive term.\n    return terms.length <= 2 ? matched.length >= 1 : matched.length >= Math.min(3, Math.ceil(terms.length * 0.22));
+    const matched = terms.filter(term => text.includes(term));
+    const strong = /official|support|docs|documentation|forum|reddit|patch|release|manual|guide/i.test(result.title + " " + host);
+    return terms.length <= 2 ? matched.length >= 1 : matched.length >= Math.min(2, Math.ceil(terms.length * 0.18)) || (strong && matched.length >= 1);
   } catch { return false; }
 }
 function sanitizeClientTime(value) {
