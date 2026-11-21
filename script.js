@@ -147,7 +147,8 @@ let remoteScreenStageHomeParent = null;
 
 
 const createdServerTextChannels = document.getElementById("createdServerTextChannels");
-const createdServerVoiceChannels = document.getElementById("createdServerVoiceChannels");
+// Text and voice channels share one category-aware Discord-style channel tree.
+const createdServerVoiceChannels = createdServerTextChannels;
 const addServerChannelButton = document.getElementById("addServerChannelButton");
 const createdServerActiveChannel = document.getElementById("createdServerActiveChannel");
 const createdServerChannelSymbol = document.getElementById("createdServerChannelSymbol");
@@ -1394,15 +1395,16 @@ if (selectedChannel) {
 }
 
 function renderCreatedServerChannels() {
-    if (!createdServerTextChannels || !createdServerVoiceChannels) return;
+    if (!createdServerTextChannels) return;
     createdServerSidebarVoiceStops.forEach(stop => stop?.());
     createdServerSidebarVoiceStops.clear();
     createdServerTextChannels.replaceChildren();
-    createdServerVoiceChannels.replaceChildren();
 
-    const categories = createdServerChannels.filter(c => c.type === "category");
-    const texts = createdServerChannels.filter(c => c.type === "text");
-    const voices = createdServerChannels.filter(c => c.type === "voice");
+    const categories = createdServerChannels.filter(channel => channel.type === "category");
+    const channelItems = createdServerChannels.filter(channel =>
+        channel.type === "text" || channel.type === "voice"
+    );
+    const voices = channelItems.filter(channel => channel.type === "voice");
     const canManageChannels = currentServerCanManageChannels ||
         activeCreatedServerOwnerUid === currentUser?.uid;
 
@@ -1415,12 +1417,15 @@ function renderCreatedServerChannels() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "created-server-channel-button";
+
         const symbol = document.createElement("span");
         symbol.className = "created-server-channel-icon";
         symbol.textContent = channel.type === "voice" ? "◖" : "#";
+
         const name = document.createElement("span");
         name.className = "created-server-channel-name";
         name.textContent = channel.name;
+
         button.append(symbol, name);
         button.classList.toggle("selected",
             channel.id === activeCreatedServerChannelId &&
@@ -1430,16 +1435,12 @@ function renderCreatedServerChannels() {
             : openCreatedServerVoiceChannel(channel);
         li.append(button);
 
-        let sidebarMembers = null;
         if (channel.type === "voice") {
-            sidebarMembers = document.createElement("div");
+            const sidebarMembers = document.createElement("div");
             sidebarMembers.className = "created-server-voice-sidebar-members";
             sidebarMembers.setAttribute("aria-label", "People in this voice channel");
             li.append(sidebarMembers);
-        }
 
-        // These three actions are exclusive to voice-channel rows.
-        if (channel.type === "voice") {
             const actions = document.createElement("div");
             actions.className = "created-server-voice-row-actions";
 
@@ -1493,13 +1494,29 @@ function renderCreatedServerChannels() {
         return li;
     }
 
-    function appendCategoryHeading(container, category) {
+    function appendCategoryHeading(category) {
         const heading = document.createElement("li");
         heading.className = "created-server-category-heading";
+
         const label = document.createElement("span");
         label.textContent = category.name.toUpperCase();
         heading.append(label);
+
         if (canManageChannels) {
+            const actions = document.createElement("span");
+            actions.className = "created-server-category-actions";
+
+            const add = document.createElement("button");
+            add.type = "button";
+            add.className = "created-server-category-add";
+            add.textContent = "+";
+            add.title = `Add a text or voice channel to ${category.name}`;
+            add.setAttribute("aria-label", `Add a channel to ${category.name}`);
+            add.onclick = event => {
+                event.stopPropagation();
+                void createCreatedServerChannel(null, category.id);
+            };
+
             const remove = document.createElement("button");
             remove.type = "button";
             remove.className = "created-server-channel-delete";
@@ -1507,47 +1524,48 @@ function renderCreatedServerChannels() {
             remove.title = "Delete category";
             remove.setAttribute("aria-label", `Delete category ${category.name}`);
             remove.onclick = () => void deleteCreatedServerChannel(category);
-            heading.append(remove);
+
+            actions.append(add, remove);
+            heading.append(actions);
         }
-        container.append(heading);
+
+        createdServerTextChannels.append(heading);
     }
 
-    function renderChannelList(container, type, channels, showCategoryHeadings = false) {
-        const uncategorized = channels.filter(c => !c.parentCategoryId ||
-            !categories.some(cat => cat.id === c.parentCategoryId));
-        uncategorized.forEach(channel => container.append(makeChannelRow(channel)));
+    // Channels without a valid category remain at the top.
+    channelItems
+        .filter(channel => !channel.parentCategoryId ||
+            !categories.some(category => category.id === channel.parentCategoryId))
+        .forEach(channel => createdServerTextChannels.append(makeChannelRow(channel)));
 
-        categories.forEach(category => {
-            // Each category heading is rendered once, in the text-channel section.
-            // Voice channels still stay grouped/indented, without duplicating every
-            // category heading a second time in the voice section.
-            if (showCategoryHeadings) appendCategoryHeading(container, category);
-            channels
-                .filter(channel => channel.parentCategoryId === category.id)
-                .forEach(channel => {
-                    const row = makeChannelRow(channel);
-                    row.classList.add("is-categorized");
-                    container.append(row);
-                });
-        });
-    }
-
-    renderChannelList(createdServerTextChannels, "text", texts, true);
-    renderChannelList(createdServerVoiceChannels, "voice", voices, false);
+    // Each category now contains both # text channels and voice channels.
+    categories.forEach(category => {
+        appendCategoryHeading(category);
+        channelItems
+            .filter(channel => channel.parentCategoryId === category.id)
+            .forEach(channel => {
+                const row = makeChannelRow(channel);
+                row.classList.add("is-categorized");
+                createdServerTextChannels.append(row);
+            });
+    });
 
     if (activeCreatedServerId) {
         voices.forEach(channel => {
-            const row = [...createdServerVoiceChannels.querySelectorAll(".created-server-channel-item")]
+            const row = [...createdServerTextChannels.querySelectorAll(".created-server-channel-item")]
                 .find(item => item.dataset.channelId === channel.id);
             const strip = row?.querySelector(".created-server-voice-sidebar-members");
             const stop = strip && window.diamondWatchCreatedVoiceSidebarRoom?.(
                 "cs-" + activeCreatedServerId + "-" + channel.id,
                 strip
             );
-            if (typeof stop === "function") createdServerSidebarVoiceStops.set(channel.id, stop);
+            if (typeof stop === "function") {
+                createdServerSidebarVoiceStops.set(channel.id, stop);
+            }
         });
     }
 }
+
 // DELETE CREATED SERVER CHANNEL
 async function deleteCreatedServerChannel(channel) {
     if (!currentUser || !activeCreatedServerId || !channel?.id ||
@@ -2300,29 +2318,36 @@ function openCreatedServerVoiceChannel(channel) {
     );
 }
 
-async function createCreatedServerChannel(typeOverride = null) {
+async function createCreatedServerChannel(typeOverride = null, parentCategoryIdOverride = null) {
     if (!currentUser || !activeCreatedServerId) return;
     if (!(await currentServerHasPermission("manageChannels"))) {
         alert("You need the Manage Channels role permission to create channels.");
         return;
     }
-    const serverId = activeCreatedServerId;
-    const nameInput = prompt(typeOverride === "category" ? "Enter the category name:" : "Enter the channel name:");
-    if (nameInput === null) return;
-    const name = nameInput.trim();
-    if (name.length < 1 || name.length > 40) {
-        alert("Names must be between 1 and 40 characters.");
-        return;
-    }
 
+    const serverId = activeCreatedServerId;
     let type = typeOverride;
+
     if (!type) {
-        const typeInput = prompt("Enter channel type: text or voice", "text");
+        const typeInput = prompt("Create a text or voice channel? Enter text or voice:", "text");
         if (typeInput === null) return;
         type = typeInput.trim().toLowerCase();
     }
     if (!["text", "voice", "category"].includes(type)) {
-        alert("Channel type must be text or voice.");
+        alert("Choose text, voice, or category.");
+        return;
+    }
+
+    const nameInput = prompt(
+        type === "category" ? "Enter the category name:" :
+        type === "voice" ? "Enter the voice channel name:" :
+        "Enter the text channel name:"
+    );
+    if (nameInput === null) return;
+
+    const name = nameInput.trim();
+    if (name.length < 1 || name.length > 40) {
+        alert("Names must be between 1 and 40 characters.");
         return;
     }
 
@@ -2335,10 +2360,27 @@ async function createCreatedServerChannel(typeOverride = null) {
 
     let parentCategoryId = null;
     if (type === "text" || type === "voice") {
-        const availableCategories = createdServerChannels.filter(c => c.type === "category");
-        if (availableCategories.length) {
-            const choices = availableCategories.map((c, i) => `${i + 1}. ${c.name}`).join("\n");
-            const answer = prompt(`Place this channel under a category by entering its number, or leave blank for no category:\n${choices}`, "");
+        const availableCategories = createdServerChannels.filter(channel =>
+            channel.type === "category"
+        );
+
+        if (parentCategoryIdOverride) {
+            const selectedCategory = availableCategories.find(category =>
+                category.id === parentCategoryIdOverride
+            );
+            if (!selectedCategory) {
+                alert("That category no longer exists. Refresh the server channel list and try again.");
+                return;
+            }
+            parentCategoryId = selectedCategory.id;
+        } else if (availableCategories.length) {
+            const choices = availableCategories.map((category, index) =>
+                `${index + 1}. ${category.name}`
+            ).join("\n");
+            const answer = prompt(
+                `Place this channel under a category by entering its number, or leave blank for no category:\n${choices}`,
+                ""
+            );
             if (answer === null) return;
             if (answer.trim()) {
                 const index = Number(answer) - 1;
@@ -2359,20 +2401,31 @@ async function createCreatedServerChannel(typeOverride = null) {
     buttons.forEach(button => button.disabled = true);
 
     try {
-        const channelsRef = collection(db, "servers", serverId, "channels");
         const channelData = {
-            name, nameLower, type, createdBy: currentUser.uid,
+            name,
+            nameLower,
+            type,
+            createdBy: currentUser.uid,
             createdAt: serverTimestamp()
         };
         if (parentCategoryId) channelData.parentCategoryId = parentCategoryId;
-        const channelRef = await addDoc(channelsRef, channelData);
+
+        const channelRef = await addDoc(
+            collection(db, "servers", serverId, "channels"),
+            channelData
+        );
+
         if (activeCreatedServerId === serverId && type === "text") {
-            openCreatedServerChannel({ id: channelRef.id, ...channelData, createdAt: null });
+            openCreatedServerChannel({
+                id: channelRef.id,
+                ...channelData,
+                createdAt: null
+            });
         }
     } catch (error) {
         console.error("Channel creation failed:", error);
         alert(error.code === "permission-denied"
-            ? "Firebase denied channel creation. Check your Firestore rules."
+            ? "Firebase denied channel creation. Check your Firestore rules and the server's Manage Channels permission."
             : "The channel could not be created.");
     } finally {
         buttons.forEach(button => button.disabled = false);
