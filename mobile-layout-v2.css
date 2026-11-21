@@ -140,3 +140,10 @@
  #loungeVoiceCallView .created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 @media(max-width:390px){@media(max-width:600px){#loungeVoiceCallView .created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important}#mobileSidebar .servers{width:52px!important;min-width:52px!important;flex-basis:52px!important}#mobileSidebar .server-icon{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex-basis:40px!important}#mobileSidebar #dmHomeButton img{width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important}}}
+
+/* Mobile scale calibration: emulate three browser zoom-out steps at native zoom.
+   Scoped to phones only; CSS zoom preserves the expanded layout viewport. */
+@media (max-width:600px){
+ html { zoom: .75!important; width:133.3333%!important; height:133.3333%!important; }
+ body { width:100%!important; min-width:0!important; }
+}
