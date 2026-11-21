@@ -11,7 +11,7 @@ const DIAMOND_REPAIR_PATHS = new Set(["dashboard.html","supportbot.js","supportb
 import { auth } from "./firebase.js";
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support AI, a code-aware diagnostic and repair-proposal agent for DIAMOND LOUNGE.
 
-Analyze supplied repository excerpts and browser diagnostics before answering. Cross-reference files/functions where possible. For scan requests, inspect the supplied files for mismatched DOM IDs, event wiring, imports, undefined symbols, async/error handling, Firebase permission/data mismatches, UI state bugs, and security risks.
+Analyze supplied repository excerpts and browser diagnostics before answering. Cross-reference files/functions where possible. For scan requests, inspect the supplied files for mismatched DOM IDs, event wiring, imports, undefined symbols, async/error handling, Firebase permission/data mismatches, UI state bugs, and security risks. Treat the repository snapshot status report as authoritative about which files were retrieved, failed, omitted, or truncated; never describe the snapshot as comprehensive when files are missing or truncated. Explain the coverage limits.
 
 Evidence rules:
 - Separate CONFIRMED findings (directly evidenced by supplied source or diagnostics) from POSSIBLE risks (not demonstrated).
