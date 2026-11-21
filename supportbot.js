@@ -7,7 +7,12 @@ window.addEventListener('error',e=>{if(diamondBrowserErrors.length<8)diamondBrow
 window.addEventListener('unhandledrejection',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError('Unhandled promise: '+(e.reason?.message||e.reason||'unknown')));});
 const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
 const DIAMOND_REPAIR_BRIDGE_ENDPOINT = "https://diamond-support-github-bridge.jeffreygustave1.workers.dev";
-const DIAMOND_REPAIR_PATHS = new Set(["dashboard.html","supportbot.js","supportbot.css","style.css","dm.css","voice.js","watch.js","server.js","channels.js","dm.js","profile.js","calls.js","activities.js","README.md" ]);
+const DIAMOND_REPAIR_PATHS = new Set([
+  "dashboard.html","firebase.js","script.js","voice.js","dm-call.js","watch-feature.js","media.js",
+  "voice-sounds.js","watchdog.js","supportbot.js","supportbot.css","style.css","luxury.css",
+  "branding-polish.css","brand.css","dm.css","dm-call.css","firestore.rules","storage.rules",
+  "diamond-support-worker.js","diamond-support-github-bridge.js","README.md"
+]);
 import { auth } from "./firebase.js";
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support AI, a code-aware diagnostic and repair-proposal agent for DIAMOND LOUNGE.
 
@@ -27,7 +32,68 @@ Website includes profiles, messages/DMs, servers/channels, voice, video, screens
 const view=document.getElementById("supportBotView"),openBtn=document.getElementById("supportBotOpen"),chat=document.getElementById("supportBotChat"),choices=document.getElementById("supportBotChoices"),reset=document.getElementById("supportBotReset"),form=document.getElementById("supportBotForm"),input=document.getElementById("supportBotInput"),sendButton=document.getElementById("supportBotSend");
 const topics=["Account or login","Profile or avatar","Messages and DMs","Voice or microphone","Camera or video","Screen sharing","Servers or channels","Website bugs"];
 let history=[],busy=false,projectSnapshotPromise=null;
-async function getProjectSnapshot(){if(projectSnapshotPromise)return projectSnapshotPromise;projectSnapshotPromise=(async()=>{try{const tr=await fetch('https://api.github.com/repos/jeffreygustave1/diamond-lounge/git/trees/main?recursive=1');if(!tr.ok)return 'Repository context unavailable (tree HTTP '+tr.status+').';const tree=await tr.json(),targets=['firebase.js','server.js','channels.js','dm.js','calls.js','watch.js','voice.js','profile.js','activities.js','firestore.rules','dashboard.html','supportbot.js','supportbot.css','dm.css','style.css','README.md'];let total=0,parts=[],status=[],MAX_FILE=1200,MAX_TOTAL=8500;for(const path of targets){if(!tree.tree?.some(x=>x.path===path&&x.type==='blob')){status.push(path+': NOT FOUND');continue;}try{const res=await fetch('https://raw.githubusercontent.com/jeffreygustave1/diamond-lounge/main/'+path);if(!res.ok){status.push(path+': FETCH FAILED HTTP '+res.status);continue;}const full=await res.text();if(total>=MAX_TOTAL){status.push(path+': OMITTED (budget)');continue;}const src=full.slice(0,Math.min(MAX_FILE,MAX_TOTAL-total));total+=src.length;status.push(path+': retrieved '+src.length+'/'+full.length+(src.length<full.length?' (TRUNCATED)':' (COMPLETE)'));parts.push('\\n--- '+path+' ---\\n'+src);}catch(e){status.push(path+': FETCH ERROR '+String(e).slice(0,120));}}return 'REPOSITORY RETRIEVAL STATUS (budget '+MAX_TOTAL+'):\\n'+status.join('\\n')+'\\n\\nSource excerpts prioritized by core modules, read-only and potentially truncated:\\n'+parts.join('\\n');}catch{return 'Repository context unavailable.';}})();return projectSnapshotPromise;}function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
+async function getProjectSnapshot(focus=""){
+ if(projectSnapshotPromise)return projectSnapshotPromise;
+ projectSnapshotPromise=(async()=>{
+  try{
+   const tr=await fetch("https://api.github.com/repos/jeffreygustave1/diamond-lounge/git/trees/main?recursive=1");
+   if(!tr.ok)return {manifest:"Repository tree unavailable (HTTP "+tr.status+").",chunks:[]};
+   const tree=await tr.json();
+   const entries=Array.isArray(tree.tree)?tree.tree:[];
+   const files=new Set(entries.filter(x=>x.type==="blob").map(x=>x.path));
+   const styleRequest=/(css|style|layout|appearance|visual|spacing|color|font)/i.test(focus);
+   const watchRequest=/(watch|youtube|media|video activity)/i.test(focus);
+   let targets;
+   if(styleRequest){
+    targets=["dashboard.html","style.css","luxury.css","branding-polish.css","brand.css","dm.css","dm-call.css","supportbot.css","script.js","firebase.js"];
+   }else if(watchRequest){
+    targets=["dashboard.html","firebase.js","script.js","voice.js","watch-feature.js","media.js","voice-sounds.js","firestore.rules","storage.rules","supportbot.js"];
+   }else{
+    targets=["dashboard.html","firebase.js","script.js","voice.js","dm-call.js","firestore.rules","storage.rules","supportbot.js","diamond-support-worker.js","diamond-support-github-bridge.js"];
+   }
+   const manifest=[],chunks=[];
+   const MAX_SAMPLE=2100,MAX_INDEX=650;
+   function sampleSource(path,full){
+    if(full.length<=MAX_SAMPLE)return {sample:full,index:""};
+    const head=Math.floor(MAX_SAMPLE*.38),mid=Math.floor(MAX_SAMPLE*.24),tail=MAX_SAMPLE-head-mid;
+    const midStart=Math.max(head,Math.floor((full.length-mid)/2));
+    const tailStart=Math.max(midStart+mid,full.length-tail);
+    const sample=full.slice(0,head)+"\n...[middle omitted]...\n"+full.slice(midStart,midStart+mid)+"\n...[end excerpt]...\n"+full.slice(tailStart);
+    let index="";
+    if(/\\.js$/i.test(path)){
+     const names=[];
+     const lines=full.split("\n");
+     for(let i=0;i<lines.length;i++){
+      const m=lines[i].match(/^\\s*(?:export\\s+)?(?:async\\s+)?function\\s+([A-Za-z_$][\\w$]*)/);
+      if(m)names.push((i+1)+":"+m[1]);
+     }
+     if(names.length)index="Function index (source line numbers): "+names.slice(0,24).join(", ")+(names.length>24?" … ("+names.length+" total)":"");
+     if(index.length>MAX_INDEX)index=index.slice(0,MAX_INDEX)+"…";
+    }
+    return {sample,index};
+   }
+   for(const path of targets){
+    if(!files.has(path)){manifest.push(path+": NOT PRESENT in repository tree");continue;}
+    try{
+     const res=await fetch("https://raw.githubusercontent.com/jeffreygustave1/diamond-lounge/main/"+path);
+     if(!res.ok){manifest.push(path+": FETCH FAILED HTTP "+res.status);continue;}
+     const full=await res.text();
+     const picked=sampleSource(path,full);
+     const excerpt=picked.sample+(picked.index?"\n\n"+picked.index:"");
+     const complete=full.length<=MAX_SAMPLE;
+     manifest.push(path+": fetched "+full.length+" chars; sent "+excerpt.length+" chars ("+(complete?"COMPLETE":"SAMPLED; omitted source is not analyzed")+")");
+     chunks.push("REPOSITORY SOURCE: "+path+"\n"+excerpt);
+    }catch(e){manifest.push(path+": FETCH ERROR "+String(e).slice(0,120));}
+   }
+   const extra=entries.filter(x=>x.type==="blob"&&/\\.(js|css|html|rules)$/i.test(x.path)&&!targets.includes(x.path)).map(x=>x.path);
+   manifest.push("Other source files present but not sampled: "+(extra.slice(0,24).join(", ")||"none")+(extra.length>24?" … ("+extra.length+" total)":""));
+   manifest.push("The live app entry points visible in dashboard.html are script.js, watch-feature.js, supportbot.js, dm-call.js, voice.js, and watchdog.js. Main application features are consolidated in script.js; separate server.js/channels.js/dm.js/calls.js/profile.js files are not part of this repository tree.");
+   return {manifest:"REPOSITORY RETRIEVAL STATUS (each source excerpt is a separate message):\n"+manifest.join("\n"),chunks};
+  }catch(e){return {manifest:"Repository context unavailable: "+String(e).slice(0,180),chunks:[]};}
+ })();
+ return projectSnapshotPromise;
+}
+function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
 function proposalCard(proposal){
   if(!proposal||proposal.repair!==true||!Array.isArray(proposal.files)||proposal.files.length<1||proposal.files.length>6)return false;
   const files=proposal.files.filter(f=>f&&DIAMOND_REPAIR_PATHS.has(f.path)&&typeof f.content==="string"&&f.content.trim());
@@ -68,18 +134,18 @@ async function send(message){
  bubble("Diamond is investigating…","bot");
  const thinking=chat.lastElementChild;
  try{
-  const snapshot=await getProjectSnapshot();
-  const original=history[0].content;
-  const prefix=DIAMOND_SUPPORT_SYSTEM+"\n\nRecent browser errors (if any): ";
-  const errorText=diamondBrowserErrors.length?diamondBrowserErrors.join("\n"):"No captured browser errors.";
-  const enriched=prefix+errorText+"\n\n"+snapshot+"\n\nUser question: "+original;
-  const messages=[{role:"user",content:enriched}];
-  const recent=history.slice(1).slice(-4);
+  const snapshot=await getProjectSnapshot(value);
+  const original=(history[0]?.content||value).slice(0,650);
+  const errorText=diamondBrowserErrors.length?diamondBrowserErrors.join("\\n").slice(0,650):"No captured browser errors.";
+  const context=DIAMOND_SUPPORT_SYSTEM+"\\n\\nInitial user request: "+original+"\\n\\nRecent browser diagnostics (bounded):\\n"+errorText;
+  const messages=[{role:"user",content:context.slice(0,3800)},{role:"user",content:snapshot.manifest.slice(0,3800)}];
+  for(const chunk of snapshot.chunks.slice(0,10))messages.push({role:"user",content:chunk.slice(0,3800)});
+  const recent=history.slice(1).slice(-4).map(m=>({role:m.role,content:String(m.content||"").slice(0,3800)}));
   messages.push(...recent);
   const response=await fetch(DIAMOND_AI_ENDPOINT,{
    method:"POST",
    headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({messages:messages})
+   body:JSON.stringify({messages:messages.slice(-16)})
   });
   let data={};
   try{data=await response.json();}catch(error){}
