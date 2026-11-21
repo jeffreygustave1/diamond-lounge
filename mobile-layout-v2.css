@@ -50,3 +50,30 @@
   #mobileSidebar .server-icon { flex-basis:42px!important;width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important; }
   #loungeVoiceCallView .created-server-voice-stage { grid-template-columns:minmax(0,1fr)!important; }
 }
+
+/* 2026-11 mobile rail visibility correction: DM diamond must always be visible */
+@media (max-width: 600px) {
+  #mobileSidebar .servers { position:relative!important; isolation:isolate!important; }
+  #mobileSidebar #dmHomeButton.server-icon.dm-home,
+  #mobileSidebar .servers > #dmHomeButton {
+    display:grid!important; visibility:visible!important; opacity:1!important;
+    position:relative!important; flex:0 0 46px!important; width:46px!important;
+    min-width:46px!important; height:46px!important; min-height:46px!important;
+    margin:0 auto 4px!important; padding:0!important; overflow:visible!important;
+    transform:none!important; z-index:3!important; border-radius:15px!important;
+    background:#20232b!important; border:1px solid rgba(210,230,255,.28)!important;
+    box-shadow:0 0 14px rgba(100,180,255,.15)!important;
+  }
+  #mobileSidebar #dmHomeButton img,
+  #mobileSidebar #dmHomeButton img[src] {
+    display:block!important; visibility:visible!important; opacity:1!important;
+    position:relative!important; width:40px!important; height:40px!important;
+    max-width:none!important; max-height:none!important; margin:auto!important;
+    object-fit:contain!important; transform:none!important; clip:auto!important;
+  }
+  #mobileSidebar #dmHomeButton::before,#mobileSidebar #dmHomeButton::after {display:none!important;content:none!important;}
+  #mobileSidebar .server-divider {flex-shrink:0!important;}
+  #mobileSidebar #mainServerButton {margin-top:2px!important;}
+  .mobile-sidebar-backdrop {display:block!important;}
+  .dashboard.mobile-nav-open .mobile-sidebar-backdrop {visibility:visible!important;opacity:1!important;pointer-events:auto!important;}
+}
