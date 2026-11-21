@@ -53,6 +53,34 @@ const ICE_SERVERS = [
     }
 ];
 
+let sessionIceServers = ICE_SERVERS;
+
+async function loadSessionIceServers() {
+    sessionIceServers = ICE_SERVERS;
+    try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+        const token = await currentUser.getIdToken();
+        const response = await fetch("/api/turn-credentials", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("TURN endpoint returned " + response.status);
+        const result = await response.json();
+        if (!Array.isArray(result.iceServers) ||
+            !result.iceServers.some(server => String(server?.urls || "").startsWith("turn"))) {
+            throw new Error("Endpoint returned invalid ICE servers");
+        }
+        sessionIceServers = [
+            ...ICE_SERVERS.filter(server => String(server.urls || "").startsWith("stun:")),
+            ...result.iceServers
+        ];
+    } catch (error) {
+        console.warn("Dynamic TURN configuration unavailable; using existing ICE configuration.", error);
+        sessionIceServers = ICE_SERVERS;
+    }
+}
+
 /* ==========================================
    DOM ELEMENTS
 ========================================== */
@@ -556,7 +584,7 @@ function closeAllPeers() {
 
 function makePeer(person, callRef) {
     const pc = new RTCPeerConnection({
-        iceServers: ICE_SERVERS
+        iceServers: sessionIceServers
     });
 
     const peer = {
@@ -1422,6 +1450,8 @@ async function joinVoice() {
         localStream = await navigator.mediaDevices.getUserMedia({
             audio: true
         });
+
+        await loadSessionIceServers();
 
         sessionId =
             globalThis.crypto?.randomUUID?.() ||
