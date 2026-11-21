@@ -1,6 +1,6 @@
 // Diamond Support — browser-aware troubleshooting assistant.
 // Captures a bounded sample of browser errors to help diagnose user-reported problems.
-// This does not grant repository, code-editing, or deployment access.
+// Adds a bounded read-only source snapshot for context; no direct code-edit or deployment access.
 const diamondBrowserErrors=[];
 function diamondSafeError(value){return String(value||'').replace(/https?:\\/\\/[^\\s?#]+(?:\\?[^\\s]*)?/g,'[URL]').replace(/(token|password|secret|apiKey|authorization)\\s*[:=]\\s*[^\\s,;]+/gi,'$1=[redacted]').slice(0,500);}
 window.addEventListener('error',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError((e.message||'Script error')+' ('+(e.filename||'')+':'+(e.lineno||0)+')'));});
@@ -8,7 +8,7 @@ window.addEventListener('unhandledrejection',e=>{if(diamondBrowserErrors.length<
 const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support, the helpful technical support assistant for DIAMOND LOUNGE, a Discord-like community web app.
 
-Your job is to troubleshoot issues step by step, not just give generic replies. When browser diagnostics are included, prioritize matching errors, explain their likely causes, and propose a focused fix. You still cannot change files or deploy code unless an actual tool grants that ability.
+Use supplied project-source excerpts to diagnose real code, cite filenames, and avoid speculative fixes. If source is missing, say so. Your job is to troubleshoot issues step by step, not just give generic replies. When browser diagnostics are included, prioritize matching errors, explain their likely causes, and propose a focused fix. You still cannot change files or deploy code unless an actual tool grants that ability.
 Website features include user accounts and profiles/avatar uploads, text channels and messages, direct messages, server creation/membership/roles/channels, voice chat, camera/video, screen sharing, voice-room watch activities, and premium cosmetics/entitlements.
 
 Guidelines:
@@ -24,7 +24,7 @@ Guidelines:
 - Keep answers focused on DIAMOND LOUNGE and don't invent features or access.`;
 const view=document.getElementById("supportBotView"),openBtn=document.getElementById("supportBotOpen"),chat=document.getElementById("supportBotChat"),choices=document.getElementById("supportBotChoices"),reset=document.getElementById("supportBotReset"),form=document.getElementById("supportBotForm"),input=document.getElementById("supportBotInput"),sendButton=document.getElementById("supportBotSend");
 const topics=["Account or login","Profile or avatar","Messages and DMs","Voice or microphone","Camera or video","Screen sharing","Servers or channels","Website bugs"];
-let history=[],busy=false;
+let history=[],busy=false,projectSnapshotPromise=null;\nasync function getProjectSnapshot(){if(projectSnapshotPromise)return projectSnapshotPromise;projectSnapshotPromise=(async()=>{try{const tr=await fetch('https://api.github.com/repos/jeffreygustave1/diamond-lounge/git/trees/main?recursive=1');if(!tr.ok)return 'Repository context unavailable.';const tree=await tr.json(),targets=['dashboard.html','supportbot.js','voice.js','watch.js','firebase.js','firestore.rules'];let total=0,parts=[];for(const path of targets){if(!tree.tree?.some(x=>x.path===path&&x.type==='blob'))continue;try{const res=await fetch('https://raw.githubusercontent.com/jeffreygustave1/diamond-lounge/main/'+path);if(!res.ok)continue;const src=(await res.text()).slice(0,10000);if(total+src.length>30000)break;total+=src.length;parts.push('\\n--- '+path+' ---\\n'+src);}catch{}}return parts.length?'Read-only repository source excerpts (possibly truncated):\\n'+parts.join('\\n'):'Could not retrieve project source files.';}catch{return 'Repository context unavailable.';}})();return projectSnapshotPromise;}
 function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
 function topicButtons(){choices.replaceChildren();topics.forEach(topic=>{const b=document.createElement("button");b.type="button";b.textContent=topic;b.addEventListener("click",()=>send(topic));choices.appendChild(b);});}
 async function send(message){const value=(message||"").trim();if(!value||busy)return;bubble(value,"user");history.push({role:"user",content:value});input.value="";busy=true;if(sendButton)sendButton.disabled=true;input.disabled=true;choices.replaceChildren();bubble("Diamond is investigating…","bot");const thinking=chat.lastElementChild;
