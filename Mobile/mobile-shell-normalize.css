@@ -185,3 +185,28 @@
   .messages,.dm-messages,#supportBotChat{padding:10px!important;}
   .message,.dm-message{max-width:92%!important;}
 }
+
+
+/* Mobile navigation transition and layout polish */
+@media(max-width:900px){
+  #mobileSidebar{transition:transform .22s cubic-bezier(.2,.75,.25,1),box-shadow .22s ease!important;will-change:transform!important;}
+  #mobileSidebar .servers{flex:0 0 64px!important;width:64px!important;min-width:64px!important;box-sizing:border-box!important;border-right:1px solid rgba(199,169,107,.12)!important;}
+  #mobileSidebar .channels{flex:1 1 auto!important;min-width:0!important;box-sizing:border-box!important;padding:12px 10px!important;}
+  #mobileSidebar .workspace-title{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;}
+  #mobileSidebar .workspace-title h1{min-width:0!important;overflow-wrap:anywhere!important;}
+  #mobileSidebar .text-channel,#mobileSidebar .voice-channel,#dmMemberList button,#supportBotOpen{transition:background-color .16s ease,border-color .16s ease,transform .16s ease!important;border:1px solid transparent!important;}
+  #mobileSidebar .text-channel.selected,#mobileSidebar .text-channel.active,#mobileSidebar .voice-channel.selected,#mobileSidebar .voice-channel.active,#dmMemberList button.selected,#dmMemberList button.active{background:rgba(199,169,107,.12)!important;border-color:rgba(199,169,107,.2)!important;}
+  #mobileSidebar .text-channel:focus-visible,#mobileSidebar .voice-channel:focus-visible,#dmMemberList button:focus-visible,#supportBotOpen:focus-visible{outline:2px solid rgba(199,169,107,.55)!important;outline-offset:2px!important;}
+  .mobile-menu-button{flex:0 0 40px!important;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;display:grid!important;place-items:center!important;border-radius:12px!important;touch-action:manipulation!important;}
+}
+@media(max-width:600px){
+  #mobileSidebar{box-shadow:12px 0 36px rgba(0,0,0,.28)!important;}
+  #mobileSidebar .channels{padding:10px 9px!important;}
+  #mobileSidebar .workspace-heading{padding:10px!important;margin-bottom:12px!important;}
+  #mobileSidebar .section-heading{letter-spacing:.09em!important;font-size:10px!important;opacity:.72!important;}
+  .mobile-menu-button{border:1px solid rgba(199,169,107,.16)!important;background:rgba(199,169,107,.055)!important;}
+  .mobile-menu-button:active{transform:scale(.96)!important;}
+}
+@media(prefers-reduced-motion:reduce){
+  #mobileSidebar,.mobile-sidebar-backdrop,#mobileSidebar .text-channel,#mobileSidebar .voice-channel,#dmMemberList button{transition:none!important;}
+}
