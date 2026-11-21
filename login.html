@@ -104,8 +104,8 @@ googleButton.addEventListener("click", async () => {
     try {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: "select_account" });
-        await setPersistence(auth, browserLocalPersistence);
-        errorMessage.textContent = "Google returned. Checking Firebase session…";
+        // Launch the popup immediately from the tap; awaiting persistence first can lose iOS Safari's popup gesture permission.
+        errorMessage.textContent = "Opening Google…";
         const result = await signInWithPopup(auth, provider);
         errorMessage.textContent = "Google account accepted. UID: " + result.user.uid.slice(0,8) + "… Checking session persistence.";
         const activeUser = auth.currentUser;
