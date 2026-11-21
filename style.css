@@ -4033,3 +4033,14 @@ button {
 .server-assets-future-art{background:linear-gradient(135deg,#6a5739,#2b2c34 52%,#18202c);color:#f0d6a3;font-size:34px}
 .emoji-future-art{background:linear-gradient(135deg,#394d4a,#252b3b 60%,#48374a);color:#dce8dc;font-size:22px}
 .voice-future-art{background:linear-gradient(135deg,#35435a,#1b202b 55%,#51405a);color:#d9d5f2;font-size:36px}
+
+
+/* MOBILE CLICK-RECOVERY SAFETY: decorative layers must never intercept app controls. */
+@media (max-width: 900px) {
+  .dl-tour-welcome-backdrop, .dl-tour-overlay, .dl-tour-spotlight, .dl-tour-popover { display:none!important; pointer-events:none!important; }
+  .glass-stage, .glass-blob, .workspace-gem, .mobile-sidebar-backdrop:not(.active) { pointer-events:none!important; }
+  .chat-area, .chat-area * { pointer-events:auto; }
+  .chat-area .glass-stage, .chat-area .glass-blob, .chat-area .workspace-gem { pointer-events:none!important; }
+  .mobile-sidebar-backdrop { pointer-events:none!important; }
+  .dashboard.mobile-nav-open .mobile-sidebar-backdrop { pointer-events:auto!important; }
+}
