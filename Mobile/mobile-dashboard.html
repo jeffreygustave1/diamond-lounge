@@ -1208,3 +1208,10 @@
 #mobileSidebar #dmHomeButton.server-icon.dm-home img{position:absolute!important;left:50%!important;top:50%!important;width:184px!important;height:184px!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;transform:translate(-50%,-50%)!important;object-fit:contain!important;pointer-events:none!important;}
 }
 </style>
+
+<style>
+/* Prevent iOS Safari's automatic page zoom when focusing DM/support text fields (inputs below 16px). */
+@media(max-width:900px){
+ #dmConversationView input,#dmConversationView textarea,#supportBotView input,#supportBotView textarea,#dmMessageInput,#supportBotInput{font-size:16px!important;}
+}
+</style>
