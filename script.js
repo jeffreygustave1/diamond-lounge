@@ -4305,20 +4305,21 @@ document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click"
 });
 
 
-/* Mobile long-press channel/category context actions */
+/* Mobile channel/category press-and-hold context menu */
 (function(){
- let timer=null,target=null,menu=null,holdPoint=null,held=false;
- function dismiss(){menu?.remove();menu=null;held=false;}
- function canManage(){return Boolean(currentServerCanManageChannels||activeCreatedServerOwnerUid===currentUser?.uid);}
- function show(e,node){if(!canManage())return;dismiss();held=true;const type=node.classList.contains('created-server-category-heading')?'category':node.dataset.channelType;const id=node.dataset.channelId;const ch=createdServerChannels.find(x=>x.id===id);const cat=type==='category'?createdServerChannels.find(x=>x.id===node.dataset.categoryId||x.name===node.querySelector('span')?.textContent):null;
- menu=document.createElement('div');menu.className='dl-mobile-channel-menu';menu.style.left=Math.min(holdPoint.x,innerWidth-220)+'px';menu.style.top=Math.min(holdPoint.y,innerHeight-280)+'px';
- const add=(label,fn,danger=false)=>{const b=document.createElement('button');b.type='button';b.textContent=label;if(danger)b.classList.add('danger');b.onclick=()=>{dismiss();fn();};menu.append(b);};
- if(ch){add('Edit Channel',()=>{const name=prompt('Channel name:',ch.name);if(!name?.trim())return;void updateDoc(doc(db,'servers',activeCreatedServerId,'channels',ch.id),{name:name.trim(),nameLower:normalizeServerName(name.trim())}).then(()=>{ch.name=name.trim();renderCreatedServerChannels();});});add('Copy Channel Link',()=>{const u=new URL(location.href);u.searchParams.set('server',activeCreatedServerId);u.searchParams.set('channel',ch.id);void navigator.clipboard?.writeText(u.href);});add('Delete Channel',()=>void deleteCreatedServerChannel(ch),true);}
- else if(cat){add('Create Text Channel',()=>void createCreatedServerChannel('text',cat.id));add('Create Voice Channel',()=>void createCreatedServerChannel('voice',cat.id));add('Edit Category',()=>{const name=prompt('Category name:',cat.name);if(!name?.trim())return;void updateDoc(doc(db,'servers',activeCreatedServerId,'channels',cat.id),{name:name.trim(),nameLower:normalizeServerName(name.trim())}).then(()=>{cat.name=name.trim();renderCreatedServerChannels();});});add('Delete Category',()=>void deleteCreatedServerChannel(cat),true);}
- document.body.append(menu);menu.addEventListener('pointerdown',e=>e.stopPropagation());setTimeout(()=>document.addEventListener('pointerdown',outside,{once:true}),0);
- }
- function outside(e){if(menu&&!menu.contains(e.target))dismiss();}
- document.addEventListener('pointerdown',e=>{const node=e.target.closest('.created-server-channel-item,.created-server-category-heading');if(!node||!canManage())return;target=node;holdPoint={x:e.clientX,y:e.clientY};held=false;timer=setTimeout(()=>show(e,node),550);},{passive:true});
- document.addEventListener('pointerup',()=>{clearTimeout(timer);target=null;});document.addEventListener('pointercancel',()=>clearTimeout(timer));document.addEventListener('pointermove',e=>{if(timer&&holdPoint&&Math.hypot(e.clientX-holdPoint.x,e.clientY-holdPoint.y)>12)clearTimeout(timer);},{passive:true});
- document.addEventListener('click',e=>{if(held){e.preventDefault();e.stopPropagation();held=false;}},{capture:true});
+ let timer=null,menu=null,point=null,holdTriggered=false,pressedNode=null;
+ const isManager=()=>Boolean(currentServerCanManageChannels||activeCreatedServerOwnerUid===currentUser?.uid);
+ function close(){menu?.remove();menu=null;holdTriggered=false;}
+ function open(node){if(!isManager())return;close();holdTriggered=true;const isCategory=node.classList.contains('created-server-category-heading');const id=node.dataset.channelId;const channel=createdServerChannels.find(x=>x.id===id);const label=node.querySelector('.created-server-channel-name')?.textContent||node.querySelector('span')?.textContent||'';const category=isCategory?createdServerChannels.find(x=>x.type==='category'&&(x.id===node.dataset.categoryId||x.name===label)):null;
+ menu=document.createElement('div');menu.className='dl-mobile-channel-menu';menu.setAttribute('role','menu');menu.style.left=Math.max(8,Math.min(point.x,innerWidth-228))+'px';menu.style.top=Math.max(8,Math.min(point.y,innerHeight-300))+'px';
+ const add=(title,action,danger=false)=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.textContent=title;if(danger)b.classList.add('danger');b.onclick=()=>{close();action();};menu.append(b);};
+ if(channel){add('Edit Channel',()=>{const name=prompt('Channel name:',channel.name);if(!name?.trim())return;void updateDoc(doc(db,'servers',activeCreatedServerId,'channels',channel.id),{name:name.trim(),nameLower:normalizeServerName(name.trim())}).then(()=>{channel.name=name.trim();renderCreatedServerChannels();});});add('Create Channel',()=>void createCreatedServerChannel(null,channel.parentCategoryId||null));add('Delete Channel',()=>void deleteCreatedServerChannel(channel),true);}
+ else if(category){add('Add Text Channel',()=>void createCreatedServerChannel('text',category.id));add('Add Voice Channel',()=>void createCreatedServerChannel('voice',category.id));add('Edit Category',()=>{const name=prompt('Category name:',category.name);if(!name?.trim())return;void updateDoc(doc(db,'servers',activeCreatedServerId,'channels',category.id),{name:name.trim(),nameLower:normalizeServerName(name.trim())}).then(()=>{category.name=name.trim();renderCreatedServerChannels();});});add('Delete Category',()=>void deleteCreatedServerChannel(category),true);}
+ document.body.append(menu);menu.addEventListener('pointerdown',e=>e.stopPropagation());requestAnimationFrame(()=>document.addEventListener('pointerdown',outside,{once:true}));}
+ function outside(e){if(menu&&!menu.contains(e.target))close();}
+ document.addEventListener('pointerdown',e=>{const node=e.target.closest('.created-server-channel-item,.created-server-category-heading');if(!node||!isManager()||e.target.closest('button:not(.created-server-channel-button)'))return;pressedNode=node;point={x:e.clientX,y:e.clientY};holdTriggered=false;timer=setTimeout(()=>open(node),520);},{passive:true});
+ document.addEventListener('pointerup',()=>{clearTimeout(timer);pressedNode=null;});document.addEventListener('pointercancel',()=>clearTimeout(timer));document.addEventListener('pointermove',e=>{if(timer&&point&&Math.hypot(e.clientX-point.x,e.clientY-point.y)>10)clearTimeout(timer);},{passive:true});
+ document.addEventListener('click',e=>{if(holdTriggered){e.preventDefault();e.stopImmediatePropagation();holdTriggered=false;}},true);
 })();
+/* Tap a participant tile to toggle its focused view on mobile; tap again to restore. */
+(function(){document.addEventListener('click',e=>{const tile=e.target.closest('.created-server-voice-tile');if(!tile||!tile.closest('.created-server-voice-stage'))return;if(e.target.closest('button,a'))return;const stage=tile.parentElement;const was=tile.classList.contains('dl-voice-expanded');stage.querySelectorAll('.dl-voice-expanded').forEach(x=>x.classList.remove('dl-voice-expanded'));if(!was)tile.classList.add('dl-voice-expanded');});})();
