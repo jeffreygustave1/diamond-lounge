@@ -1,5 +1,5 @@
 // Diamond Lounge AI agent backend. Free Cloudflare Workers AI + resilient dual-provider web search.
-const BUILD_VERSION = "diamond-support-max-v9-evidence-2026-11-20";
+const BUILD_VERSION = "diamond-support-max-v10-research-2026-11-20";
 const SYSTEM_PROMPT = `You are Diamond Support, the general-purpose AI assistant inside Diamond Lounge. Be capable, thoughtful, technically precise, resourceful, and conversational. You can explain, investigate, reason, troubleshoot, plan, compare, calculate, code, write, teach, brainstorm, and help users make decisions. Aim for expert-level usefulness, not generic filler.
 
 CORE REASONING
@@ -15,7 +15,7 @@ CORE REASONING
 - Be domain-aware. Avoid irrelevant suggestions, generic disclaimers, filler, repetition, or needless beginner explanations. Never suggest purchasing hardware/products as the first troubleshooting step unless warranted.
 - Use clear formatting with useful headings, compact bullets, tables only when they improve clarity, and avoid overlong answers. Match depth to the request.
 
-LIVE RESEARCH AND SOURCES — STRICT QUALITY CONTROL
+LIVE RESEARCH AND SOURCES — STRICT QUALITY CONTROL\n- Search concise topic queries, not long user instruction prompts; query terms should target the subject/problem directly.\n- If search results are irrelevant, refine the query with the specific product, version, error, symptom, or context rather than answering from generic guesses.\n- When practical, cite only pages whose title/snippet meaningfully supports the claims. Never use generic domain homepage, login, portal, or navigation pages as evidence.
 - Retrieved search results are not automatically trustworthy or relevant. Validate each result for topical relevance before using or citing it.
 - Ignore unrelated login portals, account pages, generic navigation pages, spam, duplicate URLs, and results that do not directly address the user's query.
 - Prefer primary sources, official documentation, credible specialist sources, and current pages. For technical troubleshooting, prioritize relevant documentation and credible technical discussions over unrelated results.
@@ -94,7 +94,7 @@ export default {
       // Search intent is deterministic: do not rely on the model to decide whether freshness is needed.
       const needsSearch = /\b(search (the )?(web|internet|online|for|about)|look up|browse|research|latest|current|today|right now|recent|newest|as of now|this week|this month|upcoming|next (patch|update|release|event|version)|patch(es)?|release notes|changelog|driver(s)?|news|price of|available now|availability|schedule|what happened|when is .{0,40}(next|release|patch|update)|new version)\b/i.test(lastUser);
       if (needsSearch) {
-        searchQuery = lastUser.trim().replace(/\s+/g, " ").slice(0, 240);
+        searchQuery = buildSearchQuery(lastUser);
         const isStarCitizenPatchQuestion = /\bstar citizen\b/i.test(lastUser) && /\b(patch|patch notes|update|release|version|build|hotfix)\b/i.test(lastUser);
         try {
           if (isStarCitizenPatchQuestion) {
@@ -352,6 +352,17 @@ async function searchWeb(query) {
     .slice(0, 8);
 }
 
+function buildSearchQuery(input) {
+  const text = String(input || "").replace(/\s+/g, " ").trim();
+  // Extract the topic rather than sending a long instruction prompt to search engines.
+  const starCitizen = /star citizen/i.test(text);
+  if (starCitizen && /stutter|performance|fps|lag/i.test(text)) {
+    const hardware = text.match(/(?:RTX\s*\d{3,4}(?:\s*\d+GB)?|Ryzen\s*\d\s*\d{4,5}X?|\d{1,2}\s*GB\s*(?:RAM|memory))/gi) || [];
+    return ["Star Citizen stuttering performance New Babbage", ...hardware.slice(0,4)].join(" ");
+  }
+  const sentences = text.split(/[.!?]/).filter(Boolean).slice(0,2).join(" ");
+  return sentences.replace(/\b(please|investigate|research|explain|give me|I want|find out|help me|step by step)\b/gi,"").trim().slice(0,180) || text.slice(0,180);
+}
 function isUsefulCitation(result, query) {
   if (!result || !result.url || !result.title) return false;
   try {
@@ -363,7 +374,7 @@ function isUsefulCitation(result, query) {
     const text = (result.title + " " + (result.snippet || "") + " " + u.pathname).toLowerCase();
     const terms = String(query || "").toLowerCase().split(/[^a-z0-9]+/).filter(t => t.length > 3);
     // Relevance: require at least one substantive query term match in the result.
-    return terms.length === 0 || terms.some(term => text.includes(term));
+    const matched = terms.filter(term => text.includes(term));\n    // Reject low-quality matches: require multiple substantive terms, or one strong distinctive term.\n    return terms.length <= 2 ? matched.length >= 1 : matched.length >= Math.min(3, Math.ceil(terms.length * 0.22));
   } catch { return false; }
 }
 function sanitizeClientTime(value) {
