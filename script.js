@@ -3928,7 +3928,7 @@ document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click"
                 <strong>Use your free profile GIF</strong>
                 <ol>
                     <li>Choose <b>Choose a GIF</b> below.</li>
-                    <li>Select a GIF image up to 5 MB.</li>
+                    <li>Select a GIF image up to 400 KB.</li>
                     <li>Save your profile to upload and apply it.</li>
                 </ol>
                 <p><b>Current availability:</b> animated profile GIF upload is implemented. Animated server-icon uploads are not connected yet.</p>
@@ -3953,7 +3953,7 @@ document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click"
                     <li>Continue to secure checkout.</li>
                     <li>Complete the purchase.</li>
                     <li>Return to Diamond Lounge and refresh your profile editor.</li>
-                    <li>Choose a GIF image up to 5 MB and save your profile.</li>
+                    <li>Choose a GIF image up to 400 KB and save your profile.</li>
                 </ol>
                 <p><b>Current availability:</b> profile GIF uploads are implemented. Animated server-icon uploads are not connected yet.</p>
             </div>
