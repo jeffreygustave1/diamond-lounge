@@ -77,3 +77,24 @@
   .mobile-sidebar-backdrop {display:block!important;}
   .dashboard.mobile-nav-open .mobile-sidebar-backdrop {visibility:visible!important;opacity:1!important;pointer-events:auto!important;}
 }
+
+/* Mobile correction: keep voice inside the lounge content instead of covering the whole app */
+@media (max-width: 600px) {
+  #loungeView.is-voice-call {
+    position:relative!important; inset:auto!important;
+    width:100%!important; height:100%!important; min-height:0!important;
+    z-index:auto!important; flex:1 1 auto!important;
+    background:#121318!important;
+  }
+  #loungeView.is-voice-call #loungeVoiceCallView:not([hidden]) {
+    flex:1 1 auto!important; min-height:0!important; height:auto!important;
+    padding:10px 10px 120px!important;
+  }
+  #loungeVoiceCallView .created-server-voice-call {
+    min-height:0!important; height:auto!important; justify-content:flex-start!important;
+  }
+  #loungeVoiceCallView .created-server-voice-stage {
+    align-content:start!important; justify-content:start!important;
+  }
+  #voicePanel { bottom:max(8px,var(--dl-mobile-safe-bottom))!important; }
+}
