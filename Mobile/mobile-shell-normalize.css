@@ -95,3 +95,24 @@
  #dmConversationView .dm-message-box,#supportBotView #supportBotForm{position:relative!important;z-index:4!important;}
  #dmConversationView input,#dmConversationView textarea,#supportBotView input,#supportBotView textarea{font-size:16px!important;line-height:1.25!important;}
 }
+
+
+/* Mobile final pass: stable view switching, chat scroll and keyboard-safe message dock */
+@media (max-width: 900px) {
+  #dmHomeView[hidden], #dmConversationView[hidden], #supportBotView[hidden], #serverView[hidden], #loungeView[hidden], #emptyView[hidden] { display:none!important; }
+  #dmHomeView:not([hidden]), #dmConversationView:not([hidden]), #supportBotView:not([hidden]) { display:flex!important; flex-direction:column!important; flex:1 1 0!important; min-width:0!important; min-height:0!important; height:auto!important; }
+  #dmConversationView .dm-messages, #supportBotChat { flex:1 1 0!important; min-height:0!important; overflow-y:auto!important; overflow-x:hidden!important; }
+  #dmMessageForm, #supportBotForm { flex:0 0 auto!important; display:flex!important; align-items:center!important; width:auto!important; min-width:0!important; box-sizing:border-box!important; }
+  #dmMessageForm input, #supportBotForm input { flex:1 1 0!important; width:0!important; min-width:0!important; max-width:100%!important; }
+  #dmStatus, #supportBotView .upload-status { flex:0 0 auto!important; max-width:100%!important; overflow-wrap:anywhere!important; }
+  #supportBotView .support-bot-footer { flex:0 0 auto!important; max-width:100%!important; overflow-wrap:anywhere!important; }
+  #supportBotChoices { flex:0 0 auto!important; max-width:100%!important; overflow-x:auto!important; }
+  #dmConversationView, #supportBotView { overscroll-behavior:contain!important; }
+}
+@media (max-width: 600px) {
+  #dmConversationView .dm-conversation-header, #supportBotView .support-bot-header { min-height:48px!important; height:auto!important; }
+  #dmMessageForm, #supportBotForm { gap:6px!important; margin-left:6px!important; margin-right:6px!important; margin-bottom:max(6px,env(safe-area-inset-bottom))!important; padding:6px!important; }
+  #dmMessageForm button, #supportBotForm button { flex:0 0 auto!important; min-width:40px!important; min-height:40px!important; }
+  #dmMessageForm input, #supportBotForm input { font-size:16px!important; line-height:1.25!important; }
+  #supportBotView .support-bot-footer { padding:6px 8px!important; font-size:11px!important; }
+}
