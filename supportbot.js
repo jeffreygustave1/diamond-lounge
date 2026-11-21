@@ -6,7 +6,7 @@ function diamondSafeError(value){return String(value||'').replace(/https?:\\/\\/
 window.addEventListener('error',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError((e.message||'Script error')+' ('+(e.filename||'')+':'+(e.lineno||0)+')'));});
 window.addEventListener('unhandledrejection',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError('Unhandled promise: '+(e.reason?.message||e.reason||'unknown')));});
 const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
-const DIAMOND_REPAIR_BRIDGE_ENDPOINT = "https://YOUR-REPAIR-BRIDGE-WORKER.workers.dev";
+const DIAMOND_REPAIR_BRIDGE_ENDPOINT = "https://diamond-support-github-bridge.jeffreygustave1.workers.dev";
 const DIAMOND_REPAIR_PATHS = new Set(["dashboard.html","supportbot.js","supportbot.css","style.css","dm.css","voice.js","watch.js","server.js","channels.js","dm.js","profile.js","calls.js","activities.js","README.md" ]);
 import { auth } from "./firebase.js";
 const DIAMOND_SUPPORT_SYSTEM = `You are Diamond Support, the helpful technical support assistant for DIAMOND LOUNGE, a Discord-like community web app.
