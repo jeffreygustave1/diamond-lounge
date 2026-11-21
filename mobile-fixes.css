@@ -44,3 +44,18 @@ body:has(#loungeView.is-voice-call) .chat-area{position:fixed!important;inset:0!
 #voicePanel #leaveVoiceButton{grid-column:1/-1!important}
 }
 @media(max-width:600px){#loungeVoiceCallView .created-server-voice-stage{grid-template-columns:minmax(0,1fr)!important;align-content:start!important}#loungeVoiceCallView .created-server-voice-tile{min-height:180px!important}}
+
+/* Mobile voice recovery: keep navigation and room header visible, avoid opaque blackout */
+@media(max-width:900px){
+#loungeView.is-voice-call{z-index:1!important;background:#141419!important}
+#loungeView.is-voice-call .chat-header{display:flex!important;position:relative!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+#loungeView.is-voice-call .mobile-menu-button{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:13000!important}
+#loungeView.is-voice-call #loungeVoiceCallView{background:transparent!important;visibility:visible!important;opacity:1!important}
+#loungeVoiceCallView .created-server-voice-call-status{color:#d8d8de!important}
+#mobileSidebar{z-index:14000!important}
+.mobile-sidebar-backdrop{z-index:13999!important}
+.dashboard.mobile-nav-open #mobileSidebar{transform:translateX(0)!important}
+#loungeView.is-voice-call .chat-header .mobile-menu-button{min-width:46px!important;min-height:46px!important;flex-shrink:0!important}
+#mobileSidebar .servers{width:66px!important;flex-basis:66px!important;min-width:66px!important;overflow:visible!important}
+#mobileSidebar .servers>*{visibility:visible!important;opacity:1!important}
+}
