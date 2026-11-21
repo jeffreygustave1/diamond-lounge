@@ -4012,3 +4012,24 @@ button {
 .voice-participant .dl-cosmetic-badge-chip{
   width:16px;height:16px;font-size:9px
 }
+
+
+/* Future customization catalog cards — clearly marked and unavailable until implemented */
+.dl-store-coming-soon{
+    border-color:rgba(199,169,107,.15);
+    background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(199,169,107,.025));
+}
+.dl-store-coming-soon .dl-store-lock{color:#bda77f}
+.dl-store-coming-soon .dl-store-buy:disabled{
+    border-color:rgba(199,169,107,.18);
+    background:rgba(255,255,255,.035);
+    color:#aaa8a2;
+    cursor:not-allowed;
+    opacity:.9;
+}
+.dl-store-coming-soon .dl-store-buy:disabled:hover{background:rgba(255,255,255,.035)}
+.profile-banner-future-art{background:linear-gradient(120deg,#36445a,#1a202d 48%,#6b5747);color:#e8dfd0;font-size:13px}
+.animated-frame-future-art{background:radial-gradient(circle at 50% 50%,#5c7189 0,#263447 36%,#171b25 72%);color:#dceaff;font-size:34px}
+.server-assets-future-art{background:linear-gradient(135deg,#6a5739,#2b2c34 52%,#18202c);color:#f0d6a3;font-size:34px}
+.emoji-future-art{background:linear-gradient(135deg,#394d4a,#252b3b 60%,#48374a);color:#dce8dc;font-size:22px}
+.voice-future-art{background:linear-gradient(135deg,#35435a,#1b202b 55%,#51405a);color:#d9d5f2;font-size:36px}
