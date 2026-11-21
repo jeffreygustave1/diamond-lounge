@@ -26,9 +26,9 @@ export default {
       let searchResults = [];
       let searchQuery = "";
       // Deterministic search intent avoids a fragile extra AI classification call.
-      const needsSearch = /\\b(search (the web|online|for|about)|research|latest|current|today|right now|recent|newest|patch notes|release notes|driver updates|news|price of|available now|schedule|what happened|this week|this month)\\b/i.test(lastUser);
+      const needsSearch = /\b(search (the web|online|for|about)|research|latest|current|today|right now|recent|newest|patch notes|release notes|driver updates|news|price of|available now|schedule|what happened|this week|this month)\b/i.test(lastUser);
       if (needsSearch) {
-        searchQuery = lastUser.trim().replace(/\\s+/g, " ").slice(0, 240);
+        searchQuery = lastUser.trim().replace(/\s+/g, " ").slice(0, 240);
         try { searchResults = await searchWeb(searchQuery); }
         catch (searchError) { console.warn("Search step unavailable:", searchError?.message || searchError); }
       }
@@ -55,14 +55,14 @@ async function searchWeb(query) {
   if (!response.ok) throw new Error("Search provider returned HTTP " + response.status);
   const html = await response.text();
   const results = [];
-  const links = [...html.matchAll(/<a[^>]*class=["']result__a["'][^>]*href=["']([^"']+)["'][^>]*>([\\s\\S]*?)<\\/a>/gi)];
+  const links = [...html.matchAll(/<a[^>]*class=["']result__a["'][^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)];
   for (const match of links.slice(0, 10)) {
     let href = match[1].replace(/&amp;/g, "&");
     try { const u = new URL(href); if (u.hostname.includes("duckduckgo.com") && u.searchParams.has("uddg")) href = u.searchParams.get("uddg"); } catch {}
-    if (!/^https?:\\/\\//i.test(href)) continue;
-    const clean = s => s.replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/&#39;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\\s+/g," ").trim();
+    if (!/^https?:\/\//i.test(href)) continue;
+    const clean = s => s.replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/&#39;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim();
     const nearby = html.slice(match.index, match.index + 2500);
-    const snippetMatch = nearby.match(/class=["']result__snippet["'][^>]*>([\\s\\S]*?)<\\/[^>]+>/i);
+    const snippetMatch = nearby.match(/class=["']result__snippet["'][^>]*>([\s\S]*?)<\/[^>]+>/i);
     results.push({title:clean(match[2]).slice(0,240),url:href,snippet:clean(snippetMatch?.[1] || "").slice(0,700)});
   }
   return results.filter((r,i,a)=>a.findIndex(x=>x.url===r.url)===i).slice(0,6);
