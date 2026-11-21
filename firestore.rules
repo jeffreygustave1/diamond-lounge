@@ -5,6 +5,19 @@ service cloud.firestore {
     function isGuest() { return request.auth != null && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
     function isMemberAccount() { return request.auth != null && !isGuest(); }
 
+    function isValidProfileCosmetics(c) {
+      return c is map
+        && c.keys().hasAll(['aura', 'frame', 'nameplate', 'badges', 'backdrop'])
+        && c.keys().hasOnly(['aura', 'frame', 'nameplate', 'badges', 'backdrop'])
+        && c.aura in ['none', 'moonlight', 'starlight', 'aurora', 'nebula', 'ember', 'frost', 'rose']
+        && c.frame in ['none', 'silver', 'gold', 'diamond', 'aurora', 'obsidian', 'rose', 'celestial', 'sapphire']
+        && c.nameplate in ['classic', 'champagne', 'silverline', 'aurora', 'sapphire', 'rosegold', 'obsidian', 'emerald', 'violet']
+        && c.backdrop in ['midnight', 'aurora', 'sapphire', 'rose', 'emerald', 'sunset', 'violet', 'champagne']
+        && c.badges is list
+        && c.badges.size() <= 3
+        && c.badges.hasOnly(['comet', 'starlight', 'music', 'gamer', 'creator', 'artist', 'explorer', 'builder', 'bookworm', 'bloom', 'frost', 'flame', 'crown', 'moon', 'crystal']);
+    }
+
     match /users/{userId} {
       function hasSilverGifEntitlement() {
         let entitlementPath = /databases/$(database)/documents/premiumEntitlements/$(request.auth.uid);
@@ -43,11 +56,12 @@ service cloud.firestore {
         && request.resource.data.displayName.size() >= 2
         && request.resource.data.displayName.size() <= 30
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'displayName', 'avatar', 'picture', 'badges', 'updatedAt'
+          'displayName', 'avatar', 'picture', 'badges', 'cosmetics', 'updatedAt'
         ])
         && (!('avatar' in request.resource.data) || request.resource.data.avatar is string)
         && (!('picture' in request.resource.data) || (request.resource.data.picture is string && request.resource.data.picture.size() <= 600000))
         && maySaveGifPicture()
+        && (!('cosmetics' in request.resource.data) || isValidProfileCosmetics(request.resource.data.cosmetics))
         && (!('badges' in request.resource.data)
           || (request.resource.data.badges is list && request.resource.data.badges.size() <= 4))
         && (!('updatedAt' in request.resource.data) || request.resource.data.updatedAt == request.time);
@@ -379,7 +393,8 @@ service cloud.firestore {
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() <= 80
         && request.resource.data.sessionId is string
-        && request.resource.data.heartbeatAt is number;
+        && request.resource.data.heartbeatAt is number
+        && (!('cosmetics' in request.resource.data) || isValidProfileCosmetics(request.resource.data.cosmetics));
 
       allow delete: if request.auth != null
         && request.auth.uid == userId;
