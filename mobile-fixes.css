@@ -100,3 +100,12 @@ body:has(#loungeView.is-voice-call) .chat-area{position:fixed!important;inset:0!
   #mobileSidebar .servers { flex-basis:64px!important; width:64px!important; min-width:64px!important; padding-inline:4px!important; }
   #mobileSidebar .server-icon { width:46px!important; min-width:46px!important; height:46px!important; min-height:46px!important; }
 }
+
+
+/* MOBILE FIX — pin the Direct Messages diamond at the top of the rail */
+@media (max-width: 900px) {
+  #mobileSidebar .servers { justify-content:flex-start!important; align-items:center!important; padding-top:max(14px,env(safe-area-inset-top))!important; }
+  #mobileSidebar #dmHomeButton { display:grid!important; visibility:visible!important; opacity:1!important; position:relative!important; inset:auto!important; order:0!important; flex:0 0 46px!important; width:46px!important; min-width:46px!important; height:46px!important; min-height:46px!important; margin:0 auto!important; transform:none!important; overflow:visible!important; }
+  #mobileSidebar #dmHomeButton img { display:block!important; visibility:visible!important; opacity:1!important; width:100%!important; height:100%!important; object-fit:contain!important; }
+  #mobileSidebar .server-divider { display:block!important; flex:0 0 1px!important; width:28px!important; margin:3px auto!important; }
+}
