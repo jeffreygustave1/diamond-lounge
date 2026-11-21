@@ -167,8 +167,8 @@ async function getStarCitizenOfficialEvidence() {
     const html = await response.text();
     if (!html || html.length < 500) throw new Error("Empty or blocked HTML response");
     const plain = html
-      .replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, " ")
-      .replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi, " ")
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
       .replace(/<[^>]+>/g, " ")
       .replace(/&nbsp;|&#160;/gi, " ")
       .replace(/&amp;/gi, "&")
@@ -176,7 +176,7 @@ async function getStarCitizenOfficialEvidence() {
       .replace(/&#0*39;|&#x0*27;/gi, "'")
       .replace(/&lt;/gi, "<")
       .replace(/&gt;/gi, ">")
-      .replace(/\\s+/g, " ")
+      .replace(/\s+/g, " ")
       .trim();
     let snippet = "";
     if (source.kind === "status") {
@@ -186,7 +186,7 @@ async function getStarCitizenOfficialEvidence() {
       const versionAt = plain.toLowerCase().indexOf("star citizen alpha");
       snippet = versionAt >= 0 ? plain.slice(Math.max(0, versionAt - 450), versionAt + 950) : plain.slice(0, 1800);
     } else {
-      const matches = [...plain.matchAll(/Star Citizen Alpha\\s+\\d+\\.\\d+(?:\\.\\d+)?/gi)];
+      const matches = [...plain.matchAll(/Star Citizen Alpha\s+\d+\.\d+(?:\.\d+)?/gi)];
       snippet = matches.slice(0, 7).map(m => plain.slice(Math.max(0, m.index - 60), Math.min(plain.length, m.index + 160))).join(" | ");
       if (!snippet) snippet = plain.slice(0, 1800);
     }
