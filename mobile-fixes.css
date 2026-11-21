@@ -59,3 +59,20 @@ body:has(#loungeView.is-voice-call) .chat-area{position:fixed!important;inset:0!
 #mobileSidebar .servers{width:66px!important;flex-basis:66px!important;min-width:66px!important;overflow:visible!important}
 #mobileSidebar .servers>*{visibility:visible!important;opacity:1!important}
 }
+
+
+/* Mobile voice layout correction: stage visibility, dock placement, rail sizing */
+@media(max-width:900px){
+  .chat-area{position:fixed!important;inset:0!important;z-index:10!important}
+  #loungeView.is-voice-call{display:flex!important;position:absolute!important;inset:0!important;height:100dvh!important;width:100vw!important;overflow:hidden!important;flex-direction:column!important}
+  #loungeView.is-voice-call .chat-header{position:relative!important;flex:0 0 58px!important;width:100%!important;background:#16171b!important}
+  #loungeView.is-voice-call #loungeVoiceCallView{display:flex!important;position:relative!important;flex:1 1 0!important;min-height:0!important;height:auto!important;width:100%!important;overflow-y:auto!important;overflow-x:hidden!important;z-index:1!important}
+  #loungeVoiceCallView .created-server-voice-call{position:relative!important;display:flex!important;min-height:0!important;height:100%!important;flex:1 1 auto!important}
+  #loungeVoiceCallView .created-server-voice-stage{display:grid!important;min-height:120px!important}
+  #loungeVoiceCallView .created-server-voice-remote-media{position:relative!important;display:block!important;width:100%!important;min-height:0!important}
+  #voicePanel{position:fixed!important;left:10px!important;right:10px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;z-index:15000!important}
+  #mobileSidebar{width:min(340px,90vw)!important;max-width:90vw!important;z-index:16000!important}
+  #mobileSidebar .servers{width:76px!important;min-width:76px!important;flex:0 0 76px!important;box-sizing:border-box!important;padding-left:0!important;padding-right:0!important}
+  #mobileSidebar .server-logo,#mobileSidebar .server-icon{width:46px!important;min-width:46px!important;height:46px!important;min-height:46px!important;flex-shrink:0!important}
+  #mobileSidebar .servers{padding-top:max(12px,env(safe-area-inset-top))!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+}
