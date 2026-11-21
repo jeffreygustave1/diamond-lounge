@@ -160,6 +160,20 @@ function parseRepairAnswer(answer){
 function isDiamondLoungeRequest(message){
  return /\b(diamond lounge|website|web site|dashboard|login|log in|account|profile|avatar|messages|direct message|\bdm\b|voice|microphone|camera|screen share|screen sharing|server|channel|firebase|firestore|support bot|supportbot|code|bug|error|crash|repair|audit|worker|app)\b/i.test(String(message||""));
 }
+function getDiamondLiveContext(){
+ let voice={};try{voice=window.diamondVoiceControls?.getState?.()||{};}catch{}
+ const viewIds=["supportBotView","dmHomeView","dmConversationView","serverView","loungeView","emptyView"];
+ const currentView=viewIds.find(id=>{const el=document.getElementById(id);return el&&!el.hidden;})||"unknown";
+ const participantCount=document.getElementById("voiceParticipantCount")?.textContent?.trim()||"";
+ let timeZone="";try{timeZone=Intl.DateTimeFormat().resolvedOptions().timeZone||"";}catch{}
+ return {captured_at:new Date().toISOString(),signed_in:Boolean(auth.currentUser),anonymous_session:Boolean(auth.currentUser?.isAnonymous),
+  current_view:currentView,browser_online:navigator.onLine,time_zone:timeZone,
+  voice:{connected:Boolean(voice.connected),joining:Boolean(voice.joining),muted:Boolean(voice.muted),
+   camera_on:Boolean(voice.cameraOn),screen_sharing:Boolean(voice.screenOn),deafened:Boolean(voice.deafened),
+   raised_hand:Boolean(voice.raisedHand),channel:String(voice.selectedChannel||"").slice(0,100),
+   server:String(voice.serverName||"").slice(0,100),status:String(voice.status||"").slice(0,140),participant_count:participantCount.slice(0,24)},
+  recent_browser_errors:diamondBrowserErrors.slice(-8)};
+}
 function topicButtons(){choices.replaceChildren();topics.forEach(topic=>{const b=document.createElement("button");b.type="button";b.textContent=topic;b.addEventListener("click",()=>send(topic));choices.appendChild(b);});}
 async function send(message){
  const value=(message||"").trim();
@@ -192,7 +206,11 @@ async function send(message){
   const response=await fetch(DIAMOND_AI_ENDPOINT,{
    method:"POST",
    headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({messages:messages.slice(-16)})
+   body:JSON.stringify({
+       messages:messages.slice(-16),
+       app_context:appRequest?getDiamondLiveContext():null,
+       client_time:{captured_at:new Date().toISOString(),time_zone:Intl.DateTimeFormat().resolvedOptions().timeZone||""}
+      })
   });
   let data={};
   try{data=await response.json();}catch(error){}
