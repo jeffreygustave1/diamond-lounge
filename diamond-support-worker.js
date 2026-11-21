@@ -122,7 +122,9 @@ export default {
                 .slice(0, 8);
             }
           } else {
-            searchResults = await searchWeb(searchQuery);\n            if (searchResults.length < 3) {\n              const refinements = buildRefinedQueries(lastUser, searchQuery);\n              const retryResults = await Promise.all(refinements.map(q => searchWeb(q)));\n              searchResults = mergeResearchResults(searchResults, retryResults.flat());\n            } else {\n              searchResults = mergeResearchResults([], searchResults);\n            }
+            searchResults = await searchWeb(searchQuery);
+            if (searchResults.length < 3) {\n              const refinements = buildRefinedQueries(lastUser, searchQuery);\n              const retryResults = await Promise.all(refinements.map(q => searchWeb(q)));\n              searchResults = mergeResearchResults(searchResults, retryResults.flat());\n            } else {\n              searchResults = mergeResearchResults([], searchResults);
+            }
           }
         } catch (searchError) {
           console.warn("Search step unavailable:", searchError?.message || searchError);
@@ -383,7 +385,8 @@ function mergeResearchResults(existing, incoming) {
     } catch { return false; }
   }).slice(0, 12);
 }
-\nfunction isUsefulCitation(result, query) {
+
+function isUsefulCitation(result, query) {
   if (!result || !result.url || !result.title) return false;
   try {
     const u = new URL(result.url);
