@@ -168,7 +168,8 @@ let currentAvatar = "diamond";
 let uploadedPicture = "";
 const DIAMOND_LOUNGE_OWNER_UID = "NlOxj6tdInP9SMKcYIUtz1MeZ2z2";
 function isDiamondLoungeOwner() {
-    return Boolean(currentUser && currentUser.uid === DIAMOND_LOUNGE_OWNER_UID);
+    const uid = auth.currentUser?.uid || currentUser?.uid;
+    return Boolean(uid && uid === DIAMOND_LOUNGE_OWNER_UID);
 }
 function syncCustomizationShopOwnerState() {
     if (!isDiamondLoungeOwner()) return;
@@ -3796,14 +3797,110 @@ function welcome(){if(!currentUser)return;const created=Date.parse(currentUser.m
 window.diamondLoungeStartTour=start;window.diamondLoungeResetTour=()=>localStorage.removeItem(tourKey());setTimeout(welcome,1200);
 })();
 
-// Silver cosmetic checkout (requires the deployed premium Worker URL configured below).
+// Silver cosmetic details first; checkout is an explicit second step for members.
 const PREMIUM_WORKER_URL = "https://diamond-lounge-premium.jeffreygustave1.workers.dev";
-document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click", async (event) => {
-  const button=event.currentTarget; const note=document.getElementById("dlStorePaymentNote");
-  if(!auth.currentUser){if(note)note.textContent="Please sign in before purchasing premium cosmetics.";return;}
-  if(isDiamondLoungeOwner()){if(note)note.textContent="The Silver GIF Pack is already included free with your Diamond Lounge owner account. Use the profile upload control above to add a GIF.";return;}
-  if(PREMIUM_WORKER_URL.includes("YOUR-CLOUDFLARE-SUBDOMAIN")){if(note)note.textContent="Checkout is being prepared. The secure Worker must be deployed and its URL configured first.";return;}
-  button.disabled=true;button.textContent="Opening secure checkout…";
-  try{const token=await auth.currentUser.getIdToken();const response=await fetch(PREMIUM_WORKER_URL+"/checkout/silver-gif-pack",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"}});const data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Checkout could not be started.");window.location.assign(data.url);}
-  catch(error){if(note)note.textContent=error.message||"Unable to start checkout.";button.disabled=false;button.textContent="View Silver";}
+
+async function startSilverGifCheckout(button, note) {
+    if (!auth.currentUser) {
+        if (note) note.textContent = "Please sign in before purchasing premium cosmetics.";
+        return;
+    }
+    if (isDiamondLoungeOwner()) {
+        if (note) note.textContent = "The Silver GIF Pack is already included free with your Diamond Lounge owner account.";
+        return;
+    }
+    if (PREMIUM_WORKER_URL.includes("YOUR-CLOUDFLARE-SUBDOMAIN")) {
+        if (note) note.textContent = "Checkout is being prepared. The secure Worker must be deployed and its URL configured first.";
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Opening secure checkout…";
+    try {
+        const token = await auth.currentUser.getIdToken();
+        const response = await fetch(PREMIUM_WORKER_URL + "/checkout/silver-gif-pack", {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+            }
+        });
+        const data = await response.json();
+        if (!response.ok || !data.url) {
+            throw new Error(data.error || "Checkout could not be started.");
+        }
+        window.location.assign(data.url);
+    } catch (error) {
+        if (note) note.textContent = error.message || "Unable to start checkout.";
+        button.disabled = false;
+        button.textContent = "Continue to checkout";
+    }
+}
+
+document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click", (event) => {
+    const button = event.currentTarget;
+    const note = document.getElementById("dlStorePaymentNote");
+    const details = document.getElementById("dlSilverDetails");
+    if (!details) {
+        if (note) note.textContent = "Silver details are unavailable. Please refresh Diamond Lounge.";
+        return;
+    }
+
+    if (!details.hidden) {
+        details.hidden = true;
+        button.textContent = isDiamondLoungeOwner() ? "Included · Free" : "View Silver";
+        return;
+    }
+
+    const owner = isDiamondLoungeOwner();
+    details.hidden = false;
+
+    if (owner) {
+        details.innerHTML = `
+            <div class="dl-silver-details-heading">
+                <span class="dl-store-lock">✦ DIAMOND LOUNGE OWNER BENEFIT</span>
+                <strong>Silver GIF Pack — Included free</strong>
+                <p>Your owner account has free access. No purchase or checkout is required.</p>
+            </div>
+            <div class="dl-silver-details-copy">
+                <strong>Use your free profile GIF</strong>
+                <ol>
+                    <li>Choose <b>Choose a GIF</b> below.</li>
+                    <li>Select a GIF image up to 5 MB.</li>
+                    <li>Save your profile to upload and apply it.</li>
+                </ol>
+                <p><b>Current availability:</b> animated profile GIF upload is implemented. Animated server-icon uploads are not connected yet.</p>
+            </div>
+            <button type="button" class="dl-silver-action" id="dlSilverChooseGif">Choose a GIF</button>
+        `;
+        details.querySelector("#dlSilverChooseGif")?.addEventListener("click", () => {
+            document.getElementById("profileUploadInput")?.click();
+        });
+        button.textContent = "Hide details";
+        if (note) note.textContent = "Owner access confirmed for this account. The Silver GIF Pack is free.";
+    } else {
+        details.innerHTML = `
+            <div class="dl-silver-details-heading">
+                <span class="dl-store-lock">✦ SILVER EXCLUSIVE</span>
+                <strong>Animated Profile GIF</strong>
+                <p>The Silver pack unlocks the animated profile-picture upload after a verified purchase.</p>
+            </div>
+            <div class="dl-silver-details-copy">
+                <strong>How it works</strong>
+                <ol>
+                    <li>Continue to secure checkout.</li>
+                    <li>Complete the purchase.</li>
+                    <li>Return to Diamond Lounge and refresh your profile editor.</li>
+                    <li>Choose a GIF image up to 5 MB and save your profile.</li>
+                </ol>
+                <p><b>Current availability:</b> profile GIF uploads are implemented. Animated server-icon uploads are not connected yet.</p>
+            </div>
+            <button type="button" class="dl-silver-action" id="dlSilverCheckout">Continue to checkout</button>
+        `;
+        details.querySelector("#dlSilverCheckout")?.addEventListener("click", (checkoutEvent) => {
+            startSilverGifCheckout(checkoutEvent.currentTarget, note);
+        });
+        button.textContent = "Hide details";
+        if (note) note.textContent = "Review the Silver GIF details before choosing whether to purchase.";
+    }
 });
