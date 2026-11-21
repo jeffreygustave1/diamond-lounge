@@ -4161,3 +4161,34 @@ button {
   .voice-controls { gap:5px!important; }
   .voice-control { padding:6px 2px!important; }
 }
+
+
+/* MOBILE APP-LIKE LAYOUT — compact Discord-inspired phone experience */
+@media (max-width:600px) {
+  body { overscroll-behavior:none; }
+  .dashboard { position:fixed!important; inset:0!important; height:100dvh!important; }
+  .chat-area { height:100dvh!important; flex:1 1 auto!important; }
+  .chat-header { min-height:54px!important; padding:8px 10px!important; }
+  .chat-header-main { gap:8px!important; }
+  .mobile-menu-button { min-width:38px!important; min-height:38px!important; border-radius:12px!important; }
+  .channel-title { font-size:15px!important; }
+  .sub-header { font-size:11px!important; }
+  .messages, .dm-messages, .created-server-messages { flex:1 1 auto!important; min-height:0!important; }
+  .message-box, .dm-message-box { flex-shrink:0!important; padding-bottom:max(8px,env(safe-area-inset-bottom))!important; }
+  .mobile-sidebar { padding-top:env(safe-area-inset-top)!important; padding-bottom:env(safe-area-inset-bottom)!important; }
+  .servers { gap:9px!important; }
+  .server-icon { border-radius:13px!important; }
+  .channels { padding:14px 9px!important; }
+  .workspace-heading { padding-left:8px!important; padding-right:8px!important; }
+  .text-channel, .voice-channel { min-height:42px!important; font-size:14px!important; }
+  .voice-panel { border-radius:12px!important; }
+  .voice-control { min-height:44px!important; }
+  .created-server-workspace { height:100dvh!important; }
+  .created-server-chat { min-height:0!important; }
+  .created-server-chat-header { min-height:52px!important; }
+  .created-server-voice-stage { min-height:0!important; }
+  .created-server-voice-tile { min-height:135px!important; }
+  .created-server-feature-modal, .server-modal { max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)!important; overflow-y:auto!important; }
+  /* Avoid browser text autosizing that can distort the mobile viewport. */
+  html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+}
