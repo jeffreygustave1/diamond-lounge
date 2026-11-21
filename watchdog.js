@@ -38,7 +38,7 @@
   function installUI(){
     badge=document.createElement("button");badge.type="button";badge.setAttribute("aria-label","Open Diamond Watchdog diagnostics");
     badge.style.cssText="z-index:20;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;gap:0;padding:0;font:11px system-ui;cursor:pointer;white-space:nowrap;flex-shrink:0";
-    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:30px;height:75px;object-fit:cover;flex-shrink:0";
+    const gem=document.createElement("img");gem.src="../diamond.gif";gem.alt="";gem.style.cssText="width:30px;height:75px;object-fit:cover;flex-shrink:0";
     const label=document.createElement("span");label.textContent="DIAMOND WATCHDOG";label.style.cssText="letter-spacing:.4px";
     count=document.createElement("span");count.style.cssText="opacity:.75;font-size:10px;margin-left:8px";
     badge.append(gem,label,count);badge.addEventListener("click",openPanel);
