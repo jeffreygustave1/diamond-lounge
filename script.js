@@ -4303,3 +4303,22 @@ document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click"
         if (note) note.textContent = "Review the Silver GIF details before choosing whether to purchase.";
     }
 });
+
+
+/* Mobile long-press channel/category context actions */
+(function(){
+ let timer=null,target=null,menu=null,holdPoint=null,held=false;
+ function dismiss(){menu?.remove();menu=null;held=false;}
+ function canManage(){return Boolean(currentServerCanManageChannels||activeCreatedServerOwnerUid===currentUser?.uid);}
+ function show(e,node){if(!canManage())return;dismiss();held=true;const type=node.classList.contains('created-server-category-heading')?'category':node.dataset.channelType;const id=node.dataset.channelId;const ch=createdServerChannels.find(x=>x.id===id);const cat=type==='category'?createdServerChannels.find(x=>x.id===node.dataset.categoryId||x.name===node.querySelector('span')?.textContent):null;
+ menu=document.createElement('div');menu.className='dl-mobile-channel-menu';menu.style.left=Math.min(holdPoint.x,innerWidth-220)+'px';menu.style.top=Math.min(holdPoint.y,innerHeight-280)+'px';
+ const add=(label,fn,danger=false)=>{const b=document.createElement('button');b.type='button';b.textContent=label;if(danger)b.classList.add('danger');b.onclick=()=>{dismiss();fn();};menu.append(b);};
+ if(ch){add('Edit Channel',()=>{const name=prompt('Channel name:',ch.name);if(!name?.trim())return;void updateDoc(doc(db,'servers',activeCreatedServerId,'channels',ch.id),{name:name.trim(),nameLower:normalizeServerName(name.trim())}).then(()=>{ch.name=name.trim();renderCreatedServerChannels();});});add('Copy Channel Link',()=>{const u=new URL(location.href);u.searchParams.set('server',activeCreatedServerId);u.searchParams.set('channel',ch.id);void navigator.clipboard?.writeText(u.href);});add('Delete Channel',()=>void deleteCreatedServerChannel(ch),true);}
+ else if(cat){add('Create Text Channel',()=>void createCreatedServerChannel('text',cat.id));add('Create Voice Channel',()=>void createCreatedServerChannel('voice',cat.id));add('Edit Category',()=>{const name=prompt('Category name:',cat.name);if(!name?.trim())return;void updateDoc(doc(db,'servers',activeCreatedServerId,'channels',cat.id),{name:name.trim(),nameLower:normalizeServerName(name.trim())}).then(()=>{cat.name=name.trim();renderCreatedServerChannels();});});add('Delete Category',()=>void deleteCreatedServerChannel(cat),true);}
+ document.body.append(menu);menu.addEventListener('pointerdown',e=>e.stopPropagation());setTimeout(()=>document.addEventListener('pointerdown',outside,{once:true}),0);
+ }
+ function outside(e){if(menu&&!menu.contains(e.target))dismiss();}
+ document.addEventListener('pointerdown',e=>{const node=e.target.closest('.created-server-channel-item,.created-server-category-heading');if(!node||!canManage())return;target=node;holdPoint={x:e.clientX,y:e.clientY};held=false;timer=setTimeout(()=>show(e,node),550);},{passive:true});
+ document.addEventListener('pointerup',()=>{clearTimeout(timer);target=null;});document.addEventListener('pointercancel',()=>clearTimeout(timer));document.addEventListener('pointermove',e=>{if(timer&&holdPoint&&Math.hypot(e.clientX-holdPoint.x,e.clientY-holdPoint.y)>12)clearTimeout(timer);},{passive:true});
+ document.addEventListener('click',e=>{if(held){e.preventDefault();e.stopPropagation();held=false;}},{capture:true});
+})();
