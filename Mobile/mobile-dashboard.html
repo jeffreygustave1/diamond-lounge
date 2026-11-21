@@ -1162,5 +1162,17 @@
             }
         })();
     </script>
+
+<!-- TEMP MOBILE DIAGNOSTICS -->
+<style>
+#dlDiagBtn{position:fixed!important;right:12px!important;top:12px!important;z-index:2147483647!important;background:#192c49!important;color:white!important;border:1px solid #6ca9ff!important;border-radius:12px!important;padding:10px 13px!important;font:14px system-ui!important;box-shadow:0 4px 20px #0008!important}
+#dlDiagPanel{position:fixed!important;inset:58px 8px 8px!important;z-index:2147483646!important;background:#101114!important;color:#e8e8ee!important;border:1px solid #6688bb!important;border-radius:14px!important;padding:12px!important;overflow:auto!important;font:12px/1.5 monospace!important;white-space:pre-wrap!important;display:none!important}
+#dlDiagPanel.open{display:block!important}#dlDiagPanel button{background:#263b58!important;color:white!important;padding:8px!important;border-radius:8px!important;margin:3px!important}
+</style>
+<button id="dlDiagBtn">DIAG</button><section id="dlDiagPanel"><button id="dlDiagCopy">COPY REPORT</button><button id="dlDiagRefresh">REFRESH</button><button id="dlDiagClose">CLOSE</button><pre id="dlDiagText"></pre></section>
+<script>
+(()=>{const errs=[];window.addEventListener('error',e=>errs.push('ERROR: '+(e.message||e.type)+' '+(e.filename||'')+':'+(e.lineno||'')));window.addEventListener('unhandledrejection',e=>errs.push('PROMISE: '+String(e.reason)));const ids=['.dashboard','.chat-area','#mobileSidebar','#channelsSidebar','#dmSidebar','#supportBotOpen','#dmMemberList','#loungeView','#dmHomeView','#dmConversationView','#supportBotView','.mobile-menu-button'];function report(){let s=['DIAMOND LOUNGE MOBILE DIAGNOSTICS','Time: '+new Date().toISOString(),'Viewport: '+innerWidth+'x'+innerHeight,'Screen: '+screen.width+'x'+screen.height,'DPR: '+devicePixelRatio,'URL: '+location.href,''];ids.forEach(sel=>{document.querySelectorAll(sel).forEach((el,i)=>{const r=el.getBoundingClientRect(),c=getComputedStyle(el);s.push(sel+(i?' #'+i:'')+' '+(el.id?'id='+el.id:''),' rect='+JSON.stringify({x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}),' display='+c.display+' position='+c.position+' transform='+c.transform+' zoom='+c.zoom+' overflow='+c.overflow+' hidden='+el.hidden);});});s.push('','Broken images:');document.images.forEach(im=>{if(!im.complete||im.naturalWidth===0)s.push(im.src+' (broken/unloaded)')});s.push('','Captured errors:',...(errs.length?errs:['none captured']),'','Recent resource failures (if available):');performance.getEntriesByType('resource').slice(-100).filter(x=>x.transferSize===0&&x.duration>0).forEach(x=>s.push(x.name));return s.join('\n')}const btn=document.getElementById('dlDiagBtn'),panel=document.getElementById('dlDiagPanel'),pre=document.getElementById('dlDiagText');btn.onclick=()=>{panel.classList.toggle('open');pre.textContent=report()};document.getElementById('dlDiagRefresh').onclick=()=>pre.textContent=report();document.getElementById('dlDiagClose').onclick=()=>panel.classList.remove('open');document.getElementById('dlDiagCopy').onclick=async()=>{try{await navigator.clipboard.writeText(report());document.getElementById('dlDiagCopy').textContent='COPIED!'}catch(e){pre.textContent=report()+'\n\nClipboard blocked: select and copy this report manually.'}};})();
+</script>
+
 </body>
 </html>
