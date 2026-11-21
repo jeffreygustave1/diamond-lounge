@@ -72,3 +72,11 @@ body.dm-mode #supportBotView #supportBotForm{display:flex!important;visibility:v
 body.dm-mode #supportBotView #supportBotInput{display:block!important;visibility:visible!important;opacity:1!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;height:42px!important;box-sizing:border-box!important;pointer-events:auto!important;}
 body.dm-mode #supportBotView #supportBotSend{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;align-items:center!important;justify-content:center!important;}
 body.dm-mode #supportBotView #supportBotChoices{display:flex!important;visibility:visible!important;flex:0 0 auto!important;}
+
+/* Live-search citations */
+.support-bot-message-stack{display:flex;flex-direction:column;gap:6px;max-width:90%;min-width:0}
+.support-bot-message-stack .support-bot-message{max-width:100%}
+.support-bot-sources{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:10px;color:#aebbd8;padding:2px 3px}
+.support-bot-sources span{font-weight:700;letter-spacing:.4px;color:#8eabf6}
+.support-bot-sources a{color:#a9c6ff;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.support-bot-sources a:hover{color:#e4efff}
