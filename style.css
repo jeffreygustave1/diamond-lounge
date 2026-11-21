@@ -2513,11 +2513,11 @@ button {
 .created-server-category-heading{display:flex;align-items:center;justify-content:space-between;margin:13px 8px 4px;color:#949ba4;font-size:11px;font-weight:700;letter-spacing:.03em;list-style:none}.created-server-category-heading button{border:0;background:transparent;color:#949ba4;cursor:pointer}
 
 /* Voice channel row action icons: Discord-style, hover reveal */
-#createdServerVoiceChannels .created-server-channel-item{position:relative;display:flex;align-items:center;min-height:32px;padding:0 4px;border-radius:5px;overflow:visible}
+#createdServerTextChannels .created-server-channel-item[data-channel-type=voice]{position:relative;display:flex;align-items:center;min-height:32px;padding:0 4px;border-radius:5px;overflow:visible}
 #createdServerVoiceChannels .created-server-channel-button{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden}
 #createdServerVoiceChannels .created-server-channel-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .created-server-voice-row-actions{display:flex;align-items:center;gap:3px;opacity:0;visibility:hidden;position:absolute;right:7px;top:50%;transform:translateY(-50%);z-index:2}
-#createdServerVoiceChannels .created-server-channel-item:hover .created-server-voice-row-actions,#createdServerVoiceChannels .created-server-channel-item.selected .created-server-voice-row-actions,#createdServerVoiceChannels .created-server-channel-item:focus-within .created-server-voice-row-actions{opacity:1;visibility:visible}
+#createdServerTextChannels .created-server-channel-item[data-channel-type=voice]:hover .created-server-voice-row-actions,#createdServerTextChannels .created-server-channel-item[data-channel-type=voice].selected .created-server-voice-row-actions,#createdServerTextChannels .created-server-channel-item[data-channel-type=voice]:focus-within .created-server-voice-row-actions{opacity:1;visibility:visible}
 .created-server-voice-row-actions button{width:25px;height:25px;display:grid;place-items:center;padding:3px;border:0;border-radius:4px;background:transparent;color:#b5bac1;cursor:pointer}
 .created-server-voice-row-actions button:hover{background:#41434a;color:#fff}
 .created-server-voice-row-actions svg{width:17px;height:17px;fill:currentColor}
@@ -2525,7 +2525,7 @@ button {
 .created-server-voice-row-actions button[aria-label="Open voice channel chat"] svg path{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round}
 .created-server-voice-row-actions button[aria-label="Invite to channel"] svg path{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .created-server-voice-row-actions button[aria-label="Voice channel settings"] svg path{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-#createdServerVoiceChannels .created-server-channel-item:hover .created-server-channel-button,#createdServerVoiceChannels .created-server-channel-item.selected .created-server-channel-button{padding-right:82px!important}
+#createdServerTextChannels .created-server-channel-item[data-channel-type=voice]:hover .created-server-channel-button,#createdServerTextChannels .created-server-channel-item[data-channel-type=voice].selected .created-server-channel-button{padding-right:82px!important}
 .created-server-voice-chat-content{min-height:350px}
 .created-server-voice-chat-log{max-height:55dvh;min-height:200px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:8px;background:#232428;border-radius:8px}
 .created-server-voice-chat-message{display:flex;flex-direction:column;gap:3px;color:#dbdee1;overflow-wrap:anywhere}
@@ -2533,7 +2533,7 @@ button {
 .created-server-voice-chat-form{display:flex;gap:8px}
 .created-server-voice-chat-form input{flex:1;min-width:0}
 .created-server-voice-chat-form button{align-self:stretch}
-@media(max-width:600px){.created-server-voice-row-actions{opacity:1;visibility:visible;right:3px}#createdServerVoiceChannels .created-server-channel-item .created-server-channel-button{padding-right:82px!important}}
+@media(max-width:600px){.created-server-voice-row-actions{opacity:1;visibility:visible;right:3px}#createdServerTextChannels .created-server-channel-item[data-channel-type=voice] .created-server-channel-button{padding-right:82px!important}}
 
 /* Created server voice workspace refinements */
 .created-server-voice-stage{width:100%;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));}
@@ -3861,3 +3861,19 @@ button {
 .dl-silver-action{width:100%;margin-top:12px;padding:10px 14px;border:1px solid rgba(199,169,107,.55);border-radius:9px;background:linear-gradient(135deg,rgba(199,169,107,.2),rgba(199,169,107,.07));color:#f0dfbd;font-weight:750;cursor:pointer}
 .dl-silver-action:hover{background:rgba(199,169,107,.25)}
 @media(max-width:560px){.dl-silver-details{padding:12px}.dl-silver-details-heading strong{font-size:14px}}
+
+
+/* Unified text + voice channel tree with category-level create actions */
+.created-server-channel-heading-unified{align-items:center}
+.created-server-channel-add-actions{display:flex;align-items:center;gap:4px}
+.created-server-channel-add-actions button{min-width:34px;font-size:13px!important;font-weight:800}
+.created-server-channel-tree ul{margin:2px 6px 8px!important;padding:0;list-style:none}
+.created-server-category-heading{gap:5px}
+.created-server-category-actions{display:flex;align-items:center;gap:2px;margin-left:auto}
+.created-server-category-add{width:24px;height:24px;border:0;border-radius:4px;background:transparent;color:#b5bac1;font-size:19px;line-height:1;cursor:pointer}
+.created-server-category-add:hover{background:#404249;color:#f2f3f5}
+.created-server-category-heading .created-server-channel-delete{width:24px!important;min-width:24px!important;height:24px!important}
+@media(max-width:600px){
+  .created-server-channel-add-actions button{min-width:30px}
+  .created-server-category-add{width:28px;height:28px}
+}
