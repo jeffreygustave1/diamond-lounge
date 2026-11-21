@@ -144,6 +144,6 @@
 /* Mobile scale calibration: emulate three browser zoom-out steps at native zoom.
    Scoped to phones only; CSS zoom preserves the expanded layout viewport. */
 @media (max-width:600px){
- html { zoom: .75!important; width:133.3333%!important; height:133.3333%!important; }
+ html { zoom: .75!important; }
  body { width:100%!important; min-width:0!important; }
 }
