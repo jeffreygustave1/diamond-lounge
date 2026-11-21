@@ -5,24 +5,20 @@ const JWKS = createRemoteJWKSet(
   new URL("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com")
 );
 
-const FALLBACK_STUN = [
-  { urls: "stun:stun.l.google.com:19302" },
-  { urls: "stun:stun1.l.google.com:19302" },
-  { urls: "stun:stun2.l.google.com:19302" }
-];
-
-export async function onRequestPost(context) {
-  const { request, env } = context;
-  if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+export async function onRequestPost({ request, env }) {
+  if (!env.METERED_SECRET_KEY) {
+    return new Response("Service unavailable", { status: 503 });
+  }
 
   const header = request.headers.get("Authorization") || "";
-  if (!header.startsWith("Bearer ") || !env.METERED_SECRET_KEY) {
+  if (!header.startsWith("Bearer ")) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   try {
     const token = header.slice(7).trim();
     if (!token) return new Response("Unauthorized", { status: 401 });
+
     const { payload } = await jwtVerify(token, JWKS, {
       issuer: `https://securetoken.google.com/${PROJECT_ID}`,
       audience: PROJECT_ID
@@ -31,30 +27,21 @@ export async function onRequestPost(context) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    // Create a time-limited credential. 24 hours allows propagation and long calls.
-    const createResponse = await fetch(
-      "https://diamondlounge.metered.live/api/v1/turn/credential?secretKey=" + encodeURIComponent(env.METERED_SECRET_KEY),
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ expiryInSeconds: 86400, label: "diamond-lounge-session" })
-      }
+    // The Metered API key is a server-only Cloudflare secret.
+    const response = await fetch(
+      "https://diamondlounge.metered.live/api/v1/turn/credentials?apiKey=" +
+        encodeURIComponent(env.METERED_SECRET_KEY)
     );
-    if (!createResponse.ok) {
+    if (!response.ok) {
       return new Response("TURN provider unavailable", { status: 502 });
     }
-    const created = await createResponse.json();
-    if (!created?.apiKey) return new Response("Invalid TURN provider response", { status: 502 });
 
-    // Fetch the provider's full ICE list so relay URLs and transports are provider-configured.
-    const iceResponse = await fetch(
-      "https://diamondlounge.metered.live/api/v1/turn/credentials?apiKey=" + encodeURIComponent(created.apiKey)
-    );
-    if (!iceResponse.ok) return new Response("TURN configuration unavailable", { status: 502 });
-    const iceServers = await iceResponse.json();
-    if (!Array.isArray(iceServers) || !iceServers.some((server) => String(server?.urls || "").startsWith("turn"))) {
-      return new Response("Invalid ICE configuration", { status: 502 });
-    }
+    const iceServers = await response.json();
+    const hasTurn = Array.isArray(iceServers) && iceServers.some((server) => {
+      const urls = Array.isArray(server?.urls) ? server.urls : [server?.urls];
+      return urls.some((url) => typeof url === "string" && url.startsWith("turn:") || typeof url === "string" && url.startsWith("turns:"));
+    });
+    if (!hasTurn) return new Response("Invalid ICE configuration", { status: 502 });
 
     return new Response(JSON.stringify({ iceServers }), {
       headers: {
@@ -62,8 +49,7 @@ export async function onRequestPost(context) {
         "Cache-Control": "no-store"
       }
     });
-  } catch (error) {
-    console.error("TURN credential endpoint failed");
+  } catch {
     return new Response("Unauthorized or TURN service unavailable", { status: 401 });
   }
 }
