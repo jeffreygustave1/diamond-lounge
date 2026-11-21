@@ -27,7 +27,7 @@ Website includes profiles, messages/DMs, servers/channels, voice, video, screens
 const view=document.getElementById("supportBotView"),openBtn=document.getElementById("supportBotOpen"),chat=document.getElementById("supportBotChat"),choices=document.getElementById("supportBotChoices"),reset=document.getElementById("supportBotReset"),form=document.getElementById("supportBotForm"),input=document.getElementById("supportBotInput"),sendButton=document.getElementById("supportBotSend");
 const topics=["Account or login","Profile or avatar","Messages and DMs","Voice or microphone","Camera or video","Screen sharing","Servers or channels","Website bugs"];
 let history=[],busy=false,projectSnapshotPromise=null;
-async function getProjectSnapshot(){if(projectSnapshotPromise)return projectSnapshotPromise;projectSnapshotPromise=(async()=>{try{const tr=await fetch('https://api.github.com/repos/jeffreygustave1/diamond-lounge/git/trees/main?recursive=1');if(!tr.ok)return 'Repository context unavailable.';const tree=await tr.json(),targets=['dashboard.html','supportbot.js','supportbot.css','style.css','dm.css','voice.js','watch.js','firebase.js','firestore.rules','server.js','channels.js','dm.js','profile.js','calls.js','activities.js','README.md'];let total=0,parts=[];for(const path of targets){if(!tree.tree?.some(x=>x.path===path&&x.type==='blob'))continue;try{const res=await fetch('https://raw.githubusercontent.com/jeffreygustave1/diamond-lounge/main/'+path);if(!res.ok)continue;const src=(await res.text()).slice(0,7000);if(total+src.length>45000)break;total+=src.length;parts.push('\\n--- '+path+' ---\\n'+src);}catch{}}return parts.length?'Read-only repository source excerpts (possibly truncated):\\n'+parts.join('\\n'):'Could not retrieve project source files.';}catch{return 'Repository context unavailable.';}})();return projectSnapshotPromise;}
+async function getProjectSnapshot(){if(projectSnapshotPromise)return projectSnapshotPromise;projectSnapshotPromise=(async()=>{try{const tr=await fetch('https://api.github.com/repos/jeffreygustave1/diamond-lounge/git/trees/main?recursive=1');if(!tr.ok)return 'Repository context unavailable.';const tree=await tr.json(),targets=['dashboard.html','supportbot.js','supportbot.css','style.css','dm.css','voice.js','watch.js','firebase.js','firestore.rules','server.js','channels.js','dm.js','profile.js','calls.js','activities.js','README.md'];let total=0,parts=[];for(const path of targets){if(!tree.tree?.some(x=>x.path===path&&x.type==='blob'))continue;try{const res=await fetch('https://raw.githubusercontent.com/jeffreygustave1/diamond-lounge/main/'+path);if(!res.ok)continue;const src=(await res.text()).slice(0,2200);if(total+src.length>9000)break;total+=src.length;parts.push('\\n--- '+path+' ---\\n'+src);}catch{}}return parts.length?'Read-only repository source excerpts (possibly truncated):\\n'+parts.join('\\n'):'Could not retrieve project source files.';}catch{return 'Repository context unavailable.';}})();return projectSnapshotPromise;}
 function bubble(text,kind="bot"){const row=document.createElement("div");row.className="support-bot-row "+(kind==="user"?"support-bot-user-row":"support-bot-assistant-row");const b=document.createElement("div");b.className="support-bot-message "+(kind==="user"?"support-bot-user-message":"support-bot-assistant-message");b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;}
 function proposalCard(proposal){
   if(!proposal||proposal.repair!==true||!Array.isArray(proposal.files)||proposal.files.length<1||proposal.files.length>6)return false;
@@ -74,11 +74,9 @@ async function send(message){
   const prefix=DIAMOND_SUPPORT_SYSTEM+"\n\nRecent browser errors (if any): ";
   const errorText=diamondBrowserErrors.length?diamondBrowserErrors.join("\n"):"No captured browser errors.";
   const enriched=prefix+errorText+"\n\n"+snapshot+"\n\nUser question: "+original;
-  const messages=[];
-  for(let i=0;i<history.length;i++){
-   if(i===0)messages.push({role:"user",content:enriched});
-   else messages.push(history[i]);
-  }
+  const messages=[{role:"user",content:enriched}];
+  const recent=history.slice(1).slice(-4);
+  messages.push(...recent);
   const response=await fetch(DIAMOND_AI_ENDPOINT,{
    method:"POST",
    headers:{"Content-Type":"application/json"},
