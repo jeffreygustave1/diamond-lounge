@@ -20,7 +20,7 @@ const watchChatPanel=overlay.querySelector("#dlWatchChat");watchChatPanel.hidden
 const $=selector=>overlay.querySelector(selector.startsWith("#")||selector.startsWith(".")?selector:"#"+selector), close=$(".dl-watch-close"),input=$("dlWatchUrl"),player=$("dlWatchPlayer"),status=$("dlWatchStatus"),messages=$("dlWatchChatMessages");
 const watchTile=document.createElement("article");watchTile.className="created-server-voice-tile dl-watch-voice-tile";watchTile.innerHTML=`<div class="dl-watch-voice-title"><span>▶</span><strong>YouTube Watch</strong><small>Shared voice activity</small></div>`;watchTile.append(player);let voiceStage=window.diamondActiveVoiceStage||document.querySelector(".created-server-voice-stage");
 let user=null,voice={connected:false,roomId:null,selectedChannel:null},currentId=null,currentUrl="",yt=null,apiReady=false,applyingRemote=false,remoteStateUnsub=null,remoteChatUnsub=null,chatRoom=null,sharedStateRef=null,lastStateSignature="",syncTimer=null;
-function show(){overlay.hidden=false;overlay.classList.add("dl-watch-compact-open");buttons.forEach(b=>b.setAttribute("aria-expanded","true"));}function hide(){overlay.hidden=true;overlay.classList.remove("dl-watch-compact-open");buttons.forEach(b=>b.setAttribute("aria-expanded","false"));}
+function show(){overlay.hidden=false;overlay.classList.add("dl-watch-compact-open");buttons.forEach(b=>b.setAttribute("aria-expanded","true"));}function hide(){overlay.hidden=true;overlay.classList.remove("dl-watch-compact-open");buttons.forEach(b=>b.setAttribute("aria-expanded","false"));}function toggleWatchActivities(){if(overlay.hidden)show();else hide();}
 function mountWatchTile(){
  const activeStage=window.diamondActiveVoiceStage||document.querySelector(".created-server-voice-stage")||voiceStage;
  if(activeStage&&voice.connected){
@@ -54,7 +54,7 @@ function toggleWatchChat(){const chat=$("#dlWatchChat"),visible=chat.hidden;chat
 $("dlWatchTheater").addEventListener("click",()=>{const active=overlay.classList.toggle("dl-watch-theater-mode");$("dlWatchTheater").textContent=active?"Exit theater mode":"Theater mode";});
 $("dlWatchReload").addEventListener("click",()=>{if(!currentId){setStatus("Load a video first.");return;}loadLocal(currentId,true,playerTime());publishState("play");});
 $("dlWatchClear").addEventListener("click",async()=>{currentId=null;currentUrl="";yt=null;emptyPlayer();if(sharedStateRef)try{await setDoc(sharedStateRef,{videoId:null,action:"clear",position:0,updatedAt:Date.now(),updatedBy:user.uid});}catch(e){console.error(e);}setStatus("Shared player cleared.");});
-overlay.querySelector(".dl-watch-chat-launch").addEventListener("click",toggleWatchChat);close.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide();});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)hide();});buttons.forEach(b=>b.addEventListener("click",show));
+overlay.querySelector(".dl-watch-chat-launch").addEventListener("click",toggleWatchChat);close.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide();});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)hide();});buttons.forEach(b=>b.addEventListener("click",toggleWatchActivities));
 window.addEventListener("diamond-voice-state",e=>{voice=e.detail||{};attachRoom();});
 onAuthStateChanged(auth,u=>{user=u;if(voice.connected)attachRoom();});
 })();
