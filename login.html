@@ -105,8 +105,15 @@ googleButton.addEventListener("click", async () => {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: "select_account" });
         await setPersistence(auth, browserLocalPersistence);
+        errorMessage.textContent = "Google returned. Checking Firebase session…";
         const result = await signInWithPopup(auth, provider);
+        errorMessage.textContent = "Google account accepted. UID: " + result.user.uid.slice(0,8) + "… Checking session persistence.";
+        const activeUser = auth.currentUser;
+        if (!activeUser || activeUser.uid !== result.user.uid) throw new Error("Popup returned a user, but Firebase currentUser is missing or mismatched.");
+        await activeUser.getIdToken(true);
+        errorMessage.textContent = "Firebase session confirmed. Checking member profile…";
         await ensureProfile(result.user);
+        errorMessage.textContent = "Profile check passed. Opening " + postAuthDestination();
         window.location.assign(postAuthDestination());
     } catch (e) {
         console.error("Google popup sign-in error:", e);
