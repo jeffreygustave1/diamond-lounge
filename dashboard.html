@@ -11,7 +11,7 @@
     <link rel="icon" type="image/gif" href="diamond-animated.svg?v=1">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="style.css?v=57">
+    <link rel="stylesheet" href="style.css?v=58">
     <link rel="stylesheet" href="luxury.css?v=9">
     <link rel="stylesheet" href="branding-polish.css?v=9">
     <link rel="stylesheet" href="dm.css?v=9">
@@ -316,7 +316,10 @@
                         <button type="button" class="created-server-voice-user" id="mainVoiceUserProfile" title="Edit your profile">
                             <span class="created-server-voice-user-avatar" id="mainVoiceUserAvatar">✦</span>
                             <span class="created-server-voice-user-copy">
+                                <span class="dl-voice-name-line">
                                 <span id="mainVoiceUserName">Member</span>
+                                <span class="dl-cosmetic-badge-rail" id="mainVoiceUserCosmeticBadges" aria-label="Selected profile badges"></span>
+                            </span>
                                 <small id="mainVoiceUserSubline">VIP-LOUNGE</small>
                                 <span class="created-server-voice-user-badges" id="mainVoiceUserBadges"></span>
                             </span>
@@ -349,7 +352,10 @@
                         aria-label="Edit your profile">
 
                         <span class="profile-copy">
-                            <span class="profile-name" id="profileName">Member</span>
+                            <span class="profile-name-line">
+                                <span class="profile-name" id="profileName">Member</span>
+                                <span class="dl-cosmetic-badge-rail" id="profileCosmeticBadges" aria-label="Selected profile badges"></span>
+                            </span>
                             <span class="profile-status">Available</span>
                         </span>
 
@@ -556,7 +562,10 @@
                 <button type="button" class="created-server-voice-user" id="createdServerVoiceUserProfile" title="Edit your profile">
                     <span class="created-server-voice-user-avatar" id="createdServerVoiceUserAvatar">✦</span>
                     <span class="created-server-voice-user-copy">
-                        <span id="createdServerVoiceUserName">Member</span>
+                        <span class="dl-voice-name-line">
+                            <span id="createdServerVoiceUserName">Member</span>
+                            <span class="dl-cosmetic-badge-rail" id="createdServerVoiceUserCosmeticBadges" aria-label="Selected profile badges"></span>
+                        </span>
                         <small id="createdServerVoiceUserSubline">DIAMOND LOUNGE</small>
                         <span class="created-server-voice-user-badges" id="createdServerVoiceUserBadges"></span>
                     </span>
@@ -860,16 +869,62 @@
             </div>
 
 
-            <section class="dl-customization-store" aria-label="Premium customization shop">
-                <div class="dl-store-heading"><span class="eyebrow">DIAMOND EXCLUSIVES</span><h3>Customization Shop</h3><p>Explore profile and server cosmetics. Availability and unlock status are shown on each item.</p></div>
+            <section class="dl-customization-store" aria-label="Customization shop">
+                <div class="dl-store-heading">
+                    <span class="eyebrow">DIAMOND EXCLUSIVES</span>
+                    <h3>Customization Shop</h3>
+                    <p>Build a signature look. The launch styling collection is free for every member, with animated profile GIFs as a separate Silver exclusive.</p>
+                </div>
                 <div class="dl-store-grid">
-                    <article class="dl-store-item silver"><div class="dl-store-art gif-art">GIF</div><div><span class="dl-store-lock">✦ SILVER EXCLUSIVE</span><h4>Animated Profile & Server Images</h4><p>Animated profile GIFs. Animated server-icon uploads are planned for a later update.</p></div><button type="button" class="dl-store-buy" data-cosmetic="silver-gif">View Silver</button><section class="dl-silver-details" id="dlSilverDetails" hidden aria-live="polite"></section></article>
-                    <article class="dl-store-item"><div class="dl-store-art aura-art">✧</div><div><span class="dl-store-lock">✦ PREMIUM</span><h4>Profile Aura</h4><p>Elegant animated or static halos around your profile portrait.</p></div><button type="button" class="dl-store-buy" data-cosmetic="profile-aura">Locked</button></article>
-                    <article class="dl-store-item"><div class="dl-store-art frame-art">◇</div><div><span class="dl-store-lock">✦ PREMIUM</span><h4>Luxury Avatar Frames</h4><p>Gold, diamond, aurora, onyx and celestial portrait frames.</p></div><button type="button" class="dl-store-buy" data-cosmetic="avatar-frames">Locked</button></article>
-                    <article class="dl-store-item"><div class="dl-store-art name-art">NAME</div><div><span class="dl-store-lock">✦ PREMIUM</span><h4>Nameplate Styles</h4><p>Metallic gradients, glow accents and signature typography.</p></div><button type="button" class="dl-store-buy" data-cosmetic="nameplates">Locked</button></article>
-                    <article class="dl-store-item"><div class="dl-store-art badge-art">✦</div><div><span class="dl-store-lock">✦ PREMIUM</span><h4>Exclusive Profile Badges</h4><p>Display collectible badges that are exclusive to paid cosmetics.</p></div><button type="button" class="dl-store-buy" data-cosmetic="badges">Locked</button></article>
-                    <article class="dl-store-item"><div class="dl-store-art banner-art">DL</div><div><span class="dl-store-lock">✦ PREMIUM</span><h4>Server Banner & Themes</h4><p>Custom server banners, accent colors and premium lounge themes.</p></div><button type="button" class="dl-store-buy" data-cosmetic="server-themes">Locked</button></article>
-                </div><p class="dl-store-payment-note" id="dlStorePaymentNote" role="status">Purchases are not yet enabled. These items remain locked until secure payment and entitlement verification are connected.</p>
+                    <article class="dl-store-item silver">
+                        <div class="dl-store-art gif-art">GIF</div>
+                        <div>
+                            <span class="dl-store-lock">✦ SILVER EXCLUSIVE</span>
+                            <h4>Animated Profile GIF</h4>
+                            <p>Use a small animated GIF as your profile picture. Upload limit: 400 KB.</p>
+                        </div>
+                        <button type="button" class="dl-store-buy" data-cosmetic="silver-gif">View Silver</button>
+                        <section class="dl-silver-details" id="dlSilverDetails" hidden aria-live="polite"></section>
+                    </article>
+
+                    <article class="dl-store-item">
+                        <div class="dl-store-art aura-art">✧</div>
+                        <div><span class="dl-store-lock">✦ FREE COLLECTION</span><h4>Profile Auras</h4><p>Soft halos and colorful energy glows that sit around the edge of your avatar.</p></div>
+                        <div class="dl-cosmetic-options" id="dlAuraOptions" aria-label="Choose a profile aura"></div>
+                    </article>
+
+                    <article class="dl-store-item">
+                        <div class="dl-store-art frame-art">◇</div>
+                        <div><span class="dl-store-lock">✦ FREE COLLECTION</span><h4>Luxury Avatar Frames</h4><p>Clean metallic, crystal and celestial outlines. Frames stay around the edge and never cover your picture.</p></div>
+                        <div class="dl-cosmetic-options" id="dlFrameOptions" aria-label="Choose an avatar frame"></div>
+                    </article>
+
+                    <article class="dl-store-item">
+                        <div class="dl-store-art name-art">NAME</div>
+                        <div><span class="dl-store-lock">✦ FREE COLLECTION</span><h4>Nameplate Styles</h4><p>Give your display name a subtle finish, from champagne gold to aurora and sapphire.</p></div>
+                        <div class="dl-cosmetic-options" id="dlNameplateOptions" aria-label="Choose a nameplate style"></div>
+                    </article>
+
+                    <article class="dl-store-item">
+                        <div class="dl-store-art badge-art">✦</div>
+                        <div><span class="dl-store-lock">✦ COLLECT & DISPLAY</span><h4>Profile Badge Collection</h4><p>Choose up to three small collectible icons. They appear beside your name, never on top of your avatar. These are decorative badges, not verification or staff roles.</p></div>
+                        <div class="dl-cosmetic-options" id="dlProfileBadgeOptions" aria-label="Choose up to three profile badges"></div>
+                    </article>
+
+                    <article class="dl-store-item">
+                        <div class="dl-store-art banner-art">DL</div>
+                        <div><span class="dl-store-lock">✦ FREE COLLECTION</span><h4>Profile Backdrops</h4><p>Choose a richer background for your profile card and voice dock.</p></div>
+                        <div class="dl-cosmetic-options" id="dlBackdropOptions" aria-label="Choose a profile backdrop"></div>
+                    </article>
+
+                    <article class="dl-store-item dl-server-theme-item">
+                        <div class="dl-store-art server-theme-art">◈</div>
+                        <div><span class="dl-store-lock">✦ SERVER OWNER CUSTOMIZATION</span><h4>Server Themes & Banners</h4><p>Give a server you own its own color identity. Theme changes are shared with everyone in that server.</p></div>
+                        <div class="dl-cosmetic-options" id="dlServerThemeOptions" aria-label="Choose a server theme"></div>
+                        <p class="dl-server-theme-status" id="dlServerThemeStatus" role="status">Open a server you own to customize its shared theme.</p>
+                    </article>
+                </div>
+                <p class="dl-store-payment-note" id="dlStorePaymentNote" role="status">Choose your favorite styles. Your preview updates immediately; click Save profile to keep your selections.</p>
             </section>
             <form id="profileForm">
 
@@ -924,11 +979,11 @@
     
 
     <!-- APPLICATION SCRIPTS: load each application module once -->
-    <script type="module" src="script.js?v=77"></script>
+    <script type="module" src="script.js?v=78"></script>
 <script type="module" src="watch-feature.js?v=19"></script>
     <script type="module" src="supportbot.js?v=13"></script>
 <script type="module" src="dm-call.js?v=9"></script>
-<script type="module" src="voice.js?v=48"></script>
+<script type="module" src="voice.js?v=49"></script>
 <script src="watchdog.js?v=8"></script>
 
 
