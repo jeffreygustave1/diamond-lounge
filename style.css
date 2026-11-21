@@ -3839,3 +3839,8 @@ button {
 
 /* Live and Watch Chat controls live in the expandable Watch side panel. */
 .dl-watch-live-chat-control{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:9px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035);}
+
+/* Watch chat is a collapsible control-panel section, never an overlay on the video. */
+.dl-watch-side .dl-watch-chat-glass{position:static!important;inset:auto!important;width:100%!important;max-width:none!important;max-height:260px!important;height:auto!important;overflow:auto!important;margin:10px 0!important;padding:12px!important;background:rgba(16,17,22,.82)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:12px!important;box-sizing:border-box!important;font-size:12px!important;}
+.dl-watch-side .dl-watch-chat-glass[hidden]{display:none!important;}
+.dl-watch-side .dl-watch-chat-form{position:sticky!important;bottom:0!important;}
