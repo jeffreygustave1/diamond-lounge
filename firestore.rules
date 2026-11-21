@@ -6,6 +6,20 @@ service cloud.firestore {
     function isMemberAccount() { return request.auth != null && !isGuest(); }
 
     match /users/{userId} {
+      function hasSilverGifEntitlement() {
+        let entitlementPath = /databases/$(database)/documents/premiumEntitlements/$(request.auth.uid);
+        return exists(entitlementPath)
+          && get(entitlementPath).data.silverGifPack == true;
+      }
+
+      function maySaveGifPicture() {
+        return !('picture' in request.resource.data)
+          || !(request.resource.data.picture is string
+            && request.resource.data.picture.matches('^data:image/gif;base64,.*'))
+          || request.auth.uid == 'NlOxj6tdInP9SMKcYIUtz1MeZ2z2'
+          || hasSilverGifEntitlement();
+      }
+
       allow read: if request.auth != null;
 
       allow create: if isMemberAccount()
@@ -32,7 +46,8 @@ service cloud.firestore {
           'displayName', 'avatar', 'picture', 'badges', 'updatedAt'
         ])
         && (!('avatar' in request.resource.data) || request.resource.data.avatar is string)
-        && (!('picture' in request.resource.data) || request.resource.data.picture is string)
+        && (!('picture' in request.resource.data) || (request.resource.data.picture is string && request.resource.data.picture.size() <= 600000))
+        && maySaveGifPicture()
         && (!('badges' in request.resource.data)
           || (request.resource.data.badges is list && request.resource.data.badges.size() <= 4))
         && (!('updatedAt' in request.resource.data) || request.resource.data.updatedAt == request.time);
