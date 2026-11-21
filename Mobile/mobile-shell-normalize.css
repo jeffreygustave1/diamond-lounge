@@ -137,3 +137,29 @@
   .mobile-sidebar-backdrop{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:opacity .18s ease!important;}
   .dashboard.mobile-nav-open .mobile-sidebar-backdrop{opacity:1!important;visibility:visible!important;pointer-events:auto!important;}
 }
+
+
+/* Mobile drawer and DM-list refinements */
+@media(max-width:900px){
+  #mobileSidebar .channels>section{min-width:0!important;width:100%!important;}
+  #mobileSidebar .text-channels,#mobileSidebar .voice-channel-list,#dmMemberList{list-style:none!important;padding:0!important;margin:6px 0!important;}
+  #mobileSidebar .text-channels li,#mobileSidebar .voice-channel-list li,#dmMemberList li{min-width:0!important;width:100%!important;}
+  #mobileSidebar .text-channel,#mobileSidebar .voice-channel,#dmMemberList button{display:flex!important;align-items:center!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;text-align:left!important;gap:9px!important;border-radius:10px!important;}
+  #dmSidebar .dm-sidebar-heading{padding:4px 2px 10px!important;}
+  #dmSidebar .dm-search-wrap{position:sticky!important;top:0!important;z-index:2!important;padding:4px 0 8px!important;background:inherit!important;}
+  #dmSidebar #memberSearch{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;min-height:42px!important;border-radius:11px!important;font-size:16px!important;}
+  #dmMemberList{display:flex!important;flex-direction:column!important;gap:4px!important;}
+  #dmMemberList button{min-height:48px!important;padding:8px 10px!important;}
+  #dmMemberList img,.dm-member-list img{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:50%!important;object-fit:cover!important;}
+  #dmMemberList .dm-empty{padding:12px!important;text-align:center!important;overflow-wrap:anywhere!important;}
+  #supportBotOpen{min-height:46px!important;border-radius:12px!important;}
+  #mobileSidebar .section-heading{margin:14px 3px 7px!important;}
+  #mobileSidebar .channels{scrollbar-width:thin!important;}
+}
+@media(max-width:600px){
+  #dmSidebar #memberSearch{padding:10px 12px!important;}
+  #dmMemberList button{min-height:50px!important;}
+  #mobileSidebar .text-channel:active,#mobileSidebar .voice-channel:active,#dmMemberList button:active,#supportBotOpen:active{filter:brightness(1.13)!important;}
+  #mobileSidebar .workspace-heading{border-radius:14px!important;}
+  #mobileSidebar .online-label{white-space:normal!important;overflow-wrap:anywhere!important;}
+}
