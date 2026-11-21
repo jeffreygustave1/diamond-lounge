@@ -158,3 +158,14 @@
 
 /* Match DM diamond icon size to the neighboring server icon. */
 @media(max-width:600px){#mobileSidebar #dmHomeButton.server-icon.dm-home{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex-basis:42px!important;padding:0!important;}#mobileSidebar #dmHomeButton.server-icon.dm-home img{width:42px!important;height:42px!important;max-width:42px!important;max-height:42px!important;min-width:42px!important;min-height:42px!important;object-fit:contain!important;}}
+
+/* Mobile context menu + focused voice participant tile */
+@media(max-width:600px){
+ .created-server-channel-delete,.created-server-category-actions{display:none!important;}
+ .dl-mobile-channel-menu{position:fixed!important;z-index:30000!important;width:220px!important;max-width:calc(100vw - 16px)!important;padding:6px!important;display:flex!important;flex-direction:column!important;gap:3px!important;background:#202127!important;border:1px solid rgba(255,255,255,.13)!important;border-radius:14px!important;box-shadow:0 14px 42px rgba(0,0,0,.55)!important;}
+ .dl-mobile-channel-menu button{display:block!important;text-align:left!important;width:100%!important;min-height:44px!important;padding:11px 12px!important;border:0!important;border-radius:9px!important;background:transparent!important;color:#f3f3f5!important;font:inherit!important;}
+ .dl-mobile-channel-menu button:active{background:rgba(255,255,255,.1)!important}.dl-mobile-channel-menu button.danger{color:#ff777d!important;}
+ .created-server-voice-stage{position:relative!important;}
+ .created-server-voice-stage .created-server-voice-tile.dl-voice-expanded{position:fixed!important;inset:0!important;z-index:26000!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;aspect-ratio:auto!important;margin:0!important;border-radius:0!important;display:flex!important;justify-content:center!important;background:#101114!important;}
+ .created-server-voice-stage .created-server-voice-tile.dl-voice-expanded .created-server-voice-avatar{width:min(38vw,180px)!important;height:min(38vw,180px)!important;}
+}
