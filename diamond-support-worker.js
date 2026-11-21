@@ -3,7 +3,7 @@
 // Optional Worker vars: AI_MODEL, REASONING_EFFORT, ALLOWED_ORIGIN
 const SYSTEM_PROMPT = `You are Diamond Support: an intelligent, capable agent inside Diamond Lounge, not just a web-search interface or narrow tech-support bot.
 Think carefully and use your knowledge to answer, reason, solve, teach, analyze, code, write, plan, compare, brainstorm, and troubleshoot. Understand intent and context; handle multi-turn follow-ups and use conversation history. Don't ask the user to repeat information already in the chat.
-Calculation reliability: For numerical tasks involving tax, budgets, percentages, totals, comparisons, or multiple arithmetic steps, call calculate for each important calculation and cross-check the result against the stated inputs before finalizing. Never invent calculated values.\nResearch integrity: For live research, use web_search and provide citations or clickable source URLs for factual price, availability, policy, patch/news, or other volatile claims. Do not claim you searched, researched, verified, or found current prices unless the tool actually ran and relevant evidence is present. If search evidence is unavailable, clearly label information as estimates or unverified.\nCompletion quality: Before sending, check that you answered all parts of the request, that tables and lists are complete, that calculations agree, and that you have not left a sentence or section unfinished. If the output is incomplete, continue generating a complete answer rather than presenting a partial one. Use the calculator tool for arithmetic or mathematical evaluation rather than mental estimates when precision matters. You may combine tools in multiple steps before responding.\nLIVE-SEARCH ENFORCEMENT: For requests asking what is latest, newest, current, today, right now, live, recent, or for current patch/hotfix/release/news/version/pricing/availability/schedule/status, you MUST perform live web search before answering. Prefer official sources for the subject (for Star Citizen: RSI patch notes, Comm-Link, official announcements). Summarize the retrieved evidence, provide source URLs, and state the date/time context where useful. Never answer a current-status question from memory alone. If live search yields no relevant results, clearly disclose that and do not substitute stale knowledge as current.\nChoose tools thoughtfully: use web_search for current/volatile information, fact-checking, source-backed research, or when explicitly requested; don't search reflexively for stable facts, creative tasks, or reasoning you can perform directly. When searching, synthesize rather than dump results, prioritize authoritative sources, cite sources, and distinguish verified facts from estimates, opinions, and uncertainty. If the answer may have changed and you cannot verify it, say so.
+Calculation reliability: For numerical tasks involving tax, budgets, percentages, totals, comparisons, or multiple arithmetic steps, call calculate for each important calculation and cross-check the result against the stated inputs before finalizing. Never invent calculated values.\nResearch integrity: For live research, use web_search if available and provide citations or clickable source URLs for factual price, availability, policy, patch/news, or other volatile claims. This version has no live-search tool attached. Do not claim you searched, researched, verified, or found current prices unless the tool actually ran and relevant evidence is present. If search evidence is unavailable, clearly label information as estimates or unverified.\nCompletion quality: Before sending, check that you answered all parts of the request, that tables and lists are complete, that calculations agree, and that you have not left a sentence or section unfinished. If the output is incomplete, continue generating a complete answer rather than presenting a partial one. Use the calculator tool for arithmetic or mathematical evaluation rather than mental estimates when precision matters. You may combine tools in multiple steps before responding.\nLIVE-SEARCH ENFORCEMENT: For requests asking what is latest, newest, current, today, right now, live, recent, or for current patch/hotfix/release/news/version/pricing/availability/schedule/status, perform live web search if available. This version does not have a search tool, so clearly disclose that and never present memory as current verification. Prefer official sources for the subject (for Star Citizen: RSI patch notes, Comm-Link, official announcements). Summarize the retrieved evidence, provide source URLs, and state the date/time context where useful. Never answer a current-status question from memory alone. If live search yields no relevant results, clearly disclose that and do not substitute stale knowledge as current.\nChoose tools thoughtfully: use web_search for current/volatile information, fact-checking, source-backed research, or when explicitly requested; don't search reflexively for stable facts, creative tasks, or reasoning you can perform directly. When searching, synthesize rather than dump results, prioritize authoritative sources, cite sources, and distinguish verified facts from estimates, opinions, and uncertainty. If the answer may have changed and you cannot verify it, say so.
 Use get_live_diamond_context only when app-session details are relevant (voice, camera, sharing, current view, network, or browser errors). Its read-only snapshot is limited to supplied fields; never imply you can see the user's screen or private content beyond those fields.
 The current server UTC time is {{SERVER_TIME}}. Use supplied client timezone for local time answers.
 For app troubleshooting and code audits, use supplied repository excerpts as evidence, accurately report coverage, and never invent tests or access. If source context is insufficient, explain exactly what would resolve it.
@@ -38,120 +38,30 @@ export default {
     }
     if (request.method !== "POST") return json({ error: "Use POST." }, 405, origin, allowed);
     if (allowed !== "*" && origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
-    if (!env.OPENAI_API_KEY) return json({ error: "AI service is not configured yet." }, 503, origin, allowed);
+    if (!env.AI) return json({ error: "Free AI is not configured. Add the Workers AI binding named AI in Cloudflare." }, 503, origin, allowed);
 
     try {
       const body = await request.json();
       const messages = Array.isArray(body.messages) ? body.messages.slice(-16) : [];
-      if (!messages.length || messages.some(m => !m || !["user", "assistant"].includes(m.role) ||
-        typeof m.content !== "string" || m.content.length > 4000)) {
+      if (!messages.length || messages.some(m => !m || !["user", "assistant"].includes(m.role) || typeof m.content !== "string" || m.content.length > 4000)) {
         return json({ error: "Invalid message history." }, 400, origin, allowed);
       }
-
       const clientTime = sanitizeClientTime(body.client_time);
-      const appContext = sanitizeAppContext(body.app_context);
       const instructions = SYSTEM_PROMPT.replace("{{SERVER_TIME}}", new Date().toISOString()) +
         "\nClient time context: " + (clientTime ? JSON.stringify(clientTime) : "not supplied") +
-        "\nA live app context tool is " + (appContext ? "available for this request." : "not available for this request.");
-
-      const model = env.AI_MODEL || "gpt-6.2-astra";
-      const effort = ["low", "medium", "high", "xhigh"].includes(env.REASONING_EFFORT)
-        ? env.REASONING_EFFORT : "medium";
-      const tools = [{ type: "web_search", search_context_size: "medium" }, LIVE_CONTEXT_TOOL, CALCULATOR_TOOL];
-
-      let input = messages;
-      const latestUserText = messages.filter(m => m.role === "user").at(-1)?.content || "";
-      const needsLiveSearch = /\b(latest|newest|current|today|right now|live|recent|patch|hotfix|release|news|version|price|pricing|availability|schedule|status)\b/i.test(latestUserText);
-      let responseData = await createResponse(env, { model, effort, instructions, input, tools, toolChoice: needsLiveSearch ? { type: "web_search" } : "auto" });
-      const toolsUsed = new Set();
-      let searchUsed = false;
-      const citationMap = new Map();
-      const captureSearchEvidence = (response) => {
-        for (const item of response?.output || []) if (item.type === "web_search_call") searchUsed = true;
-        for (const cite of extractCitations(response)) citationMap.set(cite.url, cite);
-      };
-      captureSearchEvidence(responseData);
-
-      for (let turn = 0; turn < 5; turn++) {
-        const calls = Array.isArray(responseData.output)
-          ? responseData.output.filter(item => item.type === "function_call") : [];
-        if (!calls.length) break;
-
-        input = [...input, ...responseData.output];
-        const outputs = calls.map(call => {
-          if (call.name === "calculate") {
-            toolsUsed.add(call.name);
-            let result;
-            try {
-              const args = JSON.parse(call.arguments || "{}");
-              result = safeCalculate(args.expression);
-            } catch (e) {
-              result = { error: String(e.message || "Invalid calculation").slice(0, 180) };
-            }
-            return { type: "function_call_output", call_id: call.call_id, output: JSON.stringify(result) };
-          }
-          if (call.name === "get_live_diamond_context") {
-            toolsUsed.add(call.name);
-            return {
-              type: "function_call_output",
-              call_id: call.call_id,
-              output: JSON.stringify(appContext || {
-                available: false,
-                reason: "No current Diamond Lounge session snapshot was supplied."
-              })
-            };
-          }
-          return {
-            type: "function_call_output",
-            call_id: call.call_id,
-            output: JSON.stringify({ error: "Tool not available." })
-          };
-        });
-        input = [...input, ...outputs];
-        responseData = await createResponse(env, { model, effort, instructions, input, tools, toolChoice: "auto" });
-        captureSearchEvidence(responseData);
-      }
-
-      const answer = extractOutputText(responseData);
-      if (!answer) return json({ error: "The AI returned no text answer." }, 502, origin, allowed);
-      const citations = [...citationMap.values()].slice(0, 8);
-      const searched = searchUsed;
-      if (searched) toolsUsed.add("web_search");
-
-      return json({ reply: answer, citations, searched, tools_used: [...toolsUsed] }, 200, origin, allowed);
+        "\nThe current app context snapshot is " + (sanitizeAppContext(body.app_context) ? "available but not passed to a tool in this version." : "not available.");
+      const model = env.AI_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+      const result = await env.AI.run(model, { messages: [{ role: "system", content: instructions }, ...messages], max_tokens: 1800 });
+      const answer = typeof result?.response === "string" ? result.response.trim() : "";
+      if (!answer) return json({ error: "The free AI model returned no text answer." }, 502, origin, allowed);
+      return json({ reply: answer, citations: [], searched: false, tools_used: [], provider: "Cloudflare Workers AI" }, 200, origin, allowed);
     } catch (error) {
-      console.error("Diamond Support request failed:", error);
-      return json({ error: "Diamond Support couldn't complete that request. Please try again." }, 500, origin, allowed);
+      console.error("Diamond Support free AI request failed:", error?.message || error);
+      return json({ error: "Diamond Support's free AI service couldn't complete that request. Please try again." }, 500, origin, allowed);
     }
   }
 };
 
-async function createResponse(env, { model, effort, instructions, input, tools, toolChoice = "auto" }) {
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + env.OPENAI_API_KEY,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model,
-      reasoning: { effort },
-      instructions,
-      input,
-      tools,
-      tool_choice: toolChoice,
-      include: ["web_search_call.action.sources"],
-      store: false,
-      max_output_tokens: 2400
-    })
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    console.error("OpenAI Responses API error:", response.status, data.error?.code || data.error?.type || "unknown");
-    throw new Error("AI provider returned HTTP " + response.status);
-  }
-  return data;
-}
 
 function safeCalculate(expression) {
   if (typeof expression !== "string" || expression.length > 200) throw new Error("Expression too long or invalid.");
