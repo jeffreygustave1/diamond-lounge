@@ -3,13 +3,21 @@
 // Optional Worker vars: AI_MODEL, REASONING_EFFORT, ALLOWED_ORIGIN
 const SYSTEM_PROMPT = `You are Diamond Support: an intelligent, capable agent inside Diamond Lounge, not just a web-search interface or narrow tech-support bot.
 Think carefully and use your knowledge to answer, reason, solve, teach, analyze, code, write, plan, compare, brainstorm, and troubleshoot. Understand intent and context; handle multi-turn follow-ups and use conversation history. Don't ask the user to repeat information already in the chat.
-Choose tools thoughtfully: use web_search for current/volatile information, fact-checking, source-backed research, or when explicitly requested; don't search reflexively for stable facts, creative tasks, or reasoning you can perform directly. When searching, synthesize rather than dump results, prioritize authoritative sources, cite sources, and distinguish verified facts from estimates, opinions, and uncertainty. If the answer may have changed and you cannot verify it, say so.
+Use the calculator tool for arithmetic or mathematical evaluation rather than mental estimates when precision matters. You may combine tools in multiple steps before responding.\nChoose tools thoughtfully: use web_search for current/volatile information, fact-checking, source-backed research, or when explicitly requested; don't search reflexively for stable facts, creative tasks, or reasoning you can perform directly. When searching, synthesize rather than dump results, prioritize authoritative sources, cite sources, and distinguish verified facts from estimates, opinions, and uncertainty. If the answer may have changed and you cannot verify it, say so.
 Use get_live_diamond_context only when app-session details are relevant (voice, camera, sharing, current view, network, or browser errors). Its read-only snapshot is limited to supplied fields; never imply you can see the user's screen or private content beyond those fields.
 The current server UTC time is {{SERVER_TIME}}. Use supplied client timezone for local time answers.
 For app troubleshooting and code audits, use supplied repository excerpts as evidence, accurately report coverage, and never invent tests or access. If source context is insufficient, explain exactly what would resolve it.
 Do not request passwords, verification codes, payment details, or private messages. Do not take destructive, account-changing, or external actions without explicit user approval.
 Diamond Lounge has exactly three primary columns: server rail, contextual sidebar, and main chat/content area. Never suggest a fourth column.
 Be resourceful and proactive about useful next steps, while remaining honest about limitations. Be conversational, concise, and clear. Ask at most one focused clarification when necessary.`;
+
+const CALCULATOR_TOOL = {
+  type: "function",
+  name: "calculate",
+  description: "Evaluate a mathematical expression safely. Supports arithmetic, parentheses, powers, constants pi/e, and common functions such as sqrt, abs, sin, cos, tan, log, ln, exp, min, max, round, floor and ceil. Use when calculations materially help.",
+  strict: true,
+  parameters: { type: "object", properties: { expression: { type: "string" } }, required: ["expression"], additionalProperties: false }
+};
 
 const LIVE_CONTEXT_TOOL = {
   type: "function",
@@ -48,19 +56,30 @@ export default {
       const model = env.AI_MODEL || "gpt-6.2-astra";
       const effort = ["low", "medium", "high", "xhigh"].includes(env.REASONING_EFFORT)
         ? env.REASONING_EFFORT : "medium";
-      const tools = [{ type: "web_search", search_context_size: "medium" }, LIVE_CONTEXT_TOOL];
+      const tools = [{ type: "web_search", search_context_size: "medium" }, LIVE_CONTEXT_TOOL, CALCULATOR_TOOL];
 
       let input = messages;
       let responseData = await createResponse(env, { model, effort, instructions, input, tools });
       const toolsUsed = new Set();
 
-      for (let turn = 0; turn < 2; turn++) {
+      for (let turn = 0; turn < 5; turn++) {
         const calls = Array.isArray(responseData.output)
           ? responseData.output.filter(item => item.type === "function_call") : [];
         if (!calls.length) break;
 
         input = [...input, ...responseData.output];
         const outputs = calls.map(call => {
+          if (call.name === "calculate") {
+            toolsUsed.add(call.name);
+            let result;
+            try {
+              const args = JSON.parse(call.arguments || "{}");
+              result = safeCalculate(args.expression);
+            } catch (e) {
+              result = { error: String(e.message || "Invalid calculation").slice(0, 180) };
+            }
+            return { type: "function_call_output", call_id: call.call_id, output: JSON.stringify(result) };
+          }
           if (call.name === "get_live_diamond_context") {
             toolsUsed.add(call.name);
             return {
@@ -122,6 +141,42 @@ async function createResponse(env, { model, effort, instructions, input, tools }
     throw new Error("AI provider returned HTTP " + response.status);
   }
   return data;
+}
+
+function safeCalculate(expression) {
+  if (typeof expression !== "string" || expression.length > 200) throw new Error("Expression too long or invalid.");
+  const s = expression.replace(/\\s+/g, "").toLowerCase();
+  if (!s) throw new Error("Empty expression.");
+  let i = 0;
+  const peek = () => s[i];
+  const eat = ch => { if (s[i] === ch) { i++; return true; } return false; };
+  const number = () => {
+    const start = i; while (/[0-9.]/.test(s[i] || "")) i++;
+    const n = Number(s.slice(start, i)); if (!Number.isFinite(n)) throw new Error("Invalid number."); return n;
+  };
+  const expr = () => add();
+  const add = () => { let v = mul(); while (peek()==="+"||peek()==="-") { const op=s[i++]; const r=mul(); v=op==="+"?v+r:v-r; } return v; };
+  const mul = () => { let v = power(); while (peek()==="*"||peek()==="/"||peek()==="%") { const op=s[i++]; const r=power(); if(op==="/"&&r===0)throw new Error("Division by zero."); v=op==="*"?v*r:op==="/"?v/r:v%r; } return v; };
+  const power = () => { let v=unary(); if(eat("^")) v=Math.pow(v,power()); return v; };
+  const unary = () => { if(eat("+"))return unary(); if(eat("-"))return -unary(); return atom(); };
+  const atom = () => {
+    if(eat("(")){const v=expr();if(!eat(")"))throw new Error("Missing closing parenthesis.");return v;}
+    if(/[0-9.]/.test(peek()||""))return number();
+    if(/[a-z]/.test(peek()||"")){
+      const start=i;while(/[a-z]/.test(s[i]||""))i++;const name=s.slice(start,i);
+      if(name==="pi")return Math.PI;if(name==="e")return Math.E;
+      if(!eat("("))throw new Error("Unknown name: "+name);
+      const args=[];if(peek()!==")"){args.push(expr());while(eat(","))args.push(expr());}if(!eat(")"))throw new Error("Missing function parenthesis.");
+      const fn={sqrt:Math.sqrt,abs:Math.abs,sin:Math.sin,cos:Math.cos,tan:Math.tan,log:Math.log10,ln:Math.log,exp:Math.exp,round:Math.round,floor:Math.floor,ceil:Math.ceil,min:Math.min,max:Math.max};
+      if(!fn[name])throw new Error("Unsupported function: "+name);
+      if(["min","max"].includes(name)){if(args.length<1)throw new Error(name+" needs arguments.");return fn[name](...args);}
+      if(args.length!==1)throw new Error(name+" takes one argument.");return fn[name](args[0]);
+    }
+    throw new Error("Unexpected token.");
+  };
+  const result=expr();if(i!==s.length)throw new Error("Unexpected characters in expression.");
+  if(!Number.isFinite(result))throw new Error("Result is not finite.");
+  return { expression, result };
 }
 
 function extractOutputText(response) {
