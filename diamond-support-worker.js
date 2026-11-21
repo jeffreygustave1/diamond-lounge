@@ -107,12 +107,12 @@ async function searchWeb(query) {
     "Accept-Language": "en-US,en;q=0.9"
   };
   const clean = value => decodeEntities(String(value || "").replace(/<[^>]*>/g, " "))
-    .replace(/\\s+/g, " ").trim();
+    .replace(/\s+/g, " ").trim();
   const decodeEntities = value => value
     .replace(/&amp;/gi, "&").replace(/&quot;/gi, '"')
     .replace(/&#0*39;/gi, "'").replace(/&#x0*27;/gi, "'")
     .replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
-    .replace(/&#(\\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
     .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
 
   const normalizeUrl = (raw, base) => {
@@ -144,13 +144,13 @@ async function searchWeb(query) {
     if (!response.ok) throw new Error("DuckDuckGo HTTP " + response.status);
     const html = await response.text();
     if (!html || html.length < 500) throw new Error("DuckDuckGo returned an empty or blocked page");
-    const anchors = [...html.matchAll(/<a\\b[^>]*>/gi)];
+    const anchors = [...html.matchAll(/<a\b[^>]*>/gi)];
     const results = [];
     for (let i = 0; i < anchors.length && results.length < 8; i++) {
       const tag = anchors[i][0];
-      const classes = (tag.match(/\\bclass\\s*=\\s*["']([^"']*)["']/i) || [])[1] || "";
-      if (!classes.split(/\\s+/).includes("result__a")) continue;
-      const href = (tag.match(/\\bhref\\s*=\\s*["']([^"']+)["']/i) || [])[1] || "";
+      const classes = (tag.match(/\bclass\s*=\s*["']([^"']*)["']/i) || [])[1] || "";
+      if (!classes.split(/\s+/).includes("result__a")) continue;
+      const href = (tag.match(/\bhref\s*=\s*["']([^"']+)["']/i) || [])[1] || "";
       const url = normalizeUrl(href, "https://duckduckgo.com/");
       if (!url) continue;
       const innerStart = anchors[i].index + tag.length;
@@ -159,11 +159,11 @@ async function searchWeb(query) {
       const title = clean(html.slice(innerStart, close));
       if (!title) continue;
       const next = anchors.slice(i + 1).find(a => {
-        const c = ((a[0].match(/\\bclass\\s*=\\s*["']([^"']*)["']/i) || [])[1] || "");
-        return c.split(/\\s+/).includes("result__a");
+        const c = ((a[0].match(/\bclass\s*=\s*["']([^"']*)["']/i) || [])[1] || "");
+        return c.split(/\s+/).includes("result__a");
       });
       const section = html.slice(close, next ? next.index : Math.min(html.length, close + 3500));
-      const snippetMatch = section.match(/class\\s*=\\s*["'][^"']*result__snippet[^"']*["'][^>]*>([\\s\\S]*?)<\\/(?:div|a|span)>/i);
+      const snippetMatch = section.match(/class\s*=\s*["'][^"']*result__snippet[^"']*["'][^>]*>([\s\S]*?)<\/(?:div|a|span)>/i);
       results.push({ title: title.slice(0, 240), url, snippet: clean(snippetMatch?.[1] || ""), provider: "DuckDuckGo" });
     }
     return results;
@@ -175,20 +175,20 @@ async function searchWeb(query) {
     if (!response.ok) throw new Error("Bing HTTP " + response.status);
     const html = await response.text();
     if (!html || html.length < 500) throw new Error("Bing returned an empty or blocked page");
-    const blocks = [...html.matchAll(/<li\\b[^>]*class=["'][^"']*\\bb_algo\\b[^"']*["'][^>]*>([\\s\\S]*?)<\\/li>/gi)];
+    const blocks = [...html.matchAll(/<li\b[^>]*class=["'][^"']*\bb_algo\b[^"']*["'][^>]*>([\s\S]*?)<\/li>/gi)];
     const results = [];
     for (const blockMatch of blocks) {
       if (results.length >= 8) break;
       const block = blockMatch[1];
-      const heading = block.match(/<h2\\b[^>]*>\\s*<a\\b([^>]*)>([\\s\\S]*?)<\\/a>/i);
+      const heading = block.match(/<h2\b[^>]*>\s*<a\b([^>]*)>([\s\S]*?)<\/a>/i);
       if (!heading) continue;
-      const href = (heading[1].match(/\\bhref\\s*=\\s*["']([^"']+)["']/i) || [])[1] || "";
+      const href = (heading[1].match(/\bhref\s*=\s*["']([^"']+)["']/i) || [])[1] || "";
       const resultUrl = normalizeUrl(href, "https://www.bing.com/");
       const title = clean(heading[2]);
       if (!resultUrl || !title) continue;
       const captionAt = block.indexOf("b_caption");
       const caption = captionAt >= 0 ? block.slice(captionAt) : block;
-      const snippetMatch = caption.match(/<p\\b[^>]*>([\\s\\S]*?)<\\/p>/i);
+      const snippetMatch = caption.match(/<p\b[^>]*>([\s\S]*?)<\/p>/i);
       results.push({ title: title.slice(0, 240), url: resultUrl, snippet: clean(snippetMatch?.[1] || ""), provider: "Bing" });
     }
     return results;
