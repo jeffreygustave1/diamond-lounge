@@ -2514,8 +2514,8 @@ button {
 
 /* Voice channel row action icons: Discord-style, hover reveal */
 #createdServerTextChannels .created-server-channel-item[data-channel-type=voice]{position:relative;display:flex;align-items:center;min-height:32px;padding:0 4px;border-radius:5px;overflow:visible}
-#createdServerVoiceChannels .created-server-channel-button{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden}
-#createdServerVoiceChannels .created-server-channel-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#createdServerTextChannels .created-server-channel-item[data-channel-type=voice] .created-server-channel-button{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden}
+#createdServerTextChannels .created-server-channel-item[data-channel-type=voice] .created-server-channel-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .created-server-voice-row-actions{display:flex;align-items:center;gap:3px;opacity:0;visibility:hidden;position:absolute;right:7px;top:50%;transform:translateY(-50%);z-index:2}
 #createdServerTextChannels .created-server-channel-item[data-channel-type=voice]:hover .created-server-voice-row-actions,#createdServerTextChannels .created-server-channel-item[data-channel-type=voice].selected .created-server-voice-row-actions,#createdServerTextChannels .created-server-channel-item[data-channel-type=voice]:focus-within .created-server-voice-row-actions{opacity:1;visibility:visible}
 .created-server-voice-row-actions button{width:25px;height:25px;display:grid;place-items:center;padding:3px;border:0;border-radius:4px;background:transparent;color:#b5bac1;cursor:pointer}
