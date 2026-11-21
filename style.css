@@ -3844,3 +3844,7 @@ button {
 .dl-watch-side .dl-watch-chat-glass{position:static!important;inset:auto!important;width:100%!important;max-width:none!important;max-height:260px!important;height:auto!important;overflow:auto!important;margin:10px 0!important;padding:12px!important;background:rgba(16,17,22,.82)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:12px!important;box-sizing:border-box!important;font-size:12px!important;}
 .dl-watch-side .dl-watch-chat-glass[hidden]{display:none!important;}
 .dl-watch-side .dl-watch-chat-form{position:sticky!important;bottom:0!important;}
+
+/* ENLARGE SHARED YOUTUBE TILE: make Watch video span both stage columns; member cards remain unchanged. */
+.created-server-voice-stage>.dl-watch-voice-tile{grid-column:1/-1!important;width:100%!important;max-width:none!important;justify-self:stretch!important;}
+@media(max-width:600px){.created-server-voice-stage>.dl-watch-voice-tile{grid-column:1!important;}}
