@@ -105,3 +105,38 @@
  #mobileSidebar #dmHomeButton img{width:52px!important;height:52px!important;max-width:52px!important;max-height:52px!important;object-fit:contain!important;}
 }
 @media (max-width:390px){#mobileSidebar .servers>#dmHomeButton.server-icon.dm-home{flex-basis:52px!important;width:52px!important;min-width:52px!important;height:52px!important;min-height:52px!important;}#mobileSidebar #dmHomeButton img{width:50px!important;height:50px!important;max-width:50px!important;max-height:50px!important;}}
+
+/* Discord-inspired compact mobile system: scoped to phone-sized viewports only */
+@media (max-width:600px){
+ :root{--dl-m-size:44px;--dl-m-rail:56px;--dl-m-gap:8px}
+ .dashboard,.chat-area,#loungeView{font-size:14px!important}
+ .chat-header,.created-server-chat-header{min-height:48px!important;height:48px!important;padding:5px 8px!important;gap:6px!important}
+ .mobile-menu-button{width:38px!important;height:38px!important;min-height:38px!important;flex-basis:38px!important}
+ #mobileSidebar,.mobile-sidebar{width:min(290px,84vw)!important;max-width:84vw!important}
+ #mobileSidebar .servers{width:56px!important;min-width:56px!important;flex-basis:56px!important;padding:8px 4px!important;gap:7px!important}
+ #mobileSidebar .server-icon{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex-basis:42px!important;border-radius:14px!important}
+ #mobileSidebar #dmHomeButton.server-icon.dm-home{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex-basis:42px!important;margin:0 auto!important;padding:3px!important;overflow:hidden!important;box-sizing:border-box!important}
+ #mobileSidebar #dmHomeButton img{width:36px!important;height:36px!important;max-width:36px!important;max-height:36px!important;object-fit:contain!important;display:block!important}
+ #mobileSidebar .channels,#channelsSidebar{padding:10px 8px!important}
+ .workspace-heading{padding:8px!important;margin-bottom:10px!important}.workspace-heading .eyebrow,.section-heading{font-size:10px!important;letter-spacing:.08em!important}
+ .workspace-title h1{font-size:16px!important}.text-channel,.voice-channel{min-height:36px!important;padding:6px 8px!important;font-size:13px!important}
+ /* voice room stays in the content area, not a fullscreen takeover */
+ #loungeView.is-voice-call{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;min-height:0!important;z-index:auto!important;flex:1 1 auto!important;display:flex!important;flex-direction:column!important}
+ #loungeView.is-voice-call .chat-header{height:48px!important;min-height:48px!important}
+ #loungeView.is-voice-call #loungeVoiceCallView:not([hidden]){display:flex!important;position:relative!important;flex:1 1 auto!important;height:auto!important;min-height:0!important;width:100%!important;overflow-y:auto!important;padding:8px 8px 104px!important;box-sizing:border-box!important}
+ #loungeVoiceCallView .created-server-voice-call{width:100%!important;min-height:0!important;height:auto!important;display:flex!important;flex-direction:column!important;gap:8px!important}
+ #loungeVoiceCallView .created-server-voice-stage{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-content:start!important;justify-content:stretch!important}
+ #loungeVoiceCallView .created-server-voice-stage>*{min-width:0!important;max-width:100%!important}
+ #loungeVoiceCallView .created-server-voice-remote-media{position:relative!important;width:100%!important;min-width:0!important}
+ #loungeVoiceCallView .created-server-voice-call-status{font-size:12px!important;text-align:center!important;padding:4px!important}
+ #voicePanel{position:fixed!important;left:8px!important;right:8px!important;bottom:max(8px,env(safe-area-inset-bottom))!important;z-index:15000!important;width:auto!important;max-width:none!important;padding:8px!important;border-radius:16px!important}
+ #voicePanel .voice-controls{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+ #voicePanel .voice-control,#voicePanel button{min-height:40px!important;padding:6px!important;font-size:12px!important}
+ #voicePanel .voice-control-icon{font-size:16px!important}
+ #voicePanel .voice-control-label{font-size:11px!important}
+ #voicePanel .voice-participant-info{font-size:12px!important}
+ #voicePanel .voice-participant-list{padding:0!important;margin:6px 0!important}
+ #voicePanel .voice-participant-list .voice-participant{padding:5px!important;gap:6px!important;font-size:12px!important}
+ #loungeVoiceCallView .created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:390px){@media(max-width:600px){#loungeVoiceCallView .created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important}#mobileSidebar .servers{width:52px!important;min-width:52px!important;flex-basis:52px!important}#mobileSidebar .server-icon{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex-basis:40px!important}#mobileSidebar #dmHomeButton img{width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important}}}
