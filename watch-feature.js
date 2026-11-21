@@ -21,6 +21,9 @@ const $=selector=>overlay.querySelector(selector.startsWith("#")||selector.start
 const watchTile=document.createElement("article");watchTile.className="created-server-voice-tile dl-watch-voice-tile";watchTile.innerHTML=`<div class="dl-watch-voice-title"><span>▶</span><strong>YouTube Watch</strong><small>Shared voice activity</small></div>`;watchTile.append(player);let voiceStage=window.diamondActiveVoiceStage||document.querySelector(".created-server-voice-stage");
 let user=null,voice={connected:false,roomId:null,selectedChannel:null},currentId=null,currentUrl="",yt=null,apiReady=false,applyingRemote=false,remoteStateUnsub=null,remoteChatUnsub=null,chatRoom=null,sharedStateRef=null,lastStateSignature="",syncTimer=null;
 function show(){overlay.hidden=false;overlay.classList.add("dl-watch-compact-open");buttons.forEach(b=>b.setAttribute("aria-expanded","true"));}function hide(){overlay.hidden=true;overlay.classList.remove("dl-watch-compact-open");buttons.forEach(b=>b.setAttribute("aria-expanded","false"));}function toggleWatchActivities(){if(overlay.hidden)show();else hide();}
+
+/* On phones, dismiss Watch/activity panel with a tap anywhere outside its shell. */
+overlay.addEventListener("click",event=>{if(!overlay.hidden&&window.matchMedia("(max-width:600px)").matches&&!event.target.closest(".dl-watch-shell"))hide();});
 function mountWatchTile(){
  const activeStage=window.diamondActiveVoiceStage||document.querySelector(".created-server-voice-stage")||voiceStage;
  if(activeStage&&voice.connected){
