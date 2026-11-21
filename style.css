@@ -4044,3 +4044,19 @@ button {
   .mobile-sidebar-backdrop { pointer-events:none!important; }
   .dashboard.mobile-nav-open .mobile-sidebar-backdrop { pointer-events:auto!important; }
 }
+
+
+/* NAVIGATION CLICK RECOVERY — keep decorative glass/tour layers behind controls. */
+.dl-tour-welcome-backdrop,.dl-tour-overlay,.dl-tour-spotlight,.dl-tour-popover { pointer-events:none!important; }
+.glass-stage,.glass-blob,.workspace-gem { pointer-events:none!important; }
+@media (max-width:900px){
+  .dashboard,.mobile-sidebar,.servers,.channels { position:relative; }
+  .mobile-sidebar { z-index:100!important; }
+  .servers,.channels { pointer-events:auto!important; }
+  .mobile-sidebar button,.channels button,.servers button { pointer-events:auto!important; }
+  .mobile-sidebar-backdrop { z-index:90!important; }
+  .dashboard.mobile-nav-open .mobile-sidebar { z-index:110!important; }
+  .dashboard.mobile-nav-open .mobile-sidebar-backdrop { pointer-events:auto!important; }
+  .chat-area { position:relative; z-index:1; }
+  .chat-area button,.chat-area input,.chat-area textarea { pointer-events:auto!important; }
+}
