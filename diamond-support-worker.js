@@ -1,79 +1,207 @@
-// Diamond Lounge AI backend — deploy as a Cloudflare Worker.
-// Set OPENAI_API_KEY as a Worker secret. Optional vars: AI_MODEL, ALLOWED_ORIGIN.
-const SYSTEM_PROMPT = `You are Diamond Support, a helpful assistant inside Diamond Lounge.
-Help with Diamond Lounge navigation, DMs, profiles, servers, channels, invitations, voice calls, microphone/camera permissions, screen sharing, and troubleshooting.
-You may also answer ordinary questions outside Diamond Lounge. Do not dismiss unrelated questions or redirect users back to app troubleshooting; answer the question directly when you can.
-For current events, breaking news, release schedules, game patches, prices, and other time-sensitive questions, the backend may enable live web search. When live search is used, rely on the retrieved sources, cite them in the answer, prioritize official sources, and distinguish confirmed dates from estimates. Never invent a release date. If official sources have not announced a date, say so clearly.
-Known Diamond Lounge layout: exactly three primary columns: (1) server rail, (2) contextual sidebar, (3) main chat/content area. Do not suggest creating a fourth column or moving Diamond Support out of the third column.
-Be concise, clear, and step-by-step. Ask one focused clarifying question when needed. Never claim you can see the user's screen, account, or site logs. Do not request passwords, verification codes, payment details, or private messages. If unsure about an app-specific detail, say so rather than inventing features. `;
+// Diamond Lounge AI agent backend.
+// Required Worker secret: OPENAI_API_KEY
+// Optional Worker vars: AI_MODEL, REASONING_EFFORT, ALLOWED_ORIGIN
+const SYSTEM_PROMPT = `You are Diamond Support, the intelligent assistant inside Diamond Lounge.
+You are not limited to website support. Help with general knowledge, reasoning, writing, planning, coding, gaming, research, troubleshooting, and everyday tasks.
+Use the available web_search tool when information may have changed, when the user asks about current facts, or when sources improve accuracy. Do not search unnecessarily for stable facts or pure reasoning. Cite retrieved sources and distinguish confirmed facts from estimates.
+Use get_live_diamond_context when a question depends on the user's current Diamond Lounge session, such as voice connection, mute, camera, screen sharing, visible view, network state, or browser diagnostics. It returns a limited read-only snapshot captured when the message was sent. It does not expose private messages, passwords, authentication tokens, user IDs, or account contents. Never claim to see information the tool did not return.
+The current server UTC time is {{SERVER_TIME}}. Use the supplied client timezone for user-facing time answers when available.
+For app troubleshooting, use supplied repository excerpts as evidence. Never invent tests, access, or successful changes.
+Do not request passwords, verification codes, payment details, or private messages. Do not take destructive or account-changing actions without explicit user approval.
+Diamond Lounge has exactly three primary columns: server rail, contextual sidebar, and main chat/content area. Do not suggest a fourth column.
+Be thoughtful, capable, clear, conversational, and concise. Ask at most one focused clarification when necessary.`;
+
+const LIVE_CONTEXT_TOOL = {
+  type: "function",
+  name: "get_live_diamond_context",
+  description: "Read the limited current Diamond Lounge browser/session snapshot supplied with this request. Use only when the user's question depends on their current app, voice, camera, screen sharing, login state, or browser session.",
+  strict: true,
+  parameters: { type: "object", properties: {}, required: [], additionalProperties: false }
+};
 
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
-    const allowed = env.ALLOWED_ORIGIN || "*";
+    const allowed = env.ALLOWED_ORIGIN || "https://diamond-lounge.pages.dev";
     if (request.method === "OPTIONS") {
+      if (origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
       return new Response(null, { status: 204, headers: cors(origin, allowed) });
     }
     if (request.method !== "POST") return json({ error: "Use POST." }, 405, origin, allowed);
+    if (origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
     if (!env.OPENAI_API_KEY) return json({ error: "AI service is not configured yet." }, 503, origin, allowed);
-    if (allowed !== "*" && origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
+
     try {
       const body = await request.json();
       const messages = Array.isArray(body.messages) ? body.messages.slice(-16) : [];
-      if (!messages.length || messages.some(m => !["user","assistant"].includes(m.role) || typeof m.content !== "string" || m.content.length > 4000)) {
+      if (!messages.length || messages.some(m => !m || !["user", "assistant"].includes(m.role) ||
+        typeof m.content !== "string" || m.content.length > 4000)) {
         return json({ error: "Invalid message history." }, 400, origin, allowed);
       }
-      const useWebSearch = shouldUseWebSearch(messages);
-      const model = useWebSearch ? (env.SEARCH_MODEL || "gpt-5-search-api") : (env.AI_MODEL || "gpt-4o-mini");
-      const requestBody = {
-        model,
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages]
-      };
-      if (useWebSearch) {
-        requestBody.web_search_options = {};
-      } else {
-        requestBody.max_tokens = 700;
+
+      const clientTime = sanitizeClientTime(body.client_time);
+      const appContext = sanitizeAppContext(body.app_context);
+      const instructions = SYSTEM_PROMPT.replace("{{SERVER_TIME}}", new Date().toISOString()) +
+        "\nClient time context: " + (clientTime ? JSON.stringify(clientTime) : "not supplied") +
+        "\nA live app context tool is " + (appContext ? "available for this request." : "not available for this request.");
+
+      const model = env.AI_MODEL || "gpt-6.2-astra";
+      const effort = ["low", "medium", "high", "xhigh"].includes(env.REASONING_EFFORT)
+        ? env.REASONING_EFFORT : "medium";
+      const tools = [{ type: "web_search", search_context_size: "medium" }, LIVE_CONTEXT_TOOL];
+
+      let input = messages;
+      let responseData = await createResponse(env, { model, effort, instructions, input, tools });
+      const toolsUsed = new Set();
+
+      for (let turn = 0; turn < 2; turn++) {
+        const calls = Array.isArray(responseData.output)
+          ? responseData.output.filter(item => item.type === "function_call") : [];
+        if (!calls.length) break;
+
+        input = [...input, ...responseData.output];
+        const outputs = calls.map(call => {
+          if (call.name === "get_live_diamond_context") {
+            toolsUsed.add(call.name);
+            return {
+              type: "function_call_output",
+              call_id: call.call_id,
+              output: JSON.stringify(appContext || {
+                available: false,
+                reason: "No current Diamond Lounge session snapshot was supplied."
+              })
+            };
+          }
+          return {
+            type: "function_call_output",
+            call_id: call.call_id,
+            output: JSON.stringify({ error: "Tool not available." })
+          };
+        });
+        input = [...input, ...outputs];
+        responseData = await createResponse(env, { model, effort, instructions, input, tools });
       }
 
-      const completion = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": "Bearer " + env.OPENAI_API_KEY, "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody)
-      });
-      if (!completion.ok) {
-        return json({
-          error: useWebSearch
-            ? "Live web search is unavailable right now. No current answer was generated; please try again shortly."
-            : "The AI provider returned an error. Please try again."
-        }, 502, origin, allowed);
-      }
-      const data = await completion.json();
-      const answerMessage = data.choices?.[0]?.message;
-      const answer = answerMessage?.content;
-      if (!answer) return json({ error: "No answer was returned." }, 502, origin, allowed);
-      const citations = Array.isArray(answerMessage.annotations)
-        ? answerMessage.annotations
-            .filter(item => item?.type === "url_citation" && /^https:\/\//i.test(item.url_citation?.url || ""))
-            .map(item => ({
-              title: String(item.url_citation.title || item.url_citation.url).slice(0, 180),
-              url: item.url_citation.url
-            }))
-            .filter((item, index, all) => all.findIndex(other => other.url === item.url) === index)
-            .slice(0, 6)
-        : [];
-      return json({ reply: answer, citations, searched: useWebSearch }, 200, origin, allowed);
-    } catch (e) {
-      return json({ error: "Unable to process that message. Please try again." }, 500, origin, allowed);
+      const answer = extractOutputText(responseData);
+      if (!answer) return json({ error: "The AI returned no text answer." }, 502, origin, allowed);
+      const citations = extractCitations(responseData);
+      const searched = Array.isArray(responseData.output) &&
+        responseData.output.some(item => item.type === "web_search_call");
+      if (searched) toolsUsed.add("web_search");
+
+      return json({ reply: answer, citations, searched, tools_used: [...toolsUsed] }, 200, origin, allowed);
+    } catch (error) {
+      console.error("Diamond Support request failed:", error);
+      return json({ error: "Diamond Support couldn't complete that request. Please try again." }, 500, origin, allowed);
     }
   }
 };
-function shouldUseWebSearch(messages) {
-  const latestUser = [...messages].reverse().find(message => message.role === "user")?.content || "";
-  return /\b(latest|newest|current|currently|today|tonight|tomorrow|yesterday|recent|upcoming|next|this week|this month|this year|release date|schedule|roadmap|price right now|as of now|is it out|has .* released)\b/i.test(latestUser);
+
+async function createResponse(env, { model, effort, instructions, input, tools }) {
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + env.OPENAI_API_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      reasoning: { effort },
+      instructions,
+      input,
+      tools,
+      tool_choice: "auto",
+      include: ["web_search_call.action.sources"],
+      store: false,
+      max_output_tokens: 1400
+    })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    console.error("OpenAI Responses API error:", response.status, data.error?.code || data.error?.type || "unknown");
+    throw new Error("AI provider returned HTTP " + response.status);
+  }
+  return data;
 }
+
+function extractOutputText(response) {
+  const parts = [];
+  for (const item of response?.output || []) {
+    if (item.type !== "message" || !Array.isArray(item.content)) continue;
+    for (const block of item.content) {
+      if (block.type === "output_text" && typeof block.text === "string") parts.push(block.text);
+    }
+  }
+  return parts.join("\n").trim();
+}
+
+function extractCitations(response) {
+  const citations = [];
+  for (const item of response?.output || []) {
+    if (item.type !== "message") continue;
+    for (const block of item.content || []) {
+      for (const annotation of block.annotations || []) {
+        const cite = annotation.url_citation;
+        if (annotation.type !== "url_citation" || !/^https:\/\//i.test(cite?.url || "")) continue;
+        citations.push({ title: String(cite.title || cite.url).slice(0, 180), url: cite.url });
+      }
+    }
+  }
+  return citations.filter((item, index, all) =>
+    all.findIndex(other => other.url === item.url) === index
+  ).slice(0, 8);
+}
+
+function sanitizeClientTime(value) {
+  if (!value || typeof value !== "object") return null;
+  return { captured_at: safeString(value.captured_at, 48), time_zone: safeString(value.time_zone, 80) };
+}
+
+function sanitizeAppContext(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const views = new Set(["supportBotView", "dmHomeView", "dmConversationView", "serverView", "loungeView", "emptyView", "unknown"]);
+  const voice = value.voice && typeof value.voice === "object" ? value.voice : {};
+  return {
+    captured_at: safeString(value.captured_at, 48),
+    signed_in: value.signed_in === true,
+    anonymous_session: value.anonymous_session === true,
+    current_view: views.has(value.current_view) ? value.current_view : "unknown",
+    browser_online: value.browser_online === true,
+    time_zone: safeString(value.time_zone, 80),
+    voice: {
+      connected: voice.connected === true,
+      joining: voice.joining === true,
+      muted: voice.muted === true,
+      camera_on: voice.camera_on === true,
+      screen_sharing: voice.screen_sharing === true,
+      deafened: voice.deafened === true,
+      raised_hand: voice.raised_hand === true,
+      channel: safeString(voice.channel, 100),
+      server: safeString(voice.server, 100),
+      status: safeString(voice.status, 140),
+      participant_count: safeString(voice.participant_count, 24)
+    },
+    recent_browser_errors: Array.isArray(value.recent_browser_errors)
+      ? value.recent_browser_errors.slice(0, 8).map(item => safeString(item, 240)) : []
+  };
+}
+
+function safeString(value, max) {
+  return typeof value === "string" ? value.replace(/[\r\n\0]/g, " ").slice(0, max) : "";
+}
+
 function cors(origin, allowed) {
-  return { "Access-Control-Allow-Origin": allowed === "*" ? "*" : origin, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Vary": "Origin" };
+  return {
+    "Access-Control-Allow-Origin": allowed === "*" ? "*" : origin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Vary": "Origin"
+  };
 }
+
 function json(data, status, origin, allowed) {
-  return new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...cors(origin, allowed) } });
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...cors(origin, allowed) }
+  });
 }
