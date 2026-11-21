@@ -2,7 +2,7 @@
 // Captures a bounded sample of browser errors to help diagnose user-reported problems.
 // Adds source context and presents AI-generated repair proposals for owner review and PR submission.
 const diamondBrowserErrors=[];
-function diamondSafeError(value){return String(value||'').replace(/https?:\\/\\/[^\\s?#]+(?:\\?[^\\s]*)?/g,'[URL]').replace(/(token|password|secret|apiKey|authorization)\\s*[:=]\\s*[^\\s,;]+/gi,'$1=[redacted]').slice(0,500);}
+function diamondSafeError(value){return String(value||'').replace(/https?:\/\/[^\s?#]+(?:\?[^\s]*)?/g,'[URL]').replace(/(token|password|secret|apiKey|authorization)\s*[:=]\s*[^\s,;]+/gi,'$1=[redacted]').slice(0,500);}
 window.addEventListener('error',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError((e.message||'Script error')+' ('+(e.filename||'')+':'+(e.lineno||0)+')'));});
 window.addEventListener('unhandledrejection',e=>{if(diamondBrowserErrors.length<8)diamondBrowserErrors.push(diamondSafeError('Unhandled promise: '+(e.reason?.message||e.reason||'unknown')));});
 const DIAMOND_AI_ENDPOINT = "https://diamond-support-ai.jeffreygustave1.workers.dev";
