@@ -210,3 +210,27 @@
 @media(prefers-reduced-motion:reduce){
   #mobileSidebar,.mobile-sidebar-backdrop,#mobileSidebar .text-channel,#mobileSidebar .voice-channel,#dmMemberList button{transition:none!important;}
 }
+
+
+/* Mobile layout finishing pass: section sizing, scroll boundaries and visual rhythm */
+@media(max-width:900px){
+  #emptyView,#loungeView,#serverView,#dmHomeView,#dmConversationView,#supportBotView{box-sizing:border-box!important;min-width:0!important;}
+  #emptyView:not([hidden]),#loungeView:not([hidden]),#serverView:not([hidden]),#dmHomeView:not([hidden]),#dmConversationView:not([hidden]),#supportBotView:not([hidden]){overflow:hidden!important;}
+  .messages,.dm-messages,#supportBotChat,#dmHomeView .dm-home-list{scrollbar-width:thin!important;scrollbar-color:rgba(199,169,107,.24) transparent!important;-webkit-overflow-scrolling:touch!important;}
+  .messages::-webkit-scrollbar,.dm-messages::-webkit-scrollbar,#supportBotChat::-webkit-scrollbar,#dmHomeView .dm-home-list::-webkit-scrollbar{width:4px!important;}
+  .messages::-webkit-scrollbar-thumb,.dm-messages::-webkit-scrollbar-thumb,#supportBotChat::-webkit-scrollbar-thumb,#dmHomeView .dm-home-list::-webkit-scrollbar-thumb{background:rgba(199,169,107,.24)!important;border-radius:8px!important;}
+  .chat-header .chat-header-main>div,.dm-contact-heading>div{min-width:0!important;flex:1 1 auto!important;}
+  .chat-header button:not(.mobile-menu-button){min-width:40px!important;min-height:40px!important;touch-action:manipulation!important;}
+  .message-box,.dm-message-box{position:relative!important;z-index:5!important;}
+  #messageForm,#dmMessageForm,#supportBotForm{width:auto!important;max-width:100%!important;}
+  #messageInput,#dmMessageInput,#supportBotInput{outline-offset:2px!important;}
+}
+@media(max-width:600px){
+  .chat-area{padding:0!important;}
+  .messages,.dm-messages,#supportBotChat{scrollbar-gutter:stable!important;}
+  .chat-header-main{gap:8px!important;}
+  #dmConversationView .dm-conversation-header,#supportBotView .support-bot-header{border-radius:0!important;}
+  #messageForm,#dmMessageForm,#supportBotForm{width:calc(100% - 16px)!important;}
+  #messageForm input,#dmMessageForm input,#supportBotForm input{padding-left:10px!important;padding-right:10px!important;}
+  #messageForm input::placeholder,#dmMessageForm input::placeholder,#supportBotForm input::placeholder{opacity:.72!important;}
+}
