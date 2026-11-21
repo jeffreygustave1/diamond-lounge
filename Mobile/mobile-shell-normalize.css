@@ -50,11 +50,11 @@
  /* Remove the redundant hamburger from the mobile channel header. Drawer is opened via the app navigation gesture/rail. */
  #loungeView .chat-header .mobile-menu-button{display:none!important;}
  /* Support shortcut sits directly in the DM sidebar, above the member list, without creating a second panel/column. */
- #dmSidebar{display:flex!important;flex-direction:column!important;min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;overflow-x:hidden!important;}
- #dmSidebar #supportBotOpen{order:2!important;flex:0 0 auto!important;width:100%!important;max-width:100%!important;margin:6px 0 12px!important;box-sizing:border-box!important;}
- #dmSidebar .section-heading,#dmSidebar h3{order:3!important;flex:0 0 auto!important;}
- #dmSidebar #dmMemberList{order:4!important;flex:1 1 auto!important;min-width:0!important;overflow-y:auto!important;}
- #dmSidebar .dm-search-wrap{order:1!important;}
+ #dmSidebar:not([hidden]){display:flex!important;flex-direction:column!important;min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;overflow-x:hidden!important;}
+ #dmSidebar:not([hidden]) #supportBotOpen{order:2!important;flex:0 0 auto!important;width:100%!important;max-width:100%!important;margin:6px 0 12px!important;box-sizing:border-box!important;}
+ #dmSidebar:not([hidden]) .section-heading,#dmSidebar:not([hidden]) h3{order:3!important;flex:0 0 auto!important;}
+ #dmSidebar:not([hidden]) #dmMemberList{order:4!important;flex:1 1 auto!important;min-width:0!important;overflow-y:auto!important;}
+ #dmSidebar:not([hidden]) .dm-search-wrap{order:1!important;}
  /* Keep Diamond Support conversation in the same desktop-derived order: header, messages, choices, composer, footer. */
  #supportBotView{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;overflow:hidden!important;}
  #supportBotView>.support-bot-header{order:0!important;flex:0 0 auto!important;}
