@@ -55,11 +55,11 @@
  #dmSidebar .section-heading,#dmSidebar h3{order:3!important;flex:0 0 auto!important;}
  #dmSidebar #dmMemberList{order:4!important;flex:1 1 auto!important;min-width:0!important;overflow-y:auto!important;}
  #dmSidebar .dm-search-wrap{order:1!important;}
- /* Compact support footer and put it above the support conversation header. */
+ /* Keep Diamond Support conversation in the same desktop-derived order: header, messages, choices, composer, footer. */
  #supportBotView{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;overflow:hidden!important;}
- #supportBotView>.support-bot-footer{order:0!important;flex:0 0 auto!important;padding:7px 12px!important;margin:0!important;min-height:0!important;box-sizing:border-box!important;}
- #supportBotView>.support-bot-header{order:1!important;flex:0 0 auto!important;padding:10px 12px!important;min-height:0!important;}
- #supportBotView>#supportBotChat{order:2!important;flex:1 1 0!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;}
- #supportBotView>#supportBotChoices{order:3!important;flex:0 0 auto!important;}
- #supportBotView>#supportBotForm{order:4!important;flex:0 0 auto!important;}
+ #supportBotView>.support-bot-header{order:0!important;flex:0 0 auto!important;}
+ #supportBotView>#supportBotChat{order:1!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;}
+ #supportBotView>#supportBotChoices{order:2!important;flex:0 0 auto!important;}
+ #supportBotView>#supportBotForm{order:3!important;flex:0 0 auto!important;}
+ #supportBotView>.support-bot-footer{order:4!important;flex:0 0 auto!important;}
 }
