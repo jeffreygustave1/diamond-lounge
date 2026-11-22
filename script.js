@@ -1122,6 +1122,8 @@ dmHomeButton?.addEventListener("click", (event) => {
 });
 
 mainServerButton?.addEventListener("click", () => {
+    // Ensure the created-server panel is moved out before showing VIP-LOUNGE navigation.
+    restoreCreatedServerPanelHome();
     stopCreatedServerChannels();
     stopDirectMessages();
 
