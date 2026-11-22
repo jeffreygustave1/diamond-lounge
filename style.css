@@ -28,7 +28,7 @@
 @media (max-width: 900px) {
     html, body, #dashboard, .dashboard {
         overscroll-behavior-x: none;
-        touch-action: pan-y pinch-zoom;
+        touch-action: manipulation;
     }
 }
 
