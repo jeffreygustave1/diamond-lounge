@@ -2149,12 +2149,12 @@ function restoreCreatedServerVoiceMedia() {
 }
 
 function placeProfileCardInVisibleSidebar(serverViewActive = false) {
+    // Keep the account profile dock in the main second-column sidebar only.
+    // Never move it into created-server panels.
     const card = document.querySelector(".profile-card");
     const globalSidebar = document.getElementById("channelsSidebar");
-    const serverPanel = document.querySelector(".created-server-channel-panel");
-    const destination = serverViewActive ? serverPanel : globalSidebar;
-    if (card && destination && card.parentElement !== destination) {
-        destination.append(card);
+    if (card && globalSidebar && card.parentElement !== globalSidebar) {
+        globalSidebar.append(card);
     }
 }
 
