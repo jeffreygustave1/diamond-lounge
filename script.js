@@ -582,33 +582,31 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-// MOBILE ONLY: protect the dashboard against accidental iOS edge-back navigation.
-// Horizontal edge swipes are consumed; drawer opening remains a deliberate button action.
+// MOBILE ONLY: horizontal swipes toggle the dashboard sidebar drawer.
 (() => {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
-    let startX = 0, startY = 0, tracking = false;
+    let startX = 0, startY = 0, tracking = false, handled = false;
     document.addEventListener("touchstart", (event) => {
         if (!mobileQuery.matches || event.touches.length !== 1) return;
         const t = event.touches[0];
-        if (t.clientX > 28) return;
-        startX = t.clientX; startY = t.clientY; tracking = true;
+        startX = t.clientX; startY = t.clientY; tracking = true; handled = false;
     }, { passive: true, capture: true });
     document.addEventListener("touchmove", (event) => {
         if (!tracking || !mobileQuery.matches || event.touches.length !== 1) return;
         const t = event.touches[0], dx = t.clientX - startX, dy = t.clientY - startY;
-        if (dx > 12 && Math.abs(dy) < 65) event.preventDefault();
-        if (dx < -18 || Math.abs(dy) > 65) tracking = false;
+        if (Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+            event.preventDefault();
+            handled = true;
+        } else if (Math.abs(dy) > 35 && Math.abs(dy) > Math.abs(dx)) tracking = false;
     }, { passive: false, capture: true });
-    const stop = () => { tracking = false; };
-    document.addEventListener("touchend", stop, { passive: true, capture: true });
-    document.addEventListener("touchcancel", stop, { passive: true, capture: true });
-    // Keep a dashboard history entry so a stray swipe cannot return to login.
-    try {
-        history.pushState({ diamondDashboardGuard: true }, "", location.href);
-        window.addEventListener("popstate", () => {
-            history.pushState({ diamondDashboardGuard: true }, "", location.href);
-        });
-    } catch (e) { console.warn("Navigation guard unavailable", e); }
+    document.addEventListener("touchend", (event) => {
+        if (!tracking || !mobileQuery.matches || !handled) { tracking = false; return; }
+        const t = event.changedTouches[0], dx = t.clientX - startX;
+        if (dx > 65 && !dashboard?.classList.contains("mobile-nav-open")) setMobileSidebar(true);
+        else if (dx < -65 && dashboard?.classList.contains("mobile-nav-open")) setMobileSidebar(false);
+        tracking = false;
+    }, { passive: true, capture: true });
+    document.addEventListener("touchcancel", () => { tracking = false; handled = false; }, { passive: true, capture: true });
 })();
 
 // ==================================================
