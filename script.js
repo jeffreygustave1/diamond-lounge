@@ -582,28 +582,33 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-// MOBILE ONLY: open the existing navigation drawer with a left-edge swipe.
-// Desktop pointer/mouse behavior and layout are deliberately unchanged.
+// MOBILE ONLY: protect the dashboard against accidental iOS edge-back navigation.
+// Horizontal edge swipes are consumed; drawer opening remains a deliberate button action.
 (() => {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
     let startX = 0, startY = 0, tracking = false;
-    document.addEventListener("pointerdown", (event) => {
-        if (!mobileQuery.matches || event.pointerType !== "touch") return;
-        if (dashboard?.classList.contains("mobile-nav-open")) return;
-        if (event.clientX > 26) return;
-        startX = event.clientX; startY = event.clientY; tracking = true;
-    }, { passive: true });
-    document.addEventListener("pointermove", (event) => {
-        if (!tracking || !mobileQuery.matches || event.pointerType !== "touch") return;
-        const dx = event.clientX - startX, dy = event.clientY - startY;
-        if (dx >= 75 && Math.abs(dy) < 55) {
-            tracking = false;
-            setMobileSidebar(true);
-        } else if (dx < -15 || Math.abs(dy) > 65) tracking = false;
-    }, { passive: true });
-    const stopTracking = () => { tracking = false; };
-    document.addEventListener("pointerup", stopTracking, { passive: true });
-    document.addEventListener("pointercancel", stopTracking, { passive: true });
+    document.addEventListener("touchstart", (event) => {
+        if (!mobileQuery.matches || event.touches.length !== 1) return;
+        const t = event.touches[0];
+        if (t.clientX > 28) return;
+        startX = t.clientX; startY = t.clientY; tracking = true;
+    }, { passive: true, capture: true });
+    document.addEventListener("touchmove", (event) => {
+        if (!tracking || !mobileQuery.matches || event.touches.length !== 1) return;
+        const t = event.touches[0], dx = t.clientX - startX, dy = t.clientY - startY;
+        if (dx > 12 && Math.abs(dy) < 65) event.preventDefault();
+        if (dx < -18 || Math.abs(dy) > 65) tracking = false;
+    }, { passive: false, capture: true });
+    const stop = () => { tracking = false; };
+    document.addEventListener("touchend", stop, { passive: true, capture: true });
+    document.addEventListener("touchcancel", stop, { passive: true, capture: true });
+    // Keep a dashboard history entry so a stray swipe cannot return to login.
+    try {
+        history.pushState({ diamondDashboardGuard: true }, "", location.href);
+        window.addEventListener("popstate", () => {
+            history.pushState({ diamondDashboardGuard: true }, "", location.href);
+        });
+    } catch (e) { console.warn("Navigation guard unavailable", e); }
 })();
 
 // ==================================================
