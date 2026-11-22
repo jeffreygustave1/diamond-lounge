@@ -294,3 +294,24 @@
  #loungeView #messageForm{margin-bottom:max(8px,env(safe-area-inset-bottom))!important;}
  #loungeView #messageInput{font-size:16px!important;}
 }
+
+
+/* Mobile rebuild pass: message readability, scroll boundaries, and drawer ergonomics. */
+@media(max-width:900px){
+ #loungeView #messages{gap:8px!important;scroll-padding-block:12px!important;}
+ #loungeView #messages .message{max-width:min(94%,680px)!important;align-self:stretch!important;}
+ #loungeView #messages .message img,#loungeView #messages .message video{max-width:100%!important;height:auto!important;border-radius:10px!important;}
+ #loungeView #messages .message pre,#loungeView #messages .message code{max-width:100%!important;overflow-x:auto!important;}
+ #mobileSidebar .servers{overscroll-behavior:contain!important;scrollbar-width:thin!important;}
+ #mobileSidebar .channels{overscroll-behavior:contain!important;scrollbar-gutter:stable!important;}
+ #mobileSidebar .voice-row-head{display:flex!important;align-items:center!important;gap:6px!important;min-width:0!important;}
+ #mobileSidebar .voice-channel{flex:1 1 auto!important;min-width:0!important;}
+ #mobileSidebar .voice-join-slot{flex:0 0 auto!important;}
+ #mobileSidebar .voice-join-button{touch-action:manipulation!important;}
+ .mobile-sidebar-backdrop{touch-action:pan-y!important;}
+}
+@media(max-width:600px){
+ #loungeView #messages .message{padding:10px!important;}
+ #loungeView #messages .message p{margin-block:4px!important;}
+ #mobileSidebar .section-heading{scroll-margin-top:12px!important;}
+}
