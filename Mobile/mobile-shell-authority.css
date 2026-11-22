@@ -251,3 +251,29 @@
  #mobileSidebar .text-channel,#mobileSidebar .voice-channel{min-height:42px!important;}
  #mobileSidebar .voice-join-button{min-height:34px!important;}
 }
+
+/* Experimental mobile composition pass: cleaner spacing, stronger selected states, and balanced chat canvas. */
+@media(max-width:900px){
+ #mobileSidebar .servers{gap:11px!important;padding-top:max(14px,env(safe-area-inset-top))!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important;}
+ #mobileSidebar .server-icon{flex:0 0 44px!important;width:44px!important;height:44px!important;border-radius:14px!important;}
+ #mobileSidebar .server-icon.selected{border-radius:13px!important;}
+ #mobileSidebar .channels{padding:14px 10px 12px!important;}
+ #mobileSidebar .workspace-heading{padding:12px 11px 15px!important;margin-bottom:8px!important;}
+ #mobileSidebar .workspace-title h1{font-size:19px!important;letter-spacing:.4px!important;}
+ #mobileSidebar .text-channels,#mobileSidebar .voice-channel-list{padding:0 4px!important;}
+ #mobileSidebar .text-channel,#mobileSidebar .voice-channel{gap:9px!important;border:1px solid transparent!important;}
+ #mobileSidebar .text-channel.selected,#mobileSidebar .voice-channel.active{border-color:rgba(195,54,67,.17)!important;}
+ #mobileSidebar .profile-card{box-shadow:0 -5px 18px rgba(0,0,0,.15)!important;}
+ #loungeView{display:flex!important;flex-direction:column!important;min-height:0!important;}
+ #loungeView .chat-header{padding-top:max(8px,env(safe-area-inset-top))!important;min-height:58px!important;}
+ #loungeView .messages{flex:1 1 auto!important;min-height:0!important;}
+ #loungeView .message-box{margin:8px 10px max(8px,env(safe-area-inset-bottom))!important;}
+ #loungeView #uploadStatus{flex:0 0 auto!important;padding:0 10px!important;}
+}
+@media(max-width:600px){
+ #mobileSidebar .workspace-heading .eyebrow{font-size:9px!important;letter-spacing:2px!important;}
+ #mobileSidebar .online-label{margin-top:2px!important;}
+ #loungeView .message-box{margin-left:8px!important;margin-right:8px!important;}
+ #loungeView .message-box button{min-height:40px!important;min-width:54px!important;border-radius:11px!important;}
+ #loungeView #messageInput{min-height:40px!important;padding:10px 12px!important;}
+}
