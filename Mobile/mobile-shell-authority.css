@@ -195,3 +195,20 @@
   pointer-events:none!important;background:linear-gradient(180deg,transparent 12%,rgba(150,12,27,.06) 58%,rgba(210,25,40,.13) 100%)!important;
  }
 }
+
+/* Refined mobile Flag Day surfaces: typography, channel rhythm, chat message grouping. */
+@media(max-width:900px){
+ #mobileSidebar .workspace-heading{padding:15px 13px 13px!important;}
+ #mobileSidebar .section-heading{margin:17px 12px 8px!important;font-size:10px!important;letter-spacing:1.8px!important;font-weight:800!important;}
+ #mobileSidebar .text-channels,#mobileSidebar .voice-channel-list{padding:0 8px!important;margin:0!important;list-style:none!important;}
+ #mobileSidebar .text-channels li,#mobileSidebar .voice-channel-list li{margin:3px 0!important;}
+ #mobileSidebar .text-channel,#mobileSidebar .voice-channel{min-height:38px!important;padding:9px 11px!important;font-size:13px!important;letter-spacing:.15px!important;}
+ #mobileSidebar .channel-symbol{font-size:17px!important;font-weight:600!important;opacity:.85!important;}
+ #mobileSidebar .voice-channel-icon{filter:grayscale(.2)!important;opacity:.85!important;}
+ #mobileSidebar .voice-panel{margin:7px 5px 12px!important;border-radius:12px!important;padding:10px!important;}
+ #loungeView .chat-header{min-height:54px!important;padding:0 13px!important;backdrop-filter:blur(18px)!important;}
+ #loungeView .messages,#loungeView .dm-messages{padding:12px 10px!important;scrollbar-width:thin!important;scrollbar-color:rgba(170,50,62,.35) transparent!important;}
+ #loungeView .message{border-radius:12px!important;margin:6px 0!important;padding:10px 11px!important;box-shadow:0 5px 14px rgba(0,0,0,.12)!important;}
+ #loungeView .message-box{border-radius:15px!important;padding:6px!important;box-shadow:0 8px 24px rgba(0,0,0,.26)!important;}
+ #loungeView .message-box input,#loungeView .message-box textarea{color:#f6eeee!important;}
+}
