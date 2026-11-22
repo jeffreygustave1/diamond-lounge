@@ -734,6 +734,8 @@ function openTextChannel(channelName) {
     activeCreatedServerId = null;
     showLoungeSidebar();
     hideMainViews();
+    // Restore the created-server panel to its own view so VIP-LOUNGE keeps its independent sidebar.
+    syncCreatedServerPanelLayout();
     setMobileSidebar(true);
 
     if (loungeView) loungeView.hidden = false;
