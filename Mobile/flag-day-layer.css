@@ -1,0 +1,20 @@
+/* Experimental Haitian heritage layer — mobile rebuild branch only. No layout geometry or interaction changes. */
+@media (max-width:900px){
+ #mobileSidebar .servers,#mobileSidebar #channelsSidebar{isolation:isolate;position:relative}
+ #mobileSidebar .servers::before,#mobileSidebar #channelsSidebar::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,#070707 0%,#090909 42%,#190308 48%,#650813 100%);
+  background-size:100% 240%;animation:dlFlagDayDrift 14s ease-in-out infinite alternate;
+ }
+ #mobileSidebar .servers::after,#mobileSidebar #channelsSidebar::after{
+  content:"";position:absolute;inset:-35% -60%;z-index:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.04) 37%,rgba(255,255,255,.14) 40%,rgba(255,255,255,.025) 45%,transparent 58%,rgba(220,20,40,.09) 75%,transparent 86%);
+  animation:dlFlagDaySheen 9s ease-in-out infinite;mix-blend-mode:screen;
+ }
+ #mobileSidebar .servers>* ,#mobileSidebar #channelsSidebar>*{position:relative;z-index:1}
+ #mobileSidebar #channelsSidebar .workspace-heading{background:linear-gradient(180deg,rgba(5,5,6,.72),rgba(25,5,9,.4))}
+ #mobileSidebar #channelsSidebar .text-channel.selected,#mobileSidebar #channelsSidebar .voice-channel.active{background:linear-gradient(90deg,rgba(190,15,35,.27),rgba(30,8,12,.12))}
+}
+@keyframes dlFlagDayDrift{0%{background-position:50% 0%;filter:brightness(.9)}100%{background-position:50% 100%;filter:brightness(1.08)}}
+@keyframes dlFlagDaySheen{0%,100%{transform:translateX(-38%) skewX(-13deg);opacity:.45}50%{transform:translateX(30%) skewX(-13deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){#mobileSidebar .servers::before,#mobileSidebar #channelsSidebar::before,#mobileSidebar .servers::after,#mobileSidebar #channelsSidebar::after{animation:none}}
