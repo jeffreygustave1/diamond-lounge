@@ -4104,3 +4104,19 @@ button {
 .dl-context-menu .dl-context-item.danger:hover {
   background: rgba(237,66,69,.15) !important;
 }
+
+
+/* When the mobile two-column navigation drawer is open, hide the third content column. */
+@media (max-width: 900px) {
+  .dashboard.mobile-nav-open .chat-area,
+  .dashboard.mobile-nav-open > main,
+  .dashboard.mobile-nav-open .created-server-workspace,
+  .dashboard.mobile-nav-open .created-server-chat {
+    display: none !important;
+  }
+  .mobile-sidebar {
+    display: flex !important;
+    width: min(100vw, 520px) !important;
+    max-width: 100vw !important;
+  }
+}
