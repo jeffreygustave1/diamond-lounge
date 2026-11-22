@@ -29,3 +29,16 @@
   #dmHomeButton:hover img { transform:scale(1)!important; }
   #logoutButton img { width:100%!important; height:100%!important; transform:scale(1)!important; transform-origin:center center!important; object-fit:contain!important; }
 }
+
+/* Mobile width containment: eliminate page-level horizontal swiping and make drawer content fit its pane. */
+@media(max-width:900px){
+ html,body{overflow-x:hidden!important;max-width:100vw!important;overscroll-behavior-x:none!important;}
+ .dashboard,.chat-area,#loungeView,#dmHomeView,#dmConversationView,#supportBotView{max-width:100vw!important;width:100vw!important;min-width:0!important;overflow-x:hidden!important;box-sizing:border-box!important;}
+ .chat-area{flex:0 0 100vw!important;}
+ #mobileSidebar{width:min(300px,88vw)!important;max-width:88vw!important;overflow-x:hidden!important;}
+ #mobileSidebar .channels,#channelsSidebar,#loungeSidebar,#dmSidebar{width:calc(min(300px,88vw) - var(--dl-mobile-rail-width))!important;max-width:calc(min(300px,88vw) - var(--dl-mobile-rail-width))!important;min-width:0!important;overflow-x:hidden!important;box-sizing:border-box!important;}
+ #mobileSidebar .channels *,#channelsSidebar *{max-width:100%!important;box-sizing:border-box!important;}
+ #mobileSidebar .channels img,#channelsSidebar img{max-width:100%!important;}
+ #loungeView .chat-header,#loungeView .message-list,#loungeView .message-input-area,#loungeView .message-composer{width:100%!important;max-width:100vw!important;min-width:0!important;box-sizing:border-box!important;}
+ #loungeView input,#loungeView textarea{min-width:0!important;max-width:100%!important;}
+}
