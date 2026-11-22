@@ -3397,48 +3397,47 @@ function closeServerContextMenu() {
 }
 
 function showServerContextMenu(event, server) {
-    if (
-        !server?.id ||
-        !currentUser ||
-        server.ownerUid !== currentUser.uid
-    ) return;
-
+    if (!server?.id || !currentUser) return;
     event.preventDefault();
     closeServerContextMenu();
 
     const menu = document.createElement("div");
-    menu.className = "server-context-menu";
+    menu.className = "server-context-menu dl-context-menu";
     menu.setAttribute("role", "menu");
 
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.className = "server-context-delete";
-    deleteButton.setAttribute("role", "menuitem");
-    deleteButton.textContent = "Delete Server";
+    const addItem = (label, action, danger = false) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "dl-context-item" + (danger ? " danger" : "");
+        item.setAttribute("role", "menuitem");
+        item.textContent = label;
+        item.addEventListener("click", () => {
+            closeServerContextMenu();
+            action();
+        });
+        menu.appendChild(item);
+    };
 
-    deleteButton.addEventListener("click", () => {
-        closeServerContextMenu();
-        void deleteServer(server);
+    addItem("Mark as Read", () => openServer(server));
+    addItem("Invite People", () => void serverInviteDialog(server));
+    if (server.ownerUid === currentUser.uid || currentServerHasPermission("manageChannels")) {
+        addItem("Create Channel", () => {
+            openServer(server);
+            setTimeout(() => void createCreatedServerChannel(), 150);
+        });
+    }
+    addItem("Copy Server ID", () => {
+        void navigator.clipboard?.writeText(String(server.id));
     });
+    if (server.ownerUid === currentUser.uid) {
+        addItem("Delete Server", () => void deleteServer(server), true);
+    }
 
-    menu.appendChild(deleteButton);
-
-    menu.style.left = `${Math.max(
-        8,
-        Math.min(event.clientX, window.innerWidth - 180)
-    )}px`;
-
-    menu.style.top = `${Math.max(
-        8,
-        Math.min(event.clientY, window.innerHeight - 55)
-    )}px`;
-
+    menu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - 220))}px`;
+    menu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - 220))}px`;
     document.body.appendChild(menu);
     serverContextMenu = menu;
-
-    document.addEventListener("click", closeServerContextMenu, {
-        once: true
-    });
+    document.addEventListener("click", closeServerContextMenu, { once: true });
 }
 
 async function deleteServer(server) {
