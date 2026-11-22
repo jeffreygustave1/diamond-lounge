@@ -4147,3 +4147,8 @@ button {
   html, body { overscroll-behavior-x: none; }
   .dashboard, .chat-area, .mobile-sidebar { touch-action: pan-y; }
 }
+
+
+/* Restore the animated diamond icon in the Direct Messages rail button. */
+#dmHomeButton { overflow: visible !important; }
+#dmHomeButton img { display:block !important; visibility:visible !important; opacity:1 !important; width:100% !important; height:100% !important; max-width:none !important; max-height:none !important; object-fit:contain !important; transform:scale(1.65) !important; pointer-events:none !important; }
