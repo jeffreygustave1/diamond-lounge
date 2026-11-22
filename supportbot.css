@@ -105,3 +105,8 @@ body.dm-mode #supportBotView .support-bot-avatar{width:48px!important;height:48p
 body.dm-mode #supportBotView .support-bot-avatar{transform:scale(4)!important;transform-origin:left center!important;overflow:visible!important;}
 body.dm-mode #supportBotView .chat-header-main{overflow:visible!important;}
 body.dm-mode #supportBotView > .support-bot-header{overflow:visible!important;}
+
+/* FIX: reserve header space for the enlarged support GIF so it cannot cover the title. */
+body.dm-mode #supportBotView .support-bot-avatar{width:48px!important;height:48px!important;flex:0 0 190px!important;max-width:none!important;transform:scale(4)!important;transform-origin:left center!important;animation:diamondFacetSweep 5.8s ease-in-out infinite!important;overflow:visible!important;}
+body.dm-mode #supportBotView .chat-header-main.dm-contact-heading>div{flex:1 1 auto!important;min-width:0!important;position:relative!important;z-index:3!important;}
+body.dm-mode #supportBotView #supportBotTitle{color:#f2f5ff!important;visibility:visible!important;opacity:1!important;font-size:20px!important;font-weight:700!important;position:relative!important;z-index:3!important;}
