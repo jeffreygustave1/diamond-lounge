@@ -73,3 +73,14 @@
  #mobileSidebar .profile-card{display:flex!important;align-items:center!important;gap:8px!important;}
 
 }
+
+/* Created server mobile: server channel panel occupies column two; content occupies column three. */
+@media(max-width:900px){
+ #channelsSidebar:has(.created-server-channel-panel){display:flex!important;flex-direction:column!important;overflow-y:auto!important;overflow-x:hidden!important;}
+ #channelsSidebar .created-server-channel-panel{display:flex!important;flex:1 1 auto!important;width:100%!important;max-width:100%!important;min-width:0!important;height:100%!important;max-height:100%!important;overflow-y:auto!important;box-sizing:border-box!important;}
+ #channelsSidebar #loungeSidebar,#channelsSidebar #dmSidebar{display:none!important;}
+ #serverView{width:100vw!important;max-width:100vw!important;min-width:0!important;overflow:hidden!important;}
+ #serverView>.chat-header{display:none!important;}
+ #serverView .created-server-workspace{display:flex!important;flex-direction:column!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;}
+ #serverView .created-server-chat{display:flex!important;flex:1 1 auto!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;flex-direction:column!important;overflow:hidden!important;}
+}
