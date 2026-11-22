@@ -23,6 +23,15 @@
     box-sizing: border-box;
 }
 
+
+/* iOS mobile: disable horizontal overscroll/back gesture inside the dashboard. */
+@media (max-width: 900px) {
+    html, body, #dashboard, .dashboard {
+        overscroll-behavior-x: none;
+        touch-action: pan-y pinch-zoom;
+    }
+}
+
 html, body {
     width: 100%;
     height: 100%;
