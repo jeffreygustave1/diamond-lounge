@@ -4189,3 +4189,10 @@ button {
 
 /* DM diamond: enlarge fourfold from its current visual size without moving the rail button. */
 #dmHomeButton img { transform:scale(4)!important; transform-origin:center center!important; }
+
+
+/* iOS Safari: prevent focus-triggered page zoom on mobile controls. */
+@media (max-width: 900px) {
+  input, textarea, select, [contenteditable="true"], .message-input, .dm-message-input, .created-server-message-input { font-size:16px!important; }
+  button, a, [role="button"], .server-icon, .text-channel, .dm-channel-entry { touch-action:manipulation!important; }
+}
