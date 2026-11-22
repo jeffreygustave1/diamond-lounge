@@ -57,3 +57,14 @@
  #mobileSidebar .profile-card .profile-avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;}
 }
 
+
+
+/* Mobile profile dock: anchor the card to the bottom and keep its diamond contained. */
+@media(max-width:600px){
+ #mobileSidebar .channels,#channelsSidebar{display:flex!important;flex-direction:column!important;min-height:0!important;}
+ #mobileSidebar #loungeSidebar{flex:1 1 auto!important;min-height:0!important;}
+ #mobileSidebar .profile-card{flex:0 0 auto!important;margin: auto 0 max(8px,env(safe-area-inset-bottom))!important;width:100%!important;max-width:100%!important;min-height:60px!important;overflow:hidden!important;}
+ #mobileSidebar .profile-card #logoutButton.profile-avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;overflow:hidden!important;position:relative!important;}
+ #mobileSidebar .profile-card #logoutButton.profile-avatar img{position:static!important;width:46px!important;height:46px!important;max-width:46px!important;max-height:46px!important;transform:scale(1)!important;object-fit:contain!important;}
+ #mobileSidebar .profile-card #myProfilePicture{display:none!important;}
+}
