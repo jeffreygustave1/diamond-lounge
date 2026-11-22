@@ -349,3 +349,37 @@
  #communitySidebar{background:linear-gradient(180deg,#0b0c0e 0%,#171013 48%,#3b0b15 49%,#570d1a 100%)!important;border-left:1px solid rgba(190,45,58,.18)!important;}
  #communitySidebar .members-footer{border-top:1px solid rgba(190,45,58,.18)!important;color:rgba(235,205,208,.55)!important;}
 }
+
+
+/* HAITIAN FLAG DAY DESIGN PASS — animated black/crimson satin atmosphere, confined to the two navigation columns; UI remains above it and fully interactive. */
+@media(max-width:900px){
+ #mobileSidebar .servers,#mobileSidebar #channelsSidebar{
+   position:relative!important;isolation:isolate!important;overflow:hidden!important;
+ }
+ #mobileSidebar .servers::before,#mobileSidebar #channelsSidebar::before{
+   content:""!important;position:absolute!important;inset:0!important;z-index:0!important;pointer-events:none!important;
+   background:linear-gradient(180deg,#090909 0%,#0a0a0b 43%,#26070d 48%,#6b0815 100%)!important;
+   background-size:100% 220%!important;animation:dlHaitianSatinFlow 12s ease-in-out infinite alternate!important;
+ }
+ #mobileSidebar .servers::after,#mobileSidebar #channelsSidebar::after{
+   content:""!important;position:absolute!important;inset:-25% -40%!important;z-index:0!important;pointer-events:none!important;
+   background:linear-gradient(112deg,transparent 20%,rgba(255,255,255,.035) 34%,rgba(255,255,255,.09) 38%,rgba(255,255,255,.015) 43%,transparent 55%,rgba(180,15,32,.08) 72%,transparent 83%)!important;
+   transform:translateX(-30%) skewX(-12deg)!important;animation:dlHaitianFlagShimmer 8s ease-in-out infinite!important;mix-blend-mode:screen!important;
+ }
+ #mobileSidebar .servers>* ,#mobileSidebar #channelsSidebar>*,
+ #mobileSidebar #channelsSidebar #loungeSidebar>*{position:relative!important;z-index:1!important;}
+ #mobileSidebar #channelsSidebar .workspace-heading{background:linear-gradient(180deg,rgba(8,8,9,.66),rgba(20,8,11,.30))!important;}
+ #mobileSidebar #channelsSidebar .text-channel.selected,#mobileSidebar #channelsSidebar .voice-channel.active{background:linear-gradient(90deg,rgba(175,18,37,.30),rgba(30,9,12,.12))!important;}
+}
+@keyframes dlHaitianSatinFlow{
+ 0%{background-position:50% 0%;filter:brightness(.88)}
+ 100%{background-position:50% 100%;filter:brightness(1.08)}
+}
+@keyframes dlHaitianFlagShimmer{
+ 0%,100%{transform:translateX(-36%) skewX(-12deg);opacity:.5}
+ 50%{transform:translateX(28%) skewX(-12deg);opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+ #mobileSidebar .servers::before,#mobileSidebar #channelsSidebar::before,
+ #mobileSidebar .servers::after,#mobileSidebar #channelsSidebar::after{animation:none!important}
+}
