@@ -26,3 +26,21 @@
  #supportBotView #supportBotChat>*{position:relative;z-index:1;}
  #supportBotView{background:radial-gradient(ellipse at 95% 10%,rgba(130,20,32,.07),transparent 45%),linear-gradient(180deg,rgba(10,10,12,.98),rgba(15,11,13,.98) 58%,rgba(28,8,13,.98))!important;}
 }
+
+
+/* Haitian Flag Day decorative cloth field: extend a subtle flag motif into the main chat surfaces. */
+@media(max-width:900px){
+ #loungeView,#dmConversationView,#dmHomeView,#serverView{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  background-color:#08090b!important;
+  background-image:linear-gradient(180deg,rgba(4,4,5,.98) 0%,rgba(12,9,11,.96) 48%,rgba(70,7,18,.94) 49%,rgba(110,8,24,.92) 100%),radial-gradient(ellipse at 75% 40%,rgba(220,30,50,.15),transparent 65%)!important;
+ }
+ #loungeView::before,#dmConversationView::before,#dmHomeView::before,#serverView::before{
+  content:""!important;position:absolute!important;inset:-30% -45%!important;z-index:0!important;pointer-events:none!important;
+  background:linear-gradient(115deg,transparent 27%,rgba(255,255,255,.025) 36%,rgba(255,255,255,.12) 39%,rgba(255,255,255,.025) 43%,transparent 55%,rgba(180,15,32,.1) 70%,transparent 82%)!important;
+  animation:dlChatFlagSatin 11s ease-in-out infinite!important;mix-blend-mode:screen!important;
+ }
+ #loungeView>* ,#dmConversationView>* ,#dmHomeView>* ,#serverView>*{position:relative!important;z-index:1!important;}
+}
+@keyframes dlChatFlagSatin{0%,100%{transform:translateX(-34%) skewX(-12deg);opacity:.45}50%{transform:translateX(27%) skewX(-12deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){#loungeView::before,#dmConversationView::before,#dmHomeView::before,#serverView::before{animation:none!important}}
