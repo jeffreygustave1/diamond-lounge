@@ -25,7 +25,7 @@
 
 /* Four-times diamond sizing: preserve the existing icon positions. */
 @media (max-width: 900px) {
-  #dmHomeButton img { transform:scale(4)!important; transform-origin:center center!important; }
+  #dmHomeButton img { transform:scale(3)!important; transform-origin:center center!important; }
   #dmHomeButton:hover img { transform:scale(4)!important; }
   .profile-card .profile-avatar img { transform:scale(4)!important; transform-origin:center center!important; }
 }
