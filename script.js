@@ -1132,6 +1132,11 @@ mainServerButton?.addEventListener("click", () => {
 
     showLoungeSidebar();
     showEmptyView();
+    // Restore the complete VIP-LOUNGE navigation (text and voice sections).
+    if (loungeSidebar) loungeSidebar.hidden = false;
+    if (communitySidebar) communitySidebar.hidden = false;
+    const channelsSidebar = document.getElementById("channelsSidebar");
+    if (channelsSidebar) channelsSidebar.hidden = false;
     clearServerSelections();
 
     if (mainServerButton) {
@@ -1675,12 +1680,21 @@ if (selectedChannel) {
                 return;
             }
 
+            // Server icon selection opens navigation only. Wait for the user to choose a channel.
             const firstTextChannel = createdServerChannels.find(
                 (channel) => channel.type === "text"
             );
 
             if (firstTextChannel) {
-                openCreatedServerChannel(firstTextChannel);
+                stopCreatedServerMessages();
+                activeCreatedServerChannelId = null;
+                activeCreatedServerChannelType = "text";
+                if (createdServerActiveChannel) createdServerActiveChannel.textContent = "Select a channel";
+                if (createdServerChannelSymbol) createdServerChannelSymbol.textContent = "#";
+                if (createdServerMessages) createdServerMessages.textContent = "Choose a channel from the navigation.";
+                if (createdServerMessageInput) createdServerMessageInput.disabled = true;
+                if (createdServerSendButton) createdServerSendButton.disabled = true;
+                setMobileSidebar(true);
             } else {
                 stopCreatedServerMessages();
 
