@@ -23,9 +23,9 @@
   @media (max-width: 900px) { #mobileSidebar { transition:none!important; } }
 }
 
-/* Four-times diamond sizing: preserve the existing icon positions. */
+/* Keep the DM and logout diamonds inside their existing buttons without changing button positions. */
 @media (max-width: 900px) {
-  #dmHomeButton img { transform:scale(3)!important; transform-origin:center center!important; }
-  #dmHomeButton:hover img { transform:scale(3)!important; }
-  .profile-card .profile-avatar img { transform:scale(3)!important; transform-origin:center center!important; }
+  #dmHomeButton img { width:100%!important; height:100%!important; position:static!important; left:auto!important; top:auto!important; transform:scale(1)!important; transform-origin:center center!important; object-fit:contain!important; }
+  #dmHomeButton:hover img { transform:scale(1)!important; }
+  .profile-card .profile-avatar img { width:100%!important; height:100%!important; transform:scale(1)!important; transform-origin:center center!important; object-fit:contain!important; }
 }
