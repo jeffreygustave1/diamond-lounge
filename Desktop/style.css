@@ -4195,3 +4195,15 @@ button {
 
 /* Mobile long-press action menu */
 @media(max-width:600px){.dl-mobile-channel-menu{position:fixed;z-index:30000;min-width:200px;max-width:220px;padding:6px;background:#202127;border:1px solid rgba(255,255,255,.12);border-radius:12px;box-shadow:0 12px 40px #0009;display:flex;flex-direction:column;gap:3px}.dl-mobile-channel-menu button{border:0;background:transparent;color:#eee;text-align:left;padding:12px;border-radius:8px;font-size:14px}.dl-mobile-channel-menu button:active{background:#393b44}.dl-mobile-channel-menu button.danger{color:#ff646b}}
+
+
+/* Desktop correction: keep Watchdog fully visible in the Diamond Support header. */
+#supportBotView .support-bot-header{min-width:0!important;overflow:visible!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;flex-wrap:nowrap!important}
+#supportBotView .support-bot-header .dm-contact-heading{flex:1 1 auto!important;min-width:0!important}
+#supportBotView .support-bot-header [aria-label="Open Diamond Watchdog diagnostics"]{display:flex!important;flex:0 0 auto!important;max-width:none!important;min-width:max-content!important;overflow:visible!important;gap:6px!important;white-space:nowrap!important;padding:4px 8px!important;font-size:12px!important}
+#supportBotView .support-bot-header [aria-label="Open Diamond Watchdog diagnostics"] img{width:30px!important;height:44px!important;max-width:30px!important;max-height:44px!important;object-fit:contain!important}
+#supportBotView .support-bot-header [aria-label="Open Diamond Watchdog diagnostics"] span{display:inline-block!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important;white-space:nowrap!important}
+#supportBotView .support-bot-header [aria-label="Open Diamond Watchdog diagnostics"] span:last-child{margin-left:4px!important}
+/* Desktop: microphone and deafen are housed in the Watch controls, not the voice dock. */
+.created-server-voice-quick-actions [data-voice-action="mute"],
+.created-server-voice-quick-actions [data-voice-action="deafen"]{display:none!important}
