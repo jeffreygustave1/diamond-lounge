@@ -222,3 +222,13 @@
  #mobileSidebar .server-icon.add-server:active{transform:scale(.94)!important;}
  #mobileSidebar .server-icon.selected::before{content:"";position:absolute!important;left:-3px!important;top:50%!important;transform:translateY(-50%)!important;height:23px!important;width:3px!important;border-radius:0 4px 4px 0!important;background:#d34d5d!important;box-shadow:0 0 9px rgba(215,50,65,.4)!important;}
 }
+
+/* Experimental polish: subtle watermarking and safe contrast hierarchy for mobile header and sidebar */
+@media(max-width:900px){
+ #loungeView .chat-header{border-bottom:1px solid rgba(196,55,68,.20)!important;box-shadow:0 5px 18px rgba(0,0,0,.18)!important;}
+ #mobileSidebar .workspace-heading{border-bottom:1px solid rgba(200,55,68,.15)!important;}
+ #mobileSidebar .text-channel:active,#mobileSidebar .voice-channel:active{transform:scale(.985)!important;}
+ #mobileSidebar .text-channel,#mobileSidebar .voice-channel{transition:background .16s ease,border-color .16s ease,transform .16s ease!important;}
+ #loungeView .message{overflow-wrap:anywhere!important;}
+ #loungeView .message-box{backdrop-filter:blur(16px)!important;}
+}
