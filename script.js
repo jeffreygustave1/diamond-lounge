@@ -712,6 +712,7 @@ function showEmptyView() {
 
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
+    setMobileSidebar(false);
     const returningFromPrimaryVoice = Boolean(primaryVoiceChannelName);
     if (returningFromPrimaryVoice) closePrimaryVoiceCallView();
 
@@ -1035,6 +1036,7 @@ messageForm?.addEventListener("submit", (event) => {
 
 function showDirectMessages() {
     if (!currentUser) return;
+    setMobileSidebar(false);
     placeProfileCardInVisibleSidebar(false);
     const channelsSidebar = document.getElementById("channelsSidebar");
     if (channelsSidebar) channelsSidebar.hidden = false;
@@ -1204,6 +1206,7 @@ function getConversationId(firstUid, secondUid) {
 
 async function openConversation(member) {
     if (!currentUser || !member?.uid) return;
+    setMobileSidebar(false);
 
     stopDirectMessages();
 
@@ -1899,6 +1902,7 @@ async function deleteCreatedServerChannel(channel) {
 
 function openCreatedServerChannel(channel) {
     if (!currentUser || !activeCreatedServerId || !channel?.id) return;
+    setMobileSidebar(false);
 
     if (channel.type !== "text") return;
 
@@ -2529,6 +2533,7 @@ document.getElementById("createdServerVoiceUserProfile")?.addEventListener("clic
 
 function openCreatedServerVoiceChannel(channel) {
     if (!channel?.id || !activeCreatedServerId) return;
+    setMobileSidebar(false);
     stopCreatedServerMessages();
     createdServerVoicePresenceStop?.();
     createdServerVoicePresenceStop = null;
@@ -3310,6 +3315,7 @@ async function serverEventsDialog() {
 }
 
 function openServer(server) {
+    setMobileSidebar(false);
     syncCreatedServerPanelLayout();
     if (!server?.id) return;
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
