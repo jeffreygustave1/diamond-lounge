@@ -557,6 +557,22 @@ async function refreshServerMemberPermissions(serverId) {
 // MOBILE NAVIGATION
 // ==================================================
 
+// Mobile created-server navigation is placed into the second column (channel sidebar).
+const createdServerPanel = document.querySelector(".created-server-channel-panel");
+const createdServerPanelHome = createdServerPanel?.parentElement;
+const createdServerPanelMarker = document.createComment("created-server-panel-home");
+if (createdServerPanel) createdServerPanelHome?.insertBefore(createdServerPanelMarker, createdServerPanel);
+function syncCreatedServerPanelLayout() {
+    if (!createdServerPanel || !createdServerPanelMarker.parentNode) return;
+    if (window.matchMedia("(max-width: 900px)").matches && serverView && !serverView.hidden) {
+        const destination = document.getElementById("channelsSidebar");
+        if (destination && createdServerPanel.parentElement !== destination) destination.appendChild(createdServerPanel);
+    } else if (createdServerPanel.parentElement !== createdServerPanelMarker.parentNode) {
+        createdServerPanelMarker.parentNode.insertBefore(createdServerPanel, createdServerPanelMarker.nextSibling);
+    }
+}
+window.addEventListener("resize", syncCreatedServerPanelLayout);
+
 function setMobileSidebar(open) {
     if (!dashboard) return;
     dashboard.classList.toggle("mobile-nav-open", open);
@@ -3290,6 +3306,7 @@ async function serverEventsDialog() {
 }
 
 function openServer(server) {
+    syncCreatedServerPanelLayout();
     if (!server?.id) return;
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
     const channelsSidebar = document.getElementById("channelsSidebar");
@@ -3363,7 +3380,8 @@ loadCreatedServerChannels(server.id);
     serverButton?.setAttribute("aria-pressed", "true");
 
     updateCreatedServerVoiceUI();
-    setMobileSidebar(false);
+    syncCreatedServerPanelLayout();
+    setMobileSidebar(window.matchMedia('(max-width: 900px)').matches);
 }
 
 function closeServerContextMenu() {
