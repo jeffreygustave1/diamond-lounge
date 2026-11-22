@@ -4335,3 +4335,9 @@ document.addEventListener("contextmenu", function(event) {
   serverContextMenu=menu;
   setTimeout(()=>document.addEventListener("click",()=>menu.remove(),{once:true}),0);
 },true);
+
+// Dismiss voice/activity popups when tapping outside their dialog surface.
+document.addEventListener("pointerdown", (event) => {
+    const backdrop = document.getElementById("serverFeatureDialog");
+    if (backdrop && !backdrop.contains(event.target)) backdrop.remove();
+}, true);
