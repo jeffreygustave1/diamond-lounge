@@ -277,3 +277,20 @@
  #loungeView .message-box button{min-height:40px!important;min-width:54px!important;border-radius:11px!important;}
  #loungeView #messageInput{min-height:40px!important;padding:10px 12px!important;}
 }
+
+
+/* Mobile pass: message-list empty state, clearer composer, and active-channel affordances. */
+@media(max-width:900px){
+ #loungeView #messages:empty::before{content:"Welcome to the lounge\\A\\AStart the conversation.";white-space:pre-wrap;display:block;text-align:center;margin:auto;padding:28px 18px;color:rgba(239,204,208,.52);font:500 13px/1.65 system-ui,sans-serif;letter-spacing:.2px;}
+ #loungeView #messages{display:flex!important;flex-direction:column!important;}
+ #loungeView #messageForm{display:flex!important;align-items:center!important;gap:8px!important;}
+ #loungeView #messageInput{flex:1 1 auto!important;width:0!important;min-width:0!important;}
+ #loungeView #messageForm button[type=submit]{flex:0 0 auto!important;transition:filter .15s ease,transform .15s ease!important;}
+ #loungeView #messageForm button[type=submit]:active{transform:scale(.96)!important;filter:brightness(.9)!important;}
+ #mobileSidebar .text-channel[aria-current=page]{background:linear-gradient(90deg,rgba(150,28,43,.28),rgba(75,15,24,.1))!important;box-shadow:inset 2px 0 #c94a5a!important;color:#ffe4e5!important;}
+ #mobileSidebar button:focus-visible{outline:2px solid rgba(227,106,119,.52)!important;outline-offset:2px!important;}
+}
+@media(max-width:600px){
+ #loungeView #messageForm{margin-bottom:max(8px,env(safe-area-inset-bottom))!important;}
+ #loungeView #messageInput{font-size:16px!important;}
+}
