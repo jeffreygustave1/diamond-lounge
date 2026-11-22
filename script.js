@@ -1054,6 +1054,8 @@ function showDirectMessages() {
     if (dmSidebar) dmSidebar.hidden = false;
 
     hideMainViews();
+    // Restore the original second-column layout for Direct Messages after created-server navigation was moved.
+    syncCreatedServerPanelLayout();
 
     if (dmHomeView) dmHomeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
