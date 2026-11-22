@@ -337,3 +337,15 @@
  #serverView .created-server-channel-panel,#serverView .created-server-channel-tree,#serverView .created-server-channel-section{background-color:#09090b!important;background-image:linear-gradient(180deg,#08090b 0%,#151014 47%,#420b15 48%,#620c1b 100%)!important;background-blend-mode:normal!important;}
  #serverView .created-server-channel-panel>*{background-color:transparent!important;}
 }
+
+
+/* Haitian flag mockup continuation: unified heritage palette across the rail, channel column, chat canvas and member column; layout and controls remain untouched. */
+@media(max-width:900px){
+ #mobileSidebar .servers{background-color:#08090b!important;background-image:linear-gradient(180deg,rgba(4,5,7,.96) 0%,rgba(15,10,12,.96) 48%,rgba(55,8,17,.94) 49%,rgba(90,9,20,.96) 100%),radial-gradient(ellipse at 50% 18%,rgba(190,35,48,.12),transparent 60%)!important;}
+ #mobileSidebar #channelsSidebar{background-color:#0b0b0d!important;background-image:linear-gradient(180deg,rgba(8,9,11,.98) 0%,rgba(20,13,16,.98) 47%,rgba(48,8,16,.98) 48%,rgba(75,9,19,.98) 100%),radial-gradient(ellipse at 80% 20%,rgba(190,35,48,.10),transparent 65%)!important;}
+ #loungeView,#dmConversationView,#supportBotView,#dmHomeView,#serverView{background-color:#0c0c0f!important;background-image:radial-gradient(ellipse at 100% 0%,rgba(150,22,35,.12),transparent 42%),linear-gradient(180deg,rgba(10,10,12,.98),rgba(15,11,13,.98) 58%,rgba(28,8,13,.98))!important;}
+ #loungeView .chat-header,#dmConversationView .chat-header,#supportBotView .chat-header,#serverView>.chat-header{background:linear-gradient(90deg,rgba(15,15,17,.94),rgba(38,12,17,.88))!important;border-bottom:1px solid rgba(190,42,55,.22)!important;}
+ #loungeView #messages,#dmConversationView #dmMessages,#supportBotView #supportBotChat{background:radial-gradient(ellipse at 95% 10%,rgba(130,20,32,.07),transparent 45%)!important;}
+ #communitySidebar{background:linear-gradient(180deg,#0b0c0e 0%,#171013 48%,#3b0b15 49%,#570d1a 100%)!important;border-left:1px solid rgba(190,45,58,.18)!important;}
+ #communitySidebar .members-footer{border-top:1px solid rgba(190,45,58,.18)!important;color:rgba(235,205,208,.55)!important;}
+}
