@@ -330,3 +330,10 @@
  #mobileSidebar #channelsSidebar #loungeSidebar{background:transparent!important;}
  #mobileSidebar #channelsSidebar .workspace-heading,#mobileSidebar #channelsSidebar .section-heading,#mobileSidebar #channelsSidebar .text-channels,#mobileSidebar #channelsSidebar .voice-channel-list{background-color:transparent!important;}
 }
+
+
+/* THE AGENTS created-server channel navigation panel only: force the flag-inspired field on the channel tree container, not the chat pane. */
+@media(max-width:900px){
+ #serverView .created-server-channel-panel,#serverView .created-server-channel-tree,#serverView .created-server-channel-section{background-color:#09090b!important;background-image:linear-gradient(180deg,#08090b 0%,#151014 47%,#420b15 48%,#620c1b 100%)!important;background-blend-mode:normal!important;}
+ #serverView .created-server-channel-panel>*{background-color:transparent!important;}
+}
