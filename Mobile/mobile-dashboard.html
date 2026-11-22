@@ -18,6 +18,12 @@
     <link rel="stylesheet" href="./mobile-shell-normalize.css?v=2">
     <link rel="stylesheet" href="./mobile-shell-authority.css?v=8">
 
+<style>
+@media(max-width:900px){
+#mobileSidebar:has(#mainServerButton.selected) #channelsSidebar #loungeSidebar{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;min-height:0!important;width:100%!important;max-width:100%!important;visibility:visible!important}
+#mobileSidebar:has(#mainServerButton.selected) #channelsSidebar{display:flex!important}
+}
+</style>
 </head>
 <body>
     <div class="dashboard">
