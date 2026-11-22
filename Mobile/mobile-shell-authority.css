@@ -84,3 +84,9 @@
  #serverView .created-server-workspace{display:flex!important;flex-direction:column!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;}
  #serverView .created-server-chat{display:flex!important;flex:1 1 auto!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;flex-direction:column!important;overflow:hidden!important;}
 }
+
+/* Mobile: flush profile dock to the bottom edge of the navigation column. */
+@media(max-width:600px){
+ #mobileSidebar .channels,#channelsSidebar{padding-bottom:0!important;}
+ #mobileSidebar .profile-card{margin-top:auto!important;margin-bottom:0!important;}
+}
