@@ -4054,3 +4054,44 @@ button {
   #myProfilePicture.member-picture { display: grid !important; visibility: visible !important; opacity: 1 !important; width: 30px !important; height: 30px !important; flex: 0 0 30px !important; }
   .profile-identity { display: flex !important; min-width: 0 !important; visibility: visible !important; }
 }
+
+
+/* Diamond Lounge context menus */
+.dl-context-menu {
+  position: fixed !important;
+  z-index: 1000000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 210px !important;
+  max-width: 280px !important;
+  padding: 6px !important;
+  background: #18191c !important;
+  color: #f2f3f5 !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.55) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.dl-context-menu .dl-context-item {
+  display: block !important;
+  width: 100% !important;
+  min-height: 36px !important;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: inherit !important;
+  text-align: left !important;
+  font: inherit !important;
+  cursor: pointer !important;
+}
+.dl-context-menu .dl-context-item:hover {
+  background: #34363c !important;
+}
+.dl-context-menu .dl-context-item.danger {
+  color: #ed4245 !important;
+}
+.dl-context-menu .dl-context-item.danger:hover {
+  background: rgba(237,66,69,.15) !important;
+}
