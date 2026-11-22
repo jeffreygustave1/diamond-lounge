@@ -766,7 +766,7 @@ function openTextChannel(channelName) {
     clearServerSelections();
 
     loadMessages(channelName);
-    setMobileSidebar(false);
+    // Keep the mobile sidebar open; users dismiss it using the backdrop.
 }
 
 textChannelButtons.forEach((button) => {
@@ -1095,7 +1095,7 @@ dmHomeButton?.addEventListener("click", (event) => {
         showDirectMessages();
     }
 
-    setMobileSidebar(false);
+    // Do not close the navigation drawer when switching between DM and servers.
 });
 
 mainServerButton?.addEventListener("click", () => {
@@ -1225,7 +1225,7 @@ async function openConversation(member) {
     if (dmContactName) dmContactName.textContent = member.displayName;
 
     renderMembers();
-    setMobileSidebar(false);
+    // Keep the sidebar open when a private conversation is selected.
 
     if (dmMessages) {
         dmMessages.textContent = "Opening private conversation...";
@@ -3385,7 +3385,7 @@ loadCreatedServerChannels(server.id);
 
     updateCreatedServerVoiceUI();
     syncCreatedServerPanelLayout();
-    setMobileSidebar(window.matchMedia('(max-width: 900px)').matches);
+    // Selecting a server should not dismiss the mobile navigation panel.
 }
 
 function closeServerContextMenu() {
