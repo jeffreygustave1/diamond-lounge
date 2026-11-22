@@ -74,7 +74,7 @@
       diagControl.addEventListener("click",openPanel);
       controls.appendChild(diagControl);
       badge.style.cssText="display:flex!important;position:static!important;align-items:center;justify-content:flex-start;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap!important;gap:0!important;padding:0!important;width:126px!important;max-width:126px!important;min-width:126px!important;flex:0 0 126px!important;font-size:9px!important;overflow:visible!important";
-      const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:27px;height:27px;object-fit:contain;flex-shrink:0;margin-right:3px";
+      const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:22px;height:22px;object-fit:contain;flex-shrink:0;margin-right:3px";
       const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:8px;letter-spacing:0;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;flex:0 0 auto!important;transform:translateX(-5px)!important";if(spans[1])spans[1].style.cssText="font-size:7px;margin-left:3px!important;opacity:.75;transform:translateX(-5px)!important";
       controls.appendChild(badge);
       header.appendChild(controls);
@@ -82,7 +82,7 @@
       const main=header.querySelector(".chat-header-main");
       if(main)main.style.cssText="display:flex!important;align-items:center!important;gap:8px!important;flex:1 1 auto!important;min-width:0!important;max-width:calc(100% - 131px)!important;overflow:visible!important";
       const avatar=header.querySelector(".support-bot-avatar");
-      if(avatar)avatar.style.cssText="width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;object-fit:contain!important;transform:scale(6)!important;transform-origin:center center!important;flex:0 0 40px!important";
+      if(avatar)avatar.style.cssText="width:120px!important;height:120px!important;min-width:120px!important;max-width:120px!important;object-fit:contain!important;transform:scale(2)!important;transform-origin:center center!important;flex:0 0 120px!important";
       const title=header.querySelector("#supportBotTitle");
       if(title)title.style.cssText="font-size:14px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important";
     }
