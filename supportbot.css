@@ -100,3 +100,8 @@ body.dm-mode #supportBotView .chat-header-main{display:flex!important;visibility
 body.dm-mode #supportBotView .channel-title{visibility:visible!important;opacity:1!important;color:inherit!important;font-size:clamp(18px,5vw,24px)!important;font-weight:700!important;}
 body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visible!important;opacity:1!important;}
 body.dm-mode #supportBotView .support-bot-avatar{width:48px!important;height:48px!important;flex:0 0 48px!important;max-width:48px!important;transform:none!important;animation:none!important;}
+
+/* Enlarge the Diamond Support GIF avatar to 4x without disturbing its header flow. */
+body.dm-mode #supportBotView .support-bot-avatar{transform:scale(4)!important;transform-origin:left center!important;overflow:visible!important;}
+body.dm-mode #supportBotView .chat-header-main{overflow:visible!important;}
+body.dm-mode #supportBotView > .support-bot-header{overflow:visible!important;}
