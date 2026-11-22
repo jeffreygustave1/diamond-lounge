@@ -3350,7 +3350,7 @@ function openServer(server) {
     if (!server?.id) return;
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
     const channelsSidebar = document.getElementById("channelsSidebar");
-    if (channelsSidebar) channelsSidebar.hidden = true;
+    if (channelsSidebar) channelsSidebar.hidden = !window.matchMedia("(max-width: 900px)").matches;
     placeProfileCardInVisibleSidebar(true);
     restoreCreatedServerVoiceMedia();
 
