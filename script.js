@@ -4302,3 +4302,41 @@ document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click"
         if (note) note.textContent = "Review the Silver GIF details before choosing whether to purchase.";
     }
 });
+
+
+/* Native context-menu suppression and channel/category menu fallback */
+document.addEventListener("contextmenu", function(event) {
+  const serverIcon = event.target.closest(".server-icon.created-server");
+  const channelRow = event.target.closest(".created-server-channel-item");
+  const category = event.target.closest(".created-server-category-heading");
+  if (!serverIcon && !channelRow && !category) return;
+  event.preventDefault();
+  if (serverIcon) return; // its own menu handler handles the menu
+  closeServerContextMenu();
+  const menu = document.createElement("div");
+  menu.className = "dl-context-menu";
+  menu.setAttribute("role","menu");
+  const add = (label,fn,danger=false) => {
+    const b=document.createElement("button"); b.type="button";
+    b.className="dl-context-item"+(danger?" danger":""); b.textContent=label;
+    b.onclick=()=>{menu.remove();fn();}; menu.appendChild(b);
+  };
+  if(channelRow){
+    const id=channelRow.dataset.channelId, type=channelRow.dataset.channelType;
+    const name=channelRow.querySelector(".created-server-channel-name")?.textContent||"Channel";
+    add("Copy Channel ID",()=>void navigator.clipboard?.writeText(String(id||"")));
+    if(type==="voice") add("Open Voice Channel",()=>channelRow.querySelector(".created-server-channel-button")?.click());
+    else add("Open Channel",()=>channelRow.querySelector(".created-server-channel-button")?.click());
+    const channel=(createdServerChannels||[]).find(x=>String(x.id)===String(id));
+    if(channel && (currentServerHasPermission("manageChannels")||activeCreatedServerOwnerUid===currentUser?.uid))
+      add("Delete Channel",()=>void deleteCreatedServerChannel(channel),true);
+  } else if(category){
+    add("Create Channel",()=>category.querySelector(".created-server-category-add")?.click());
+    add("Delete Category",()=>category.querySelector(".created-server-channel-delete")?.click(),true);
+  }
+  menu.style.left=Math.max(8,Math.min(event.clientX,window.innerWidth-220))+"px";
+  menu.style.top=Math.max(8,Math.min(event.clientY,window.innerHeight-180))+"px";
+  document.body.appendChild(menu);
+  serverContextMenu=menu;
+  setTimeout(()=>document.addEventListener("click",()=>menu.remove(),{once:true}),0);
+},true);
