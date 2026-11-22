@@ -18,3 +18,11 @@
 @keyframes dlFlagDayDrift{0%{background-position:50% 0%;filter:brightness(.9)}100%{background-position:50% 100%;filter:brightness(1.08)}}
 @keyframes dlFlagDaySheen{0%,100%{transform:translateX(-38%) skewX(-13deg);opacity:.45}50%{transform:translateX(30%) skewX(-13deg);opacity:1}}
 @media(prefers-reduced-motion:reduce){#mobileSidebar .servers::before,#mobileSidebar #channelsSidebar::before,#mobileSidebar .servers::after,#mobileSidebar #channelsSidebar::after{animation:none}}
+
+/* Extend the lounge heritage watermark treatment into the Diamond Support conversation canvas. */
+@media(max-width:900px){
+ #supportBotView #supportBotChat{position:relative!important;isolation:isolate!important;background-color:transparent!important;}
+ #supportBotView #supportBotChat::before{content:"L’UNION\A FAIT LA FORCE";white-space:pre;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:none;z-index:0;font-family:Georgia,serif;font-size:clamp(16px,4vw,24px);font-weight:700;letter-spacing:4px;line-height:1.8;color:rgba(220,75,90,.075);text-shadow:0 0 22px rgba(145,12,27,.12);}
+ #supportBotView #supportBotChat>*{position:relative;z-index:1;}
+ #supportBotView{background:radial-gradient(ellipse at 95% 10%,rgba(130,20,32,.07),transparent 45%),linear-gradient(180deg,rgba(10,10,12,.98),rgba(15,11,13,.98) 58%,rgba(28,8,13,.98))!important;}
+}
