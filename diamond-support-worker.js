@@ -1,5 +1,5 @@
 // Diamond Lounge AI agent backend. Free Cloudflare Workers AI + resilient dual-provider web search.
-const BUILD_VERSION = "diamond-support-max-v11-2026-11-20";
+const BUILD_VERSION = "diamond-support-max-v12-2026-11-21";
 const SYSTEM_PROMPT = `You are Diamond Support, the general-purpose AI assistant inside Diamond Lounge. Be capable, thoughtful, technically precise, resourceful, and conversational. You can explain, investigate, reason, troubleshoot, plan, compare, calculate, code, write, teach, brainstorm, and help users make decisions. Aim for expert-level usefulness, not generic filler.
 
 CORE REASONING
@@ -47,9 +47,9 @@ Diamond Lounge is a community/chat web app with three primary columns only: serv
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
-    const allowed = env.ALLOWED_ORIGIN || "https://diamond-lounge.pages.dev";
+    const allowed = env.ALLOWED_ORIGIN || "https://diamond-lounge.pages.dev,https://mobile-discord-rebuild.diamond-lounge.pages.dev";
     if (request.method === "OPTIONS") {
-      if (allowed !== "*" && origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
+      if (!originAllowed(origin, allowed)) return json({ error: "Origin not allowed." }, 403, origin, allowed);
       return new Response(null, { status: 204, headers: cors(origin, allowed) });
     }
     // Public read-only health route makes it easy to confirm which Worker build is deployed.
@@ -81,7 +81,7 @@ export default {
       }, 200, origin, allowed);
     }
     if (request.method !== "POST") return json({ error: "Use POST, GET /health, or GET /diagnostics." }, 405, origin, allowed);
-    if (allowed !== "*" && origin !== allowed) return json({ error: "Origin not allowed." }, 403, origin, allowed);
+    if (!originAllowed(origin, allowed)) return json({ error: "Origin not allowed." }, 403, origin, allowed);
     if (!env.AI) return json({ error: "Free AI is not configured. Add the Workers AI binding named AI in Cloudflare." }, 503, origin, allowed);
     try {
       const body = await request.json();
@@ -411,5 +411,6 @@ function sanitizeClientTime(value) {
   return { captured_at: safeString(value.captured_at, 48), time_zone: safeString(value.time_zone, 80) };
 }
 function safeString(value, max) { return typeof value === "string" ? value.replace(/[\r\n\0]/g, " ").slice(0, max) : ""; }
-function cors(origin, allowed) { return { "Access-Control-Allow-Origin": allowed === "*" ? "*" : origin, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Vary": "Origin" }; }
+function originAllowed(origin, allowed) { return allowed === "*" || String(allowed).split(",").map(x => x.trim()).includes(origin); }
+function cors(origin, allowed) { return { "Access-Control-Allow-Origin": allowed === "*" ? "*" : (originAllowed(origin, allowed) ? origin : "https://diamond-lounge.pages.dev"), "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Vary": "Origin" }; }
 function json(data, status, origin, allowed) { return new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...cors(origin, allowed) } }); }
