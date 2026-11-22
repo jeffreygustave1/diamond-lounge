@@ -4166,3 +4166,17 @@ button {
   #channelsSidebar:has(.created-server-channel-panel) #dmSidebar { display:none!important; }
   .dashboard.mobile-nav-open .chat-area { min-width:0!important; }
 }
+
+
+/* Prevent created-server column two from drifting horizontally on mobile. */
+@media (max-width: 900px) {
+  .dashboard.mobile-nav-open #channelsSidebar:has(.created-server-channel-panel) { overflow-x:hidden!important; overscroll-behavior-x:none!important; touch-action:pan-y!important; }
+  #channelsSidebar .created-server-channel-panel { overflow-x:hidden!important; overscroll-behavior-x:none!important; touch-action:pan-y!important; }
+  #channelsSidebar .created-server-channel-panel * { max-width:100%; box-sizing:border-box; }
+  #channelsSidebar .created-server-channel-panel ul,
+  #channelsSidebar .created-server-channel-panel li,
+  #channelsSidebar .created-server-channel-panel button,
+  #channelsSidebar .created-server-channel-panel details,
+  #channelsSidebar .created-server-channel-panel summary { min-width:0!important; }
+  .dashboard.mobile-nav-open #channelsSidebar:has(.created-server-channel-panel) { overflow-x:clip!important; }
+}
