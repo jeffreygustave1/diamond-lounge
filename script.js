@@ -37,7 +37,6 @@ const textChannelButtons = [...document.querySelectorAll(".text-channel")];
 
 const dashboard = document.querySelector(".dashboard");
 const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
-const mobileMenuButtons = document.querySelectorAll(".mobile-menu-button");
 
 const dmHomeButton = document.getElementById("dmHomeButton");
 const mainServerButton = document.getElementById("mainServerButton");
@@ -560,23 +559,8 @@ async function refreshServerMemberPermissions(serverId) {
 
 function setMobileSidebar(open) {
     if (!dashboard) return;
-
     dashboard.classList.toggle("mobile-nav-open", open);
-
-    mobileMenuButtons.forEach((button) => {
-        button.setAttribute("aria-expanded", String(open));
-        button.setAttribute(
-            "aria-label",
-            open ? "Close navigation menu" : "Open navigation menu"
-        );
-    });
 }
-
-mobileMenuButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        setMobileSidebar(!dashboard?.classList.contains("mobile-nav-open"));
-    });
-});
 
 mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
