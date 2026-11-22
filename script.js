@@ -566,33 +566,32 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-// MOBILE ONLY: horizontal swipes toggle the dashboard sidebar drawer.
+// MOBILE ONLY: intercept horizontal gestures for the drawer; never use them for page navigation.
 (() => {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
-    let startX = 0, startY = 0, tracking = false, handled = false;
+    let startX = 0, startY = 0, tracking = false, horizontal = false;
     document.addEventListener("touchstart", (event) => {
-        if (!mobileQuery.matches || event.touches.length !== 1) return;
+        if (!mobileQuery.matches || event.touches.length !== 1) { tracking = false; return; }
         const t = event.touches[0];
-        startX = t.clientX; startY = t.clientY; tracking = true; handled = false;
+        startX = t.clientX; startY = t.clientY; tracking = true; horizontal = false;
     }, { passive: true, capture: true });
     document.addEventListener("touchmove", (event) => {
         if (!tracking || !mobileQuery.matches || event.touches.length !== 1) return;
         const t = event.touches[0], dx = t.clientX - startX, dy = t.clientY - startY;
-        if (Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy) * 1.25) {
-            event.preventDefault();
-            handled = true;
-        } else if (Math.abs(dy) > 35 && Math.abs(dy) > Math.abs(dx)) tracking = false;
+        if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+            horizontal = true;
+            if (event.cancelable) event.preventDefault();
+        } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) tracking = false;
     }, { passive: false, capture: true });
     document.addEventListener("touchend", (event) => {
-        if (!tracking || !mobileQuery.matches || !handled) { tracking = false; return; }
+        if (!tracking || !mobileQuery.matches || !horizontal) { tracking = false; horizontal = false; return; }
         const t = event.changedTouches[0], dx = t.clientX - startX;
-        if (dx > 65 && !dashboard?.classList.contains("mobile-nav-open")) setMobileSidebar(true);
-        else if (dx < -65 && dashboard?.classList.contains("mobile-nav-open")) setMobileSidebar(false);
-        tracking = false;
+        if (dx > 60 && !dashboard?.classList.contains("mobile-nav-open")) setMobileSidebar(true);
+        // Closing is by tap on backdrop; a swipe-left is not required.
+        tracking = false; horizontal = false;
     }, { passive: true, capture: true });
-    document.addEventListener("touchcancel", () => { tracking = false; handled = false; }, { passive: true, capture: true });
+    document.addEventListener("touchcancel", () => { tracking = false; horizontal = false; }, { passive: true, capture: true });
 })();
-
 // ==================================================
 // VIEW AND LISTENER MANAGEMENT
 // ==================================================
