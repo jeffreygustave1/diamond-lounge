@@ -1079,24 +1079,13 @@ dmHomeButton?.addEventListener("click", (event) => {
 });
 
 mainServerButton?.addEventListener("click", () => {
-    stopCreatedServerChannels();
-    stopDirectMessages();
-
-    activeTextChannel = null;
-    activeCreatedServerId = null;
-    selectedMember = null;
-    currentConversationId = null;
-
-    showLoungeSidebar();
-    showEmptyView();
-    clearServerSelections();
-
+    // Return to the default VIP-LOUNGE and open its general channel,
+    // rather than leaving the main content area blank.
+    openTextChannel("general");
     if (mainServerButton) {
         mainServerButton.classList.add("selected");
         mainServerButton.setAttribute("aria-pressed", "true");
     }
-
-    setMobileSidebar(false);
 });
 
 function loadMembers() {
