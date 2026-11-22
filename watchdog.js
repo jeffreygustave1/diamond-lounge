@@ -38,7 +38,7 @@
   function installUI(){
     badge=document.createElement("button");badge.type="button";badge.setAttribute("aria-label","Open Diamond Watchdog diagnostics");
     badge.style.cssText="z-index:20;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;gap:0;padding:0;font:11px system-ui;cursor:pointer;white-space:nowrap;flex-shrink:0";
-    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:30px;height:75px;object-fit:cover;flex-shrink:0";
+    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:30px;height:30px;object-fit:contain;flex-shrink:0";
     const label=document.createElement("span");label.textContent="DIAMOND WATCHDOG";label.style.cssText="letter-spacing:.4px";
     count=document.createElement("span");count.style.cssText="opacity:.75;font-size:10px;margin-left:8px";
     badge.append(gem,label,count);badge.addEventListener("click",openPanel);
@@ -51,7 +51,7 @@
     panel.addEventListener("click",e=>{if(e.target===panel)closePanel();});
     document.body.appendChild(panel);
     const botView=document.getElementById("supportBotView");
-    function sync(){const active=!!botView&&!botView.hidden;badge.style.display=active?"flex":"none";if(active){const header=botView.querySelector(".support-bot-header");if(header&&badge.parentElement!==header){header.appendChild(badge);header.style.justifyContent="space-between";header.style.gap="0";header.style.flexWrap="nowrap";}}}
+    function sync(){const active=!!botView&&!botView.hidden;badge.style.display=active?"flex":"none";if(active){const header=botView.querySelector(".support-bot-header");if(header&&badge.parentElement!==header){header.appendChild(badge);header.style.justifyContent="space-between";header.style.gap="8px";header.style.flexWrap="nowrap";header.style.minWidth="0";header.style.width="100%";header.style.boxSizing="border-box";badge.style.display="flex";badge.style.visibility="visible";badge.style.flex="0 0 auto";badge.style.minWidth="max-content";}}}
     if(botView){sync();new MutationObserver(sync).observe(botView,{attributes:true,attributeFilter:["hidden"]});}else badge.style.display="none";
     render();
   }
