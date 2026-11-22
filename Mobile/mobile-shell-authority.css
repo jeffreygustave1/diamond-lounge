@@ -212,3 +212,13 @@
  #loungeView .message-box{border-radius:15px!important;padding:6px!important;box-shadow:0 8px 24px rgba(0,0,0,.26)!important;}
  #loungeView .message-box input,#loungeView .message-box textarea{color:#f6eeee!important;}
 }
+
+/* Mobile rail emblem treatment: restrained ceremonial red-and-gold details. */
+@media(max-width:900px){
+ #mobileSidebar .server-icon{border-radius:15px!important;transition:transform .18s ease,box-shadow .18s ease,background .18s ease!important;}
+ #mobileSidebar .server-icon img{filter:drop-shadow(0 2px 5px rgba(0,0,0,.42))!important;}
+ #mobileSidebar .server-divider{background:linear-gradient(90deg,transparent,rgba(190,45,59,.38),transparent)!important;height:1px!important;margin:10px 6px!important;}
+ #mobileSidebar .server-icon.add-server{color:#df8790!important;border:1px dashed rgba(200,60,74,.32)!important;background:rgba(70,12,20,.22)!important;}
+ #mobileSidebar .server-icon.add-server:active{transform:scale(.94)!important;}
+ #mobileSidebar .server-icon.selected::before{content:"";position:absolute!important;left:-3px!important;top:50%!important;transform:translateY(-50%)!important;height:23px!important;width:3px!important;border-radius:0 4px 4px 0!important;background:#d34d5d!important;box-shadow:0 0 9px rgba(215,50,65,.4)!important;}
+}
