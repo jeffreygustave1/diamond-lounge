@@ -232,3 +232,22 @@
  #loungeView .message{overflow-wrap:anywhere!important;}
  #loungeView .message-box{backdrop-filter:blur(16px)!important;}
 }
+
+/* Next rebuild pass: clearer mobile hierarchy, restrained heritage detailing, and touch-safe states. */
+@media(max-width:900px){
+ #mobileSidebar .channels{scrollbar-width:thin!important;scrollbar-color:rgba(185,48,62,.28) transparent!important;}
+ #mobileSidebar .workspace-heading .online-label{font-size:11px!important;letter-spacing:.25px!important;}
+ #mobileSidebar .online-label i{box-shadow:0 0 7px rgba(110,190,125,.28)!important;}
+ #mobileSidebar .text-channel.selected,#mobileSidebar .voice-channel.active{position:relative!important;}
+ #mobileSidebar .text-channel:focus-visible,#mobileSidebar .voice-channel:focus-visible{outline:1px solid rgba(226,105,117,.55)!important;outline-offset:1px!important;}
+ #mobileSidebar .section-heading.voice-title{padding-top:5px!important;border-top:1px solid rgba(195,48,62,.10)!important;}
+ #loungeView .chat-header{flex-shrink:0!important;}
+ #loungeView .messages,#loungeView .dm-messages{overscroll-behavior:contain!important;}
+ #loungeView .message-box input,#loungeView .message-box textarea{outline-color:rgba(203,64,77,.45)!important;}
+ #loungeView .message-box input:focus,#loungeView .message-box textarea:focus{border-color:rgba(207,65,78,.38)!important;}
+}
+@media(max-width:600px){
+ #mobileSidebar .workspace-heading .workspace-title{gap:7px!important;}
+ #mobileSidebar .text-channel,#mobileSidebar .voice-channel{min-height:42px!important;}
+ #mobileSidebar .voice-join-button{min-height:34px!important;}
+}
