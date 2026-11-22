@@ -92,3 +92,11 @@ body.dm-mode #supportBotView .support-bot-avatar{width:44px!important;height:44p
 body.dm-mode #supportBotView .chat-header-main.dm-contact-heading>div{min-width:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;}
 body.dm-mode #supportBotView #supportBotTitle{display:block!important;margin:0!important;line-height:1.25!important;white-space:normal!important;}
 body.dm-mode #supportBotView .support-bot-online{display:inline-flex!important;align-items:center!important;margin-top:5px!important;white-space:normal!important;}
+
+/* Hard reset of Diamond Support inline view/header flex sizing in mobile DM mode. */
+body.dm-mode .chat-area > #supportBotView:not([hidden]){display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;flex-direction:column!important;flex:1 1 100%!important;height:100%!important;min-height:0!important;max-height:100%!important;width:100%!important;overflow:hidden!important;}
+body.dm-mode #supportBotView > header.support-bot-header{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;flex:0 0 auto!important;min-height:72px!important;height:auto!important;width:100%!important;max-width:none!important;overflow:visible!important;box-sizing:border-box!important;}
+body.dm-mode #supportBotView .chat-header-main{display:flex!important;visibility:visible!important;align-items:center!important;gap:12px!important;min-width:0!important;width:100%!important;}
+body.dm-mode #supportBotView .channel-title{visibility:visible!important;opacity:1!important;color:inherit!important;font-size:clamp(18px,5vw,24px)!important;font-weight:700!important;}
+body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visible!important;opacity:1!important;}
+body.dm-mode #supportBotView .support-bot-avatar{width:48px!important;height:48px!important;flex:0 0 48px!important;max-width:48px!important;transform:none!important;animation:none!important;}
