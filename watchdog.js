@@ -75,7 +75,7 @@
       const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:9px;letter-spacing:0;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;flex:0 0 auto!important";if(spans[1])spans[1].style.cssText="font-size:8px;margin:0!important;opacity:.75";
       controls.appendChild(badge);
       header.appendChild(controls);
-      header.style.cssText="display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;flex-wrap:nowrap!important;min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding:8px!important;overflow:hidden!important;height:auto!important;min-height:60px!important";
+      header.style.cssText="display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;flex-wrap:nowrap!important;min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding:5px 8px!important;overflow:hidden!important;height:72px!important;min-height:72px!important;max-height:72px!important;flex:0 0 72px!important;align-self:flex-start!important";
       const main=header.querySelector(".chat-header-main");
       if(main)main.style.cssText="display:flex!important;align-items:center!important;gap:8px!important;flex:1 1 auto!important;min-width:0!important;max-width:calc(100% - 131px)!important;overflow:hidden!important";
       const avatar=header.querySelector(".support-bot-avatar");
