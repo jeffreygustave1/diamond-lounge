@@ -62,21 +62,26 @@
       if(!botView || botView.hidden)return;
       const header=botView.querySelector(".support-bot-header");
       if(!header)return;
-      // Remove the previous injected controls completely and rebuild a clean header control rail.
       header.querySelectorAll('[aria-label="Support diagnostic controls"]').forEach(el=>el.remove());
       controls=document.createElement("div");
       controls.setAttribute("aria-label","Support diagnostic controls");
-      controls.style.cssText="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;margin-left:auto;flex:0 0 150px;width:150px;min-width:150px;position:relative;z-index:5;";
+      controls.style.cssText="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;width:126px;min-width:126px;max-width:126px;flex:0 0 126px;margin-left:auto;box-sizing:border-box;";
       if(diagButton){
-        diagButton.style.cssText="display:block!important;position:static!important;inset:auto!important;z-index:auto!important;margin:0!important;padding:5px 9px!important;font-size:12px!important;border-radius:8px!important;flex:0 0 auto!important";
+        diagButton.style.cssText="display:block!important;position:static!important;margin:0!important;padding:3px 7px!important;font-size:10px!important;border-radius:6px!important;flex:0 0 auto!important";
         controls.appendChild(diagButton);
       }
-      badge.style.cssText="display:flex!important;position:static!important;z-index:auto!important;align-items:center;justify-content:flex-start;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap!important;gap:1px;padding:0!important;width:150px!important;max-width:150px!important;min-width:150px!important;flex:0 0 150px!important;font-size:10px!important;overflow:visible!important";
-      const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:30px;height:30px;object-fit:contain;flex-shrink:0";
-      const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:10px;letter-spacing:.2px;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;flex:0 0 auto!important";if(spans[1])spans[1].style.cssText="font-size:8px;margin:0!important;opacity:.75";
+      badge.style.cssText="display:flex!important;position:static!important;align-items:center;justify-content:flex-start;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap!important;gap:0!important;padding:0!important;width:126px!important;max-width:126px!important;min-width:126px!important;flex:0 0 126px!important;font-size:9px!important;overflow:visible!important";
+      const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:27px;height:27px;object-fit:contain;flex-shrink:0;margin-right:-2px";
+      const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:9px;letter-spacing:0;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;flex:0 0 auto!important";if(spans[1])spans[1].style.cssText="font-size:8px;margin:0!important;opacity:.75";
       controls.appendChild(badge);
       header.appendChild(controls);
-      header.style.display="flex";header.style.alignItems="center";header.style.justifyContent="flex-start";header.style.gap="8px";header.style.flexWrap="nowrap";header.style.minWidth="0";header.style.width="100%";header.style.boxSizing="border-box";
+      header.style.cssText="display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;flex-wrap:nowrap!important;min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding:8px!important;overflow:hidden!important;height:auto!important;min-height:60px!important";
+      const main=header.querySelector(".chat-header-main");
+      if(main)main.style.cssText="display:flex!important;align-items:center!important;gap:8px!important;flex:1 1 auto!important;min-width:0!important;max-width:calc(100% - 131px)!important;overflow:hidden!important";
+      const avatar=header.querySelector(".support-bot-avatar");
+      if(avatar)avatar.style.cssText="width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;object-fit:contain!important;transform:none!important;flex:0 0 40px!important";
+      const title=header.querySelector("#supportBotTitle");
+      if(title)title.style.cssText="font-size:14px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important";
     }
     function sync(){rebuildControls();}
     if(botView){sync();new MutationObserver(sync).observe(botView,{attributes:true,attributeFilter:["hidden"]});}
