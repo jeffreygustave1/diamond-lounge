@@ -4185,3 +4185,7 @@ button {
 /* Keep the DM animated diamond fully inside its rail button bounds. */
 #dmHomeButton { overflow:hidden!important; clip-path:inset(0 round 50%)!important; }
 #dmHomeButton img { position:absolute!important; inset:0!important; width:100%!important; height:100%!important; max-width:100%!important; max-height:100%!important; transform:none!important; object-fit:contain!important; margin:0!important; }
+
+
+/* DM diamond: enlarge fourfold from its current visual size without moving the rail button. */
+#dmHomeButton img { transform:scale(4)!important; transform-origin:center center!important; }
