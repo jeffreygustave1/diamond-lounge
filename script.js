@@ -582,24 +582,31 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-// MOBILE ONLY: open the existing navigation drawer with a left-edge swipe.
-// Desktop pointer/mouse behavior and layout are deliberately unchanged.
+// MOBILE: Discord-style navigation. Swipe right from the left edge/content to
+// reveal both navigation columns; swipe left while the drawer is open to dismiss.
+// Channel selection returns to the third (content) column. Desktop is unchanged.
 (() => {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
-    let startX = 0, startY = 0, tracking = false;
+    let startX = 0, startY = 0, tracking = false, drawerWasOpen = false;
     document.addEventListener("pointerdown", (event) => {
         if (!mobileQuery.matches || event.pointerType !== "touch") return;
-        if (dashboard?.classList.contains("mobile-nav-open")) return;
-        if (event.clientX > 26) return;
+        drawerWasOpen = Boolean(dashboard?.classList.contains("mobile-nav-open"));
+        if (drawerWasOpen) {
+            if (event.clientX > 80) return;
+        } else if (event.clientX > 40) return;
         startX = event.clientX; startY = event.clientY; tracking = true;
     }, { passive: true });
     document.addEventListener("pointermove", (event) => {
         if (!tracking || !mobileQuery.matches || event.pointerType !== "touch") return;
         const dx = event.clientX - startX, dy = event.clientY - startY;
-        if (dx >= 75 && Math.abs(dy) < 55) {
+        if (Math.abs(dy) > 60) { tracking = false; return; }
+        if (!drawerWasOpen && dx >= 65) {
             tracking = false;
             setMobileSidebar(true);
-        } else if (dx < -15 || Math.abs(dy) > 65) tracking = false;
+        } else if (drawerWasOpen && dx <= -65) {
+            tracking = false;
+            setMobileSidebar(false);
+        }
     }, { passive: true });
     const stopTracking = () => { tracking = false; };
     document.addEventListener("pointerup", stopTracking, { passive: true });
@@ -1957,6 +1964,7 @@ function openCreatedServerChannel(channel) {
         activeCreatedServerId,
         channel.id
     );
+    setMobileSidebar(false);
 }
 
 // ==================================================
@@ -2618,6 +2626,7 @@ function openCreatedServerVoiceChannel(channel) {
 
     syncCreatedServerVoiceUser();
     updateCreatedServerVoiceUI();
+    setMobileSidebar(false);
 
     // Selecting the voice-channel row immediately joins the room.
     void window.diamondJoinCreatedVoiceRoom?.(
