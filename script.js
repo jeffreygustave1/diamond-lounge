@@ -820,6 +820,21 @@ onAuthStateChanged(auth, async (user) => {
 
     currentUser = user;
 
+    // Mobile/PWA: prevent iOS edge-swipe from navigating back to the login page.
+    // While authenticated, keep a dashboard history entry; logout remains the intentional exit.
+    if (window.matchMedia("(max-width: 900px)").matches) {
+        const dashboardUrl = window.location.href;
+        if (!window.__dlAuthHistoryGuard) {
+            window.__dlAuthHistoryGuard = true;
+            history.pushState({ diamondAuthenticated: true }, "", dashboardUrl);
+            window.addEventListener("popstate", () => {
+                if (auth.currentUser) {
+                    history.pushState({ diamondAuthenticated: true }, "", dashboardUrl);
+                }
+            });
+        }
+    }
+
     const displayName = (user.displayName || "Member").slice(0, 30);
 
     if (profileName) {
