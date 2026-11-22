@@ -4120,3 +4120,11 @@ button {
     max-width: 100vw !important;
   }
 }
+
+
+/* Mobile navigation is gesture-only; suppress iOS horizontal navigation bounce. */
+@media (max-width: 900px) {
+  .mobile-menu-button { display: none !important; }
+  html, body { overscroll-behavior-x: none; }
+  .dashboard, .chat-area, .mobile-sidebar { touch-action: pan-y; }
+}
