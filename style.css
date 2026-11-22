@@ -4156,3 +4156,13 @@ button {
 /* Align the DM animated diamond within its server-rail button box. */
 #dmHomeButton { position:relative !important; width:46px !important; height:46px !important; min-width:46px !important; min-height:46px !important; flex:0 0 46px !important; display:grid !important; place-items:center !important; padding:0 !important; overflow:visible !important; }
 #dmHomeButton img { width:100% !important; height:100% !important; max-width:46px !important; max-height:46px !important; object-fit:contain !important; transform:scale(1.45) !important; margin:0 !important; }
+
+
+/* Created-server mobile navigation: move the complete channel/menu panel into column two. */
+@media (max-width: 900px) {
+  .dashboard.mobile-nav-open #channelsSidebar:has(.created-server-channel-panel) { display:flex!important; width:min(68vw,360px)!important; min-width:230px!important; max-width:68vw!important; flex:1 1 auto!important; padding:0!important; overflow-y:auto!important; }
+  #channelsSidebar .created-server-channel-panel { width:100%!important; min-width:0!important; max-width:none!important; flex:1 1 auto!important; box-sizing:border-box!important; border-right:0!important; padding:16px 10px!important; }
+  #channelsSidebar:has(.created-server-channel-panel) #loungeSidebar,
+  #channelsSidebar:has(.created-server-channel-panel) #dmSidebar { display:none!important; }
+  .dashboard.mobile-nav-open .chat-area { min-width:0!important; }
+}
