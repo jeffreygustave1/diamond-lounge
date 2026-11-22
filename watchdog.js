@@ -66,14 +66,14 @@
       header.querySelectorAll('[aria-label="Support diagnostic controls"]').forEach(el=>el.remove());
       controls=document.createElement("div");
       controls.setAttribute("aria-label","Support diagnostic controls");
-      controls.style.cssText="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;margin-left:auto;flex:0 0 auto;position:relative;z-index:5";
+      controls.style.cssText="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;margin-left:auto;flex:0 0 150px;width:150px;min-width:150px;position:relative;z-index:5;";
       if(diagButton){
         diagButton.style.cssText="display:block!important;position:static!important;inset:auto!important;z-index:auto!important;margin:0!important;padding:5px 9px!important;font-size:12px!important;border-radius:8px!important;flex:0 0 auto!important";
         controls.appendChild(diagButton);
       }
-      badge.style.cssText="display:flex!important;position:static!important;z-index:auto!important;align-items:center;justify-content:flex-start;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap!important;gap:3px;padding:0!important;max-width:100%;min-width:0!important;flex:0 0 auto!important;font-size:8px!important";
-      const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:22px;height:22px;object-fit:contain;flex-shrink:0";
-      const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:8px;letter-spacing:0";if(spans[1])spans[1].style.cssText="font-size:8px;margin:0!important;opacity:.75";
+      badge.style.cssText="display:flex!important;position:static!important;z-index:auto!important;align-items:center;justify-content:flex-start;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap!important;gap:4px;padding:0!important;width:150px!important;max-width:150px!important;min-width:150px!important;flex:0 0 150px!important;font-size:10px!important;overflow:visible!important";
+      const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:30px;height:30px;object-fit:contain;flex-shrink:0";
+      const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:10px;letter-spacing:.2px;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;flex:0 0 auto!important";if(spans[1])spans[1].style.cssText="font-size:8px;margin:0!important;opacity:.75";
       controls.appendChild(badge);
       header.appendChild(controls);
       header.style.display="flex";header.style.alignItems="center";header.style.justifyContent="flex-start";header.style.gap="8px";header.style.flexWrap="nowrap";header.style.minWidth="0";header.style.width="100%";header.style.boxSizing="border-box";
