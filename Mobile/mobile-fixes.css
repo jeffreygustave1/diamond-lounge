@@ -109,3 +109,7 @@ body:has(#loungeView.is-voice-call) .chat-area{position:fixed!important;inset:0!
   #mobileSidebar #dmHomeButton img { display:block!important; visibility:visible!important; opacity:1!important; width:100%!important; height:100%!important; object-fit:contain!important; }
   #mobileSidebar .server-divider { display:block!important; flex:0 0 1px!important; width:28px!important; margin:3px auto!important; }
 }
+
+
+/* MOBILE ONLY: remove Watch activity launcher from DM sidebar; Watch remains available in voice rooms. */
+@media(max-width:900px){#dmSidebar .mobile-watch-dock-button{display:none!important}}
