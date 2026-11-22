@@ -599,27 +599,31 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-// MOBILE: Native iOS edge gestures are intercepted so a right-swipe opens the
-// navigation drawer rather than triggering browser/PWA page navigation.
+// MOBILE: Suppress iOS PWA/Safari page-turn gestures and use horizontal swipes
+// exclusively for the Diamond Lounge drawer.
 (() => {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
-    let startX = 0, startY = 0, tracking = false, drawerWasOpen = false, opened = false;
+    let startX = 0, startY = 0, tracking = false, drawerWasOpen = false;
     document.addEventListener("touchstart", (event) => {
         if (!mobileQuery.matches || !event.touches.length) return;
         const touch = event.touches[0];
         drawerWasOpen = Boolean(dashboard?.classList.contains("mobile-nav-open"));
-        if (drawerWasOpen ? touch.clientX > 80 : touch.clientX > 40) return;
-        startX = touch.clientX; startY = touch.clientY; tracking = true; opened = false;
+        // Only track drawer gestures from the left edge, whether open or closed.
+        if (drawerWasOpen ? touch.clientX > 80 : touch.clientX > 40) {
+            tracking = false; return;
+        }
+        startX = touch.clientX; startY = touch.clientY; tracking = true;
     }, { passive: true });
     document.addEventListener("touchmove", (event) => {
         if (!tracking || !mobileQuery.matches || !event.touches.length) return;
         const touch = event.touches[0], dx = touch.clientX - startX, dy = touch.clientY - startY;
         if (Math.abs(dy) > 60) { tracking = false; return; }
-        if (Math.abs(dx) > 12) event.preventDefault();
-        if (!drawerWasOpen && dx >= 65 && !opened) {
-            opened = true; tracking = false; setMobileSidebar(true);
-        } else if (drawerWasOpen && dx <= -65 && !opened) {
-            opened = true; tracking = false; setMobileSidebar(false);
+        // Cancel the native horizontal page gesture as soon as the swipe is horizontal.
+        if (Math.abs(dx) > 8 && event.cancelable) event.preventDefault();
+        if (!drawerWasOpen && dx >= 55) {
+            tracking = false; setMobileSidebar(true);
+        } else if (drawerWasOpen && dx <= -55) {
+            tracking = false; setMobileSidebar(false);
         }
     }, { passive: false });
     const stopTracking = () => { tracking = false; };
