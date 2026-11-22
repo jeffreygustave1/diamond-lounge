@@ -2275,6 +2275,14 @@ window.diamondWatchCreatedVoiceRoom = (customRoomId, stage, audience, context = 
             }
 
             liveMembers.forEach(member => updateTile(member));
+            /* Keep the Diamond Lounge companion tile visible when the room has a real member. */
+            if (liveMembers.some(member => member.uid === user?.uid)) {
+                updateTile({ uid: "diamond-lounge-member-bot", name: "Member", muted: false, cameraOn: false, screenOn: false, raisedHand: false });
+            } else {
+                tileCache.get("diamond-lounge-member-bot")?.tile.remove();
+                tileCache.delete("diamond-lounge-member-bot");
+                tileRoots.delete("diamond-lounge-member-bot");
+            }
             if (audience) audience.hidden = true;
         },
         error => {
