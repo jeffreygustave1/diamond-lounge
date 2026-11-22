@@ -599,37 +599,33 @@ mobileSidebarBackdrop?.addEventListener("click", () => {
     setMobileSidebar(false);
 });
 
-// MOBILE: Discord-style navigation. Swipe right from the left edge/content to
-// reveal both navigation columns; swipe left while the drawer is open to dismiss.
-// Channel selection returns to the third (content) column. Desktop is unchanged.
+// MOBILE: Native iOS edge gestures are intercepted so a right-swipe opens the
+// navigation drawer rather than triggering browser/PWA page navigation.
 (() => {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
-    let startX = 0, startY = 0, tracking = false, drawerWasOpen = false;
-    document.addEventListener("pointerdown", (event) => {
-        if (!mobileQuery.matches || event.pointerType !== "touch") return;
+    let startX = 0, startY = 0, tracking = false, drawerWasOpen = false, opened = false;
+    document.addEventListener("touchstart", (event) => {
+        if (!mobileQuery.matches || !event.touches.length) return;
+        const touch = event.touches[0];
         drawerWasOpen = Boolean(dashboard?.classList.contains("mobile-nav-open"));
-        if (drawerWasOpen) {
-            if (event.clientX > 80) return;
-        } else if (event.clientX > 40) return;
-        startX = event.clientX; startY = event.clientY; tracking = true;
+        if (drawerWasOpen ? touch.clientX > 80 : touch.clientX > 40) return;
+        startX = touch.clientX; startY = touch.clientY; tracking = true; opened = false;
     }, { passive: true });
-    document.addEventListener("pointermove", (event) => {
-        if (!tracking || !mobileQuery.matches || event.pointerType !== "touch") return;
-        const dx = event.clientX - startX, dy = event.clientY - startY;
+    document.addEventListener("touchmove", (event) => {
+        if (!tracking || !mobileQuery.matches || !event.touches.length) return;
+        const touch = event.touches[0], dx = touch.clientX - startX, dy = touch.clientY - startY;
         if (Math.abs(dy) > 60) { tracking = false; return; }
-        if (!drawerWasOpen && dx >= 65) {
-            tracking = false;
-            setMobileSidebar(true);
-        } else if (drawerWasOpen && dx <= -65) {
-            tracking = false;
-            setMobileSidebar(false);
+        if (Math.abs(dx) > 12) event.preventDefault();
+        if (!drawerWasOpen && dx >= 65 && !opened) {
+            opened = true; tracking = false; setMobileSidebar(true);
+        } else if (drawerWasOpen && dx <= -65 && !opened) {
+            opened = true; tracking = false; setMobileSidebar(false);
         }
-    }, { passive: true });
+    }, { passive: false });
     const stopTracking = () => { tracking = false; };
-    document.addEventListener("pointerup", stopTracking, { passive: true });
-    document.addEventListener("pointercancel", stopTracking, { passive: true });
+    document.addEventListener("touchend", stopTracking, { passive: true });
+    document.addEventListener("touchcancel", stopTracking, { passive: true });
 })();
-
 // ==================================================
 // VIEW AND LISTENER MANAGEMENT
 // ==================================================
