@@ -66,10 +66,13 @@
       controls=document.createElement("div");
       controls.setAttribute("aria-label","Support diagnostic controls");
       controls.style.cssText="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:0px;width:126px;min-width:126px;max-width:126px;flex:0 0 126px;margin-left:auto;box-sizing:border-box;";
-      if(diagButton){
-        diagButton.style.cssText="display:block!important;position:static!important;margin:0!important;padding:3px 7px!important;font-size:10px!important;border-radius:6px!important;flex:0 0 auto!important";
-        controls.appendChild(diagButton);
-      }
+      const diagControl=document.createElement("button");
+      diagControl.type="button";
+      diagControl.textContent="DIAG";
+      diagControl.setAttribute("aria-label","Open Diamond Lounge diagnostics");
+      diagControl.style.cssText="display:block!important;position:static!important;background:#17416c!important;color:#fff!important;border:1px solid #fff!important;margin:0!important;padding:3px 7px!important;font-size:10px!important;border-radius:6px!important;flex:0 0 auto!important;cursor:pointer!important";
+      diagControl.addEventListener("click",openPanel);
+      controls.appendChild(diagControl);
       badge.style.cssText="display:flex!important;position:static!important;align-items:center;justify-content:flex-start;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap!important;gap:0!important;padding:0!important;width:126px!important;max-width:126px!important;min-width:126px!important;flex:0 0 126px!important;font-size:9px!important;overflow:visible!important";
       const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:27px;height:27px;object-fit:contain;flex-shrink:0;margin-right:3px";
       const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:9px;letter-spacing:.25px;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;flex:0 0 auto!important";if(spans[1])spans[1].style.cssText="font-size:8px;margin-left:5px!important;opacity:.75";
