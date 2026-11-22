@@ -315,3 +315,10 @@
  #loungeView #messages .message p{margin-block:4px!important;}
  #mobileSidebar .section-heading{scroll-margin-top:12px!important;}
 }
+
+
+/* Visible Haitian revolutionary black-and-red flag treatment: strengthen the split flag field behind mobile navigation without covering controls. */
+@media(max-width:900px){
+ #mobileSidebar .servers{background-image:linear-gradient(180deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.72) 48%,rgba(125,10,24,.58) 49%,rgba(170,12,30,.62) 100%),radial-gradient(ellipse at 50% 50%,rgba(220,40,55,.16),transparent 70%)!important;background-color:#080808!important;}
+ #mobileSidebar .channels,#mobileSidebar #channelsSidebar{background-image:linear-gradient(180deg,rgba(0,0,0,.84) 0%,rgba(10,10,12,.76) 48%,rgba(115,10,23,.56) 49%,rgba(150,10,25,.62) 100%),radial-gradient(ellipse at 80% 55%,rgba(220,35,48,.13),transparent 72%)!important;background-color:#090909!important;}
+}
