@@ -23,11 +23,9 @@
   @media (max-width: 900px) { #mobileSidebar { transition:none!important; } }
 }
 
-/* Hard-size diamond images inside their unchanged button boxes. */
+/* Restore both diamonds to their original small baseline sizing. */
 @media (max-width: 900px) {
-  #dmHomeButton { overflow:hidden!important; }
-  #dmHomeButton img { display:block!important; width:38px!important; height:38px!important; max-width:38px!important; max-height:38px!important; position:static!important; margin:0!important; transform:none!important; object-fit:contain!important; }
-  #dmHomeButton:hover img { transform:none!important; }
-  #logoutButton { overflow:hidden!important; }
-  #logoutButton img { display:block!important; width:28px!important; height:28px!important; max-width:28px!important; max-height:28px!important; transform:none!important; object-fit:contain!important; }
+  #dmHomeButton img { width:93px!important; height:93px!important; position:relative!important; left:-25px!important; top:-24px!important; transform:scale(1)!important; transform-origin:center center!important; object-fit:contain!important; }
+  #dmHomeButton:hover img { transform:scale(1)!important; }
+  #logoutButton img { width:100%!important; height:100%!important; transform:scale(1)!important; transform-origin:center center!important; object-fit:contain!important; }
 }
