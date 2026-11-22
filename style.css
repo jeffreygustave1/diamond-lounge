@@ -4180,3 +4180,8 @@ button {
   #channelsSidebar .created-server-channel-panel summary { min-width:0!important; }
   .dashboard.mobile-nav-open #channelsSidebar:has(.created-server-channel-panel) { overflow-x:clip!important; }
 }
+
+
+/* Keep the DM animated diamond fully inside its rail button bounds. */
+#dmHomeButton { overflow:hidden!important; clip-path:inset(0 round 50%)!important; }
+#dmHomeButton img { position:absolute!important; inset:0!important; width:100%!important; height:100%!important; max-width:100%!important; max-height:100%!important; transform:none!important; object-fit:contain!important; margin:0!important; }
