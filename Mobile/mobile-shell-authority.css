@@ -66,5 +66,10 @@
  #mobileSidebar .profile-card{flex:0 0 auto!important;margin: auto 0 max(8px,env(safe-area-inset-bottom))!important;width:100%!important;max-width:100%!important;min-height:60px!important;overflow:hidden!important;}
  #mobileSidebar .profile-card #logoutButton.profile-avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;overflow:hidden!important;position:relative!important;}
  #mobileSidebar .profile-card #logoutButton.profile-avatar img{position:static!important;width:46px!important;height:46px!important;max-width:46px!important;max-height:46px!important;transform:scale(1)!important;object-fit:contain!important;}
- #mobileSidebar .profile-card #myProfilePicture{display:none!important;}
+ #mobileSidebar .profile-card #profileButton{display:flex!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;overflow:hidden!important;padding:0!important;}
+ #mobileSidebar .profile-card #profileButton .profile-copy{flex:1 1 auto!important;min-width:0!important;text-align:left!important;}
+ #mobileSidebar .profile-card #profileButton #myProfilePicture{display:block!important;flex:0 0 42px!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;max-width:42px!important;max-height:42px!important;transform:none!important;overflow:hidden!important;position:relative!important;}
+ #mobileSidebar .profile-card #profileButton #myProfilePicture img{width:42px!important;height:42px!important;max-width:42px!important;max-height:42px!important;transform:none!important;object-fit:cover!important;}
+ #mobileSidebar .profile-card{display:flex!important;align-items:center!important;gap:8px!important;}
+
 }
