@@ -146,6 +146,23 @@ let remoteVideoGridHomeParent = null;
 let remoteScreenStageHomeParent = null;
 
 
+// Mobile created-server navigation: relocate the server channel panel into column two.
+const createdServerChannelPanel = document.querySelector(".created-server-channel-panel");
+const createdServerChannelPanelHome = createdServerChannelPanel?.parentElement;
+const createdServerChannelPanelPlaceholder = document.createComment("created-server-channel-panel-home");
+if (createdServerChannelPanel) createdServerChannelPanelHome?.insertBefore(createdServerChannelPanelPlaceholder, createdServerChannelPanel);
+function moveCreatedServerPanelToNavigation() {
+  const sidebar = document.getElementById("channelsSidebar");
+  if (createdServerChannelPanel && sidebar && window.matchMedia("(max-width: 900px)").matches) {
+    sidebar.appendChild(createdServerChannelPanel);
+    sidebar.hidden = false;
+  }
+}
+function restoreCreatedServerPanelHome() {
+  if (createdServerChannelPanel && createdServerChannelPanelPlaceholder.parentNode) {
+    createdServerChannelPanelPlaceholder.parentNode.insertBefore(createdServerChannelPanel, createdServerChannelPanelPlaceholder);
+  }
+}
 const createdServerTextChannels = document.getElementById("createdServerTextChannels");
 // Text and voice channels share one category-aware Discord-style channel tree.
 const createdServerVoiceChannels = createdServerTextChannels;
@@ -672,6 +689,7 @@ function clearServerSelections() {
 }
 
 function showLoungeSidebar() {
+    restoreCreatedServerPanelHome();
     placeProfileCardInVisibleSidebar(false);
     const channelsSidebar = document.getElementById("channelsSidebar");
     if (channelsSidebar) channelsSidebar.hidden = false;
@@ -692,6 +710,7 @@ function showLoungeSidebar() {
 }
 
 function showEmptyView() {
+    restoreCreatedServerPanelHome();
     stopPublicMessages();
 
     activeTextChannel = null;
@@ -3327,6 +3346,7 @@ async function serverEventsDialog() {
 }
 
 function openServer(server) {
+    moveCreatedServerPanelToNavigation();
     if (!server?.id) return;
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
     const channelsSidebar = document.getElementById("channelsSidebar");
