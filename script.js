@@ -1036,7 +1036,6 @@ messageForm?.addEventListener("submit", (event) => {
 
 function showDirectMessages() {
     if (!currentUser) return;
-    setMobileSidebar(false);
     placeProfileCardInVisibleSidebar(false);
     const channelsSidebar = document.getElementById("channelsSidebar");
     if (channelsSidebar) channelsSidebar.hidden = false;
