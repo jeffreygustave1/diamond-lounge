@@ -82,7 +82,7 @@
       const main=header.querySelector(".chat-header-main");
       if(main)main.style.cssText="display:flex!important;align-items:center!important;gap:8px!important;flex:1 1 auto!important;min-width:0!important;max-width:calc(100% - 131px)!important;overflow:visible!important";
       const avatar=header.querySelector(".support-bot-avatar");
-      if(avatar)avatar.style.cssText="width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;object-fit:contain!important;transform:scale(4)!important;transform-origin:center center!important;flex:0 0 40px!important";
+      if(avatar)avatar.style.cssText="width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;object-fit:contain!important;transform:scale(8)!important;transform-origin:center center!important;flex:0 0 40px!important";
       const title=header.querySelector("#supportBotTitle");
       if(title)title.style.cssText="font-size:14px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important";
     }
