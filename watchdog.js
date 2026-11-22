@@ -65,12 +65,12 @@
       header.querySelectorAll('[aria-label="Support diagnostic controls"]').forEach(el=>el.remove());
       controls=document.createElement("div");
       controls.setAttribute("aria-label","Support diagnostic controls");
-      controls.style.cssText="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:0px;width:126px;min-width:126px;max-width:126px;flex:0 0 126px;margin-left:auto;box-sizing:border-box;";
+      controls.style.cssText="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;width:126px;min-width:126px;max-width:126px;flex:0 0 126px;margin-left:auto;box-sizing:border-box;position:relative;z-index:50;overflow:visible;";
       const diagControl=document.createElement("button");
       diagControl.type="button";
       diagControl.textContent="DIAG";
       diagControl.setAttribute("aria-label","Open Diamond Lounge diagnostics");
-      diagControl.style.cssText="display:block!important;position:static!important;background:#17416c!important;color:#fff!important;border:1px solid #fff!important;margin:0!important;padding:3px 7px!important;font-size:10px!important;border-radius:6px!important;flex:0 0 auto!important;cursor:pointer!important";
+      diagControl.style.cssText="display:block!important;position:static!important;background:#17416c!important;color:#fff!important;border:1px solid #fff!important;margin:0 0 2px 0!important;padding:4px 10px!important;font-size:11px!important;border-radius:6px!important;flex:0 0 auto!important;cursor:pointer!important;min-height:24px!important;min-width:45px!important;opacity:1!important;visibility:visible!important";
       diagControl.addEventListener("click",openPanel);
       controls.appendChild(diagControl);
       badge.style.cssText="display:flex!important;position:static!important;align-items:center;justify-content:flex-start;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap!important;gap:0!important;padding:0!important;width:126px!important;max-width:126px!important;min-width:126px!important;flex:0 0 126px!important;font-size:9px!important;overflow:visible!important";
