@@ -1118,7 +1118,7 @@ dmHomeButton?.addEventListener("click", (event) => {
     }
 
     // Keep the navigation drawer open while the DM home/member list is visible.
-    if (!(dmHomeView && !dmHomeView.hidden)) setMobileSidebar(false);
+    setMobileSidebar(true);
 });
 
 mainServerButton?.addEventListener("click", () => {
@@ -1139,7 +1139,7 @@ mainServerButton?.addEventListener("click", () => {
         mainServerButton.setAttribute("aria-pressed", "true");
     }
 
-    setMobileSidebar(false);
+    setMobileSidebar(true);
 });
 
 function loadMembers() {
@@ -3420,7 +3420,7 @@ loadCreatedServerChannels(server.id);
     serverButton?.setAttribute("aria-pressed", "true");
 
     updateCreatedServerVoiceUI();
-    setMobileSidebar(false);
+    setMobileSidebar(true);
 }
 
 function closeServerContextMenu() {
