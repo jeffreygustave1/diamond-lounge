@@ -55,9 +55,31 @@
     document.body.appendChild(panel);
     const botView=document.getElementById("supportBotView");
     const diagButton=document.getElementById("dlDiagBtn");
-    let controlStack=null;
-    function sync(){const active=!!botView&&!botView.hidden;badge.style.display="none";if(diagButton)diagButton.style.display="none";if(active){const header=botView.querySelector(".support-bot-header");if(header){if(!controlStack){controlStack=document.createElement("div");controlStack.setAttribute("aria-label","Support diagnostic controls");controlStack.style.cssText="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:0 0 auto;margin-left:auto;position:relative;z-index:5;";}if(controlStack.parentElement!==header)header.appendChild(controlStack);if(diagButton&&diagButton.parentElement!==controlStack){controlStack.appendChild(diagButton);diagButton.style.cssText="display:block!important;position:static!important;inset:auto!important;z-index:auto!important;margin:0!important;padding:5px 9px!important;font-size:12px!important;border-radius:8px!important;";}if(badge.parentElement!==controlStack)controlStack.appendChild(badge);badge.style.cssText="display:flex!important;position:static!important;z-index:auto!important;align-items:center;justify-content:center;gap:2px;padding:0!important;max-width:100%;min-width:0!important;flex:0 0 auto!important;font-size:8px!important;";const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:22px;height:22px;object-fit:contain;flex-shrink:0";const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:8px;letter-spacing:0;";if(spans[1])spans[1].style.cssText="font-size:8px;margin:0!important;opacity:.75";header.style.display="flex";header.style.alignItems="center";header.style.justifyContent="flex-start";header.style.gap="8px";header.style.flexWrap="nowrap";header.style.minWidth="0";header.style.width="100%";header.style.boxSizing="border-box";}}}
-    if(botView){sync();new MutationObserver(sync).observe(botView,{attributes:true,attributeFilter:["hidden"]});}else {badge.style.display="none";if(diagButton)diagButton.style.display="none";}
+    let controls=null;
+    function rebuildControls(){
+      badge.style.display="none";
+      if(diagButton)diagButton.style.display="none";
+      if(!botView || botView.hidden)return;
+      const header=botView.querySelector(".support-bot-header");
+      if(!header)return;
+      // Remove the previous injected controls completely and rebuild a clean header control rail.
+      header.querySelectorAll('[aria-label="Support diagnostic controls"]').forEach(el=>el.remove());
+      controls=document.createElement("div");
+      controls.setAttribute("aria-label","Support diagnostic controls");
+      controls.style.cssText="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;margin-left:auto;flex:0 0 auto;position:relative;z-index:5";
+      if(diagButton){
+        diagButton.style.cssText="display:block!important;position:static!important;inset:auto!important;z-index:auto!important;margin:0!important;padding:5px 9px!important;font-size:12px!important;border-radius:8px!important;flex:0 0 auto!important";
+        controls.appendChild(diagButton);
+      }
+      badge.style.cssText="display:flex!important;position:static!important;z-index:auto!important;align-items:center;justify-content:center;gap:2px;padding:0!important;max-width:100%;min-width:0!important;flex:0 0 auto!important;font-size:8px!important";
+      const gem=badge.querySelector("img");if(gem)gem.style.cssText="width:22px;height:22px;object-fit:contain;flex-shrink:0";
+      const spans=badge.querySelectorAll("span");if(spans[0])spans[0].style.cssText="font-size:8px;letter-spacing:0";if(spans[1])spans[1].style.cssText="font-size:8px;margin:0!important;opacity:.75";
+      controls.appendChild(badge);
+      header.appendChild(controls);
+      header.style.display="flex";header.style.alignItems="center";header.style.justifyContent="flex-start";header.style.gap="8px";header.style.flexWrap="nowrap";header.style.minWidth="0";header.style.width="100%";header.style.boxSizing="border-box";
+    }
+    function sync(){rebuildControls();}
+    if(botView){sync();new MutationObserver(sync).observe(botView,{attributes:true,attributeFilter:["hidden"]});}
     render();
   }
   function render(){if(count)count.textContent=String(entries.length);if(panel){panel.querySelector("[data-summary]").textContent=entries.length+" captured event(s). Stored locally in this page session. Copy the report to share it.";panel.querySelector("[data-log]").textContent=entries.length?reportText():"No errors captured yet. If the app is blank, refresh and reproduce the issue, then reopen Watchdog.";}}
