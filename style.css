@@ -4231,3 +4231,13 @@ button {
     margin-bottom: 0 !important;
   }
 }
+
+
+/* GLOBAL mobile drawer geometry: keep server rail + one channel panel only. */
+@media (max-width: 900px) {
+  .dashboard.mobile-nav-open .mobile-sidebar { width: min(88vw, 520px) !important; max-width: 88vw !important; flex-direction: row !important; overflow: hidden !important; box-sizing: border-box !important; }
+  .dashboard.mobile-nav-open .mobile-sidebar > .servers { width: 58px !important; min-width: 58px !important; max-width: 58px !important; flex: 0 0 58px !important; box-sizing: border-box !important; }
+  .dashboard.mobile-nav-open #channelsSidebar { display: flex !important; width: auto !important; min-width: 0 !important; max-width: none !important; flex: 1 1 0 !important; box-sizing: border-box !important; overflow-x: hidden !important; overscroll-behavior-x: none !important; }
+  .dashboard.mobile-nav-open #channelsSidebar > #loungeSidebar, .dashboard.mobile-nav-open #channelsSidebar > #dmSidebar, .dashboard.mobile-nav-open #channelsSidebar > .created-server-channel-panel { width: 100% !important; min-width: 0 !important; max-width: 100% !important; flex: 1 1 auto !important; box-sizing: border-box !important; }
+  .dashboard.mobile-nav-open .chat-area, .dashboard.mobile-nav-open .created-server-chat { display: none !important; }
+}
