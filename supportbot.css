@@ -182,3 +182,6 @@ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visi
 @media(max-width:900px){
  body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header .support-bot-avatar{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;flex:0 0 32px!important;transform:scale(8)!important;transform-origin:center center!important;image-rendering:auto!important;}
 }
+
+/* Clean up enlarged Diamond Support GIF rendering only; preserve its existing anchor and layout. */
+@media(max-width:900px){body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header .support-bot-avatar{image-rendering:auto!important;filter:contrast(1.12) brightness(1.06) drop-shadow(0 0 5px rgba(0,145,255,.28))!important;object-fit:cover!important;}}
