@@ -45,7 +45,7 @@
     // Only the WATCHDOG label opens diagnostics; other header areas remain inert.
     label.style.cssText="letter-spacing:.4px;cursor:pointer;pointer-events:auto";
     label.addEventListener("click",e=>{e.stopPropagation();openPanel();});
-    badge.style.cssText+="position:absolute;right:10px;top:calc(100% + 6px);transform:translateY(0);width:auto;max-width:140px;overflow:visible";
+    badge.style.cssText+="position:relative;align-self:flex-end;margin:0 10px 0 0;transform:none;width:auto;max-width:140px;overflow:visible";
     gem.style.cssText="width:32px;height:32px;object-fit:contain;flex-shrink:0;transform:translateX(-5px) scale(2);transform-origin:center center;pointer-events:none";
     count.style.cssText="opacity:.75;font-size:10px;margin-left:4px;pointer-events:none";
     panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-label","Diamond Watchdog error report");
@@ -57,7 +57,7 @@
     panel.addEventListener("click",e=>{if(e.target===panel)closePanel();});
     document.body.appendChild(panel);
     const botView=document.getElementById("supportBotView");
-    function sync(){const active=!!botView&&!botView.hidden;badge.style.display=active?"flex":"none";if(active){const header=botView.querySelector(".support-bot-header");if(header&&badge.parentElement!==header){header.appendChild(badge);header.style.justifyContent="space-between";header.style.gap="8px";header.style.flexWrap="nowrap";header.style.minWidth="0";header.style.width="100%";header.style.boxSizing="border-box";badge.style.display="flex";badge.style.visibility="visible";badge.style.flex="0 0 auto";badge.style.minWidth="max-content";}}}
+    function sync(){const active=!!botView&&!botView.hidden;badge.style.display=active?"flex":"none";if(active&&botView.parentElement&&badge.parentElement!==botView.parentElement){botView.parentElement.insertBefore(badge,botView);badge.style.display="flex";badge.style.visibility="visible";badge.style.flex="0 0 auto";badge.style.minWidth="max-content";}}
     if(botView){sync();new MutationObserver(sync).observe(botView,{attributes:true,attributeFilter:["hidden"]});}else badge.style.display="none";
     render();
   }
