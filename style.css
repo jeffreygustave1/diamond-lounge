@@ -4263,3 +4263,18 @@ button {
   }
   #loungeView .message-box { margin-bottom: 0 !important; }
 }
+
+
+/* iPhone composer spacing override: the small-screen glass composer shorthand margin was outranking the prior bottom-margin-only fix. Override only its bottom edge, including glass variants. */
+@media (max-width: 600px) {
+  .message-box.glass-surface,
+  .dm-message-box.glass-surface,
+  #dmConversationView .message-box.glass-surface,
+  #dmConversationView .dm-message-box.glass-surface,
+  #supportBotView .message-box.glass-surface,
+  #supportBotView .dm-message-box.glass-surface,
+  .created-server-chat .message-box.glass-surface,
+  .created-server-chat .dm-message-box.glass-surface {
+    margin-bottom: 0 !important;
+  }
+}
