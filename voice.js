@@ -1451,6 +1451,12 @@ async function joinVoice() {
             audio: true
         });
 
+        if (!localStream.getAudioTracks().length) {
+            const micError = new Error("No microphone audio track was returned.");
+            micError.name = "NotFoundError";
+            throw micError;
+        }
+
         await loadSessionIceServers();
 
         sessionId =
@@ -1570,11 +1576,14 @@ async function joinVoice() {
         if (controlsRow) controlsRow.hidden = true;
         if (leaveRow) leaveRow.hidden = true;
 
-        setStatus(
-            error.name === "NotAllowedError"
-                ? "Microphone permission was blocked."
-                : "Could not join voice. Check microphone access and Firebase rules."
-        );
+        const micFailureMessage = {
+            NotAllowedError: "Microphone permission was blocked. Allow microphone access in your browser settings.",
+            SecurityError: "Microphone access is blocked by browser security settings.",
+            NotFoundError: "No microphone was detected. Connect or select a microphone.",
+            NotReadableError: "Your microphone is busy or unavailable. Close other apps using it and try again.",
+            AbortError: "Microphone startup was interrupted. Please try again."
+        }[error.name] || "Could not join voice. Check microphone access, your connection, and Firebase rules.";
+        setStatus(micFailureMessage);
 
     } finally {
         joining = false;
