@@ -4211,3 +4211,23 @@ button {
     bottom: 0 !important;
   }
 }
+
+
+/* GLOBAL composer bottom-gap correction across public chat, DMs, support, and created servers. */
+@media (max-width: 900px) {
+  .chat-area,
+  .created-server-chat,
+  #dmConversationView,
+  #supportBotView,
+  #loungeView {
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .message-box,
+  .dm-message-box,
+  #createdServerMessageForm,
+  #dmMessageForm,
+  #messageForm {
+    margin-bottom: 0 !important;
+  }
+}
