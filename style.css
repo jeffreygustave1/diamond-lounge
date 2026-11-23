@@ -4196,3 +4196,18 @@ button {
   input, textarea, select, [contenteditable="true"], .message-input, .dm-message-input, .created-server-message-input { font-size:16px!important; }
   button, a, [role="button"], .server-icon, .text-channel, .dm-channel-entry { touch-action:manipulation!important; }
 }
+
+
+/* GLOBAL iPhone safe-area correction: inset the dashboard below the status bar across all views. */
+@media (max-width: 900px) {
+  .dashboard {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    height: 100dvh !important;
+    box-sizing: border-box !important;
+  }
+  .mobile-sidebar {
+    top: env(safe-area-inset-top, 0px) !important;
+    height: calc(100dvh - env(safe-area-inset-top, 0px)) !important;
+    bottom: 0 !important;
+  }
+}
