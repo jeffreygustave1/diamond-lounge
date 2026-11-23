@@ -3314,12 +3314,13 @@ async function serverEventsDialog() {
 }
 
 function openServer(server) {
-    setMobileSidebar(false);
     syncCreatedServerPanelLayout();
     if (!server?.id) return;
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
     const channelsSidebar = document.getElementById("channelsSidebar");
-    if (channelsSidebar) channelsSidebar.hidden = true;
+    // On mobile, this is the drawer's second column and must stay visible
+    // while the created-server channel panel is moved into it.
+    if (channelsSidebar) channelsSidebar.hidden = !window.matchMedia("(max-width: 900px)").matches;
     placeProfileCardInVisibleSidebar(true);
     restoreCreatedServerVoiceMedia();
 
