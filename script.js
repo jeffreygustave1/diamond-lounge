@@ -2558,7 +2558,7 @@ function openCreatedServerVoiceChannel(channel) {
         call.dataset.channelId = channel.id;
 
         const stage = document.createElement("div");
-        stage.className = "created-server-voice-stage";
+        stage.className = "created-server-voice-stage created-server-voice-stage-mobile";
         stage.id = "createdServerVoiceStage";
         stage.setAttribute("aria-label", "People in voice");
 
