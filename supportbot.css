@@ -174,3 +174,6 @@ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visi
 
 /* Slight additional top offset (incremental) for mobile support header. */
 @media(max-width:900px){body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header{padding-top:20px!important;}}
+
+/* Place Restart immediately above topic suggestions on the inline mobile Support view. */
+@media(max-width:900px){body.dm-mode #supportBotView .support-bot-footer{order:2!important;}body.dm-mode #supportBotView .support-bot-choices{order:3!important;}body.dm-mode #supportBotView .support-bot-input-row{order:4!important;}}
