@@ -139,3 +139,12 @@ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visi
  body.dm-mode #supportBotView > header.support-bot-header .chat-header-main.dm-contact-heading > div { overflow:visible!important; }
  body.dm-mode #supportBotView #supportBotTitle { font-size:16px!important; }
 }
+
+/* FIX TITLE WRAPPING: Diamond Support must render on one horizontal line. */
+@media (max-width:900px){
+ body.dm-mode #supportBotView > header.support-bot-header.dm-conversation-header{flex-direction:row!important;align-items:center!important;}
+ body.dm-mode #supportBotView .chat-header-main.dm-contact-heading{flex-direction:row!important;align-items:center!important;}
+ body.dm-mode #supportBotView .chat-header-main.dm-contact-heading>div{flex:0 0 auto!important;width:max-content!important;min-width:max-content!important;max-width:none!important;overflow:visible!important;white-space:nowrap!important;}
+ body.dm-mode #supportBotView #supportBotTitle{display:block!important;width:max-content!important;max-width:none!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;flex:none!important;}
+ body.dm-mode #supportBotView .sub-header{white-space:nowrap!important;}
+}
