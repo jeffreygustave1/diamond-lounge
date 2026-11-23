@@ -148,3 +148,15 @@ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visi
  body.dm-mode #supportBotView #supportBotTitle{display:block!important;width:max-content!important;max-width:none!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;flex:none!important;}
  body.dm-mode #supportBotView .sub-header{white-space:nowrap!important;}
 }
+
+/* HEADER REPAIR: keep title + online status visible beside the gem, with watchdog isolated at the right. */
+@media(max-width:900px){
+ body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header{position:relative!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;min-height:56px!important;height:auto!important;padding:8px 150px 8px 10px!important;overflow:visible!important;box-sizing:border-box!important;}
+ body.dm-mode #supportBotView .chat-header-main.dm-contact-heading{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;overflow:visible!important;}
+ body.dm-mode #supportBotView .support-bot-avatar{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;flex:0 0 32px!important;transform:none!important;animation:diamondFacetSweep 5.8s ease-in-out infinite!important;}
+ body.dm-mode #supportBotView .chat-header-main.dm-contact-heading>div{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;flex:0 1 auto!important;width:auto!important;min-width:0!important;max-width:none!important;overflow:visible!important;white-space:nowrap!important;}
+ body.dm-mode #supportBotView #supportBotTitle{display:block!important;visibility:visible!important;opacity:1!important;color:#f2f5ff!important;font-size:16px!important;font-weight:700!important;line-height:1.2!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;}
+ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visible!important;opacity:1!important;margin-top:3px!important;white-space:nowrap!important;}
+ body.dm-mode #supportBotView .support-bot-online{display:inline-flex!important;visibility:visible!important;align-items:center!important;gap:5px!important;font-size:10px!important;white-space:nowrap!important;}
+ body.dm-mode #supportBotView .support-bot-online i{display:inline-block!important;visibility:visible!important;width:6px!important;height:6px!important;flex:0 0 6px!important;border-radius:50%!important;background:#57d69a!important;}
+}
