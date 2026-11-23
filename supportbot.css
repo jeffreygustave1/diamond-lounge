@@ -160,3 +160,10 @@ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visi
  body.dm-mode #supportBotView .support-bot-online{display:inline-flex!important;visibility:visible!important;align-items:center!important;gap:5px!important;font-size:10px!important;white-space:nowrap!important;}
  body.dm-mode #supportBotView .support-bot-online i{display:inline-block!important;visibility:visible!important;width:6px!important;height:6px!important;flex:0 0 6px!important;border-radius:50%!important;background:#57d69a!important;}
 }
+
+/* User-requested GIF enlargement only: keep both header elements anchored in their current positions. */
+@media(max-width:900px){
+ body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header .support-bot-avatar{transform:scale(4)!important;transform-origin:center center!important;overflow:visible!important;}
+ body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header .chat-header-main{overflow:visible!important;}
+ body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header{overflow:visible!important;}
+}
