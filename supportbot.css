@@ -178,8 +178,7 @@ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visi
 /* Place Restart immediately above topic suggestions on the inline mobile Support view. */
 @media(max-width:900px){body.dm-mode #supportBotView .support-bot-footer{order:2!important;}body.dm-mode #supportBotView .support-bot-choices{order:3!important;}body.dm-mode #supportBotView .support-bot-input-row{order:4!important;}}
 
-/* Focused header polish: use a larger native avatar footprint to reduce magnification blur. */
+/* Double the GIF visually without changing its layout footprint or anchor position. */
 @media(max-width:900px){
- body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header .support-bot-avatar{width:64px!important;height:64px!important;max-width:64px!important;max-height:64px!important;flex:0 0 64px!important;transform:scale(2)!important;transform-origin:center center!important;image-rendering:auto!important;}
- body.dm-mode #supportBotView .chat-header-main.dm-contact-heading{gap:6px!important;}
+ body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header .support-bot-avatar{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;flex:0 0 32px!important;transform:scale(8)!important;transform-origin:center center!important;image-rendering:auto!important;}
 }
