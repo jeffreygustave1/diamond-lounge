@@ -45,7 +45,7 @@
     // Only the WATCHDOG label opens diagnostics; other header areas remain inert.
     label.style.cssText="letter-spacing:.4px;cursor:pointer;pointer-events:auto";
     label.addEventListener("click",e=>{e.stopPropagation();openPanel();});
-    badge.style.cssText+="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:auto;max-width:140px;overflow:visible";
+    badge.style.cssText+="position:absolute;right:10px;top:-8px;transform:translateY(0);width:auto;max-width:140px;overflow:visible";
     gem.style.cssText="width:32px;height:32px;object-fit:contain;flex-shrink:0;transform:translateX(-5px) scale(2);transform-origin:center center;pointer-events:none";
     count.style.cssText="opacity:.75;font-size:10px;margin-left:4px;pointer-events:none";
     panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-label","Diamond Watchdog error report");
