@@ -4241,3 +4241,44 @@ button {
   .dashboard.mobile-nav-open #channelsSidebar > #loungeSidebar, .dashboard.mobile-nav-open #channelsSidebar > #dmSidebar, .dashboard.mobile-nav-open #channelsSidebar > .created-server-channel-panel { width: 100% !important; min-width: 0 !important; max-width: 100% !important; flex: 1 1 auto !important; box-sizing: border-box !important; }
   .dashboard.mobile-nav-open .chat-area, .dashboard.mobile-nav-open .created-server-chat { display: none !important; }
 }
+
+
+/* GLOBAL mobile conversation-bottom spacing fix: keep the composer flush with the bottom edge in every chat view, including selected DM member conversations. */
+@media (max-width: 900px) {
+  .chat-area,
+  #loungeView,
+  #serverView,
+  #dmHomeView,
+  #dmConversationView,
+  #supportBotView,
+  .created-server-chat,
+  .created-server-workspace,
+  .dm-conversation-view,
+  .dm-view,
+  .lounge-view,
+  .server-view {
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  #loungeView, #serverView, #dmHomeView, #dmConversationView, #supportBotView, .created-server-chat, .dm-conversation-view, .dm-view, .lounge-view, .server-view {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    height: auto !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+  .messages, .dm-messages, #dmMessages, #conversationMessages, .conversation-messages {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .message-box, .dm-message-box, #createdServerMessageForm, #dmMessageForm, #messageForm, form[class*="message-box"], form[id*="MessageForm"] {
+    flex: 0 0 auto !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
