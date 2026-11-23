@@ -1526,6 +1526,10 @@ async function joinVoice() {
 
         await heartbeat();
 
+        // Refresh after microphone + presence are ready so call negotiation
+        // does not wait for a later heartbeat to discover participants.
+        watchParticipants();
+
         heartbeatTimer = setInterval(() => {
             if (localStream) {
                 heartbeat().catch((error) => {
