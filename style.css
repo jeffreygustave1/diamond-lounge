@@ -4304,10 +4304,10 @@ button {
     height: 100% !important;
     flex: 1 1 auto !important;
   }
-  #loungeView,
-  #serverView,
-  #dmConversationView,
-  #supportBotView {
+  #loungeView:not([hidden]),
+  #serverView:not([hidden]),
+  #dmConversationView:not([hidden]),
+  #supportBotView:not([hidden]) {
     display: flex !important;
     flex-direction: column !important;
   }
