@@ -4519,6 +4519,20 @@ button {
     display: none !important;
     pointer-events: none !important;
   }
+  #createdServerMessages.is-voice-call-view .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-call.is-screen-sharing #screenShareStage {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
   #createdServerMessages.is-voice-call-view .created-server-voice-call-status {
     flex: 0 0 auto !important;
     position: relative !important;
