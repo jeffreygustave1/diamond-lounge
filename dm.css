@@ -479,10 +479,3 @@ body.dm-mode #dmSidebar .dm-channel-entry:hover{background:rgba(199,169,107,.09)
 /* Explicit DM workspace: member list in sidebar column; selected chat in the main/right column. */
 @media (min-width: 761px){body.dm-mode .dashboard{display:flex!important;flex-direction:row!important;overflow:hidden!important}body.dm-mode #mobileSidebar{display:flex!important;flex:0 0 340px!important;width:340px!important;min-width:340px!important;max-width:340px!important;position:relative!important;transform:none!important}body.dm-mode #mobileSidebar .servers{flex:0 0 76px!important;width:76px!important}body.dm-mode #channelsSidebar{display:flex!important;flex:1 1 auto!important;width:264px!important;min-width:0!important;max-width:none!important}body.dm-mode .chat-area{display:flex!important;flex:1 1 0!important;width:auto!important;min-width:0!important;height:100%!important;overflow:hidden!important;position:relative!important}body.dm-mode .chat-area>*:not(#dmConversationView):not(#supportBotView){display:none!important}body.dm-mode .chat-area>#dmConversationView:not([hidden]){display:flex!important;flex:1 1 auto!important;width:100%!important;min-width:0!important;height:100%!important;max-height:none!important;position:relative!important}}
 
-
-/* iPhone safe-area correction: keep the private DM header below the status bar. */
-@media (max-width: 600px) {
-  body.dm-mode #dmConversationView > .dm-conversation-header {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
-  }
-}
