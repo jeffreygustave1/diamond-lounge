@@ -4398,3 +4398,22 @@ button {
     gap: 4px !important;
   }
 }
+
+
+/* Mobile voice screen-share layering fix: keep the black shared-screen media canvas behind the participant rail. */
+@media (max-width: 600px) {
+  .created-server-voice-call.is-screen-sharing {
+    isolation: isolate !important;
+  }
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media,
+  .created-server-voice-call.is-screen-sharing #screenShareStage {
+    z-index: 1 !important;
+  }
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage {
+    z-index: 10 !important;
+    pointer-events: auto !important;
+  }
+  .created-server-voice-call.is-screen-sharing .created-server-voice-tile {
+    pointer-events: auto !important;
+  }
+}
