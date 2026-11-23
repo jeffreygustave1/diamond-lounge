@@ -4278,3 +4278,67 @@ button {
     margin-bottom: 0 !important;
   }
 }
+
+
+/* GLOBAL compact voice-chat layout on phones: keep the participant roster visible without oversized controls. */
+@media (max-width: 600px) {
+  .voice-row .voice-panel,
+  .voice-panel {
+    padding: 7px !important;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+    border-radius: 8px !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+  .voice-status,
+  .voice-panel-status,
+  #dmCallStatus {
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 5px !important;
+  }
+  .voice-controls,
+  .voice-leave-row,
+  .dm-call-voice-buttons {
+    gap: 4px !important;
+    margin-bottom: 5px !important;
+  }
+  .voice-control {
+    padding: 5px 2px !important;
+    gap: 3px !important;
+    min-height: 0 !important;
+    border-radius: 7px !important;
+  }
+  .voice-control-icon { font-size: 12px !important; }
+  .voice-control-label { font-size: 8px !important; line-height: 1.1 !important; }
+  .voice-participants { margin-top: 5px !important; }
+  .voice-participants h4,
+  .voice-participant-info > span {
+    margin: 0 0 4px !important;
+    font-size: 10px !important;
+    letter-spacing: .03em !important;
+  }
+  #voiceParticipants,
+  .voice-participant-list {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-height: 24dvh !important;
+    overflow-y: auto !important;
+  }
+  #voiceParticipants li,
+  .voice-participant-list li {
+    padding: 3px 0 !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  .voice-participant { gap: 4px !important; min-width: 0 !important; }
+  .voice-badges { font-size: 8px !important; }
+  .remote-video-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+    gap: 4px !important;
+    margin-top: 5px !important;
+  }
+  .remote-video-tile figcaption { font-size: 8px !important; padding: 3px 4px !important; }
+  .voice-row .voice-panel > * { min-width: 0 !important; }
+}
