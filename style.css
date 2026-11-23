@@ -4502,3 +4502,35 @@ button {
    justify-content:center!important;
  }
 }
+
+/* Mobile created-server voice: foreground the compact participant grid and
+   keep the remote-media canvas beneath it unless actively sharing. */
+@media (max-width: 600px) {
+  #createdServerMessages.is-voice-call-view > .created-server-voice-call {
+    position: relative !important;
+    isolation: isolate !important;
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-stage-mobile {
+    position: relative !important;
+    z-index: 20 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-remote-media {
+    z-index: 0 !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-remote-media #screenShareStage {
+    z-index: 0 !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-stage-mobile .created-server-voice-tile {
+    position: relative !important;
+    z-index: 21 !important;
+  }
+}
