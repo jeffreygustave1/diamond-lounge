@@ -726,7 +726,6 @@ function openTextChannel(channelName) {
     hideMainViews();
     // Restore the created-server panel to its own view so VIP-LOUNGE keeps its independent sidebar.
     syncCreatedServerPanelLayout();
-    setMobileSidebar(true);
 
     if (loungeView) loungeView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = false;
@@ -756,7 +755,7 @@ function openTextChannel(channelName) {
     clearServerSelections();
 
     loadMessages(channelName);
-    // Keep the mobile sidebar open; users dismiss it using the backdrop.
+    // Selection closes the navigation drawer on small screens.
 }
 
 textChannelButtons.forEach((button) => {
