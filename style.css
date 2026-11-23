@@ -4468,3 +4468,62 @@ button {
     opacity: 1 !important;
   }
 }
+
+
+/* Dedicated mobile presentation for created-server voice rooms.
+   Keeps the participant stage as the voice.js rendering target, but gives it a
+   mobile-only layout independent of the desktop room canvas. */
+@media (max-width: 600px) {
+  #createdServerMessages.is-voice-call-view > .created-server-voice-call {
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+    background: #101114 !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-stage-mobile {
+    display: grid !important;
+    position: relative !important;
+    inset: auto !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: minmax(120px, 1fr) !important;
+    align-content: start !important;
+    justify-items: stretch !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background: #101114 !important;
+    z-index: 2 !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-stage-mobile .created-server-voice-tile {
+    min-width: 0 !important;
+    min-height: 120px !important;
+    height: auto !important;
+    border-radius: 12px !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-stage-mobile .created-server-voice-avatar {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-remote-media {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  #createdServerMessages.is-voice-call-view .created-server-voice-call-status {
+    flex: 0 0 auto !important;
+    position: relative !important;
+    z-index: 3 !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+}
