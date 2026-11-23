@@ -4198,10 +4198,10 @@ button {
 }
 
 
-/* GLOBAL iPhone safe-area correction: inset the dashboard below the status bar across all views. */
+/* GLOBAL iPhone top inset: keep channel/member/support headers below Safari's status-bar area on mobile. */
 @media (max-width: 900px) {
   .dashboard {
-    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
     height: 100dvh !important;
     box-sizing: border-box !important;
   }
