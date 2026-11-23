@@ -171,3 +171,6 @@ body.dm-mode #supportBotView .sub-header{display:block!important;visibility:visi
 
 /* Small top inset requested: lower the entire Support header slightly from the iPhone screen edge without changing horizontal placement or sizing. */
 @media(max-width:900px){body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header{padding-top:16px!important;}}
+
+/* Slight additional top offset (incremental) for mobile support header. */
+@media(max-width:900px){body.dm-mode #supportBotView>header.support-bot-header.dm-conversation-header{padding-top:20px!important;}}
