@@ -719,17 +719,6 @@ function openTextChannel(channelName) {
     // Release created-server channel listeners when returning to VIP-LOUNGE.
     stopCreatedServerChannels();
 
-    if (
-        !returningFromPrimaryVoice &&
-        activeTextChannel === channelName &&
-        loungeView &&
-        !loungeView.hidden
-    ) {
-        showEmptyView();
-        setMobileSidebar(false);
-        return;
-    }
-
     stopDirectMessages();
 
     activeCreatedServerId = null;
