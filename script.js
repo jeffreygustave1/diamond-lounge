@@ -635,6 +635,8 @@ function showEmptyView() {
     currentServerCanManageChannels = false;
 
     hideMainViews();
+    placeProfileCardInVisibleSidebar(false);
+    syncCreatedServerPanelLayout();
 
     if (emptyView) emptyView.hidden = false;
     if (communitySidebar) communitySidebar.hidden = true;
@@ -3234,13 +3236,23 @@ async function serverEventsDialog() {
     document.getElementById("serverFeatureDialog")?.querySelector(".created-server-feature-close")?.addEventListener("click", unsub, { once: true });
 }
 
-/* Normalize the member-created server workspace after navigation changes. */
+/* Share the existing second navigation column with member-created servers. */
+let createdServerPanelOriginalStyle;
+
 function syncCreatedServerPanelLayout() {
     const serverView = document.getElementById("serverView");
     const workspace = document.getElementById("createdServerWorkspace");
-    const channelPanel = workspace?.querySelector(".created-server-channel-panel");
+    const desktopSidebar = document.getElementById("desktopSidebar");
+    const channelsSidebar = document.getElementById("channelsSidebar");
+    const channelPanel = document.querySelector(".created-server-channel-panel");
     const serverChat = workspace?.querySelector(".created-server-chat");
-    if (!serverView || !workspace || !channelPanel || !serverChat) return;
+
+    if (!serverView || !workspace || !desktopSidebar || !channelsSidebar || !channelPanel || !serverChat) return;
+
+    if (createdServerPanelOriginalStyle === undefined) {
+        createdServerPanelOriginalStyle = channelPanel.getAttribute("style");
+    }
+
     serverView.style.flexDirection = "column";
     serverView.style.minWidth = "0";
     serverView.style.minHeight = "0";
@@ -3249,10 +3261,54 @@ function syncCreatedServerPanelLayout() {
     workspace.style.minWidth = "0";
     workspace.style.minHeight = "0";
     workspace.style.overflow = "hidden";
-    channelPanel.style.flexShrink = "0";
     serverChat.style.flex = "1 1 0%";
     serverChat.style.minWidth = "0";
     serverChat.style.minHeight = "0";
+
+    if (!serverView.hidden) {
+        const theme = getComputedStyle(workspace);
+
+        [
+            "--dl-server-sidebar",
+            "--dl-server-chat",
+            "--dl-server-header",
+            "--dl-server-accent"
+        ].forEach((property) => {
+            const value = theme.getPropertyValue(property).trim();
+            if (value) channelPanel.style.setProperty(property, value);
+        });
+
+        desktopSidebar.insertBefore(channelPanel, channelsSidebar);
+        channelsSidebar.hidden = true;
+
+        Object.assign(channelPanel.style, {
+            display: "flex",
+            flex: "0 0 275px",
+            width: "275px",
+            minWidth: "275px",
+            maxWidth: "275px",
+            height: "100%",
+            minHeight: "0",
+            boxSizing: "border-box",
+            overflowY: "auto",
+            flexDirection: "column",
+            alignSelf: "stretch"
+        });
+
+        channelPanel.style.setProperty(
+            "background",
+            "var(--dl-server-sidebar, rgba(20,21,24,.96))"
+        );
+    } else {
+        workspace.insertBefore(channelPanel, serverChat);
+        if (createdServerPanelOriginalStyle === null) {
+            channelPanel.removeAttribute("style");
+        } else {
+            channelPanel.setAttribute("style", createdServerPanelOriginalStyle);
+        }
+        channelPanel.style.flexShrink = "0";
+        channelsSidebar.hidden = false;
+    }
 }
 
 function openServer(server) {
