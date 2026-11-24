@@ -256,3 +256,17 @@ button{color:inherit;}
   padding: 0 !important;
   border: 0 !important;
 }
+
+
+/* Created-server navigation: remove redundant inline management controls. */
+.created-server-channel-add-actions,
+.created-server-category-add,
+.created-server-channel-delete,
+#addServerChannelButton {
+  display: none !important;
+}
+
+/* Members remains available in the server dropdown, not the chat header. */
+#serverView .created-server-header-members {
+  display: none !important;
+}
