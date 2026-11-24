@@ -323,31 +323,4 @@ body.auth-page {
     font-size: 11px;
 }
 
-@media(max-width:650px) {
-    .landing-nav {
-        height: 70px;
-        padding: 0 18px;
-    }
 
-    .landing-nav nav {
-        gap: 14px;
-    }
-
-    .landing-nav nav a {
-        font-size: 12px;
-    }
-
-    .landing-hero {
-        min-height: 470px;
-        padding-top: 100px;
-    }
-
-    .landing-features {
-        grid-template-columns: 1fr;
-        max-width: 440px;
-    }
-
-    .auth-page .login-container {
-        padding: 28px 22px;
-    }
-}
