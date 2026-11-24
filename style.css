@@ -25,12 +25,7 @@
 
 
 /* iOS mobile: disable horizontal overscroll/back gesture inside the dashboard. */
-@media (max-width: 900px) {
-    html, body, #dashboard, .dashboard {
-        overscroll-behavior-x: none;
-        touch-action: manipulation;
-    }
-}
+
 
 html, body {
     width: 100%;
@@ -1924,330 +1919,20 @@ button {
    TABLET / SMALL DESKTOP
 ========================================================= */
 
-@media (max-width: 1050px) {
-    .members {
-        width: 225px;
-    }
 
-    .channels {
-        width: 250px;
-    }
-}
 
 /* =========================================================
    RESPONSIVE NAVIGATION — TABLET AND MOBILE
    The sidebar is a drawer. Chat always fills the screen.
 ========================================================= */
 
-@media (max-width: 900px) {
 
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        max-width: 100%;
-        overflow: hidden;
-    }
-
-    body {
-        height: 100dvh;
-        min-height: 0;
-        overscroll-behavior: none;
-    }
-
-    .dashboard {
-        display: flex;
-        position: relative;
-        width: 100%;
-        height: 100dvh;
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    .members,
-    #communitySidebar {
-        display: none !important;
-    }
-
-    .chat-area {
-        display: flex;
-        flex: 1 1 100%;
-        width: 100%;
-        min-width: 0;
-        max-width: 100%;
-        height: 100%;
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    .mobile-sidebar {
-        position: fixed;
-        z-index: 1002;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        display: flex;
-        width: min(310px,88vw);
-        max-width: 88vw;
-        height: 100dvh;
-        overflow: hidden;
-        background: #0c0d0f;
-        box-shadow: 18px 0 45px rgba(0,0,0,.45);
-        transform: translateX(-110%);
-        transition: transform .28s cubic-bezier(.22,.8,.25,1);
-        will-change: transform;
-    }
-
-    .dashboard.mobile-nav-open .mobile-sidebar {
-        transform: translateX(0);
-    }
-
-    .servers {
-        width: 58px;
-        min-width: 58px;
-        max-width: 58px;
-        flex: none;
-        gap: 10px;
-        padding: 14px 0;
-        padding-top: max(14px,env(safe-area-inset-top));
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    .server-icon {
-        width: 40px;
-        height: 40px;
-        flex: none;
-        border-radius: 13px;
-    }
-
-    .channels {
-        width: auto;
-        min-width: 0;
-        flex: 1 1 auto;
-        padding: 18px 10px;
-        padding-bottom: max(14px,env(safe-area-inset-bottom));
-        overflow-y: auto;
-        overflow-x: hidden;
-        border-right: 0;
-    }
-
-    .mobile-menu-button {
-        display: flex !important;
-        flex: none;
-    }
-
-    .mobile-sidebar-backdrop {
-        display: block;
-        position: fixed;
-        z-index: 1001;
-        inset: 0;
-        width: 100%;
-        height: 100dvh;
-        padding: 0;
-        border: 0;
-        background: rgba(0,0,0,.58);
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity .25s ease, visibility .25s ease;
-    }
-
-    .dashboard.mobile-nav-open .mobile-sidebar-backdrop {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
-
-    .chat-header {
-        min-width: 0;
-        padding: 12px 14px;
-        gap: 10px;
-    }
-
-    .chat-header-main {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .chat-header-main > div {
-        min-width: 0;
-    }
-
-    .channel-title,
-    .sub-header {
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .messages,
-    .dm-messages {
-        min-width: 0;
-        max-width: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-
-    .message-box {
-        min-width: 0;
-        max-width: 100%;
-    }
-
-    .message-box input[type="text"] {
-        min-width: 0;
-        width: 0;
-        flex: 1;
-    }
-
-    .empty-channel-view,
-    .server-view,
-    .lounge-view,
-    .dm-view,
-    .dm-conversation-view {
-        min-width: 0;
-        max-width: 100%;
-        overflow: hidden;
-    }
-
-    #loungeView,
-    #serverView,
-    #dmHomeView,
-    #dmConversationView,
-    #emptyView {
-        min-width: 0;
-        max-width: 100%;
-    }
-
-    .voice-controls {
-        grid-template-columns: repeat(3,minmax(0,1fr));
-    }
-}
 
 /* =========================================================
    SMALL PHONES
 ========================================================= */
 
-@media (max-width: 600px) {
 
-    .mobile-sidebar {
-        width: min(280px,88vw);
-        max-width: 88vw;
-    }
-
-    .servers {
-        width: 54px;
-        min-width: 54px;
-        max-width: 54px;
-    }
-
-    .server-icon {
-        width: 38px;
-        height: 38px;
-    }
-
-    .workspace-heading {
-        padding-bottom: 17px;
-        margin-bottom: 12px;
-    }
-
-    .workspace-heading h1 {
-        font-size: 19px;
-    }
-
-    .section-heading {
-        margin-top: 16px;
-    }
-
-    .chat-header {
-        padding: 10px 12px;
-    }
-
-    .messages,
-    .dm-messages {
-        margin: 10px 8px 0;
-        padding: 14px 10px;
-        border-radius: 14px;
-    }
-
-    .message {
-        max-width: 100%;
-        overflow-wrap: anywhere;
-        color: rgba(241,246,248,.96);
-    }
-
-    .message strong {
-        color: #f2e3c2;
-    }
-
-    .message-box {
-        width: auto;
-        min-width: 0;
-        max-width: 100%;
-        margin: 8px !important;
-        gap: 6px;
-    }
-
-    .message-box.glass-surface {
-        margin: 8px !important;
-    }
-
-    .message-box input,
-    .dm-message-box input {
-        min-width: 0;
-        width: 0;
-        flex: 1;
-    }
-
-    .message-box button {
-        padding: 9px 12px;
-    }
-
-    .empty-channel-view {
-        padding: 12px;
-    }
-
-    .liquid-glass-panel {
-        padding: 30px 18px;
-        border-radius: 20px;
-    }
-
-    .glass-gem {
-        width: 70px;
-        height: 70px;
-        transform: scale(2.6);
-        margin-bottom: 22px;
-    }
-
-    .empty-channel-view {
-        padding: 16px;
-    }
-
-    .voice-join-slot .voice-join-button {
-        min-width: 52px;
-        padding: 6px 9px !important;
-    }
-
-    .voice-count {
-        font-size: 8px;
-    }
-
-    .crop-frame,
-    .crop-frame img {
-        width: 130px;
-        height: 130px;
-    }
-
-    .profile-modal-choices {
-        grid-template-columns: repeat(2,1fr);
-    }
-
-    img,
-    video,
-    iframe {
-        max-width: 100%;
-    }
-}
 
 /* =========================================================
    LANDSCAPE PHONES
@@ -2339,14 +2024,7 @@ button {
     color: #ff7777;
 }
 
-@media (max-width: 768px) {
-    .created-server-channel-delete {
-        width: 40px;
-        min-width: 40px;
-        height: 40px;
-        background: rgba(199, 169, 107, 0.08);
-    }
-}
+
 
 /* MEMBER-CREATED SERVER CHANNEL WORKSPACE */
 .created-server-workspace {
@@ -2442,26 +2120,8 @@ button {
     overflow-y: auto;
     overflow-wrap: anywhere;
 }
-@media (max-width: 900px) {
-    .created-server-workspace { min-height: 0; }
-    .created-server-channel-panel {
-        width: min(220px, 40vw);
-        min-width: 150px;
-        flex-basis: min(220px, 40vw);
-        padding: 14px 8px;
-    }
-    .created-server-chat-header { padding: 12px; }
-    .created-server-messages { padding: 12px; }
-}
-@media (max-width: 600px) {
-    .created-server-channel-panel {
-        width: 155px;
-        min-width: 135px;
-        flex-basis: 155px;
-        padding: 12px 7px;
-    }
-    .created-server-channel-button { padding: 8px 6px; }
-}
+
+
 
 /* DISCORD-STYLE CREATED SERVER SIDEBAR — DIAMOND LOUNGE */
 .created-server-workspace{background:#313338;color:#dbdee1;}
@@ -2493,8 +2153,8 @@ button {
 .created-server-header-members{border:0;background:transparent;color:#b5bac1;cursor:pointer;padding:7px 10px;border-radius:5px;}
 .created-server-header-members:hover{background:#35373c;color:#f2f3f5;}
 .created-server-messages{color:#dbdee1;}
-@media(max-width:900px){.created-server-channel-panel{width:min(245px,45vw)!important;min-width:180px!important;flex-basis:min(245px,45vw)!important;}.created-server-dropdown>summary{padding:15px 12px;}}
-@media(max-width:600px){.created-server-channel-panel{width:175px!important;min-width:150px!important;flex-basis:175px!important;}}
+
+
 
 /* CREATED-SERVER VOICE VIEW AND FEATURE MODALS */
 .created-server-voice-title{font-size:22px;color:#f2f3f5;margin:12px 0 18px}
@@ -2517,7 +2177,7 @@ button {
 .created-server-feature-content input,.created-server-feature-content select{width:100%;padding:10px;background:#1e1f22;color:#f2f3f5;border:1px solid #45464d;border-radius:6px}
 .created-server-feature-content label{color:#b5bac1;font-size:12px;font-weight:700}
 .created-server-feature-content button{align-self:flex-start}
-@media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr}.created-server-feature-modal{padding:20px 16px}}
+
 
 .created-server-category-heading{display:flex;align-items:center;justify-content:space-between;margin:13px 8px 4px;color:#949ba4;font-size:11px;font-weight:700;letter-spacing:.03em;list-style:none}.created-server-category-heading button{border:0;background:transparent;color:#949ba4;cursor:pointer}
 
@@ -2542,7 +2202,7 @@ button {
 .created-server-voice-chat-form{display:flex;gap:8px}
 .created-server-voice-chat-form input{flex:1;min-width:0}
 .created-server-voice-chat-form button{align-self:stretch}
-@media(max-width:600px){.created-server-voice-row-actions{opacity:1;visibility:visible;right:3px}#createdServerTextChannels .created-server-channel-item[data-channel-type=voice] .created-server-channel-button{padding-right:82px!important}}
+
 
 /* Created server voice workspace refinements */
 .created-server-voice-stage{width:100%;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));}
@@ -2551,7 +2211,7 @@ button {
 .created-server-category-heading{display:flex;align-items:center;justify-content:space-between;padding:12px 8px 5px;color:#a5a5aa;font-size:11px;font-weight:700;letter-spacing:.09em;}
 .created-server-channel-item[data-channel-type=voice] .created-server-channel-icon{color:#c7a96b;}
 .created-server-voice-chat-log{max-height:45vh;overflow:auto;}
-@media(max-width:600px){.created-server-voice-tile{min-height:145px}.created-server-voice-avatar{width:76px;height:76px}.created-server-voice-stage{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}}
+
 
 .created-server-voice-avatar{overflow:hidden;position:relative;}
 .created-server-voice-avatar-image{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
@@ -3134,47 +2794,8 @@ button {
     line-height: 1.45;
 }
 
-@media (max-width: 850px) {
-    .created-server-voice-call-status {
-        display: none;
-    }
-    .created-server-voice-stage {
-        grid-auto-rows: minmax(160px,1fr);
-    }
-}
-@media (max-width: 620px) {
-    .created-server-voice-stage {
-        grid-template-columns: 1fr;
-        grid-auto-rows: minmax(180px,1fr);
-    }
-    .created-server-voice-toolbar {
-        flex-wrap: wrap;
-        gap: 7px;
-        padding: 8px 8px max(12px,env(safe-area-inset-bottom));
-    }
-    .created-server-voice-toolbar-group {
-        gap: 2px;
-        max-width: 100%;
-    }
-    .created-server-voice-tool {
-        width: 43px;
-        height: 43px;
-    }
-    .created-server-voice-join {
-        height: 44px;
-    }
-    .created-server-voice-leave {
-        width: 49px;
-        min-width: 49px;
-        height: 44px;
-    }
-    .created-server-voice-connection {
-        padding: 8px 7px;
-    }
-    .created-server-voice-user-actions button {
-        width: 25px;
-    }
-}
+
+
 
 
 /* Final alignment refinements for the reference call layout. */
@@ -3249,11 +2870,7 @@ button {
 #mainVoiceConnectionPanel .created-server-voice-user-badges {
     margin-top: 1px;
 }
-@media (max-width: 850px) {
-    #loungeView.is-voice-call .chat-header {
-        padding: 12px 14px;
-    }
-}
+
 
 
 
@@ -3534,41 +3151,16 @@ button {
 .created-server-local-screen {
     position: relative !important;
 }
-@media (max-width: 700px) {
-    .created-server-voice-call.is-screen-sharing .created-server-voice-stage {
-        top: auto;
-        right: 8px;
-        bottom: 82px;
-        left: 8px;
-        flex-direction: row;
-        width: auto;
-        height: 104px;
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
-    .created-server-voice-call.is-screen-sharing .created-server-voice-tile {
-        flex: 0 0 142px;
-        width: 142px;
-        min-height: 96px;
-        max-height: 96px;
-    }
-    .created-server-voice-call.is-screen-sharing .created-server-voice-avatar {
-        width: 38px;
-        height: 38px;
-    }
-    .created-server-voice-call.is-screen-sharing .created-server-voice-toolbar {
-        padding-top: 8px;
-    }
-}
+
 
 /* Diamond Support Bot */
 .support-bot-launch{width:calc(100% - 18px);margin:10px 9px 16px;padding:11px 14px;border:1px solid rgba(199,169,107,.45);border-radius:12px;background:linear-gradient(135deg,rgba(199,169,107,.16),rgba(255,255,255,.035));color:var(--gold-bright);font-weight:700;cursor:pointer;transition:.2s ease;text-align:left}.support-bot-launch:hover{border-color:var(--gold-bright);background:rgba(199,169,107,.23);transform:translateY(-1px)}
-.support-bot-backdrop{position:fixed;inset:0;z-index:10000;background:rgba(4,5,8,.72);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;padding:18px}.support-bot-panel{width:min(480px,100%);max-height:min(720px,90vh);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(199,169,107,.3);border-radius:20px;background:linear-gradient(160deg,#202126,#131419);box-shadow:0 24px 90px rgba(0,0,0,.55)}.support-bot-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}.support-bot-eyebrow{font-size:10px;letter-spacing:2px;color:var(--gold);font-weight:800}.support-bot-header h2{font-size:18px;margin:5px 0 0}.support-bot-header button{width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-size:24px;cursor:pointer}.support-bot-chat{padding:18px 20px 8px;overflow:auto;min-height:110px}.support-bot-message{max-width:100%;padding:11px 13px;margin:0 0 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.045);font-size:13px;line-height:1.55;color:var(--text)}.support-bot-choices{padding:8px 20px 18px;display:flex;flex-direction:column;gap:8px;overflow:auto}.support-bot-choices button{padding:11px 13px;border:1px solid rgba(199,169,107,.22);border-radius:11px;background:rgba(199,169,107,.07);color:var(--text);text-align:left;cursor:pointer;transition:.15s}.support-bot-choices button:hover{background:rgba(199,169,107,.17);border-color:rgba(199,169,107,.55)}.support-bot-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--muted)}.support-bot-footer button{border:0;background:transparent;color:var(--gold-bright);cursor:pointer;font-weight:700}@media(max-width:520px){.support-bot-backdrop{padding:10px}.support-bot-panel{max-height:94vh;border-radius:16px}}
+.support-bot-backdrop{position:fixed;inset:0;z-index:10000;background:rgba(4,5,8,.72);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;padding:18px}.support-bot-panel{width:min(480px,100%);max-height:min(720px,90vh);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(199,169,107,.3);border-radius:20px;background:linear-gradient(160deg,#202126,#131419);box-shadow:0 24px 90px rgba(0,0,0,.55)}.support-bot-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}.support-bot-eyebrow{font-size:10px;letter-spacing:2px;color:var(--gold);font-weight:800}.support-bot-header h2{font-size:18px;margin:5px 0 0}.support-bot-header button{width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-size:24px;cursor:pointer}.support-bot-chat{padding:18px 20px 8px;overflow:auto;min-height:110px}.support-bot-message{max-width:100%;padding:11px 13px;margin:0 0 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.045);font-size:13px;line-height:1.55;color:var(--text)}.support-bot-choices{padding:8px 20px 18px;display:flex;flex-direction:column;gap:8px;overflow:auto}.support-bot-choices button{padding:11px 13px;border:1px solid rgba(199,169,107,.22);border-radius:11px;background:rgba(199,169,107,.07);color:var(--text);text-align:left;cursor:pointer;transition:.15s}.support-bot-choices button:hover{background:rgba(199,169,107,.17);border-color:rgba(199,169,107,.55)}.support-bot-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--muted)}.support-bot-footer button{border:0;background:transparent;color:var(--gold-bright);cursor:pointer;font-weight:700}
 
 /* Animated sapphire gem beside Diamond Support */
 .support-bot-launch{display:flex;align-items:center;gap:10px}.support-bot-diamond{width:25px;height:25px;flex:0 0 25px;overflow:visible;filter:drop-shadow(0 0 5px rgba(0,130,255,.45));animation:supportGemFloat 3s ease-in-out infinite}.support-bot-diamond .gem-main{fill:#0759d5;stroke:#66e6ff;stroke-width:1.5}.support-bot-diamond .gem-top{fill:#9beeff;stroke:#38baff;stroke-width:1}.support-bot-diamond .gem-facet{fill:#123fba;stroke:#68dcff;stroke-width:.7}.support-bot-diamond .gem-glow{fill:#12a9ff;opacity:.18;filter:blur(5px)}.support-bot-diamond .gem-spark{fill:#fff;transform-origin:45px 13px;animation:supportGemSpark 2.2s ease-in-out infinite}.support-bot-launch:hover .support-bot-diamond{filter:drop-shadow(0 0 9px rgba(0,180,255,.8))}.support-bot-launch span{line-height:1.2}@keyframes supportGemFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-2px) rotate(2deg)}}@keyframes supportGemSpark{0%,100%{opacity:.35;transform:scale(.65)}50%{opacity:1;transform:scale(1.1)}}
 
-.dl-tour-welcome-backdrop{position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:20px;background:rgba(5,6,9,.72);backdrop-filter:blur(8px)}.dl-tour-welcome{width:min(430px,100%);padding:28px;border:1px solid rgba(199,169,107,.4);border-radius:20px;background:linear-gradient(145deg,#25252b,#14151a);box-shadow:0 24px 80px rgba(0,0,0,.55);color:#f4f4f5}.dl-tour-eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:#c7a96b}.dl-tour-welcome h2,.dl-tour-popover h3{margin:10px 0;font-size:23px}.dl-tour-welcome p,.dl-tour-popover p{font-size:13px;line-height:1.6;color:#c6c7cc}.dl-tour-welcome-actions,.dl-tour-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}.dl-tour-welcome button,.dl-tour-popover button{padding:10px 14px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:rgba(255,255,255,.06);color:#f5f5f5;font-weight:700;cursor:pointer}.dl-tour-welcome .dl-tour-next,.dl-tour-popover .dl-tour-next{border-color:#c7a96b;background:linear-gradient(135deg,#c7a96b,#e5cf9d);color:#19191d}.dl-tour-overlay{position:fixed;inset:0;z-index:10051;background:rgba(4,5,8,.65);pointer-events:none}.dl-tour-spotlight{position:fixed;z-index:10052;border:2px solid #c7a96b;border-radius:14px;box-shadow:0 0 0 4px rgba(199,169,107,.2),0 0 30px rgba(199,169,107,.35);pointer-events:none;transition:all .2s ease}.dl-tour-popover{position:fixed;z-index:10053;padding:18px;border:1px solid rgba(199,169,107,.45);border-radius:16px;background:linear-gradient(145deg,#24252b,#14151a);box-shadow:0 18px 60px rgba(0,0,0,.6);color:#f5f5f5}.dl-tour-popover h3{font-size:19px}.dl-tour-popover p{margin:8px 0 0}@media(max-width:520px){.dl-tour-welcome{padding:22px}.dl-tour-welcome-actions,.dl-tour-actions{flex-wrap:wrap}}
+.dl-tour-welcome-backdrop{position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:20px;background:rgba(5,6,9,.72);backdrop-filter:blur(8px)}.dl-tour-welcome{width:min(430px,100%);padding:28px;border:1px solid rgba(199,169,107,.4);border-radius:20px;background:linear-gradient(145deg,#25252b,#14151a);box-shadow:0 24px 80px rgba(0,0,0,.55);color:#f4f4f5}.dl-tour-eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:#c7a96b}.dl-tour-welcome h2,.dl-tour-popover h3{margin:10px 0;font-size:23px}.dl-tour-welcome p,.dl-tour-popover p{font-size:13px;line-height:1.6;color:#c6c7cc}.dl-tour-welcome-actions,.dl-tour-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}.dl-tour-welcome button,.dl-tour-popover button{padding:10px 14px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:rgba(255,255,255,.06);color:#f5f5f5;font-weight:700;cursor:pointer}.dl-tour-welcome .dl-tour-next,.dl-tour-popover .dl-tour-next{border-color:#c7a96b;background:linear-gradient(135deg,#c7a96b,#e5cf9d);color:#19191d}.dl-tour-overlay{position:fixed;inset:0;z-index:10051;background:rgba(4,5,8,.65);pointer-events:none}.dl-tour-spotlight{position:fixed;z-index:10052;border:2px solid #c7a96b;border-radius:14px;box-shadow:0 0 0 4px rgba(199,169,107,.2),0 0 30px rgba(199,169,107,.35);pointer-events:none;transition:all .2s ease}.dl-tour-popover{position:fixed;z-index:10053;padding:18px;border:1px solid rgba(199,169,107,.45);border-radius:16px;background:linear-gradient(145deg,#24252b,#14151a);box-shadow:0 18px 60px rgba(0,0,0,.6);color:#f5f5f5}.dl-tour-popover h3{font-size:19px}.dl-tour-popover p{margin:8px 0 0}
 /* LUXURY PROFILE EDITOR MODAL */
 #profileModal{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(4,5,8,.78);backdrop-filter:blur(14px) saturate(130%);-webkit-backdrop-filter:blur(14px) saturate(130%)}
 #profileModal[hidden]{display:none!important}
@@ -3601,7 +3193,7 @@ button {
 #profileModal .server-create-button{border:1px solid rgba(226,205,157,.45);background:linear-gradient(135deg,#c7a96b,#e5cf9d);color:#1a1917;box-shadow:0 5px 20px rgba(199,169,107,.1)}
 #profileModal .server-modal-actions button:hover{transform:translateY(-1px)}
 #profileModal #profileStatus{grid-column:1/-1;font-size:12px;color:#d8c49a}
-@media(max-width:600px){#profileModal{padding:12px}#profileModal>section.server-modal{padding:28px 18px 22px;border-radius:18px}#profileModal h2{font-size:25px}#profileModal #profileForm{grid-template-columns:1fr}#profileModal .profile-badges-note,#profileModal .server-modal-actions,#profileModal #profileStatus{grid-column:1}#profileModal .profile-modal-choices{gap:7px}#profileModal .profile-choice{padding:10px 5px}}
+
 
 /* Diamond Lounge glass featured watch */
 .dl-watch-launch{font-size:19px!important;color:#d9c38f!important}
@@ -3628,8 +3220,8 @@ button {
 .dl-watch-side p{color:#b4b4ba;font-size:13px;line-height:1.6}
 .dl-watch-url{width:100%;box-sizing:border-box;margin-top:14px;padding:12px;border-radius:11px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);color:white}
 .dl-watch-load{width:100%;margin-top:9px;padding:12px;border:1px solid rgba(220,196,146,.35);border-radius:11px;background:linear-gradient(120deg,#b99c64,#e4d2a7);color:#191919;font-weight:800;cursor:pointer}
-@media(max-width:900px){.dl-watch-grid{grid-template-columns:1fr}.dl-watch-side{min-height:auto}.dl-watch-chat-glass{width:min(260px,48%);font-size:11px}}
-@media(max-width:600px){.dl-watch-overlay{padding:5px}.dl-watch-shell{height:96vh;border-radius:18px;padding:12px}.dl-watch-player{border-radius:13px}.dl-watch-chat-glass{right:8px;bottom:8px;padding:8px;width:48%;max-height:40%;font-size:10px}.dl-watch-grid{gap:12px}}
+
+
 
 
 /* Discord-style Watch activity in the channel sidebar (not the server rail) */
@@ -3657,7 +3249,7 @@ button {
 /* A single speaker should not occupy the entire voice stage. */
 .created-server-voice-tile:only-child{grid-column:auto!important;width:min(100%,460px)!important;min-height:260px!important;max-height:360px;margin:0 auto!important}
 .created-server-voice-tile:only-child .created-server-voice-avatar{width:64px;height:64px;font-size:24px;border-width:2px}
-@media(max-width:700px){.created-server-voice-tile:only-child{width:min(100%,360px)!important;min-height:220px!important}.created-server-voice-tile:only-child .created-server-voice-avatar{width:56px;height:56px}}
+
 
 
 /* Expanded Watch activity controls */
@@ -3681,14 +3273,14 @@ button {
 .dl-watch-theater-mode .dl-watch-shell{width:min(1800px,100%);height:98vh}
 .dl-watch-theater-mode .dl-watch-grid{grid-template-columns:minmax(0,1fr) 290px}
 .dl-watch-chat-glass[hidden]{display:none!important}
-@media(max-width:900px){.dl-watch-theater-mode .dl-watch-grid{grid-template-columns:1fr}}
+
 
 /* Tighter single-member voice stage: keep the profile tile from swallowing the call view. */
 .created-server-voice-stage{align-content:center;justify-items:center}
 .created-server-voice-tile:only-child{width:min(100%,340px)!important;min-height:190px!important;max-height:240px!important}
 .created-server-voice-tile:only-child .created-server-voice-avatar{width:52px;height:52px;font-size:20px}
 .created-server-voice-tile:only-child .created-server-voice-tile-footer{padding:7px 10px}
-@media(max-width:700px){.created-server-voice-tile:only-child{width:min(100%,300px)!important;min-height:175px!important;max-height:215px!important}.created-server-voice-tile:only-child .created-server-voice-avatar{width:46px;height:46px}}
+
 
 
 /* Realtime Watch chat styling */
@@ -3714,7 +3306,7 @@ button {
 .dl-store-art{height:84px;border-radius:10px;display:grid;place-items:center;font-weight:800;letter-spacing:2px;font-size:20px;color:#f4e4c1;background:linear-gradient(135deg,#252b36,#111319);border:1px solid rgba(199,169,107,.22)}
 .gif-art{background:linear-gradient(135deg,#243c4a,#161b29,#544332);color:#c9e8ff}.aura-art{background:radial-gradient(circle,#425a73,#171921 65%);font-size:32px}.frame-art{background:linear-gradient(135deg,#c7a96b,#27231b);font-size:32px;color:#161310}.name-art{background:linear-gradient(110deg,#30313a,#16171c);color:#c7a96b;font-size:13px}.badge-art{background:linear-gradient(135deg,#3e4c43,#161b19);font-size:32px}.banner-art{background:linear-gradient(135deg,#3a3149,#171820);font-size:28px}
 .dl-store-lock{color:#c7a96b;font-size:9px;letter-spacing:1.5px;font-weight:800}.dl-store-item h4{margin:3px 0;font-size:14px;color:#e7e6e1}.dl-store-item p{margin:0}.dl-store-buy{margin-top:auto;width:100%;padding:9px 12px;border:1px solid rgba(199,169,107,.35);border-radius:9px;background:rgba(199,169,107,.08);color:#e2cfaa;font-size:11px;font-weight:700;cursor:pointer}.dl-store-buy:hover{background:rgba(199,169,107,.15)}.dl-store-payment-note{margin-top:14px;padding:11px;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#b4b4bc;font-size:11px;line-height:1.5}
-@media(max-width:560px){.dl-store-grid{grid-template-columns:1fr}.dl-customization-store{padding:13px}}
+
 
 
 /* WATCH: video is a voice-stage participant tile; controls stay in a compact side panel */
@@ -3762,11 +3354,7 @@ button {
 }
 .dl-watch-voice-tile .dl-watch-player iframe{width:100%;height:100%}
 .dl-watch-voice-tile .dl-watch-chat-glass{width:min(260px,48%);font-size:10px;padding:9px}
-@media(max-width:600px){
- .dl-watch-overlay{inset:auto 8px 8px auto!important;width:min(310px,calc(100vw - 16px))!important}
- .dl-watch-shell{max-height:65vh!important;padding:10px!important}
- .dl-watch-voice-tile{width:100%;margin:8px 0}
-}
+
 
 
 /* Shared Watch belongs in the large voice participant stage, not the tiny remote-video tray. */
@@ -3788,9 +3376,7 @@ button {
 .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player #dlWatchYT{
   width:100%!important;height:100%!important;
 }
-@media(max-width:700px){
- .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player{min-height:190px!important;max-height:45vh!important}
-}
+
 
 
 /* Watch video acts as an equal voice-channel participant alongside member tiles. */
@@ -3798,7 +3384,7 @@ button {
 .created-server-voice-stage>.dl-watch-voice-tile{box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:240px!important;max-height:none!important;margin:0!important;align-self:stretch!important;justify-self:stretch!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:12px!important;background:#232428!important;padding:12px!important}
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-voice-title{margin-bottom:4px!important}
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{min-height:0!important;max-height:none!important;aspect-ratio:16/9!important}
-@media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr!important}.created-server-voice-stage>.dl-watch-voice-tile{min-height:180px!important}}
+
 
 /* Watch activities: compact expandable menu, positioned near the voice connection panel. */
 .dl-watch-overlay.dl-watch-compact-open{inset:auto auto 150px 350px!important;width:min(370px,calc(100vw - 370px))!important;height:auto!important;min-height:0!important;padding:0!important;background:transparent!important;backdrop-filter:none!important;display:block!important;z-index:12050!important}
@@ -3809,7 +3395,7 @@ button {
 .dl-watch-compact-open .dl-watch-side{padding:10px!important;min-height:0!important}
 .dl-watch-compact-open .dl-watch-side h3{margin:0 0 10px!important}
 .dl-watch-compact-open .dl-watch-note{display:none!important}
-@media(max-width:760px){.dl-watch-overlay.dl-watch-compact-open{left:12px!important;bottom:100px!important;width:min(370px,calc(100vw - 24px))!important}}
+
 /* Participant-stage grid uses square tiles; Watch video fills its square without stretching the grid row. */
 .created-server-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(0,1fr)!important;align-content:start!important}
 .created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile){aspect-ratio:1/1!important;min-height:0!important;height:auto!important}
@@ -3817,14 +3403,14 @@ button {
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-voice-title{position:absolute!important;z-index:4;left:10px;right:10px;top:10px;padding:7px 10px;border-radius:9px;background:rgba(10,10,12,.75);backdrop-filter:blur(8px)}
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:1/1!important;min-height:0!important;max-height:none!important;border:0!important;border-radius:0!important}
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player iframe,.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player #dlWatchYT{width:100%!important;height:100%!important}
-@media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr!important}.created-server-voice-stage>.dl-watch-voice-tile{aspect-ratio:1/1!important}}
+
 
 /* FINAL WATCH ACTIVITY + SQUARE STAGE FIX */
 .dl-watch-overlay.dl-watch-compact-open{position:fixed!important;inset:auto auto 205px 20px!important;width:min(390px,calc(100vw - 24px))!important;height:auto!important;max-height:none!important;padding:0!important;display:block!important;overflow:visible!important;background:transparent!important;backdrop-filter:none!important;}
 .dl-watch-compact-open .dl-watch-shell{width:100%!important;height:auto!important;max-height:60vh!important;overflow:auto!important;padding:14px!important;border-radius:16px!important}
 .dl-watch-compact-open .dl-watch-top{display:none!important}.dl-watch-compact-open .dl-watch-grid{display:block!important}.dl-watch-compact-open .dl-watch-main{display:none!important}.dl-watch-compact-open .dl-watch-side{display:block!important;min-height:0!important;padding:8px!important}
 .dl-watch-compact-open .dl-watch-side h3{margin:0 0 10px!important}.dl-watch-compact-open .dl-watch-note{display:none!important}
-@media(max-width:700px){.dl-watch-overlay.dl-watch-compact-open{left:12px!important;bottom:165px!important;width:calc(100vw - 24px)!important}}
+
 .created-server-voice-stage{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:14px!important;align-content:start!important;justify-items:stretch!important}
 .created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile){aspect-ratio:1/1!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;box-sizing:border-box!important;justify-self:stretch!important;align-self:stretch!important;overflow:hidden!important}
 .created-server-voice-stage>.created-server-voice-tile:not(.dl-watch-voice-tile) .created-server-voice-avatar{width:min(34%,110px)!important;height:auto!important;aspect-ratio:1/1!important;flex-shrink:0!important}
@@ -3832,7 +3418,7 @@ button {
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-voice-title{position:absolute!important;top:10px!important;left:10px!important;right:10px!important;z-index:5!important;margin:0!important;padding:8px 10px!important;background:rgba(12,12,15,.72)!important;border-radius:10px!important;backdrop-filter:blur(8px)!important}
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;aspect-ratio:1/1!important;border:0!important;border-radius:0!important}
 .created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player iframe,.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player #dlWatchYT{width:100%!important;height:100%!important}
-@media(max-width:600px){.created-server-voice-stage{grid-template-columns:1fr!important}.created-server-voice-stage>.created-server-voice-tile{aspect-ratio:1/1!important}}
+
 
 /* WATCH TILE ONLY: restore wide YouTube video, without altering member profile cards. */
 .created-server-voice-stage>.dl-watch-voice-tile{grid-column:auto!important;aspect-ratio:auto!important;height:auto!important;min-height:0!important;max-height:none!important;display:flex!important;flex-direction:column!important;position:relative!important;padding:12px!important;overflow:visible!important;}
@@ -3844,7 +3430,7 @@ button {
 .dl-watch-live-pill i{width:7px;height:7px;border-radius:50%;background:#79c98b;box-shadow:0 0 8px rgba(121,201,139,.7);}
 .dl-watch-chat-launch{padding:7px 12px;border:1px solid rgba(199,169,107,.32);border-radius:9px;background:rgba(199,169,107,.1);color:#e8d4a9;font-size:11px;font-weight:700;cursor:pointer;}
 .dl-watch-chat-launch:hover{background:rgba(199,169,107,.18);}
-@media(max-width:600px){.created-server-voice-stage>.dl-watch-voice-tile .dl-watch-player{aspect-ratio:16/9!important;min-height:0!important;}}
+
 
 /* Live and Watch Chat controls live in the expandable Watch side panel. */
 .dl-watch-live-chat-control{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:9px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035);}
@@ -3856,7 +3442,7 @@ button {
 
 /* ENLARGE SHARED YOUTUBE TILE: make Watch video span both stage columns; member cards remain unchanged. */
 .created-server-voice-stage>.dl-watch-voice-tile{grid-column:1/-1!important;width:100%!important;max-width:none!important;justify-self:stretch!important;}
-@media(max-width:600px){.created-server-voice-stage>.dl-watch-voice-tile{grid-column:1!important;}}
+
 
 
 /* Silver GIF in-site product details */
@@ -3869,7 +3455,7 @@ button {
 .dl-silver-details-copy li{margin:3px 0}
 .dl-silver-action{width:100%;margin-top:12px;padding:10px 14px;border:1px solid rgba(199,169,107,.55);border-radius:9px;background:linear-gradient(135deg,rgba(199,169,107,.2),rgba(199,169,107,.07));color:#f0dfbd;font-weight:750;cursor:pointer}
 .dl-silver-action:hover{background:rgba(199,169,107,.25)}
-@media(max-width:560px){.dl-silver-details{padding:12px}.dl-silver-details-heading strong{font-size:14px}}
+
 
 
 /* Unified text + voice channel tree with category-level create actions */
@@ -3882,10 +3468,7 @@ button {
 .created-server-category-add{width:24px;height:24px;border:0;border-radius:4px;background:transparent;color:#b5bac1;font-size:19px;line-height:1;cursor:pointer}
 .created-server-category-add:hover{background:#404249;color:#f2f3f5}
 .created-server-category-heading .created-server-channel-delete{width:24px!important;min-width:24px!important;height:24px!important}
-@media(max-width:600px){
-  .created-server-channel-add-actions button{min-width:30px}
-  .created-server-category-add{width:28px;height:28px}
-}
+
 
 
 /* =========================================================
@@ -4045,24 +3628,7 @@ button {
 
 
 /* MOBILE DRAWER / PROFILE VISIBILITY SAFETY OVERRIDE (mobile only) */
-@media (max-width: 900px) {
-  .mobile-sidebar {
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    height: 100dvh !important;
-    transform: translateX(-110%) !important;
-    z-index: 1002 !important;
-  }
-  .dashboard.mobile-nav-open .mobile-sidebar {
-    transform: translateX(0) !important;
-  }
-  .mobile-menu-button { display: flex !important; visibility: visible !important; opacity: 1 !important; }
-  .profile-card { display: flex !important; width: 100% !important; min-width: 0 !important; flex-shrink: 0 !important; }
-  #myProfilePicture.member-picture { display: grid !important; visibility: visible !important; opacity: 1 !important; width: 30px !important; height: 30px !important; flex: 0 0 30px !important; }
-  .profile-identity { display: flex !important; min-width: 0 !important; visibility: visible !important; }
-}
+
 
 
 /* Diamond Lounge context menus */
@@ -4107,46 +3673,11 @@ button {
 
 
 /* When the mobile two-column navigation drawer is open, hide the third content column. */
-@media (max-width: 900px) {
-  .dashboard.mobile-nav-open .chat-area,
-  .dashboard.mobile-nav-open > main,
-  .dashboard.mobile-nav-open .created-server-workspace,
-  .dashboard.mobile-nav-open .created-server-chat {
-    display: none !important;
-  }
-  .mobile-sidebar {
-    display: flex !important;
-    width: min(88vw, 520px) !important;
-    max-width: 88vw !important;
-  }
 
-  /* Tap the open space to the right of the drawer to dismiss navigation. */
-  .mobile-sidebar-backdrop {
-    display: block !important;
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 1001 !important;
-    border: 0 !important;
-    padding: 0 !important;
-    background: rgba(0, 0, 0, .42) !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-  .dashboard.mobile-nav-open .mobile-sidebar-backdrop {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-  }
-}
 
 
 /* Mobile navigation is gesture-only; suppress iOS horizontal navigation bounce. */
-@media (max-width: 900px) {
-  .mobile-menu-button { display: none !important; }
-  html, body { overscroll-behavior-x: none; }
-  .dashboard, .chat-area, .mobile-sidebar { touch-action: pan-y; }
-}
+
 
 
 /* Restore the animated diamond icon in the Direct Messages rail button. */
@@ -4159,27 +3690,11 @@ button {
 
 
 /* Created-server mobile navigation: move the complete channel/menu panel into column two. */
-@media (max-width: 900px) {
-  .dashboard.mobile-nav-open #channelsSidebar:has(.created-server-channel-panel) { display:flex!important; width:min(68vw,360px)!important; min-width:230px!important; max-width:68vw!important; flex:1 1 auto!important; padding:0!important; overflow-y:auto!important; }
-  #channelsSidebar .created-server-channel-panel { width:100%!important; min-width:0!important; max-width:none!important; flex:1 1 auto!important; box-sizing:border-box!important; border-right:0!important; padding:16px 10px!important; }
-  #channelsSidebar:has(.created-server-channel-panel) #loungeSidebar,
-  #channelsSidebar:has(.created-server-channel-panel) #dmSidebar { display:none!important; }
-  .dashboard.mobile-nav-open .chat-area { min-width:0!important; }
-}
+
 
 
 /* Prevent created-server column two from drifting horizontally on mobile. */
-@media (max-width: 900px) {
-  .dashboard.mobile-nav-open #channelsSidebar:has(.created-server-channel-panel) { overflow-x:hidden!important; overscroll-behavior-x:none!important; touch-action:pan-y!important; }
-  #channelsSidebar .created-server-channel-panel { overflow-x:hidden!important; overscroll-behavior-x:none!important; touch-action:pan-y!important; }
-  #channelsSidebar .created-server-channel-panel * { max-width:100%; box-sizing:border-box; }
-  #channelsSidebar .created-server-channel-panel ul,
-  #channelsSidebar .created-server-channel-panel li,
-  #channelsSidebar .created-server-channel-panel button,
-  #channelsSidebar .created-server-channel-panel details,
-  #channelsSidebar .created-server-channel-panel summary { min-width:0!important; }
-  .dashboard.mobile-nav-open #channelsSidebar:has(.created-server-channel-panel) { overflow-x:clip!important; }
-}
+
 
 
 /* Keep the DM animated diamond fully inside its rail button bounds. */
@@ -4192,89 +3707,24 @@ button {
 
 
 /* iOS Safari: prevent focus-triggered page zoom on mobile controls. */
-@media (max-width: 900px) {
-  input, textarea, select, [contenteditable="true"], .message-input, .dm-message-input, .created-server-message-input { font-size:16px!important; }
-  button, a, [role="button"], .server-icon, .text-channel, .dm-channel-entry { touch-action:manipulation!important; }
-}
+
 
 
 /* GLOBAL iPhone top inset: keep channel/member/support headers below Safari's status-bar area on mobile. */
-@media (max-width: 900px) {
-  .dashboard {
-    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
-    height: 100dvh !important;
-    box-sizing: border-box !important;
-  }
-  .mobile-sidebar {
-    top: env(safe-area-inset-top, 0px) !important;
-    height: calc(100dvh - env(safe-area-inset-top, 0px)) !important;
-    bottom: 0 !important;
-  }
-}
+
 
 
 /* GLOBAL composer bottom-gap correction across public chat, DMs, support, and created servers. */
-@media (max-width: 900px) {
-  .chat-area,
-  .created-server-chat,
-  #dmConversationView,
-  #supportBotView,
-  #loungeView {
-    min-height: 0 !important;
-    padding-bottom: 0 !important;
-  }
-  .message-box,
-  .dm-message-box,
-  #createdServerMessageForm,
-  #dmMessageForm,
-  #messageForm {
-    margin-bottom: 0 !important;
-  }
-}
+
 
 
 /* GLOBAL mobile drawer geometry: keep server rail + one channel panel only. */
-@media (max-width: 900px) {
-  .dashboard.mobile-nav-open .mobile-sidebar { width: min(88vw, 520px) !important; max-width: 88vw !important; flex-direction: row !important; overflow: hidden !important; box-sizing: border-box !important; }
-  .dashboard.mobile-nav-open .mobile-sidebar > .servers { width: 58px !important; min-width: 58px !important; max-width: 58px !important; flex: 0 0 58px !important; box-sizing: border-box !important; }
-  .dashboard.mobile-nav-open #channelsSidebar { display: flex !important; width: auto !important; min-width: 0 !important; max-width: none !important; flex: 1 1 0 !important; box-sizing: border-box !important; overflow-x: hidden !important; overscroll-behavior-x: none !important; }
-  .dashboard.mobile-nav-open #channelsSidebar > #loungeSidebar, .dashboard.mobile-nav-open #channelsSidebar > #dmSidebar, .dashboard.mobile-nav-open #channelsSidebar > .created-server-channel-panel { width: 100% !important; min-width: 0 !important; max-width: 100% !important; flex: 1 1 auto !important; box-sizing: border-box !important; }
-  .dashboard.mobile-nav-open .chat-area, .dashboard.mobile-nav-open .created-server-chat { display: none !important; }
-}
+
 
 
 /* Mobile composer bottom-edge spacing only: remove trailing bottom margins from chat send bars across views without changing view/container layout. */
-@media (max-width: 900px) {
-  .message-box,
-  .dm-message-box,
-  #messageForm,
-  #dmMessageForm,
-  #createdServerMessageForm,
-  form.message-box,
-  form.dm-message-box,
-  #loungeView .message-box,
-  #dmConversationView .message-box,
-  #dmConversationView .dm-message-box,
-  .created-server-chat .message-box,
-  .created-server-chat .dm-message-box,
-  #supportBotView .message-box,
-  #supportBotView .dm-message-box {
-    margin-bottom: 0 !important;
-  }
-  #loungeView .message-box { margin-bottom: 0 !important; }
-}
+
 
 
 /* iPhone composer spacing override: the small-screen glass composer shorthand margin was outranking the prior bottom-margin-only fix. Override only its bottom edge, including glass variants. */
-@media (max-width: 600px) {
-  .message-box.glass-surface,
-  .dm-message-box.glass-surface,
-  #dmConversationView .message-box.glass-surface,
-  #dmConversationView .dm-message-box.glass-surface,
-  #supportBotView .message-box.glass-surface,
-  #supportBotView .dm-message-box.glass-surface,
-  .created-server-chat .message-box.glass-surface,
-  .created-server-chat .dm-message-box.glass-surface {
-    margin-bottom: 0 !important;
-  }
-}
+
