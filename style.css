@@ -276,3 +276,33 @@ button {
 .profile-upload{display:block;width:100%;margin-bottom:9px;padding:12px;border:1px solid rgba(199,169,107,.3);border-radius:12px;background:linear-gradient(110deg,#403725,#27231b);color:#f0dfbd;font-size:12px;font-weight:750;text-align:center;cursor:pointer}.profile-upload-note,.profile-crop-hint{color:#9ea0a8;font-size:11px;line-height:1.55;text-align:center}.profile-crop{margin:15px 0}.crop-frame{width:220px;height:220px;margin:12px auto;overflow:hidden;border:1px solid rgba(199,169,107,.25);border-radius:16px;background:#101115}.crop-frame img{width:100%;height:100%;object-fit:contain}.crop-zoom-label{display:block;color:#c9c5bc;font-size:12px;margin:8px 0}
 .dl-customization-store{margin:24px 0 18px;padding:20px;border:1px solid rgba(199,169,107,.24);border-radius:18px;background:linear-gradient(145deg,rgba(26,28,34,.98),rgba(12,13,16,.98));box-shadow:inset 0 1px rgba(255,255,255,.035)}.dl-store-heading h3{margin:6px 0 8px;font-size:21px;color:#f2e7ce}.dl-store-heading p,.dl-store-item p{color:#a5a5ad;font-size:12px;line-height:1.55}.dl-store-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:17px}.dl-store-item{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012));min-width:0}.dl-store-art{height:92px;border-radius:11px;display:grid;place-items:center;font-weight:800;letter-spacing:2px;font-size:22px;color:#f4e4c1;background:linear-gradient(135deg,#252b36,#111319);border:1px solid rgba(199,169,107,.24)}.gif-art{background:linear-gradient(135deg,#243c4a,#161b29,#544332);color:#c9e8ff}.aura-art{background:radial-gradient(circle,#425a73,#171921 65%);font-size:32px}.frame-art{background:linear-gradient(135deg,#c7a96b,#27231b);font-size:32px;color:#161310}.name-art{background:linear-gradient(110deg,#30313a,#16171c);color:#c7a96b;font-size:13px}.badge-art{background:linear-gradient(135deg,#3e4c43,#161b19);font-size:32px}.banner-art{background:linear-gradient(135deg,#3a3149,#171820);font-size:28px}.dl-store-lock{color:#c7a96b;font-size:9px;letter-spacing:1.5px;font-weight:800}.dl-store-item h4{margin:3px 0;font-size:14px;color:#e7e6e1}.dl-store-item p{margin:0}.dl-store-buy{margin-top:auto;width:100%;padding:10px 12px;border:1px solid rgba(199,169,107,.38);border-radius:10px;background:rgba(199,169,107,.09);color:#e2cfaa;font-size:11px;font-weight:750;cursor:pointer}.dl-store-buy:hover{background:rgba(199,169,107,.16)}
 .dl-cosmetic-options{display:flex;flex-wrap:wrap;align-items:center;gap:8px;max-height:180px;overflow:auto;padding:3px 2px 5px}.dl-cosmetic-option{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:6px 10px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(255,255,255,.035);color:#d8dbe2;font-size:11px;line-height:1.2;cursor:pointer;transition:border-color .15s,background .15s}.dl-cosmetic-option:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(199,169,107,.5)}.dl-cosmetic-option.selected{border-color:#c7a96b;background:rgba(199,169,107,.16);color:#fff1d0}.dl-cosmetic-option:disabled{opacity:.45;cursor:not-allowed}.dl-cosmetic-swatch{width:23px;height:23px;display:inline-grid;place-items:center;flex:none;border:1px solid rgba(255,255,255,.22);border-radius:7px;background:linear-gradient(135deg,#39404c,#17191e);color:#fff;font-size:12px;font-weight:800}.dl-cosmetic-swatch.is-symbol{border-radius:50%;font-size:13px}.dl-cosmetic-option-label{white-space:nowrap}.dl-server-theme-status,.dl-cosmetic-store-note{margin:0;color:#aeb3bd;font-size:11px;line-height:1.5}.dl-server-theme-art{background:linear-gradient(135deg,#27344c,#52757d,#c7a96b);color:#f8f4e8;font-size:28px}
+
+/* Compact Diamond Support entry in desktop Direct Messages sidebar */
+#supportBotOpen.support-bot-launch {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 48px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  padding: 10px 14px !important;
+  margin: 8px 0 14px !important;
+  text-align: left !important;
+}
+#supportBotOpen .support-bot-diamond {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  flex: 0 0 26px !important;
+  display: block !important;
+  margin: 0 !important;
+}
+#supportBotOpen > span {
+  display: block !important;
+  flex: 1 1 auto !important;
+  white-space: nowrap !important;
+  text-align: left !important;
+}
