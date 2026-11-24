@@ -36,8 +36,6 @@ const activeChannelDescription = document.getElementById("activeChannelDescripti
 const textChannelButtons = [...document.querySelectorAll(".text-channel")];
 
 const dashboard = document.querySelector(".dashboard");
-const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
-
 const dmHomeButton = document.getElementById("dmHomeButton");
 const mainServerButton = document.getElementById("mainServerButton");
 const logoutButton = document.getElementById("logoutButton");
@@ -554,61 +552,6 @@ async function refreshServerMemberPermissions(serverId) {
 }
 
 // ==================================================
-// MOBILE NAVIGATION
-// ==================================================
-
-// Mobile created-server navigation is placed into the second column (channel sidebar).
-const createdServerPanel = document.querySelector(".created-server-channel-panel");
-const createdServerPanelHome = createdServerPanel?.parentElement;
-const createdServerPanelMarker = document.createComment("created-server-panel-home");
-if (createdServerPanel) createdServerPanelHome?.insertBefore(createdServerPanelMarker, createdServerPanel);
-function syncCreatedServerPanelLayout() {
-    if (!createdServerPanel || !createdServerPanelMarker.parentNode) return;
-    if (window.matchMedia("(max-width: 900px)").matches && serverView && !serverView.hidden) {
-        const destination = document.getElementById("channelsSidebar");
-        if (destination && createdServerPanel.parentElement !== destination) destination.appendChild(createdServerPanel);
-    } else if (createdServerPanel.parentElement !== createdServerPanelMarker.parentNode) {
-        createdServerPanelMarker.parentNode.insertBefore(createdServerPanel, createdServerPanelMarker.nextSibling);
-    }
-}
-window.addEventListener("resize", syncCreatedServerPanelLayout);
-
-function setMobileSidebar(open) {
-    if (!dashboard) return;
-    dashboard.classList.toggle("mobile-nav-open", open);
-}
-
-mobileSidebarBackdrop?.addEventListener("click", () => {
-    setMobileSidebar(false);
-});
-
-// MOBILE ONLY: intercept horizontal gestures for the drawer; never use them for page navigation.
-(() => {
-    const mobileQuery = window.matchMedia("(max-width: 900px)");
-    let startX = 0, startY = 0, tracking = false, horizontal = false;
-    document.addEventListener("touchstart", (event) => {
-        if (!mobileQuery.matches || event.touches.length !== 1) { tracking = false; return; }
-        const t = event.touches[0];
-        startX = t.clientX; startY = t.clientY; tracking = true; horizontal = false;
-    }, { passive: true, capture: true });
-    document.addEventListener("touchmove", (event) => {
-        if (!tracking || !mobileQuery.matches || event.touches.length !== 1) return;
-        const t = event.touches[0], dx = t.clientX - startX, dy = t.clientY - startY;
-        if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.15) {
-            horizontal = true;
-            if (event.cancelable) event.preventDefault();
-        } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) tracking = false;
-    }, { passive: false, capture: true });
-    document.addEventListener("touchend", (event) => {
-        if (!tracking || !mobileQuery.matches || !horizontal) { tracking = false; horizontal = false; return; }
-        const t = event.changedTouches[0], dx = t.clientX - startX;
-        if (dx > 60 && !dashboard?.classList.contains("mobile-nav-open")) setMobileSidebar(true);
-        // Closing is by tap on backdrop; a swipe-left is not required.
-        tracking = false; horizontal = false;
-    }, { passive: true, capture: true });
-    document.addEventListener("touchcancel", () => { tracking = false; horizontal = false; }, { passive: true, capture: true });
-})();
-// ==================================================
 // VIEW AND LISTENER MANAGEMENT
 // ==================================================
 
@@ -712,8 +655,7 @@ function showEmptyView() {
 
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
-    setMobileSidebar(false);
-    const returningFromPrimaryVoice = Boolean(primaryVoiceChannelName);
+const returningFromPrimaryVoice = Boolean(primaryVoiceChannelName);
     if (returningFromPrimaryVoice) closePrimaryVoiceCallView();
 
     // Release created-server channel listeners when returning to VIP-LOUNGE.
@@ -1193,9 +1135,7 @@ function getConversationId(firstUid, secondUid) {
 
 async function openConversation(member) {
     if (!currentUser || !member?.uid) return;
-    setMobileSidebar(false);
-
-    stopDirectMessages();
+stopDirectMessages();
 
     activeCreatedServerId = null;
     selectedMember = member;
@@ -1889,9 +1829,7 @@ async function deleteCreatedServerChannel(channel) {
 
 function openCreatedServerChannel(channel) {
     if (!currentUser || !activeCreatedServerId || !channel?.id) return;
-    setMobileSidebar(false);
-
-    if (channel.type !== "text") return;
+if (channel.type !== "text") return;
 
     activeCreatedServerVoiceChannel = null;
     restoreCreatedServerVoiceMedia();
@@ -2355,8 +2293,7 @@ function openPrimaryVoiceCall(channelName, roomId) {
     clearServerSelections();
     mainServerButton?.classList.add("selected");
     mainServerButton?.setAttribute("aria-pressed", "true");
-    setMobileSidebar(false);
-    const messages = document.getElementById("messages");
+const messages = document.getElementById("messages");
     const messageForm = document.getElementById("messageForm");
     const uploadStatus = document.getElementById("uploadStatus");
     if (messages) messages.hidden = true;
@@ -2520,8 +2457,7 @@ document.getElementById("createdServerVoiceUserProfile")?.addEventListener("clic
 
 function openCreatedServerVoiceChannel(channel) {
     if (!channel?.id || !activeCreatedServerId) return;
-    setMobileSidebar(false);
-    stopCreatedServerMessages();
+stopCreatedServerMessages();
     createdServerVoicePresenceStop?.();
     createdServerVoicePresenceStop = null;
 
@@ -3632,8 +3568,7 @@ async function loadServerIcons() {
 
 async function logoutUser() {
     try {
-        setMobileSidebar(false);
-        closeServerContextMenu();
+closeServerContextMenu();
 
         stopPublicMessages();
         stopDirectMessages();
@@ -4152,8 +4087,7 @@ profileForm?.addEventListener("submit", async (event) => {
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-        setMobileSidebar(false);
-        closeServerModal();
+closeServerModal();
         closeProfileModal();
         closeServerContextMenu();
     }

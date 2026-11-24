@@ -24,9 +24,6 @@
 }
 
 
-/* iOS mobile: disable horizontal overscroll/back gesture inside the dashboard. */
-
-
 html, body {
     width: 100%;
     height: 100%;
@@ -938,21 +935,7 @@ button {
    MOBILE MENU BUTTON
 ========================================================= */
 
-.mobile-menu-button {
-    display: none;
-    width: 38px;
-    height: 38px;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 5px;
-    padding: 0;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: #1b1c20;
-    cursor: pointer;
-}
+
 
 .mobile-menu-button:hover {
     background: #302a1e;
@@ -1859,9 +1842,7 @@ button {
    BACKDROP
 ========================================================= */
 
-.mobile-sidebar-backdrop {
-    display: none;
-}
+
 
 /* =========================================================
    DECORATIVE ELEMENTS / INTERACTION
@@ -3625,10 +3606,6 @@ button {
 .server-assets-future-art{background:linear-gradient(135deg,#6a5739,#2b2c34 52%,#18202c);color:#f0d6a3;font-size:34px}
 .emoji-future-art{background:linear-gradient(135deg,#394d4a,#252b3b 60%,#48374a);color:#dce8dc;font-size:22px}
 .voice-future-art{background:linear-gradient(135deg,#35435a,#1b202b 55%,#51405a);color:#d9d5f2;font-size:36px}
-
-
-/* MOBILE DRAWER / PROFILE VISIBILITY SAFETY OVERRIDE (mobile only) */
-
 
 
 /* Diamond Lounge context menus */
