@@ -1837,7 +1837,10 @@ async function deleteCreatedServerChannel(channel) {
         return;
     }
 
-    if (!confirm(`Delete the ${channel.type} channel "${channel.name}"?`)) return;
+    const confirmMessage = channel.type === "category"
+        ? `Delete the category "${channel.name}"? Its channels will remain in the server as top-level channels.`
+        : `Delete the ${channel.type} channel "${channel.name}"?`;
+    if (!confirm(confirmMessage)) return;
     const serverId = activeCreatedServerId;
 
     try {
@@ -4337,7 +4340,7 @@ document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click"
 document.addEventListener("contextmenu", function(event) {
   const serverIcon = event.target.closest(".server-icon.created-server");
   const channelRow = event.target.closest(".created-server-channel-item");
-  const category = event.target.closest(".created-server-category-group, .created-server-category-heading");
+  const category = channelRow ? null : event.target.closest(".created-server-category-group, .created-server-category-heading");
   if (!serverIcon && !channelRow && !category) return;
   event.preventDefault();
   if (serverIcon) return; // its own menu handler handles the menu
