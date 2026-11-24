@@ -350,3 +350,79 @@ button{color:inherit;}
   width: 100% !important;
   flex: 1 1 100% !important;
 }
+
+
+/* Created-server categories: Discord-style collapsible groups and channel spacing. */
+#createdServerTextChannels {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 9px !important;
+  padding: 5px 10px 14px 10px !important;
+}
+
+#createdServerTextChannels > .created-server-channel-item {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#createdServerTextChannels .created-server-channel-button {
+  min-height: 40px !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+}
+
+#createdServerTextChannels > .created-server-category-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  margin: 5px 0 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+#createdServerTextChannels .created-server-category-toggle {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  width: 100% !important;
+  min-height: 34px !important;
+  padding: 5px 9px !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #c9c3b7 !important;
+  text-align: left !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: .07em !important;
+  cursor: pointer !important;
+}
+
+#createdServerTextChannels .created-server-category-chevron {
+  display: inline-block !important;
+  transition: transform .16s ease !important;
+  font-size: 12px !important;
+}
+
+#createdServerTextChannels .created-server-category-group.is-collapsed
+.created-server-category-chevron {
+  transform: rotate(-90deg) !important;
+}
+
+#createdServerTextChannels .created-server-category-children {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin: 0 0 0 15px !important;
+  padding: 0 0 0 10px !important;
+  border-left: 1px solid rgba(199,169,107,.2) !important;
+  list-style: none !important;
+}
+
+#createdServerTextChannels .created-server-category-group.is-collapsed
+.created-server-category-children {
+  display: none !important;
+}
+
+#createdServerTextChannels .created-server-category-children > .created-server-channel-item {
+  margin: 0 !important;
+}
