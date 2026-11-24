@@ -226,3 +226,33 @@ button{color:inherit;}
   padding: 0 !important;
   border: 0 !important;
 }
+
+
+/* Direct messages: keep the member-conversation composer flush with the bottom. */
+#dmConversationView:not([hidden]) {
+  display: flex !important;
+  flex: 1 1 0% !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#dmMessages {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+#dmMessageForm {
+  flex: 0 0 auto !important;
+  margin-bottom: 0 !important;
+}
+
+#dmConversationView .upload-status:not(:has(*)) {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
