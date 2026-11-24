@@ -46,7 +46,7 @@
     label.style.cssText="letter-spacing:.4px;cursor:pointer;pointer-events:auto;display:inline-block;max-width:120px;overflow:visible";
     label.addEventListener("click",e=>{e.stopPropagation();openPanel();});
     badge.style.cssText+="position:absolute;right:10px;bottom:4px;top:auto;transform:none;width:auto;max-width:160px;overflow:visible;z-index:30";
-    gem.style.cssText="width:96px;height:96px;object-fit:contain;flex-shrink:0;transform:scale(0.85);transform-origin:center center;pointer-events:none";
+    gem.style.cssText="width:96px;height:96px;object-fit:contain;flex-shrink:0;transform:scale(0.85);transform-origin:center center;pointer-events:none;margin-right:-40px";
     count.style.cssText="opacity:.75;font-size:10px;margin-left:12px;pointer-events:none";
     panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-label","Diamond Watchdog error report");
     panel.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,7,12,.94);color:#edf3ff;display:none;flex-direction:column;padding:env(safe-area-inset-top,12px) 12px env(safe-area-inset-bottom,12px);font:14px system-ui;box-sizing:border-box";
