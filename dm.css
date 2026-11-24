@@ -247,54 +247,9 @@
     background: rgba(20, 21, 24, .98);
 }
 
-/* MOBILE */
 
-@media (max-width: 600px) {
 
-    .dm-sidebar-heading {
-        padding-bottom: 14px;
-    }
 
-    .dm-sidebar-heading h2 {
-        font-size: 22px;
-    }
-
-    .dm-member-button {
-        gap: 8px;
-        padding: 9px 5px;
-    }
-
-    .dm-member-avatar {
-        width: 32px;
-        height: 32px;
-    }
-
-    .dm-welcome {
-        padding: 20px 12px;
-    }
-
-    .dm-welcome-gem {
-        width: 180px;
-        height: auto;
-    }
-
-    .dm-welcome h2 {
-        font-size: 28px;
-    }
-
-    .dm-conversation-header {
-        padding: 12px;
-    }
-
-    .dm-message-box {
-        margin-right: 10px;
-        margin-left: 10px;
-    }
-
-    .dm-message-box button {
-        padding: 9px 12px;
-    }
-}
 
 
 /* ---------- MATCH CHANNELS TO DIRECT MESSAGES ---------- */
@@ -451,7 +406,7 @@ body.dm-mode #dmConversationView #dmStatus { flex: 0 0 auto !important; }
 /* Final DM column correction: directory stays in column two; conversation is
    a direct child of the main (third) column, with header at its top. */
 body.dm-mode .dashboard { display:flex !important; flex-direction:row !important; }
-body.dm-mode .mobile-sidebar { display:flex !important; flex:0 0 auto !important; width:auto !important; }
+body.dm-mode .desktop-sidebar { display:flex !important; flex:0 0 auto !important; width:auto !important; }
 body.dm-mode #channelsSidebar { height:100% !important; box-sizing:border-box !important; }
 body.dm-mode #dmSidebar:not([hidden]) { order:0 !important; }
 body.dm-mode #channelsSidebar > .profile-card { order:99 !important; margin-top:auto !important; }
@@ -477,5 +432,5 @@ body.dm-mode #dmSidebar .dm-channel-entry:hover{background:rgba(199,169,107,.09)
 
 
 /* Explicit DM workspace: member list in sidebar column; selected chat in the main/right column. */
-@media (min-width: 761px){body.dm-mode .dashboard{display:flex!important;flex-direction:row!important;overflow:hidden!important}body.dm-mode #mobileSidebar{display:flex!important;flex:0 0 340px!important;width:340px!important;min-width:340px!important;max-width:340px!important;position:relative!important;transform:none!important}body.dm-mode #mobileSidebar .servers{flex:0 0 76px!important;width:76px!important}body.dm-mode #channelsSidebar{display:flex!important;flex:1 1 auto!important;width:264px!important;min-width:0!important;max-width:none!important}body.dm-mode .chat-area{display:flex!important;flex:1 1 0!important;width:auto!important;min-width:0!important;height:100%!important;overflow:hidden!important;position:relative!important}body.dm-mode .chat-area>*:not(#dmConversationView):not(#supportBotView){display:none!important}body.dm-mode .chat-area>#dmConversationView:not([hidden]){display:flex!important;flex:1 1 auto!important;width:100%!important;min-width:0!important;height:100%!important;max-height:none!important;position:relative!important}}
+@media (min-width: 761px){body.dm-mode .dashboard{display:flex!important;flex-direction:row!important;overflow:hidden!important}body.dm-mode #desktopSidebar{display:flex!important;flex:0 0 340px!important;width:340px!important;min-width:340px!important;max-width:340px!important;position:relative!important;transform:none!important}body.dm-mode #desktopSidebar .servers{flex:0 0 76px!important;width:76px!important}body.dm-mode #channelsSidebar{display:flex!important;flex:1 1 auto!important;width:264px!important;min-width:0!important;max-width:none!important}body.dm-mode .chat-area{display:flex!important;flex:1 1 0!important;width:auto!important;min-width:0!important;height:100%!important;overflow:hidden!important;position:relative!important}body.dm-mode .chat-area>*:not(#dmConversationView):not(#supportBotView){display:none!important}body.dm-mode .chat-area>#dmConversationView:not([hidden]){display:flex!important;flex:1 1 auto!important;width:100%!important;min-width:0!important;height:100%!important;max-height:none!important;position:relative!important}}
 

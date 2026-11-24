@@ -159,9 +159,6 @@ let members = [];
 let selectedMember = null;
 let currentConversationId = null;
 let serverContextMenu = null;
-let serverLongPressTimer = null;
-let suppressServerClick = false;
-
 let currentAvatar = "diamond";
 let uploadedPicture = "";
 const DIAMOND_LOUNGE_OWNER_UID = "NlOxj6tdInP9SMKcYIUtz1MeZ2z2";
@@ -3242,9 +3239,7 @@ function openServer(server) {
     if (!server?.id) return;
     if (primaryVoiceChannelName) closePrimaryVoiceCallView();
     const channelsSidebar = document.getElementById("channelsSidebar");
-    // On mobile, this is the drawer's second column and must stay visible
-    // while the created-server channel panel is moved into it.
-    if (channelsSidebar) channelsSidebar.hidden = !window.matchMedia("(max-width: 900px)").matches;
+    if (channelsSidebar) channelsSidebar.hidden = false;
     placeProfileCardInVisibleSidebar(true);
     restoreCreatedServerVoiceMedia();
 
@@ -3315,7 +3310,7 @@ loadCreatedServerChannels(server.id);
 
     updateCreatedServerVoiceUI();
     syncCreatedServerPanelLayout();
-    // Selecting a server should not dismiss the mobile navigation panel.
+    
 }
 
 function closeServerContextMenu() {
@@ -3432,53 +3427,11 @@ function makeServerIcon(server) {
 
     server.button = icon;
 
-    icon.addEventListener("click", (event) => {
-        if (suppressServerClick) {
-            event.preventDefault();
-            event.stopPropagation();
-            suppressServerClick = false;
-            return;
-        }
-
-        openServer(server);
-    });
+    icon.addEventListener("click", () => { openServer(server); });
 
     // COMPUTER RIGHT-CLICK
     icon.addEventListener("contextmenu", (event) => {
         showServerContextMenu(event, server);
-    });
-
-    // MOBILE LONG-PRESS
-    icon.addEventListener("pointerdown", (event) => {
-        if (event.pointerType !== "touch") return;
-
-        clearTimeout(serverLongPressTimer);
-        suppressServerClick = false;
-
-        serverLongPressTimer = setTimeout(() => {
-            suppressServerClick = true;
-
-            showServerContextMenu(
-                {
-                    preventDefault() {},
-                    clientX: event.clientX,
-                    clientY: event.clientY
-                },
-                server
-            );
-        }, 650);
-    });
-
-    icon.addEventListener("pointerup", () => {
-        clearTimeout(serverLongPressTimer);
-    });
-
-    icon.addEventListener("pointercancel", () => {
-        clearTimeout(serverLongPressTimer);
-    });
-
-    icon.addEventListener("pointerleave", () => {
-        clearTimeout(serverLongPressTimer);
     });
 
     return icon;
