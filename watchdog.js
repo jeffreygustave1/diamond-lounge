@@ -43,10 +43,10 @@
     count=document.createElement("span");count.style.cssText="opacity:.75;font-size:10px;margin-left:8px";
     badge.append(gem,label,count);
     // Only the WATCHDOG label opens diagnostics; other header areas remain inert.
-    label.style.cssText="letter-spacing:.4px;cursor:pointer;pointer-events:auto";
+    label.style.cssText="letter-spacing:.4px;cursor:pointer;pointer-events:auto;display:inline-block;max-width:120px;overflow:visible";
     label.addEventListener("click",e=>{e.stopPropagation();openPanel();});
-    badge.style.cssText+="position:absolute;right:10px;top:42px;transform:none;width:auto;max-width:140px;overflow:visible";
-    gem.style.cssText="width:32px;height:32px;object-fit:contain;flex-shrink:0;transform:translateX(11px) scale(2);transform-origin:center center;pointer-events:none";
+    badge.style.cssText+="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:auto;max-width:160px;overflow:visible;z-index:30";
+    gem.style.cssText="width:32px;height:32px;object-fit:contain;flex-shrink:0;transform:scale(1.35);transform-origin:center center;pointer-events:none";
     count.style.cssText="opacity:.75;font-size:10px;margin-left:4px;pointer-events:none";
     panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-label","Diamond Watchdog error report");
     panel.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,7,12,.94);color:#edf3ff;display:none;flex-direction:column;padding:env(safe-area-inset-top,12px) 12px env(safe-area-inset-bottom,12px);font:14px system-ui;box-sizing:border-box";
