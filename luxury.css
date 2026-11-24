@@ -112,3 +112,23 @@ button{color:inherit;}
 
 
 
+
+
+/* Created-server sidebar: scroll navigation independently from the pinned profile card. */
+#desktopSidebar > .created-server-channel-panel {
+  overflow: visible !important;
+}
+
+#desktopSidebar > .created-server-channel-panel > .dl-created-server-scroll-area {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+#desktopSidebar > .created-server-channel-panel > .profile-card {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+}
