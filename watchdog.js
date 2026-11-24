@@ -47,7 +47,7 @@
     label.addEventListener("click",e=>{e.stopPropagation();openPanel();});
     badge.style.cssText+="position:absolute;right:10px;bottom:4px;top:auto;transform:none;width:auto;max-width:160px;overflow:visible;z-index:30";
     gem.style.cssText="width:32px;height:32px;object-fit:contain;flex-shrink:0;transform:scale(1.35);transform-origin:center center;pointer-events:none";
-    count.style.cssText="opacity:.75;font-size:10px;margin-left:4px;pointer-events:none";
+    count.style.cssText="opacity:.75;font-size:10px;margin-left:12px;pointer-events:none";
     panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-label","Diamond Watchdog error report");
     panel.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,7,12,.94);color:#edf3ff;display:none;flex-direction:column;padding:env(safe-area-inset-top,12px) 12px env(safe-area-inset-bottom,12px);font:14px system-ui;box-sizing:border-box";
     panel.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0"><strong style="font-size:17px">DIAMOND WATCHDOG</strong><button data-close style="padding:10px 14px;border-radius:10px">Close</button></div><div data-summary style="padding:8px 0"></div><div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 0"><button data-copy style="padding:10px;border-radius:10px">Copy report</button><button data-clear style="padding:10px;border-radius:10px">Clear logs</button></div><pre data-log style="overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#151922;border:1px solid #303746;border-radius:12px;padding:12px;flex:1;min-height:0;margin:0;font:12px ui-monospace,monospace"></pre>';
