@@ -3271,6 +3271,8 @@ function syncCreatedServerPanelLayout() {
     serverChat.style.minWidth = "0";
     serverChat.style.minHeight = "0";
 
+    const scrollAreaSelector = ":scope > .dl-created-server-scroll-area";
+
     if (!serverView.hidden) {
         const theme = getComputedStyle(workspace);
 
@@ -3296,16 +3298,49 @@ function syncCreatedServerPanelLayout() {
             height: "100%",
             minHeight: "0",
             boxSizing: "border-box",
-            overflowY: "auto",
+            overflow: "visible",
             flexDirection: "column",
             alignSelf: "stretch"
         });
+
+        // Keep the profile card outside the independently scrolling channel area.
+        let profileCard = channelPanel.querySelector(":scope > .profile-card");
+        const existingScrollArea = channelPanel.querySelector(scrollAreaSelector);
+
+        if (!profileCard && existingScrollArea) {
+            profileCard = existingScrollArea.querySelector(".profile-card");
+        }
+
+        if (profileCard && profileCard.parentElement !== channelPanel) {
+            channelPanel.append(profileCard);
+        }
+
+        let scrollArea = channelPanel.querySelector(scrollAreaSelector);
+        if (!scrollArea) {
+            scrollArea = document.createElement("div");
+            scrollArea.className = "dl-created-server-scroll-area";
+
+            [...channelPanel.children].forEach((child) => {
+                if (child !== profileCard) scrollArea.append(child);
+            });
+
+            channelPanel.insertBefore(scrollArea, profileCard || null);
+        }
 
         channelPanel.style.setProperty(
             "background",
             "var(--dl-server-sidebar, rgba(20,21,24,.96))"
         );
     } else {
+        // Restore the original sidebar children before returning to the normal layout.
+        const scrollArea = channelPanel.querySelector(scrollAreaSelector);
+        if (scrollArea) {
+            while (scrollArea.firstChild) {
+                channelPanel.insertBefore(scrollArea.firstChild, scrollArea);
+            }
+            scrollArea.remove();
+        }
+
         workspace.insertBefore(channelPanel, serverChat);
         if (createdServerPanelOriginalStyle === null) {
             channelPanel.removeAttribute("style");
