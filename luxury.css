@@ -270,3 +270,83 @@ button{color:inherit;}
 #serverView .created-server-header-members {
   display: none !important;
 }
+
+
+/* Created-server luxury theme: channel navigation, dropdown, and header. */
+.created-server-channel-panel {
+  background: #141518 !important;
+  color: #f4f0e8 !important;
+  border-right: 1px solid rgba(199,169,107,.18) !important;
+}
+
+.created-server-dropdown,
+.created-server-channel-heading,
+.created-server-channel-section {
+  background: transparent !important;
+  color: #f4f0e8 !important;
+}
+
+.created-server-channel-item {
+  width: 100% !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.created-server-channel-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  background: #1b1c20 !important;
+  color: #c9c3b7 !important;
+  border: 1px solid rgba(199,169,107,.12) !important;
+  border-radius: 8px !important;
+}
+
+.created-server-channel-button.selected {
+  background: rgba(199,169,107,.15) !important;
+  color: #e1c98f !important;
+  border-color: rgba(199,169,107,.45) !important;
+}
+
+.created-server-menu button {
+  background: #1b1c20 !important;
+  color: #e1c98f !important;
+  border: 1px solid rgba(199,169,107,.18) !important;
+  border-radius: 8px !important;
+  transition: background .15s, border-color .15s !important;
+}
+
+.created-server-menu button:hover {
+  background: #30291e !important;
+  border-color: rgba(199,169,107,.48) !important;
+}
+
+.created-server-dropdown summary {
+  background: #141518 !important;
+  color: #f4f0e8 !important;
+  border-color: rgba(199,169,107,.18) !important;
+}
+
+.created-server-chat-header {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 26px !important;
+  background: #141518 !important;
+  color: #e1c98f !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  border-bottom: 1px solid rgba(199,169,107,.22) !important;
+}
+
+/* Created-server voice channels: hide shortcut controls and fill the row. */
+.created-server-channel-section button[title="Open voice channel chat"],
+.created-server-channel-section button[title="Invite to channel"],
+.created-server-channel-section button[title="Voice channel settings"] {
+  display: none !important;
+}
+
+.created-server-channel-section .created-server-channel-button {
+  width: 100% !important;
+  flex: 1 1 100% !important;
+}
