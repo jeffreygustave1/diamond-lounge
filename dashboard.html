@@ -435,33 +435,16 @@
             <!-- MEMBER-CREATED SERVER VIEW -->
             <section id="serverView" class="server-view" hidden>
 
-                <header class="chat-header">
-
-                    <div class="chat-header-main">
-
-                        <div>
-                            <div class="channel-title">
-                                <span id="serverViewName">Server</span>
-                            </div>
-
-                            <div
-                                class="sub-header"
-                                id="serverViewVisibility">
-                                Your community
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <span class="secure-label">✦ YOUR SERVER</span>
-
-                </header>
-
                 
 <div class="created-server-workspace" id="createdServerWorkspace">
     <aside class="created-server-channel-panel">
         <details class="created-server-dropdown">
-            <summary id="createdServerMenuTrigger"><span id="createdServerMenuName">Server menu</span><span class="server-menu-chevron">⌄</span></summary>
+            <summary id="createdServerMenuTrigger" style="display:flex;align-items:center;justify-content:flex-start;width:100%;padding:18px 16px;white-space:normal;text-align:left;border-bottom:1px solid var(--line);">
+            <span style="display:flex;flex-direction:column;gap:5px;min-width:0;">
+                <strong id="createdServerMenuName" style="font-size:15px;font-weight:700;color:var(--text);">Server</strong>
+                <span id="serverViewVisibility" style="font-size:11px;font-weight:400;color:var(--muted);">Your community</span>
+            </span>
+        </summary>
             <div class="created-server-menu">
                 <button type="button" data-server-menu-action="invite">Invite People</button>
                 <button type="button" data-server-menu-action="settings">Server Settings</button>
