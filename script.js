@@ -3234,6 +3234,27 @@ async function serverEventsDialog() {
     document.getElementById("serverFeatureDialog")?.querySelector(".created-server-feature-close")?.addEventListener("click", unsub, { once: true });
 }
 
+/* Normalize the member-created server workspace after navigation changes. */
+function syncCreatedServerPanelLayout() {
+    const serverView = document.getElementById("serverView");
+    const workspace = document.getElementById("createdServerWorkspace");
+    const channelPanel = workspace?.querySelector(".created-server-channel-panel");
+    const serverChat = workspace?.querySelector(".created-server-chat");
+    if (!serverView || !workspace || !channelPanel || !serverChat) return;
+    serverView.style.flexDirection = "column";
+    serverView.style.minWidth = "0";
+    serverView.style.minHeight = "0";
+    workspace.style.display = "flex";
+    workspace.style.flex = "1 1 auto";
+    workspace.style.minWidth = "0";
+    workspace.style.minHeight = "0";
+    workspace.style.overflow = "hidden";
+    channelPanel.style.flexShrink = "0";
+    serverChat.style.flex = "1 1 0%";
+    serverChat.style.minWidth = "0";
+    serverChat.style.minHeight = "0";
+}
+
 function openServer(server) {
     syncCreatedServerPanelLayout();
     if (!server?.id) return;
