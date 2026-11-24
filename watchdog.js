@@ -1,4 +1,4 @@
-/* Diamond Lounge Watchdog — mobile-accessible on-device diagnostics. */
+/* Diamond Lounge Watchdog — desktop diagnostics. */
 (() => {
   if (window.__diamondWatchdogInstalled) return;
   window.__diamondWatchdogInstalled = true;
@@ -11,12 +11,6 @@
     if(entries.length>MAX)entries.shift();
     render();
   }
-  // Navigation tap tracer: captures the actual topmost element and sidebar state on mobile.
-  window.addEventListener("pointerdown",event=>{
-    const target=event.target;const nav=target?.closest?.("button,.server-icon,.text-channel,.mobile-menu-button,#mobileSidebar,#channelsSidebar");
-    if(!nav)return;let top="";try{top=document.elementFromPoint(event.clientX,event.clientY)?.tagName+"#"+(document.elementFromPoint(event.clientX,event.clientY)?.id||"")+"."+(document.elementFromPoint(event.clientX,event.clientY)?.className||"");}catch{}
-    record("Navigation tap",nav.tagName+"#"+(nav.id||"")+"."+(typeof nav.className==="string"?nav.className:""),{topmost:top,point:{x:event.clientX,y:event.clientY},mobileNavOpen:!!document.querySelector(".dashboard.mobile-nav-open"),dmMode:document.body.classList.contains("dm-mode"),targetText:(nav.innerText||nav.getAttribute("aria-label")||"").slice(0,100)});
-  },true);
   window.addEventListener("error",event=>{
     if(event.target&&event.target!==window){
       const el=event.target;record("Resource load failure",el.src||el.href||el.tagName,{tag:el.tagName||"",url:el.src||el.href||""});return;
@@ -49,7 +43,7 @@
     gem.style.cssText="width:96px;height:96px;object-fit:contain;flex-shrink:0;transform:scale(0.85);transform-origin:center center;pointer-events:none;margin-right:-40px";
     count.style.cssText="opacity:.75;font-size:10px;margin-left:12px;pointer-events:none";
     panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-label","Diamond Watchdog error report");
-    panel.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,7,12,.94);color:#edf3ff;display:none;flex-direction:column;padding:env(safe-area-inset-top,12px) 12px env(safe-area-inset-bottom,12px);font:14px system-ui;box-sizing:border-box";
+    panel.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,7,12,.94);color:#edf3ff;display:none;flex-direction:column;padding:12px;font:14px system-ui;box-sizing:border-box";
     panel.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0"><strong style="font-size:17px">DIAMOND WATCHDOG</strong><button data-close style="padding:10px 14px;border-radius:10px">Close</button></div><div data-summary style="padding:8px 0"></div><div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 0"><button data-copy style="padding:10px;border-radius:10px">Copy report</button><button data-clear style="padding:10px;border-radius:10px">Clear logs</button></div><pre data-log style="overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#151922;border:1px solid #303746;border-radius:12px;padding:12px;flex:1;min-height:0;margin:0;font:12px ui-monospace,monospace"></pre>';
     panel.querySelector("[data-close]").onclick=closePanel;
     panel.querySelector("[data-copy]").onclick=async()=>{const t=reportText()||"No errors recorded.";try{await navigator.clipboard.writeText(t);panel.querySelector("[data-summary]").textContent="Report copied — paste it into your ChatGPT chat."; }catch{try{const ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;opacity:0";panel.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();panel.querySelector("[data-summary]").textContent="Copy attempted. Paste the report into ChatGPT."; }catch{panel.querySelector("[data-summary]").textContent="Copy failed. Select the report text below manually.";}}};
