@@ -43,7 +43,7 @@ const loungeSidebar = document.getElementById("loungeSidebar");
 const dmSidebar = document.getElementById("dmSidebar");
 const emptyView = document.getElementById("emptyView");
 const serverView = document.getElementById("serverView");
-const serverViewName = document.getElementById("serverViewName");
+const serverViewName = document.getElementById("createdServerMenuName");
 const serverViewVisibility = document.getElementById("serverViewVisibility");
 const serverWelcomeName = document.getElementById("serverWelcomeName");
 const loungeView = document.getElementById("loungeView");
@@ -2868,6 +2868,12 @@ async function serverSettingsDialog() {
             if (serverWelcomeName) serverWelcomeName.textContent = name;
             const menuName = document.getElementById("createdServerMenuName");
             if (menuName) menuName.textContent = name;
+            const menuVisibility = document.getElementById("serverViewVisibility");
+            if (menuVisibility) {
+                menuVisibility.textContent = visibility.value === "public"
+                    ? "Public server — anyone can join"
+                    : "Private server — invite only";
+            }
             await loadServerIcons();
             save.textContent = "Saved";
             if (previewUrl) URL.revokeObjectURL(previewUrl);
