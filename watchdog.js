@@ -38,16 +38,16 @@
   function installUI(){
     badge=document.createElement("button");badge.type="button";badge.setAttribute("aria-label","Open Diamond Watchdog diagnostics");
     badge.style.cssText="z-index:20;border:0;background:transparent;color:#dcecff;display:flex;align-items:center;gap:0;padding:0;font:11px system-ui;cursor:pointer;white-space:nowrap;flex-shrink:0";
-    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:168px;height:168px;object-fit:contain;flex-shrink:0";
+    const gem=document.createElement("img");gem.src="diamond.gif";gem.alt="";gem.style.cssText="width:150px;height:150px;object-fit:contain;flex-shrink:0;transform:translateX(45px) scale(0.45);transform-origin:center center";
     const label=document.createElement("span");label.textContent="DIAMOND WATCHDOG";label.style.cssText="letter-spacing:.4px";
     count=document.createElement("span");count.style.cssText="opacity:.75;font-size:10px;margin-left:8px";
     badge.append(gem,label,count);
     // Only the WATCHDOG label opens diagnostics; other header areas remain inert.
     label.style.cssText="letter-spacing:.4px;cursor:pointer;pointer-events:auto;display:inline-block;max-width:120px;overflow:visible";
     label.addEventListener("click",e=>{e.stopPropagation();openPanel();});
-    badge.style.cssText+="justify-content:flex-start;gap:0;padding:0;flex-shrink:0;position:relative;overflow:visible;z-index:10";
-    gem.style.cssText="width:168px;height:168px;object-fit:contain;flex-shrink:0;pointer-events:none";
-    count.style.cssText="opacity:.75;font-size:10px;pointer-events:none";
+    badge.style.cssText+="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:auto;max-width:160px;overflow:visible;z-index:30";
+    gem.style.cssText="width:32px;height:32px;object-fit:contain;flex-shrink:0;transform:scale(1.35);transform-origin:center center;pointer-events:none";
+    count.style.cssText="opacity:.75;font-size:10px;margin-left:4px;pointer-events:none";
     panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-label","Diamond Watchdog error report");
     panel.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(5,7,12,.94);color:#edf3ff;display:none;flex-direction:column;padding:env(safe-area-inset-top,12px) 12px env(safe-area-inset-bottom,12px);font:14px system-ui;box-sizing:border-box";
     panel.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0"><strong style="font-size:17px">DIAMOND WATCHDOG</strong><button data-close style="padding:10px 14px;border-radius:10px">Close</button></div><div data-summary style="padding:8px 0"></div><div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 0"><button data-copy style="padding:10px;border-radius:10px">Copy report</button><button data-clear style="padding:10px;border-radius:10px">Clear logs</button></div><pre data-log style="overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#151922;border:1px solid #303746;border-radius:12px;padding:12px;flex:1;min-height:0;margin:0;font:12px ui-monospace,monospace"></pre>';
