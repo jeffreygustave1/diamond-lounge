@@ -1724,61 +1724,55 @@ function renderCreatedServerChannels() {
         return li;
     }
 
-    function appendCategoryHeading(category) {
-        const heading = document.createElement("li");
-        heading.className = "created-server-category-heading";
+    function appendCategoryGroup(category) {
+        const group = document.createElement("li");
+        group.className = "created-server-category-group";
+        group.dataset.categoryId = category.id;
+
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "created-server-category-toggle";
+        toggle.setAttribute("aria-expanded", "true");
+
+        const chevron = document.createElement("span");
+        chevron.className = "created-server-category-chevron";
+        chevron.setAttribute("aria-hidden", "true");
+        chevron.textContent = "▾";
 
         const label = document.createElement("span");
+        label.className = "created-server-category-name";
         label.textContent = category.name.toUpperCase();
-        heading.append(label);
 
-        if (canManageChannels) {
-            const actions = document.createElement("span");
-            actions.className = "created-server-category-actions";
+        toggle.append(chevron, label);
+        toggle.addEventListener("click", () => {
+            const collapsed = group.classList.toggle("is-collapsed");
+            toggle.setAttribute("aria-expanded", String(!collapsed));
+        });
 
-            const add = document.createElement("button");
-            add.type = "button";
-            add.className = "created-server-category-add";
-            add.textContent = "+";
-            add.title = `Add a text or voice channel to ${category.name}`;
-            add.setAttribute("aria-label", `Add a channel to ${category.name}`);
-            add.onclick = event => {
-                event.stopPropagation();
-                void createCreatedServerChannel(null, category.id);
-            };
+        const children = document.createElement("ul");
+        children.className = "created-server-category-children";
+        children.setAttribute("aria-label", `${category.name} channels`);
 
-            const remove = document.createElement("button");
-            remove.type = "button";
-            remove.className = "created-server-channel-delete";
-            remove.textContent = "×";
-            remove.title = "Delete category";
-            remove.setAttribute("aria-label", `Delete category ${category.name}`);
-            remove.onclick = () => void deleteCreatedServerChannel(category);
-
-            actions.append(add, remove);
-            heading.append(actions);
-        }
-
-        createdServerTextChannels.append(heading);
-    }
-
-    // Channels without a valid category remain at the top.
-    channelItems
-        .filter(channel => !channel.parentCategoryId ||
-            !categories.some(category => category.id === channel.parentCategoryId))
-        .forEach(channel => createdServerTextChannels.append(makeChannelRow(channel)));
-
-    // Each category now contains both # text channels and voice channels.
-    categories.forEach(category => {
-        appendCategoryHeading(category);
         channelItems
             .filter(channel => channel.parentCategoryId === category.id)
             .forEach(channel => {
                 const row = makeChannelRow(channel);
                 row.classList.add("is-categorized");
-                createdServerTextChannels.append(row);
+                children.append(row);
             });
-    });
+
+        group.append(toggle, children);
+        createdServerTextChannels.append(group);
+    }
+
+    // Unassigned channels stay at the top level, separate from categories.
+    channelItems
+        .filter(channel => !channel.parentCategoryId ||
+            !categories.some(category => category.id === channel.parentCategoryId))
+        .forEach(channel => createdServerTextChannels.append(makeChannelRow(channel)));
+
+    // Categories are independent collapsible groups; their channels are nested.
+    categories.forEach(appendCategoryGroup);
 
     if (activeCreatedServerId) {
         voices.forEach(channel => {
@@ -1793,6 +1787,45 @@ function renderCreatedServerChannels() {
                 createdServerSidebarVoiceStops.set(channel.id, stop);
             }
         });
+    }
+}
+
+// RENAME CREATED SERVER CATEGORY
+async function renameCreatedServerCategory(category) {
+    if (!currentUser || !activeCreatedServerId || !category?.id) return;
+    if (!(await currentServerHasPermission("manageChannels"))) {
+        alert("You need the Manage Channels role permission to rename categories.");
+        return;
+    }
+
+    const nextName = prompt("Enter the new category name:", category.name || "");
+    if (nextName === null) return;
+    const name = nextName.trim();
+    if (!name || name.length > 40) {
+        alert("Category names must be between 1 and 40 characters.");
+        return;
+    }
+    if (createdServerChannels.some(item =>
+        item.id !== category.id &&
+        item.type === "category" &&
+        String(item.name || "").trim().toLowerCase() === name.toLowerCase()
+    )) {
+        alert("A category with that name already exists.");
+        return;
+    }
+
+    try {
+        await updateDoc(
+            doc(db, "servers", activeCreatedServerId, "channels", category.id),
+            { name, nameLower: normalizeServerName(name) }
+        );
+        category.name = name;
+        renderCreatedServerChannels();
+    } catch (error) {
+        console.error("Category rename failed:", error);
+        alert(error.code === "permission-denied"
+            ? "Firebase denied category updates. Check your Manage Channels permission and Firestore rules."
+            : "The category could not be renamed.");
     }
 }
 
@@ -4304,38 +4337,71 @@ document.querySelector('[data-cosmetic="silver-gif"]')?.addEventListener("click"
 document.addEventListener("contextmenu", function(event) {
   const serverIcon = event.target.closest(".server-icon.created-server");
   const channelRow = event.target.closest(".created-server-channel-item");
-  const category = event.target.closest(".created-server-category-heading");
+  const category = event.target.closest(".created-server-category-group, .created-server-category-heading");
   if (!serverIcon && !channelRow && !category) return;
   event.preventDefault();
   if (serverIcon) return; // its own menu handler handles the menu
+
   closeServerContextMenu();
   const menu = document.createElement("div");
   menu.className = "dl-context-menu";
-  menu.setAttribute("role","menu");
-  const add = (label,fn,danger=false) => {
-    const b=document.createElement("button"); b.type="button";
-    b.className="dl-context-item"+(danger?" danger":""); b.textContent=label;
-    b.onclick=()=>{menu.remove();fn();}; menu.appendChild(b);
+  menu.setAttribute("role", "menu");
+
+  const add = (label, fn, danger = false) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dl-context-item" + (danger ? " danger" : "");
+    button.textContent = label;
+    button.setAttribute("role", "menuitem");
+    button.onclick = () => {
+      menu.remove();
+      if (serverContextMenu === menu) serverContextMenu = null;
+      fn();
+    };
+    menu.appendChild(button);
   };
-  if(channelRow){
-    const id=channelRow.dataset.channelId, type=channelRow.dataset.channelType;
-    const name=channelRow.querySelector(".created-server-channel-name")?.textContent||"Channel";
-    add("Copy Channel ID",()=>void navigator.clipboard?.writeText(String(id||"")));
-    if(type==="voice") add("Open Voice Channel",()=>channelRow.querySelector(".created-server-channel-button")?.click());
-    else add("Open Channel",()=>channelRow.querySelector(".created-server-channel-button")?.click());
-    const channel=(createdServerChannels||[]).find(x=>String(x.id)===String(id));
-    if(channel && (currentServerHasPermission("manageChannels")||activeCreatedServerOwnerUid===currentUser?.uid))
-      add("Delete Channel",()=>void deleteCreatedServerChannel(channel),true);
-  } else if(category){
-    add("Create Channel",()=>category.querySelector(".created-server-category-add")?.click());
-    add("Delete Category",()=>category.querySelector(".created-server-channel-delete")?.click(),true);
+
+  const canManage = !!(currentServerCanManageChannels ||
+    activeCreatedServerOwnerUid === currentUser?.uid);
+
+  if (category) {
+    const categoryId = category.dataset.categoryId;
+    const categoryData = (createdServerChannels || []).find(item =>
+      item.type === "category" && String(item.id) === String(categoryId)
+    );
+    if (categoryData) {
+      if (canManage) {
+        add("Create Text Channel", () => void createCreatedServerChannel("text", categoryData.id));
+        add("Create Voice Channel", () => void createCreatedServerChannel("voice", categoryData.id));
+        add("Rename Category", () => void renameCreatedServerCategory(categoryData));
+      }
+      const collapsed = category.classList.contains("is-collapsed");
+      add(collapsed ? "Expand Category" : "Collapse Category", () => {
+        const toggle = category.querySelector(".created-server-category-toggle");
+        if (toggle) toggle.click();
+      });
+      if (canManage) add("Delete Category", () => void deleteCreatedServerChannel(categoryData), true);
+    }
+  } else if (channelRow) {
+    const id = channelRow.dataset.channelId;
+    const type = channelRow.dataset.channelType;
+    const channel = (createdServerChannels || []).find(item => String(item.id) === String(id));
+    add("Copy Channel ID", () => void navigator.clipboard?.writeText(String(id || "")));
+    add(type === "voice" ? "Open Voice Channel" : "Open Channel",
+      () => channelRow.querySelector(".created-server-channel-button")?.click());
+    if (channel && canManage) add("Delete Channel", () => void deleteCreatedServerChannel(channel), true);
   }
-  menu.style.left=Math.max(8,Math.min(event.clientX,window.innerWidth-220))+"px";
-  menu.style.top=Math.max(8,Math.min(event.clientY,window.innerHeight-180))+"px";
+
+  const menuWidth = 230;
+  menu.style.left = Math.max(8, Math.min(event.clientX, window.innerWidth - menuWidth)) + "px";
+  menu.style.top = Math.max(8, Math.min(event.clientY, window.innerHeight - 260)) + "px";
   document.body.appendChild(menu);
-  serverContextMenu=menu;
-  setTimeout(()=>document.addEventListener("click",()=>menu.remove(),{once:true}),0);
-},true);
+  serverContextMenu = menu;
+  setTimeout(() => document.addEventListener("click", () => {
+    menu.remove();
+    if (serverContextMenu === menu) serverContextMenu = null;
+  }, { once: true }), 0);
+}, true);
 
 // Dismiss voice/activity popups when tapping outside their dialog surface.
 document.addEventListener("pointerdown", (event) => {
