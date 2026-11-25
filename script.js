@@ -3374,6 +3374,7 @@ async function serverEventsDialog() {
 let createdServerPanelOriginalStyle;
 
 function syncCreatedServerPanelLayout() {
+    syncMobileCreatedServerPanelLayout();
     const serverView = document.getElementById("serverView");
     const workspace = document.getElementById("createdServerWorkspace");
     const desktopSidebar = document.getElementById("desktopSidebar");
