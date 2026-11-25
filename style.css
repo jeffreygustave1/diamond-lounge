@@ -4534,3 +4534,54 @@ button {
     z-index: 21 !important;
   }
 }
+
+
+/* MOBILE-LIVE: gesture-only navigation; no mobile-specific menu/back buttons. */
+@media (max-width: 900px) {
+  .mobile-menu-button,
+  .mobile-sidebar-backdrop {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  .mobile-sidebar {
+    position: fixed !important;
+    top: max(env(safe-area-inset-top, 0px), 0px) !important;
+    right: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: min(88vw, 520px) !important;
+    max-width: 88vw !important;
+    height: calc(100dvh - max(env(safe-area-inset-top, 0px), 0px)) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow: hidden !important;
+    transform: translate3d(-110%, 0, 0) !important;
+    transition: transform .28s cubic-bezier(.22,.8,.25,1) !important;
+    z-index: 1002 !important;
+  }
+  .dashboard.mobile-nav-open .mobile-sidebar {
+    transform: translate3d(0, 0, 0) !important;
+  }
+  .dashboard.mobile-nav-open .chat-area,
+  .dashboard.mobile-nav-open .created-server-chat {
+    display: none !important;
+  }
+  .dashboard:not(.mobile-nav-open) .chat-area {
+    display: flex !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .mobile-sidebar > .servers {
+    flex: 0 0 58px !important;
+    width: 58px !important;
+    min-width: 58px !important;
+    max-width: 58px !important;
+  }
+  #channelsSidebar {
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    overflow-x: hidden !important;
+  }
+}
