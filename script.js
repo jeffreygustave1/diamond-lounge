@@ -586,6 +586,52 @@ function setMobileSidebar(open) {
     if (open) syncMobileCreatedServerPanelLayout();
 }
 
+/*
+ * On iOS, an edge-swipe to the right can invoke Safari's Back navigation
+ * instead of the in-app channel-drawer gesture. Keep authenticated mobile
+ * sessions on the dashboard and use that gesture to reveal the two-column
+ * server/channel navigation instead of returning to login or the landing page.
+ */
+let mobileDashboardHistoryGuardInstalled = false;
+function installMobileDashboardHistoryGuard() {
+    if (mobileDashboardHistoryGuardInstalled ||
+        !window.matchMedia("(max-width: 900px)").matches) return;
+
+    mobileDashboardHistoryGuardInstalled = true;
+    const dashboardUrl = window.location.href;
+    const historyMarker = "__diamondLoungeAuthenticatedDashboard";
+
+    window.history.pushState(
+        { ...(window.history.state || {}), [historyMarker]: true },
+        "",
+        dashboardUrl
+    );
+
+    window.addEventListener("popstate", () => {
+        if (!auth.currentUser) return;
+
+        // Replace the entry Safari returned to, then establish a fresh
+        // dashboard entry so repeated edge-swipes cannot expose login.
+        window.history.replaceState(
+            { ...(window.history.state || {}), [historyMarker]: true },
+            "",
+            dashboardUrl
+        );
+        window.history.pushState(
+            { ...(window.history.state || {}), [historyMarker]: true },
+            "",
+            dashboardUrl
+        );
+
+        // A right-edge/back swipe becomes the intended two-column drawer.
+        setMobileSidebar(true);
+    });
+}
+
+window.addEventListener("resize", () => {
+    if (auth.currentUser) installMobileDashboardHistoryGuard();
+});
+
 window.addEventListener("resize", syncMobileCreatedServerPanelLayout);
 
 // Gesture-only mobile navigation: right-swipe from chat reveals the drawer.
@@ -812,6 +858,7 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
+    installMobileDashboardHistoryGuard();
     currentUser = user;
 
     const displayName = (user.displayName || "Member").slice(0, 30);
