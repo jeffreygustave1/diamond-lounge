@@ -36,7 +36,6 @@ const activeChannelDescription = document.getElementById("activeChannelDescripti
 const textChannelButtons = [...document.querySelectorAll(".text-channel")];
 
 const dashboard = document.querySelector(".dashboard");
-const mobileSidebarBackdrop = document.getElementById("mobileSidebarBackdrop");
 
 const dmHomeButton = document.getElementById("dmHomeButton");
 const mainServerButton = document.getElementById("mainServerButton");
@@ -575,38 +574,56 @@ window.addEventListener("resize", syncCreatedServerPanelLayout);
 
 function setMobileSidebar(open) {
     if (!dashboard) return;
-    dashboard.classList.toggle("mobile-nav-open", open);
+    const isMobile = window.matchMedia("(max-width: 900px)").matches;
+    dashboard.classList.toggle("mobile-nav-open", Boolean(open && isMobile));
+    if (open) syncCreatedServerPanelLayout();
 }
 
-mobileSidebarBackdrop?.addEventListener("click", () => {
-    setMobileSidebar(false);
-});
-
-// MOBILE ONLY: intercept horizontal gestures for the drawer; never use them for page navigation.
+// MOBILE ONLY: navigation is gesture-only. A right swipe from chat reveals the
+// two-column channel drawer; selecting a channel closes it. Left swipes do nothing.
 (() => {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
     let startX = 0, startY = 0, tracking = false, horizontal = false;
     document.addEventListener("touchstart", (event) => {
-        if (!mobileQuery.matches || event.touches.length !== 1) { tracking = false; return; }
-        const t = event.touches[0];
-        startX = t.clientX; startY = t.clientY; tracking = true; horizontal = false;
+        const origin = event.target instanceof Element ? event.target : event.target?.parentElement;
+        if (!mobileQuery.matches || event.touches.length !== 1 ||
+            dashboard?.classList.contains("mobile-nav-open") ||
+            !origin?.closest(".chat-area")) {
+            tracking = false;
+            horizontal = false;
+            return;
+        }
+        const touch = event.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        tracking = true;
+        horizontal = false;
     }, { passive: true, capture: true });
     document.addEventListener("touchmove", (event) => {
         if (!tracking || !mobileQuery.matches || event.touches.length !== 1) return;
-        const t = event.touches[0], dx = t.clientX - startX, dy = t.clientY - startY;
+        const touch = event.touches[0];
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
         if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.15) {
             horizontal = true;
             if (event.cancelable) event.preventDefault();
-        } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) tracking = false;
+        } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
+            tracking = false;
+        }
     }, { passive: false, capture: true });
     document.addEventListener("touchend", (event) => {
-        if (!tracking || !mobileQuery.matches || !horizontal) { tracking = false; horizontal = false; return; }
-        const t = event.changedTouches[0], dx = t.clientX - startX;
-        if (dx > 60 && !dashboard?.classList.contains("mobile-nav-open")) setMobileSidebar(true);
-        // Closing is by tap on backdrop; a swipe-left is not required.
-        tracking = false; horizontal = false;
+        if (tracking && horizontal && mobileQuery.matches) {
+            const touch = event.changedTouches[0];
+            const dx = touch.clientX - startX;
+            if (dx > 60) setMobileSidebar(true);
+        }
+        tracking = false;
+        horizontal = false;
     }, { passive: true, capture: true });
-    document.addEventListener("touchcancel", () => { tracking = false; horizontal = false; }, { passive: true, capture: true });
+    document.addEventListener("touchcancel", () => {
+        tracking = false;
+        horizontal = false;
+    }, { passive: true, capture: true });
 })();
 // ==================================================
 // VIEW AND LISTENER MANAGEMENT
