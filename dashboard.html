@@ -17,6 +17,21 @@
     <link rel="stylesheet" href="dm.css?v=11">
     <link rel="stylesheet" href="supportbot.css?v=19">
     <link rel="stylesheet" href="dm-call.css?v=8">
+    <script>
+    (() => {
+        const isMobilePage = false;
+        const query = window.matchMedia("(max-width: 900px)");
+        const route = () => {
+            if (query.matches === isMobilePage) return;
+            const target = new URL(isMobilePage ? "dashboard.html" : "mobile-dashboard.html", window.location.href);
+            target.search = window.location.search;
+            target.hash = window.location.hash;
+            window.location.replace(target.href);
+        };
+        route();
+        query.addEventListener("change", route);
+    })();
+    </script>
 </head>
 <body>
     <div class="dashboard">
