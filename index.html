@@ -117,5 +117,18 @@
         DIAMOND LOUNGE <span>✦</span> MADE FOR YOUR COMMUNITY
     </footer>
 
+
+    <script type="module">
+        import { auth } from "./firebase.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+
+        onAuthStateChanged(auth, user => {
+            if (!user) return;
+            const destination = new URL("dashboard.html", window.location.href);
+            destination.search = window.location.search;
+            destination.hash = window.location.hash;
+            window.location.replace(destination.href);
+        });
+    </script>
 </body>
 </html>
