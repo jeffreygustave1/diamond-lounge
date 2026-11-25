@@ -552,6 +552,93 @@ async function refreshServerMemberPermissions(serverId) {
 // VIEW AND LISTENER MANAGEMENT
 // ==================================================
 
+// ==================================================
+// MOBILE NAVIGATION
+// ==================================================
+
+// The mobile server/channel drawer is separate from the desktop sidebar layout.
+const mobileCreatedServerPanel = document.querySelector(".created-server-channel-panel");
+const mobileCreatedServerPanelHome = mobileCreatedServerPanel?.parentElement;
+const mobileCreatedServerPanelMarker = document.createComment("mobile-created-server-panel-home");
+if (mobileCreatedServerPanel) {
+    mobileCreatedServerPanelHome?.insertBefore(mobileCreatedServerPanelMarker, mobileCreatedServerPanel);
+}
+
+function syncMobileCreatedServerPanelLayout() {
+    if (!mobileCreatedServerPanel || !mobileCreatedServerPanelMarker.parentNode) return;
+    const isMobile = window.matchMedia("(max-width: 900px)").matches;
+    if (isMobile && serverView && !serverView.hidden) {
+        const destination = document.getElementById("channelsSidebar");
+        if (destination && mobileCreatedServerPanel.parentElement !== destination) {
+            destination.appendChild(mobileCreatedServerPanel);
+        }
+    } else if (mobileCreatedServerPanel.parentElement !== mobileCreatedServerPanelMarker.parentNode) {
+        mobileCreatedServerPanelMarker.parentNode.insertBefore(
+            mobileCreatedServerPanel,
+            mobileCreatedServerPanelMarker.nextSibling
+        );
+    }
+}
+
+function setMobileSidebar(open) {
+    if (!dashboard || !window.matchMedia("(max-width: 900px)").matches) return;
+    dashboard.classList.toggle("mobile-nav-open", Boolean(open));
+    if (open) syncMobileCreatedServerPanelLayout();
+}
+
+window.addEventListener("resize", syncMobileCreatedServerPanelLayout);
+
+// Gesture-only mobile navigation: right-swipe from chat reveals the drawer.
+// Selecting a destination closes it. Left swipes never navigate backward.
+(() => {
+    const mobileQuery = window.matchMedia("(max-width: 900px)");
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    let horizontal = false;
+
+    document.addEventListener("touchstart", event => {
+        const origin = event.target instanceof Element ? event.target : event.target?.parentElement;
+        if (!mobileQuery.matches || event.touches.length !== 1 ||
+            dashboard?.classList.contains("mobile-nav-open") ||
+            !origin?.closest(".chat-area")) {
+            tracking = false;
+            horizontal = false;
+            return;
+        }
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        tracking = true;
+        horizontal = false;
+    }, { passive: true, capture: true });
+
+    document.addEventListener("touchmove", event => {
+        if (!tracking || !mobileQuery.matches || event.touches.length !== 1) return;
+        const dx = event.touches[0].clientX - startX;
+        const dy = event.touches[0].clientY - startY;
+        if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+            horizontal = true;
+            if (event.cancelable) event.preventDefault();
+        } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
+            tracking = false;
+        }
+    }, { passive: false, capture: true });
+
+    document.addEventListener("touchend", event => {
+        if (tracking && horizontal && mobileQuery.matches) {
+            const dx = event.changedTouches[0].clientX - startX;
+            if (dx > 60) setMobileSidebar(true);
+        }
+        tracking = false;
+        horizontal = false;
+    }, { passive: true, capture: true });
+
+    document.addEventListener("touchcancel", () => {
+        tracking = false;
+        horizontal = false;
+    }, { passive: true, capture: true });
+})();
+
 function stopPublicMessages() {
     stopMessagesListener?.();
     stopMessagesListener = null;
@@ -654,6 +741,7 @@ function showEmptyView() {
 
 function openTextChannel(channelName) {
     if (!currentUser || !channelName) return;
+    setMobileSidebar(false);
 const returningFromPrimaryVoice = Boolean(primaryVoiceChannelName);
     if (returningFromPrimaryVoice) closePrimaryVoiceCallView();
 
@@ -1134,6 +1222,7 @@ function getConversationId(firstUid, secondUid) {
 
 async function openConversation(member) {
     if (!currentUser || !member?.uid) return;
+    setMobileSidebar(false);
 stopDirectMessages();
 
     activeCreatedServerId = null;
@@ -1864,6 +1953,7 @@ async function deleteCreatedServerChannel(channel) {
 
 function openCreatedServerChannel(channel) {
     if (!currentUser || !activeCreatedServerId || !channel?.id) return;
+    setMobileSidebar(false);
 if (channel.type !== "text") return;
 
     activeCreatedServerVoiceChannel = null;
@@ -2307,6 +2397,7 @@ function closePrimaryVoiceCallView() {
 
 function openPrimaryVoiceCall(channelName, roomId) {
     if (!channelName || !roomId) return;
+    setMobileSidebar(false);
     createdServerVoicePresenceStop?.();
     createdServerVoicePresenceStop = null;
     activeCreatedServerVoiceChannel = null;
@@ -2492,6 +2583,7 @@ document.getElementById("createdServerVoiceUserProfile")?.addEventListener("clic
 
 function openCreatedServerVoiceChannel(channel) {
     if (!channel?.id || !activeCreatedServerId) return;
+    setMobileSidebar(false);
 stopCreatedServerMessages();
     createdServerVoicePresenceStop?.();
     createdServerVoicePresenceStop = null;
@@ -3675,6 +3767,7 @@ async function loadServerIcons() {
 
 async function logoutUser() {
     try {
+        setMobileSidebar(false);
 closeServerContextMenu();
 
         stopPublicMessages();
@@ -4194,6 +4287,7 @@ profileForm?.addEventListener("submit", async (event) => {
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+        setMobileSidebar(false);
 closeServerModal();
         closeProfileModal();
         closeServerContextMenu();
