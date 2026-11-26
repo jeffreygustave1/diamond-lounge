@@ -4695,3 +4695,35 @@ button {
     opacity: 1 !important;
   }
 }
+
+/* MOBILE NAV REPAIR — keep the drawer to exactly two columns:
+   server rail + one full-width channel column. */
+@media (max-width: 900px) {
+  .dashboard:has(.created-server.selected) #channelsSidebar {
+    display: flex !important;
+    flex: 1 1 0% !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #channelsSidebar > .created-server-channel-panel {
+    display: flex !important;
+    flex: 1 1 0% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  #channelsSidebar > #loungeSidebar[hidden],
+  #channelsSidebar > #dmSidebar[hidden] {
+    display: none !important;
+  }
+}
