@@ -564,19 +564,48 @@ if (mobileCreatedServerPanel) {
     mobileCreatedServerPanelHome?.insertBefore(mobileCreatedServerPanelMarker, mobileCreatedServerPanel);
 }
 
+let mobileCreatedServerPanelOriginalStyle;
 function syncMobileCreatedServerPanelLayout() {
     if (!mobileCreatedServerPanel || !mobileCreatedServerPanelMarker.parentNode) return;
     const isMobile = window.matchMedia("(max-width: 900px)").matches;
-    if (isMobile && serverView && !serverView.hidden) {
-        const destination = document.getElementById("channelsSidebar");
-        if (destination && mobileCreatedServerPanel.parentElement !== destination) {
+    const destination = document.getElementById("channelsSidebar");
+
+    if (isMobile && serverView && !serverView.hidden && destination) {
+        if (mobileCreatedServerPanelOriginalStyle === undefined) {
+            mobileCreatedServerPanelOriginalStyle = mobileCreatedServerPanel.getAttribute("style");
+        }
+        if (mobileCreatedServerPanel.parentElement !== destination) {
             destination.appendChild(mobileCreatedServerPanel);
         }
-    } else if (mobileCreatedServerPanel.parentElement !== mobileCreatedServerPanelMarker.parentNode) {
-        mobileCreatedServerPanelMarker.parentNode.insertBefore(
-            mobileCreatedServerPanel,
-            mobileCreatedServerPanelMarker.nextSibling
-        );
+        destination.hidden = false;
+        Object.assign(mobileCreatedServerPanel.style, {
+            display: "flex",
+            flex: "1 1 0%",
+            width: "100%",
+            minWidth: "0",
+            maxWidth: "100%",
+            height: "100%",
+            minHeight: "0",
+            boxSizing: "border-box",
+            overflowX: "hidden",
+            overflowY: "auto",
+            flexDirection: "column"
+        });
+    } else {
+        if (mobileCreatedServerPanel.parentElement !== mobileCreatedServerPanelMarker.parentNode) {
+            mobileCreatedServerPanelMarker.parentNode.insertBefore(
+                mobileCreatedServerPanel,
+                mobileCreatedServerPanelMarker.nextSibling
+            );
+        }
+        if (mobileCreatedServerPanelOriginalStyle !== undefined) {
+            if (mobileCreatedServerPanelOriginalStyle === null) {
+                mobileCreatedServerPanel.removeAttribute("style");
+            } else {
+                mobileCreatedServerPanel.setAttribute("style", mobileCreatedServerPanelOriginalStyle);
+            }
+        }
+        if (destination) destination.hidden = false;
     }
 }
 
@@ -642,16 +671,29 @@ window.addEventListener("resize", syncMobileCreatedServerPanelLayout);
     let startY = 0;
     let tracking = false;
     let horizontal = false;
+    let startedInDrawer = false;
 
     document.addEventListener("touchstart", event => {
         const origin = event.target instanceof Element ? event.target : event.target?.parentElement;
-        if (!mobileQuery.matches || event.touches.length !== 1 ||
-            dashboard?.classList.contains("mobile-nav-open") ||
-            !origin?.closest(".chat-area")) {
+        if (!mobileQuery.matches || event.touches.length !== 1) {
             tracking = false;
             horizontal = false;
+            startedInDrawer = false;
             return;
         }
+
+        startedInDrawer = Boolean(dashboard?.classList.contains("mobile-nav-open"));
+        const validOrigin = startedInDrawer
+            ? origin?.closest(".mobile-sidebar")
+            : origin?.closest(".chat-area");
+
+        if (!validOrigin) {
+            tracking = false;
+            horizontal = false;
+            startedInDrawer = false;
+            return;
+        }
+
         startX = event.touches[0].clientX;
         startY = event.touches[0].clientY;
         tracking = true;
@@ -673,15 +715,18 @@ window.addEventListener("resize", syncMobileCreatedServerPanelLayout);
     document.addEventListener("touchend", event => {
         if (tracking && horizontal && mobileQuery.matches) {
             const dx = event.changedTouches[0].clientX - startX;
-            if (dx > 60) setMobileSidebar(true);
+            if (startedInDrawer && dx < -60) setMobileSidebar(false);
+            else if (!startedInDrawer && dx > 60) setMobileSidebar(true);
         }
         tracking = false;
         horizontal = false;
+        startedInDrawer = false;
     }, { passive: true, capture: true });
 
     document.addEventListener("touchcancel", () => {
         tracking = false;
         horizontal = false;
+        startedInDrawer = false;
     }, { passive: true, capture: true });
 })();
 
