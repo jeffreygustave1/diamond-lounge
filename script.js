@@ -672,6 +672,7 @@ window.addEventListener("resize", syncMobileCreatedServerPanelLayout);
     let tracking = false;
     let horizontal = false;
     let startedInDrawer = false;
+    let gestureHandled = false;
 
     document.addEventListener("touchstart", event => {
         const origin = event.target instanceof Element ? event.target : event.target?.parentElement;
@@ -707,13 +708,23 @@ window.addEventListener("resize", syncMobileCreatedServerPanelLayout);
         if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.15) {
             horizontal = true;
             if (event.cancelable) event.preventDefault();
+
+            // Apply the drawer transition as soon as a deliberate horizontal
+            // swipe crosses the threshold; do not depend on touchend firing.
+            if (!gestureHandled && startedInDrawer && dx < -60) {
+                setMobileSidebar(false);
+                gestureHandled = true;
+            } else if (!gestureHandled && !startedInDrawer && dx > 60) {
+                setMobileSidebar(true);
+                gestureHandled = true;
+            }
         } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
             tracking = false;
         }
     }, { passive: false, capture: true });
 
     document.addEventListener("touchend", event => {
-        if (tracking && horizontal && mobileQuery.matches) {
+        if (tracking && horizontal && !gestureHandled && mobileQuery.matches) {
             const dx = event.changedTouches[0].clientX - startX;
             if (startedInDrawer && dx < -60) setMobileSidebar(false);
             else if (!startedInDrawer && dx > 60) setMobileSidebar(true);
@@ -721,12 +732,14 @@ window.addEventListener("resize", syncMobileCreatedServerPanelLayout);
         tracking = false;
         horizontal = false;
         startedInDrawer = false;
+        gestureHandled = false;
     }, { passive: true, capture: true });
 
     document.addEventListener("touchcancel", () => {
         tracking = false;
         horizontal = false;
         startedInDrawer = false;
+        gestureHandled = false;
     }, { passive: true, capture: true });
 })();
 
