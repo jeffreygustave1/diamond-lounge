@@ -4585,3 +4585,61 @@ button {
     overflow-x: hidden !important;
   }
 }
+
+
+/* MOBILE LIVE FIXES — remove the artificial top spacer and keep server composers in view. */
+@media (max-width: 900px) {
+  .dashboard {
+    padding-top: 0 !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+  }
+
+  #serverView {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #createdServerWorkspace {
+    display: flex !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #createdServerWorkspace > .created-server-chat {
+    display: flex !important;
+    flex: 1 1 0% !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #createdServerMessages {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  #createdServerMessageForm:not([hidden]) {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #createdServerMessageForm:not([hidden]) input,
+  #createdServerMessageForm:not([hidden]) button {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
