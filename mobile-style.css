@@ -4727,3 +4727,20 @@ button {
     display: none !important;
   }
 }
+
+/* MOBILE DRAWER STATE GUARD — the sidebar must be fully non-interactive
+   and off-canvas whenever the two-column navigation is not open. */
+@media (max-width: 900px) {
+  .dashboard:not(.mobile-nav-open) > .mobile-sidebar {
+    transform: translate3d(-110%, 0, 0) !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: transform .28s cubic-bezier(.22,.8,.25,1), visibility 0s linear .28s !important;
+  }
+  .dashboard.mobile-nav-open > .mobile-sidebar {
+    transform: translate3d(0, 0, 0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transition: transform .28s cubic-bezier(.22,.8,.25,1), visibility 0s !important;
+  }
+}
