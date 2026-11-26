@@ -4201,7 +4201,7 @@ button {
 /* GLOBAL iPhone top inset: keep channel/member/support headers below Safari's status-bar area on mobile. */
 @media (max-width: 900px) {
   .dashboard {
-    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
+    padding-top: 0 !important;
     height: 100dvh !important;
     box-sizing: border-box !important;
   }
@@ -4639,6 +4639,58 @@ button {
 
   #createdServerMessageForm:not([hidden]) input,
   #createdServerMessageForm:not([hidden]) button {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+
+/* MOBILE LIVE — deterministic created-server composer sizing.
+   Keep the message field flexible and the Send control at a stable touch size. */
+@media (max-width: 900px) {
+  #createdServerMessageForm:not([hidden]) {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 58px !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 3 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #createdServerMessageForm:not([hidden]) > #createdServerMessageInput {
+    display: block !important;
+    flex: 1 1 0% !important;
+    width: 1px !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 40px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #createdServerMessageForm:not([hidden]) > #createdServerSendButton {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 64px !important;
+    max-width: none !important;
+    height: 40px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
     visibility: visible !important;
     opacity: 1 !important;
   }
