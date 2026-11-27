@@ -116,3 +116,35 @@ button{color:inherit;}
     .message-box{margin-right:10px;margin-left:10px;}
     .message-box button{padding:9px 12px;}
 }
+
+/* Final iPhone viewport rule: luxury.css loads after style.css, so its
+   desktop/small-phone 100vh + minimum-height declarations must not override
+   the dynamic mobile viewport sizing used by Safari. */
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .dashboard {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .chat-area {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
