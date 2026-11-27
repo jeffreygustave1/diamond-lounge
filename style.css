@@ -4675,3 +4675,121 @@ button {
   }
 }
 
+/* MOBILE CHAT VIEWPORT + COMPOSER RECOVERY
+   The dashboard must start at the top of the available Safari viewport;
+   safe-area top padding belongs to edge-aware controls, not the whole app.
+   Keep every active conversation as a bounded flex column so its composer
+   remains visible below the independently scrolling message history. */
+@media (max-width: 900px) {
+  .dashboard {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .chat-area {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #loungeView:not([hidden]),
+  #serverView:not([hidden]),
+  #dmConversationView:not([hidden]),
+  #supportBotView:not([hidden]) {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  #loungeView:not([hidden]) > .chat-header,
+  #dmConversationView:not([hidden]) > .chat-header,
+  #supportBotView:not([hidden]) > .chat-header,
+  .created-server-chat > .created-server-chat-header {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    min-height: 58px !important;
+    margin: 0 !important;
+  }
+
+  #loungeView:not([hidden]) > .messages,
+  #dmConversationView:not([hidden]) > .messages,
+  #supportBotView:not([hidden]) > .messages,
+  .created-server-chat > .created-server-messages {
+    display: block !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  #messageForm:not([hidden]),
+  #dmMessageForm:not([hidden]),
+  #supportBotForm:not([hidden]),
+  #createdServerMessageForm:not([hidden]) {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    position: relative !important;
+    z-index: 5 !important;
+    visibility: visible !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
+  }
+
+  #messageForm input,
+  #dmMessageForm input,
+  #supportBotForm input,
+  #createdServerMessageForm input {
+    display: block !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+
+  #messageForm button,
+  #dmMessageForm button,
+  #supportBotForm button,
+  #createdServerMessageForm button {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    visibility: visible !important;
+  }
+
+  #loungeView > .upload-status,
+  #dmConversationView > .upload-status,
+  #supportBotView > .upload-status,
+  .created-server-chat > .upload-status {
+    flex: 0 0 auto !important;
+  }
+
+  .created-server-chat {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+}
+
