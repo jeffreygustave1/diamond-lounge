@@ -4967,3 +4967,37 @@ button {
   }
 }
 
+/* MOBILE SCREEN-SHARE — enlarge the shared-content panel toward the
+   participant/profile cards, and crop the stream to fill its wider frame. */
+@media (max-width: 600px) {
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media {
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media #screenShareStage {
+    height: clamp(350px, 50vw, 420px) !important;
+    min-height: 350px !important;
+    max-height: 420px !important;
+    aspect-ratio: auto !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media #remoteScreenContainer,
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media .remote-video-screen {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media .remote-video-screen video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
