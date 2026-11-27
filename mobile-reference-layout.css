@@ -1,0 +1,221 @@
+/* DIAMOND LOUNGE — MOBILE STREAM + MEMBER TILE STANDARD
+   Applied to every primary and created-server voice room on the site.
+   Keeps the existing graphite / champagne-gold brand palette. */
+
+@media (max-width: 900px) {
+  /* The room canvas uses Diamond Lounge graphite, never a forced pure-black fill. */
+  #createdServerMessages.is-voice-call-view,
+  #loungeVoiceCallView:not([hidden]),
+  .created-server-voice-call {
+    background: var(--panel, #17181c) !important;
+  }
+
+  #createdServerMessages.is-voice-call-view {
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .created-server-voice-call {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* One shared grid for VIP Lounge and every created server voice room. */
+  .created-server-voice-stage {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    align-content: start !important;
+    align-items: stretch !important;
+    justify-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 10px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background: transparent !important;
+  }
+
+  /* The shared YouTube/watch stream is always the full-width first tile. */
+  .created-server-voice-stage > .dl-watch-voice-tile {
+    grid-column: 1 / -1 !important;
+    order: -1 !important;
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: 2.06 / 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(199, 169, 107, .32) !important;
+    border-radius: 18px !important;
+    background: var(--panel-raised, #1d1e23) !important;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .16) !important;
+  }
+
+  .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-voice-title {
+    display: none !important;
+  }
+
+  .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player,
+  .created-server-voice-stage > .dl-watch-voice-tile #dlWatchPlayer {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    aspect-ratio: auto !important;
+    border: 0 !important;
+    border-radius: inherit !important;
+  }
+
+  .created-server-voice-stage > .dl-watch-voice-tile iframe,
+  .created-server-voice-stage > .dl-watch-voice-tile video {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-radius: inherit !important;
+    object-fit: cover !important;
+  }
+
+  /* Square, matching member cards with the user's selected profile-card colors. */
+  .created-server-voice-stage > .created-server-voice-tile {
+    position: relative !important;
+    display: grid !important;
+    place-items: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(255, 255, 255, .13) !important;
+    border-radius: 18px !important;
+    background: var(--voice-card-background, var(--panel-raised, #1d1e23)) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .13) !important;
+  }
+
+  .created-server-voice-stage > .created-server-voice-tile.is-self {
+    border: 2px solid #42c77a !important;
+    box-shadow: 0 0 0 1px rgba(66, 199, 122, .32), 0 4px 14px rgba(0, 0, 0, .13) !important;
+  }
+
+  .created-server-voice-stage .created-server-voice-avatar {
+    width: clamp(54px, 23vw, 88px) !important;
+    height: clamp(54px, 23vw, 88px) !important;
+    flex: 0 0 auto !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+
+  .created-server-voice-stage .created-server-voice-tile-footer {
+    position: absolute !important;
+    right: 8px !important;
+    bottom: 9px !important;
+    left: 8px !important;
+    display: flex !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .created-server-voice-stage .created-server-voice-identity {
+    display: flex !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-stage .created-server-voice-name-pill {
+    display: inline-block !important;
+    max-width: 100% !important;
+    padding: 5px 11px !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
+    background: rgba(20, 21, 24, .68) !important;
+    color: #fff !important;
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Keep the video/screen-share layer clipped to the same rounded geometry. */
+  .created-server-voice-remote-media {
+    border-radius: 18px !important;
+    overflow: hidden !important;
+  }
+
+  /* When screen sharing, retain the same full-width stream-first grid instead
+     of collapsing the member tiles into a narrow desktop-style side rail. */
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage {
+    position: relative !important;
+    inset: auto !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    align-content: start !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 10px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-tile {
+    display: grid !important;
+    flex: initial !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* Narrow phones: preserve the two-column member layout without clipping. */
+@media (max-width: 380px) {
+  .created-server-voice-stage {
+    gap: 9px !important;
+    padding: 8px !important;
+  }
+
+  .created-server-voice-stage > .created-server-voice-tile {
+    border-radius: 15px !important;
+  }
+
+  .created-server-voice-stage .created-server-voice-name-pill {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+}
