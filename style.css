@@ -4793,3 +4793,143 @@ button {
   }
 }
 
+/* MOBILE VOICE ROOM — match the supplied reference: shared media first,
+   then compact two-column member tiles. Scoped to voice views only. */
+@media (max-width: 600px) {
+  .created-server-voice-call:not(.is-screen-sharing) .created-server-voice-stage,
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage,
+  #loungeVoiceStage.created-server-voice-stage {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: minmax(0, auto) !important;
+    align-content: start !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    min-width: 0 !important;
+  }
+
+  .created-server-voice-stage-mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+
+  .created-server-voice-stage-mobile .created-server-voice-tile,
+  .created-server-voice-stage .created-server-voice-tile {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+    max-height: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .created-server-voice-stage .created-server-voice-avatar {
+    width: clamp(44px, 14vw, 76px) !important;
+    height: clamp(44px, 14vw, 76px) !important;
+    flex: 0 0 auto !important;
+  }
+
+  .created-server-voice-stage .created-server-voice-name-pill {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* During screen share, move the media canvas into the first grid row.
+     The participant cards occupy the rows below it instead of overlaying it. */
+  .created-server-voice-call.is-screen-sharing {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    align-content: start !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    z-index: 12 !important;
+    overflow: hidden !important;
+    pointer-events: auto !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media #screenShareStage {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media #remoteScreenContainer {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    z-index: 20 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    pointer-events: auto !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage .created-server-voice-tile {
+    position: relative !important;
+    min-height: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Shared Watch/stream activity cards span the full mobile width. */
+  .created-server-voice-stage > .dl-watch-voice-tile {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+  }
+
+  /* Private one-to-one call tiles fit side-by-side on phones. */
+  .dm-call-main-stage {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 8px auto !important;
+  }
+  .dm-call-main-stage video {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+  }
+}
+
