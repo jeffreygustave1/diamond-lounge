@@ -4933,3 +4933,37 @@ button {
   }
 }
 
+/* VOICE VIEW FIX: the mobile chat sizing rule above sets .messages to
+   display:block!important, which overrides the browser's [hidden] behavior.
+   When VIP Lounge is in a voice call, remove chat history from the layout and
+   let the voice-room canvas take the space directly below its header. */
+@media (max-width: 900px) {
+  #loungeView.is-voice-call > #messages[hidden],
+  #loungeView.is-voice-call > #messageForm[hidden],
+  #loungeView.is-voice-call > #uploadStatus[hidden] {
+    display: none !important;
+  }
+
+  #loungeView.is-voice-call > #loungeVoiceCallView:not([hidden]) {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #loungeView.is-voice-call > #loungeVoiceCallView > .created-server-voice-call {
+    display: grid !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+}
+
