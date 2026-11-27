@@ -52,3 +52,218 @@
 #dmCallVoiceControls,#dmCallVoiceControls *{pointer-events:auto!important}
 #dmCallVoiceControls button{position:relative!important;z-index:12002!important;cursor:pointer!important;touch-action:manipulation}
 #dmCallVideos{position:relative;z-index:1}
+
+/* MOBILE VOICE ROOM LAYOUT — match the reference proportions:
+   shared screen first (wide 16:9), then square member cards in two columns.
+   Applies to VIP Lounge and every member-created server voice room. */
+@media (max-width: 600px) {
+  .created-server-voice-call {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: #000 !important;
+  }
+
+  .created-server-voice-call .created-server-voice-remote-media {
+    display: none !important;
+    position: relative !important;
+    inset: auto !important;
+    order: 0 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media {
+    display: block !important;
+    aspect-ratio: 16 / 9 !important;
+    max-height: 42dvh !important;
+    z-index: 2 !important;
+    background: #050506 !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media #screenShareStage {
+    display: flex !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: 42dvh !important;
+    aspect-ratio: 16 / 9 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #050506 !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media #remoteScreenContainer {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media .remote-video-screen {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #050506 !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-remote-media .remote-video-screen video {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    background: #050506 !important;
+  }
+
+  .created-server-voice-call .created-server-voice-stage,
+  .created-server-voice-call .created-server-voice-stage-mobile {
+    position: relative !important;
+    inset: auto !important;
+    order: 1 !important;
+    z-index: 3 !important;
+    display: grid !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    align-content: start !important;
+    justify-items: stretch !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background: #000 !important;
+    pointer-events: auto !important;
+  }
+
+  .created-server-voice-call .created-server-voice-tile,
+  .created-server-voice-call .created-server-voice-stage-mobile .created-server-voice-tile {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
+    box-sizing: border-box !important;
+    padding: 8px 5px !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+    background: var(--voice-card-background, #24262b) !important;
+    pointer-events: auto !important;
+  }
+
+  .created-server-voice-call .created-server-voice-avatar {
+    width: clamp(44px, 15vw, 76px) !important;
+    height: clamp(44px, 15vw, 76px) !important;
+    flex: 0 0 auto !important;
+    font-size: clamp(18px, 5vw, 28px) !important;
+  }
+
+  .created-server-voice-call .created-server-voice-tile-footer,
+  .created-server-voice-call .created-server-voice-identity {
+    right: 5px !important;
+    bottom: 5px !important;
+    left: 5px !important;
+    width: calc(100% - 10px) !important;
+    min-width: 0 !important;
+    justify-content: center !important;
+    text-align: center !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-call .created-server-voice-name-pill {
+    max-width: 100% !important;
+    padding: 4px 7px !important;
+    overflow: hidden !important;
+    font-size: 11px !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .created-server-voice-call .created-server-voice-indicators {
+    justify-content: center !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage,
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage-mobile {
+    position: relative !important;
+    inset: auto !important;
+    order: 1 !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    overflow-y: auto !important;
+  }
+
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage .created-server-voice-tile,
+  .created-server-voice-call.is-screen-sharing .created-server-voice-stage-mobile .created-server-voice-tile {
+    flex: initial !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  /* Private one-to-one calls keep both video feeds visible side by side. */
+  #dmCallVideos.dm-call-main-stage {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: center !important;
+    justify-content: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 8px auto !important;
+  }
+
+  #dmCallVideos.dm-call-main-stage video {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 30dvh !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+  }
+}
+
