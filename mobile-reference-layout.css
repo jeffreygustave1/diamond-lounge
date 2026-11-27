@@ -219,3 +219,26 @@
     font-size: 11px !important;
   }
 }
+
+
+/* MOBILE CREATED-SERVER HEADER PLACEMENT
+   The server identity belongs in the second-column server menu, not above
+   the third-column channel conversation. The menu name is already populated
+   from the active server by script.js. */
+@media (max-width: 900px) {
+  #serverView > .chat-header {
+    display: none !important;
+  }
+
+  #channelsSidebar > .created-server-channel-panel > .created-server-dropdown {
+    display: block !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+  }
+
+  #channelsSidebar > .created-server-channel-panel > .created-server-dropdown > summary {
+    min-height: 62px !important;
+    padding: 16px 14px !important;
+    box-sizing: border-box !important;
+  }
+}
