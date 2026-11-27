@@ -4198,16 +4198,23 @@ button {
 }
 
 
-/* GLOBAL iPhone top inset: keep channel/member/support headers below Safari's status-bar area on mobile. */
+/* iPhone viewport alignment: use only the real safe-area inset.
+   Do not reserve an artificial 44px top gap; extend through the bottom
+   safe area so the chat and composer reach the visible screen edge. */
 @media (max-width: 900px) {
+  html,
+  body {
+    overflow: hidden !important;
+  }
   .dashboard {
-    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
-    height: 100dvh !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    height: calc(100dvh + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 0 !important;
     box-sizing: border-box !important;
   }
   .mobile-sidebar {
     top: env(safe-area-inset-top, 0px) !important;
-    height: calc(100dvh - env(safe-area-inset-top, 0px)) !important;
+    height: calc(100dvh - env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px)) !important;
     bottom: 0 !important;
   }
 }
