@@ -572,10 +572,27 @@ function syncCreatedServerPanelLayout() {
 }
 window.addEventListener("resize", syncCreatedServerPanelLayout);
 
+const mobileNavDismissEdge = document.createElement("button");
+mobileNavDismissEdge.type = "button";
+mobileNavDismissEdge.id = "mobileNavDismissEdge";
+mobileNavDismissEdge.className = "mobile-nav-dismiss-edge";
+mobileNavDismissEdge.setAttribute("aria-label", "Close navigation and return to the active voice room");
+mobileNavDismissEdge.title = "Tap to return to voice";
+mobileNavDismissEdge.textContent = "‹";
+mobileNavDismissEdge.hidden = true;
+dashboard?.appendChild(mobileNavDismissEdge);
+mobileNavDismissEdge.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMobileSidebar(false);
+});
+
 function setMobileSidebar(open) {
     if (!dashboard) return;
     const isMobile = window.matchMedia("(max-width: 900px)").matches;
-    dashboard.classList.toggle("mobile-nav-open", Boolean(open && isMobile));
+    const shouldOpen = Boolean(open && isMobile);
+    dashboard.classList.toggle("mobile-nav-open", shouldOpen);
+    if (mobileNavDismissEdge) mobileNavDismissEdge.hidden = !shouldOpen;
     if (open) syncCreatedServerPanelLayout();
 }
 
