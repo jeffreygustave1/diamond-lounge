@@ -4633,3 +4633,45 @@ button {
   margin-top: auto !important;
 }
 
+/* Global sidebar bottom alignment: make every second-column shell fill its
+   available height so the docked profile card reaches the true bottom edge. */
+.channels,
+#channelsSidebar {
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+.created-server-workspace {
+  min-height: 0 !important;
+  height: 100% !important;
+  align-items: stretch !important;
+}
+.created-server-channel-panel {
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+  align-self: stretch !important;
+}
+.created-server-channel-panel > .profile-card {
+  margin-bottom: 8px !important;
+}
+
+/* The mobile drawer and its second column must inherit the full drawer height. */
+@media (max-width: 900px) {
+  .mobile-sidebar,
+  .dashboard.mobile-nav-open #channelsSidebar {
+    height: 100% !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .dashboard.mobile-nav-open #channelsSidebar {
+    align-self: stretch !important;
+  }
+  .dashboard.mobile-nav-open #channelsSidebar > .created-server-channel-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
