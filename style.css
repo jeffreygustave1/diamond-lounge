@@ -5051,3 +5051,51 @@ button {
   }
 }
 
+/* MOBILE VOICE NAV RETURN — keep active voice media mounted behind the drawer.
+   The exposed right edge is a dedicated tap target; closing the drawer only
+   changes navigation visibility and never reopens/rejoins the selected room. */
+@media (max-width: 900px) {
+  .dashboard.mobile-nav-open .chat-area:has(#loungeView.is-voice-call) {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  .dashboard.mobile-nav-open .created-server-chat:has(#createdServerMessages.is-voice-call-view) {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  .mobile-nav-dismiss-edge {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: min(88vw, 520px) !important;
+    z-index: 1005 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-left: 1px solid rgba(255,255,255,.14) !important;
+    border-radius: 0 !important;
+    background: linear-gradient(90deg, rgba(12,13,17,.72), rgba(12,13,17,.94)) !important;
+    color: #f0e6cf !important;
+    font-size: 34px !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    box-shadow: -8px 0 24px rgba(0,0,0,.18) !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .mobile-nav-dismiss-edge[hidden] {
+    display: none !important;
+  }
+}
+
