@@ -4592,3 +4592,44 @@ button {
     overflow-x: hidden !important;
   }
 }
+
+/* Second-column scrolling: keep the account card docked while the active
+   channel/member list scrolls independently above it. */
+.channels {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+.channels > #loungeSidebar,
+.channels > #dmSidebar {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+.channels > .profile-card {
+  position: relative !important;
+  z-index: 12 !important;
+  flex: 0 0 auto !important;
+  margin-top: 8px;
+}
+
+/* Created-server channel panel has its own scroll area; its profile dock
+   sticks to the bottom edge instead of travelling with the channel list. */
+.created-server-channel-panel {
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+}
+.created-server-channel-panel > .profile-card {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 20 !important;
+  flex: 0 0 auto !important;
+  margin-top: auto !important;
+}
+
