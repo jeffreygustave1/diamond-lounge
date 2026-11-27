@@ -5001,3 +5001,53 @@ button {
   }
 }
 
+/* MOBILE WATCH ACTIVITY — size the actual YouTube Watch card in the voice
+   participant stage (not the separate remote screen-share canvas). */
+@media (max-width: 600px) {
+  .created-server-voice-stage > .dl-watch-voice-tile {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+    justify-self: stretch !important;
+    align-self: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: clamp(500px, 64vh, 600px) !important;
+    min-height: 500px !important;
+    max-height: 600px !important;
+    aspect-ratio: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    padding: 12px !important;
+  }
+
+  .created-server-voice-stage > .dl-watch-voice-tile > .dl-watch-voice-title {
+    flex: 0 0 auto !important;
+  }
+
+  .created-server-voice-stage > .dl-watch-voice-tile > .dl-watch-player {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    margin-top: 12px !important;
+    overflow: hidden !important;
+  }
+
+  .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player iframe,
+  .created-server-voice-stage > .dl-watch-voice-tile .dl-watch-player #dlWatchYT {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    border: 0 !important;
+  }
+}
+
