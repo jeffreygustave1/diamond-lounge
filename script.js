@@ -572,29 +572,27 @@ function syncCreatedServerPanelLayout() {
 }
 window.addEventListener("resize", syncCreatedServerPanelLayout);
 
-const mobileNavDismissEdge = document.createElement("button");
-mobileNavDismissEdge.type = "button";
-mobileNavDismissEdge.id = "mobileNavDismissEdge";
-mobileNavDismissEdge.className = "mobile-nav-dismiss-edge";
-mobileNavDismissEdge.setAttribute("aria-label", "Close navigation and return to the active voice room");
-mobileNavDismissEdge.title = "Tap to return to voice";
-mobileNavDismissEdge.textContent = "‹";
-mobileNavDismissEdge.hidden = true;
-dashboard?.appendChild(mobileNavDismissEdge);
-mobileNavDismissEdge.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setMobileSidebar(false);
-});
-
 function setMobileSidebar(open) {
     if (!dashboard) return;
     const isMobile = window.matchMedia("(max-width: 900px)").matches;
     const shouldOpen = Boolean(open && isMobile);
     dashboard.classList.toggle("mobile-nav-open", shouldOpen);
-    if (mobileNavDismissEdge) mobileNavDismissEdge.hidden = !shouldOpen;
     if (open) syncCreatedServerPanelLayout();
 }
+
+// When the mobile drawer is open, tapping anywhere outside the two-column
+// sidebar closes it. The tap is consumed so it cannot activate controls behind
+// the drawer; the current voice view/player remains mounted and uninterrupted.
+document.addEventListener("click", (event) => {
+    if (!window.matchMedia("(max-width: 900px)").matches ||
+        !dashboard?.classList.contains("mobile-nav-open")) return;
+    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+    if (target?.closest("#mobileSidebar")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    setMobileSidebar(false);
+}, true);
 
 // MOBILE ONLY: navigation is gesture-only. A right swipe from chat reveals the
 // two-column channel drawer; selecting a channel closes it. Left swipes do nothing.
