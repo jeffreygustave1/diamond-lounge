@@ -4643,7 +4643,7 @@ button {
 }
 .created-server-workspace {
   min-height: 0 !important;
-  height: 100% !important;
+  flex: 1 1 0 !important;
   align-items: stretch !important;
 }
 .created-server-channel-panel {
