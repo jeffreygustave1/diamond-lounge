@@ -615,6 +615,7 @@ function closePeer(uid) {
     if (!peer) return;
 
     peers.delete(uid);
+    stopVoiceActivityMeter(uid);
 
     peer.unsubCall?.();
     peer.unsubCandidates?.();
@@ -807,6 +808,7 @@ function makePeer(person, callRef) {
             new MediaStream([event.track]);
 
         peer.audio.srcObject = audioStream;
+        startVoiceActivityMeter(person.uid, audioStream);
 
         peer.audio.play().catch(() => {
             setStatus(
@@ -1516,6 +1518,7 @@ async function joinVoice() {
         localStream = await navigator.mediaDevices.getUserMedia({
             audio: true
         });
+        startVoiceActivityMeter(user.uid, localStream);
 
         if (!localStream.getAudioTracks().length) {
             const micError = new Error("No microphone audio track was returned.");
@@ -1692,6 +1695,7 @@ async function leaveVoice(knownUid = user?.uid) {
         track.stop();
     });
 
+    stopAllVoiceActivityMeters();
     localStream = null;
     cameraStream = null;
     screenStream = null;
