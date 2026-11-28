@@ -486,3 +486,35 @@
     font-size: 12px !important;
   }
 }
+
+
+/* SPEAKER RING — never highlight a tile merely because it is the local user.
+   The JS audio analyser toggles .is-speaking only while microphone energy
+   is detected, for both local and remote participants. */
+.created-server-voice-tile.is-self {
+  border: 1px solid rgba(255, 255, 255, .13) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .13) !important;
+}
+.created-server-voice-tile.is-speaking {
+  border: 3px solid #42c77a !important;
+  box-shadow:
+    0 0 0 1px rgba(66, 199, 122, .38),
+    0 0 14px rgba(66, 199, 122, .34),
+    0 4px 14px rgba(0, 0, 0, .13) !important;
+}
+@media (max-width: 900px) {
+  #loungeVoiceCallView #loungeVoiceStage > .created-server-voice-tile.is-self,
+  #createdServerMessages.is-voice-call-view #createdServerVoiceStage > .created-server-voice-tile.is-self {
+    border: 1px solid rgba(255, 255, 255, .13) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .13) !important;
+  }
+
+  #loungeVoiceCallView #loungeVoiceStage > .created-server-voice-tile.is-speaking,
+  #createdServerMessages.is-voice-call-view #createdServerVoiceStage > .created-server-voice-tile.is-speaking {
+    border: 3px solid #42c77a !important;
+    box-shadow:
+      0 0 0 1px rgba(66, 199, 122, .38),
+      0 0 14px rgba(66, 199, 122, .34),
+      0 4px 14px rgba(0, 0, 0, .13) !important;
+  }
+}
