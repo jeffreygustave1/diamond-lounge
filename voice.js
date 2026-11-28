@@ -126,6 +126,100 @@ const stopCounts = new Map();
 const voiceSidebarProfileCache = new Map();
 
 /* ==========================================
+   LIVE SPEAKER ACTIVITY METERS
+   Uses actual microphone/remote WebRTC audio energy.
+   The green tile ring is active only while speech is detected.
+========================================== */
+
+const voiceActivityMeters = new Map();
+let voiceActivityContext = null;
+let voiceActivityFrame = 0;
+
+function getVoiceActivityContext() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!voiceActivityContext || voiceActivityContext.state === "closed") {
+        voiceActivityContext = new AudioContextClass();
+    }
+    if (voiceActivityContext.state === "suspended") {
+        void voiceActivityContext.resume().catch(() => {});
+    }
+    return voiceActivityContext;
+}
+
+function stopVoiceActivityMeter(uid) {
+    const meter = voiceActivityMeters.get(uid);
+    if (!meter) return;
+    meter.source?.disconnect();
+    meter.analyser?.disconnect();
+    voiceActivityMeters.delete(uid);
+    window.diamondVoiceTileRoots?.get(uid)?.classList.remove("is-speaking");
+}
+
+function startVoiceActivityMeter(uid, stream) {
+    if (!uid || !stream?.getAudioTracks?.().some(track => track.readyState === "live")) return;
+    stopVoiceActivityMeter(uid);
+
+    const context = getVoiceActivityContext();
+    if (!context) return;
+
+    try {
+        const analyser = context.createAnalyser();
+        analyser.fftSize = 512;
+        analyser.smoothingTimeConstant = 0.35;
+        const source = context.createMediaStreamSource(stream);
+        source.connect(analyser);
+        voiceActivityMeters.set(uid, {
+            source,
+            analyser,
+            samples: new Uint8Array(analyser.fftSize),
+            active: false,
+            lastSignalAt: 0
+        });
+        if (!voiceActivityFrame) voiceActivityFrame = requestAnimationFrame(updateVoiceActivityMeters);
+    } catch (error) {
+        console.warn("Voice activity meter could not start:", uid, error);
+    }
+}
+
+function updateVoiceActivityMeters() {
+    voiceActivityFrame = 0;
+    const now = performance.now();
+
+    voiceActivityMeters.forEach((meter, uid) => {
+        meter.analyser.getByteTimeDomainData(meter.samples);
+        let sum = 0;
+        for (let i = 0; i < meter.samples.length; i++) {
+            const sample = (meter.samples[i] - 128) / 128;
+            sum += sample * sample;
+        }
+        const rms = Math.sqrt(sum / meter.samples.length);
+        const track = [...(uid === user?.uid ? localStream : peers.get(uid)?.audio?.srcObject)?.getAudioTracks?.() || []]
+            .find(item => item.readyState === "live");
+        const permitted = uid !== user?.uid || (!muted && !deafened);
+        const speakingNow = Boolean(track && !track.muted && track.enabled && permitted && rms > 0.035);
+
+        if (speakingNow) meter.lastSignalAt = now;
+        const active = speakingNow || (meter.active && now - meter.lastSignalAt < 180);
+        if (active !== meter.active) {
+            meter.active = active;
+            window.diamondVoiceTileRoots?.get(uid)?.classList.toggle("is-speaking", active);
+        }
+    });
+
+    if (voiceActivityMeters.size) {
+        voiceActivityFrame = requestAnimationFrame(updateVoiceActivityMeters);
+    }
+}
+
+function stopAllVoiceActivityMeters() {
+    if (voiceActivityFrame) cancelAnimationFrame(voiceActivityFrame);
+    voiceActivityFrame = 0;
+    [...voiceActivityMeters.keys()].forEach(stopVoiceActivityMeter);
+}
+
+
+/* ==========================================
    JOIN / LEAVE SOUND TRACKING
 ========================================== */
 
