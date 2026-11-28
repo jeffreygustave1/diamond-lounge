@@ -196,14 +196,15 @@ function updateVoiceActivityMeters() {
         const rms = Math.sqrt(sum / meter.samples.length);
         const track = [...(uid === user?.uid ? localStream : peers.get(uid)?.audio?.srcObject)?.getAudioTracks?.() || []]
             .find(item => item.readyState === "live");
-        const permitted = uid !== user?.uid || (!muted && !deafened);
+        const permitted = uid !== user?.uid || !muted;
         const speakingNow = Boolean(track && !track.muted && track.enabled && permitted && rms > 0.035);
 
         if (speakingNow) meter.lastSignalAt = now;
         const active = speakingNow || (meter.active && now - meter.lastSignalAt < 180);
-        if (active !== meter.active) {
-            meter.active = active;
-            window.diamondVoiceTileRoots?.get(uid)?.classList.toggle("is-speaking", active);
+        meter.active = active;
+        const tile = window.diamondVoiceTileRoots?.get(uid);
+        if (tile && tile.classList.contains("is-speaking") !== active) {
+            tile.classList.toggle("is-speaking", active);
         }
     });
 
